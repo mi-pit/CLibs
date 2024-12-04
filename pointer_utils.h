@@ -11,8 +11,8 @@ void free_all( int n, ... );
 void free_and_null( void ** );
 
 
-#define deref_as( type, var )                ( *( ( type * ) ( var ) ) )
-#define deref_as_offset( type, var, offset ) ( *( ( ( type * ) ( var ) ) + offset ) )
+#define deref_as( type, var )                ( *( type * ) ( var ) )
+#define deref_as_offset( type, var, offset ) ( *( ( type * ) ( var ) ) + offset )
 
 
 #endif //CLIBS_POINTER_UTILS_H

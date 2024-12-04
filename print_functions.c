@@ -46,7 +46,7 @@ void print_pointer( const void *data, size_t nbytes )
 {
     if ( nbytes != sizeof( void * ) )
     {
-        ffwarn( "%s", "invalid data size" );
+        fflwarn( "%s", "invalid data size" );
         return;
     }
 

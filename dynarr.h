@@ -6,7 +6,9 @@
 #include <stdint.h>
 
 
+/* Dynamic array */
 typedef struct dynamic_array *List;
+/* Immutable List */
 typedef const struct dynamic_array *ConstList;
 
 
@@ -53,12 +55,19 @@ List list_init_size_p( int el_size, int mode );
  */
 const void *list_get( ConstList ls, size_t idx );
 
+/**
+ *
+ * @return Returns the address of the last element
+ */
+const void *list_peek( ConstList ls );
+
 #define list_access( list, idx, type ) ( *( ( type * ) list_get( list, idx ) ) )
 
 /**
  * @return An address of ‹idx›'th element in the List
  */
-void *list_at( ConstList, size_t idx );
+void *list_at( List, size_t idx );
+void *list_at_last( List );
 
 /**
  * Changes element at ‹index› to ‹data›
@@ -100,7 +109,7 @@ int list_extend_list( List ls, ConstList app );
  * list_append( ls_inner, &ls_outer );
  * @endcode
  */
-int list_append( List, const void *data );
+int list_append( List, const void *datap );
 
 int list_insert( List, size_t index, const void *data );
 
@@ -128,15 +137,15 @@ int list_remove_fast( List, size_t index, void *container );
 int list_remove( List, size_t index, void *container );
 
 
-void *list_bsearch_p( ConstList,
-                      const void *needle,
-                      int ( *cmp )( const void *, const void * ) );
+const void *list_bsearch_p( ConstList,
+                            const void *needle,
+                            int ( *cmp )( const void *, const void * ) );
 
 int64_t list_bsearch_i( ConstList,
                         const void *needle,
                         int ( *cmp )( const void *, const void * ) );
 
-void *list_lsearch_p( ConstList, const void *needle );
+const void *list_lsearch_p( ConstList, const void *needle );
 
 int64_t list_lsearch_i( ConstList, const void *needle );
 

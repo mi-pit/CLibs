@@ -53,7 +53,7 @@ str_t string_stripped( string_t s )
     str_len   = end_idx - start_idx + 1;
     str_t new = malloc( str_len + 1 );
     if ( new == NULL )
-        return ffwarn_ret_p( "%s", "malloc" );
+        return fflwarn_ret_p( "%s", "malloc" );
 
     for ( size_t i = 0; i < str_len; ++i )
     {
@@ -113,14 +113,14 @@ str_t string_escaped( string_t s )
     if ( s == NULL )
     {
         errno = EINVAL;
-        return ffwarn_ret_p( "%s", "string must not be null" );
+        return fflwarn_ret_p( "%s", "string must not be null" );
     }
 
     size_t len = strlen( s );
 
     str_t new = calloc( len * 2 + 1, 1 );
     if ( new == NULL )
-        return ffwarn_ret_p( "%s", "calloc" );
+        return fflwarn_ret_p( "%s", "calloc" );
 
     size_t new_idx = 0;
     for ( size_t i = 0; i < len; ++i, ++new_idx )
@@ -185,7 +185,7 @@ ssize_t string_split( str_t **str_arr_cont,
     if ( split_tok == NULL || ( strcmp( split_tok, "" ) == 0 ) )
     {
         errno = EINVAL;
-        return ffwarnx_ret( RV_EXCEPTION, "%s", "invalid split token" );
+        return fflwarnx_ret( RV_EXCEPTION, "%s", "invalid split token" );
     }
 
     List ls = list_init_type( str_t );
@@ -213,7 +213,7 @@ ssize_t string_split( str_t **str_arr_cont,
             else
                 dup = strndup( curr + offset, next - curr - offset );
             if ( dup == NULL )
-                return ffwarn_ret( RV_ERROR, "%s", "strdup" );
+                return fflwarn_ret( RV_ERROR, "%s", "strdup" );
 
             list_append( ls, &dup );
             ++count;
@@ -237,8 +237,8 @@ string_t get_program_name( string_t const argv0 )
     const char *program_name = strrchr( argv0, '/' );
     if ( program_name == NULL )
     {
-        return ffwarnx_ret_p( "string must contain at least one '/' (\"%s\")",
-                              program_name );
+        return fflwarnx_ret_p( "string must contain at least one '/' (\"%s\")",
+                               program_name );
     }
     return program_name + 1;
 }

@@ -25,7 +25,7 @@ DynamicString string_init_cap( size_t capacity )
     DynamicString new = calloc( 1, sizeof( struct dynamic_string ) );
     if ( new == NULL )
     {
-        ffwarn( "%s", "calloc" );
+        fflwarn( "%s", "calloc" );
         return NULL;
     }
 
@@ -34,7 +34,7 @@ DynamicString string_init_cap( size_t capacity )
     new->data = calloc( new->cap, 1 );
     if ( new->data == NULL )
     {
-        ffwarn( "%s", "calloc" );
+        fflwarn( "%s", "calloc" );
         free( new );
         return NULL;
     }
@@ -47,7 +47,7 @@ DynamicString string_init( void )
     DynamicString new = calloc( 1, sizeof( struct dynamic_string ) );
     if ( new == NULL )
     {
-        ffwarn( "%s", "calloc" );
+        fflwarn( "%s", "calloc" );
         return NULL;
     }
 
@@ -56,7 +56,7 @@ DynamicString string_init( void )
     new->len  = 0;
     if ( new->data == NULL )
     {
-        ffwarn( "%s", "calloc" );
+        fflwarn( "%s", "calloc" );
         free( new );
         return NULL;
     }

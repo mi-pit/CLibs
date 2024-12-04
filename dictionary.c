@@ -100,9 +100,9 @@ int dict_insert_f( struct key_value_pair_set *dict,
         assert( item->val_size == 0 );
 
         if ( ( item->key = malloc( key_size ) ) == NULL )
-            return ffwarn_ret( RV_ERROR, "%s", "malloc" );
+            return fflwarn_ret( RV_ERROR, "%s", "malloc" );
         if ( ( item->val = malloc( val_size ) ) == NULL )
-            return ffwarn_ret( RV_ERROR, "%s", "malloc" );
+            return fflwarn_ret( RV_ERROR, "%s", "malloc" );
 
         memcpy( item->key, key, key_size );
         memcpy( item->val, val, val_size );
@@ -179,7 +179,7 @@ int dict_set_val( Dict dict,
     free( item->val );
     item->val = malloc( val_size );
     if ( item->val == NULL )
-        return ffwarn_ret( RV_ERROR, "%s", "malloc" );
+        return fflwarn_ret( RV_ERROR, "%s", "malloc" );
 
     item->val_size = val_size;
     memcpy( item->val, val, val_size );

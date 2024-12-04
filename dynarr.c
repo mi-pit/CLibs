@@ -36,10 +36,9 @@
  * List::size = 0\n
  * List::items = pointer to heap allocated memory of width ‹capacity›, hash_set to 0\n
  * List::el_size = width of a single element\n
-
 */
 struct dynamic_array {
-    size_t capacity; // amount of allocated memory for items
+    size_t capacity; // amount of allocated memory slots for items
     size_t size;     // number of items stored in List
     void *items;     // an array of any type
     int el_size;     // sizeof a single items
@@ -52,15 +51,15 @@ struct dynamic_array {
 
 List list_init_size( int el_size )
 {
-    List ls = calloc( 1, sizeof( struct dynamic_array ) );
+    struct dynamic_array *ls = calloc( 1, sizeof( struct dynamic_array ) );
     if ( ls == NULL )
-        return ffwarn_ret_p( "%s", "calloc" );
+        return fwarn_ret_p( "%s", "calloc" );
 
     ls->items = calloc( LIST_DEF_SIZE, el_size );
     if ( ls->items == NULL )
     {
         free( ls );
-        return ffwarn_ret_p( "%s", "calloc" );
+        return fwarn_ret_p( "%s", "calloc" );
     }
     ls->capacity = LIST_DEF_SIZE;
     ls->el_size  = el_size;
@@ -76,16 +75,30 @@ List list_init_size_p( int el_size, int mode )
 }
 
 
+/* Immutable */
 const void *list_get( ConstList ls, size_t idx )
 {
-    return ( ( byte * ) ls->items ) + idx * ls->el_size;
+    return ( const byte * ) ls->items + idx * ls->el_size;
 }
 
-void *list_at( ConstList ls, size_t idx )
+const void *list_peek( ConstList ls )
 {
-    byte *ptr     = ( byte     *) ls->items;
-    size_t offset = idx * ls->el_size;
-    return ptr + offset;
+    if ( ls->size == 0 )
+        return fwarnx_ret_p( "%s", "list contains no elements" );
+
+    return list_get( ls, list_size( ls ) - 1 );
+}
+
+
+/* Mutable */
+void *list_at( List ls, size_t idx )
+{
+    return ( byte * ) ls->items + idx * ls->el_size;
+}
+
+void *list_at_last( List ls )
+{
+    return list_at( ls, list_size( ls ) - 1 );
 }
 
 
@@ -109,10 +122,8 @@ static int list_upsize( List ls, size_t min_cap_add )
 
     void *tmp = realloc( ls->items, new_capacity * ls->el_size );
     if ( tmp == NULL )
-    {
-        warn( __func__ );
-        return RV_ERROR;
-    }
+        return fwarn_ret( RV_ERROR, "%s", "realloc" );
+
     ls->items    = tmp;
     ls->capacity = new_capacity;
     return RV_SUCCESS;
@@ -156,8 +167,13 @@ int list_set_at( List ls, size_t index, const void *data )
 int list_append( List ls, const void *data )
 {
     if ( ls->size + 1 > ls->capacity )
-        if ( list_upsize( ls, 1 ) )
+    {
+        if ( list_upsize( ls, 1 ) != RV_SUCCESS )
+        {
+            print_stack_trace();
             return RV_ERROR;
+        }
+    }
 
     list_set_at( ls, ls->size++, data );
 
@@ -167,8 +183,13 @@ int list_append( List ls, const void *data )
 int list_extend_array( List ls, const void *array, size_t len )
 {
     if ( ls->capacity < ls->size + len )
-        if ( list_upsize( ls, len ) )
+    {
+        if ( list_upsize( ls, len ) != RV_SUCCESS )
+        {
+            print_stack_trace();
             return RV_ERROR;
+        }
+    }
 
     memcpy( list_at( ls, ls->size ), array, len * ls->el_size );
 
@@ -180,8 +201,13 @@ int list_extend_array( List ls, const void *array, size_t len )
 int list_extend_list( List ls, ConstList app )
 {
     if ( ls->size + app->size >= ls->capacity )
+    {
         if ( list_upsize( ls, app->size ) != RV_SUCCESS )
+        {
+            print_stack_trace();
             return RV_ERROR;
+        }
+    }
 
     memcpy( list_at( ls, ls->size ), app->items, app->size * app->el_size );
 
@@ -193,8 +219,13 @@ int list_extend_list( List ls, ConstList app )
 int list_insert( List ls, size_t at, const void *data )
 {
     if ( ls->size + 1 >= ls->capacity )
+    {
         if ( list_upsize( ls, 1 ) )
+        {
+            print_stack_trace();
             return RV_ERROR;
+        }
+    }
 
     memmove( list_at( ls, at + 1 ), list_at( ls, at ), ( ls->size - at ) * ls->el_size );
 
@@ -209,14 +240,16 @@ int list_insert( List ls, size_t at, const void *data )
 int list_pop( List ls, void *container )
 {
     if ( ls->size <= 0 )
-    {
-        warnx( "list_pop: popping from an empty List" );
-        return RV_EXCEPTION;
-    }
+        return fwarnx_ret( RV_EXCEPTION, "%s", "popping from an empty List" );
 
     if ( ls->capacity / LIST_CAP_SIZE_RATIO > ls->size )
+    {
         if ( list_downsize( ls ) )
+        {
+            print_stack_trace();
             return RV_ERROR;
+        }
+    }
 
     if ( container != NULL )
         memcpy( container, list_at( ls, ls->size - 1 ), ls->el_size );
@@ -274,9 +307,9 @@ int list_remove_fast( List ls, size_t index, void *container )
 }
 
 
-void *list_bsearch_p( ConstList ls,
-                      const void *needle,
-                      int ( *cmp )( const void *, const void * ) )
+const void *list_bsearch_p( ConstList ls,
+                            const void *needle,
+                            int ( *cmp )( const void *, const void * ) )
 {
     return bsearch( needle, ls->items, ls->size, ls->el_size, cmp );
 }
@@ -285,27 +318,27 @@ int64_t list_bsearch_i( ConstList ls,
                         const void *needle,
                         int ( *cmp )( const void *, const void * ) )
 {
-    char *res = list_bsearch_p( ls, needle, cmp );
+    const char *res = list_bsearch_p( ls, needle, cmp );
     if ( res == NULL )
         return -1;
     return res - ( char * ) ls->items;
 }
 
-void *list_lsearch_p( ConstList ls, const void *needle )
+const void *list_lsearch_p( ConstList ls, const void *needle )
 {
     for ( size_t i = 0; i < ls->size; ++i )
-        if ( memcmp( list_at( ls, i ), needle, ls->el_size ) == 0 )
-            return list_at( ls, i );
+        if ( memcmp( list_get( ls, i ), needle, ls->el_size ) == 0 )
+            return list_get( ls, i );
 
     return NULL;
 }
 
 int64_t list_lsearch_i( ConstList ls, const void *needle )
 {
-    char *res = list_lsearch_p( ls, needle );
+    const byte *res = list_lsearch_p( ls, needle );
     if ( res == NULL )
         return -1;
-    return res - ( char * ) ls->items;
+    return res - ( byte * ) ls->items;
 }
 
 inline void list_sort( List ls, int ( *cmp )( const void *, const void * ) )
@@ -318,10 +351,7 @@ int list_reverse( List ls )
 {
     byte *buffer = malloc( ls->el_size );
     if ( buffer == NULL )
-    {
-        warn( __func__ );
-        return RV_ERROR;
-    }
+        return fwarn_ret( RV_ERROR, "%s", "buffer allocation" );
 
     void *l = ls->items;
     void *r = list_at( ls, ls->size - 1 );
@@ -337,8 +367,8 @@ int list_reverse( List ls )
         // [ l ], [ r, ..., m, ..., r ] –> [ l ], [ r, ..., m, ..., l ]
         memcpy( r, buffer, ls->el_size );
 
-        l = ( char * ) l + ls->el_size;
-        r = ( char * ) r - ls->el_size;
+        l = ( byte * ) l + ls->el_size;
+        r = ( byte * ) r - ls->el_size;
     }
 
     free( buffer );
@@ -494,6 +524,9 @@ void list_print( ConstList ls )
 
 /* ––––– GETTERS/SETTERS ––––– */
 
+/**
+ * @return Number of elements in the list
+ */
 size_t list_size( ConstList ls )
 {
     return ls->size;
@@ -513,7 +546,7 @@ void *list_items_copy( ConstList ls )
 {
     void *copy = calloc( ls->size, ls->el_size );
     if ( copy == NULL )
-        return ffwarn_ret_p( "%s", "calloc" );
+        return fflwarn_ret_p( "%s", "calloc" );
 
     memcpy( copy, ls->items, ls->size * ls->el_size );
     return copy;

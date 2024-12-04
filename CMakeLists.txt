@@ -27,4 +27,13 @@ add_executable(CLibs
         sets.h
         string_utils.c
         string_utils.h
-        swexpr.h swexpr.c)
+        swexpr.h swexpr.c
+        )
+
+add_executable(TestSwex
+        dynarr.c
+        errors.c
+        main.c
+        pointer_utils.c
+        swexpr.c
+        )
