@@ -4,12 +4,12 @@
 
 #include "swexpr.h"
 
-#include "errors.h" /* RV */
+#include "errors.h" /* RV, print_stack_trace() */
 
-List Of( data * ) switch_expr_values_stack      = NULL; // def = NULL
-List Of( var addr ) switch_expr_variables_stack = NULL; // def = NULL
-List Of( size_t ) switch_expr_sizes_stack       = NULL; // def = 0
-List Of( bool ) switch_expr_assigned_stack      = NULL; // def = false
+List switch_expr_values_stack    = NULL;
+List switch_expr_variables_stack = NULL;
+List switch_expr_sizes_stack     = NULL;
+List switch_expr_assigned_stack  = NULL;
 
 
 static const bool TRUE  = true;

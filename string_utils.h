@@ -5,26 +5,25 @@
 #ifndef CLIBS_STRING_UTILS_H
 #define CLIBS_STRING_UTILS_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <sys/types.h>
+#include <stdbool.h>   /* bool */
+#include <sys/types.h> /* ssize_t */
 
 
 typedef const char *string_t;
 typedef char *str_t;
 
 
+#ifndef ESCAPED_CHARS
 #define ESCAPED_CHARS "\n\t\r\f\v\0"
-
+#endif //ESCAPED_CHARS
 
 str_t string_stripped( string_t );
-void string_strip( char *s );
+void string_strip( str_t s );
 
 str_t string_escaped( string_t );
-void string_escape( char **strp, size_t *capp );
 
 str_t string_reversed( string_t );
-void string_reverse( char *s );
+void string_reverse( str_t s );
 
 /**
  * Result may contain empty strings

@@ -145,13 +145,6 @@ str_t string_escaped( string_t s )
     return new;
 }
 
-void string_escape( str_t *strp, size_t *capp )
-{
-    // TODO
-    UNUSED( strp && ( *capp = *capp ) );
-    err( ENOSYS, "%s not implemented", __func__ );
-}
-
 
 str_t string_reversed( string_t s )
 {

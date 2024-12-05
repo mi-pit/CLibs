@@ -4,25 +4,23 @@
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
 
-#include "dynarr.h"
-#include "pointer_utils.h"
+#include "dynarr.h"        /* List (stack) */
+#include "pointer_utils.h" /* deref_as(), free_n() */
 
-#include <err.h>
-#include <errno.h>
-#include <stdbool.h>
-#include <string.h>
+#include <err.h>     /* err() */
+#include <errno.h>   /* ENOMEM */
+#include <stdbool.h> /* bool */
+#include <string.h>  /* memcpy() */
 
 
 /* TODO
  *  check swex functions return values
  */
 
-#define Of( TYPEARG )
-
-extern List Of( data * ) switch_expr_values_stack;      // def = NULL
-extern List Of( var addr ) switch_expr_variables_stack; // def = NULL
-extern List Of( size_t ) switch_expr_sizes_stack;       // def = 0
-extern List Of( bool ) switch_expr_assigned_stack;      // def = false
+extern List switch_expr_values_stack;
+extern List switch_expr_variables_stack;
+extern List switch_expr_sizes_stack;
+extern List switch_expr_assigned_stack;
 
 static void *swex_aux_variable_ = NULL; // for case matching
 
