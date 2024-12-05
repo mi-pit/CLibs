@@ -546,7 +546,7 @@ void *list_items_copy( ConstList ls )
 {
     void *copy = calloc( ls->size, ls->el_size );
     if ( copy == NULL )
-        return fflwarn_ret_p( "%s", "calloc" );
+        return fwarn_ret_p( "%s", "calloc" );
 
     memcpy( copy, ls->items, ls->size * ls->el_size );
     return copy;

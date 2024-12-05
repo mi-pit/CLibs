@@ -5,6 +5,7 @@
 #ifndef CLIBS_STRING_UTILS_H
 #define CLIBS_STRING_UTILS_H
 
+#include <regex.h>
 #include <stdbool.h>   /* bool */
 #include <sys/types.h> /* ssize_t */
 
@@ -38,7 +39,11 @@ void string_reverse( str_t s );
 ssize_t string_split( str_t **str_arr_cont,
                       string_t str,
                       string_t split_tok,
-                      bool excl_empty );
+                      bool excl_empty ) __result_use_check;
+ssize_t string_split_regex( str_t **str_arr_cont,
+                            string_t string,
+                            regex_t *restrict regexp,
+                            bool excl_empty ) __result_use_check;
 
 
 string_t get_program_name( string_t argv0 );

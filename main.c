@@ -2,10 +2,13 @@
 // Created by MacBook on 04.12.2024.
 //
 
+#include "errors.h"
+#include "string_utils.h"
 #include "swexpr.h"
 
-#include <printf.h>
+#include <regex.h>
 #include <stdlib.h>
+
 
 int global = 0;
 
@@ -54,7 +57,32 @@ int main( void )
 {
     TYPE r = test_swex();
     printf( "ret: %lli\n", ( signed long long int ) r );
-    printf( "global: %i\n", global );
+    printf( "global: %i\n\n", global );
+
+    string_t s = "Karel\nKokot_\nHopspop_\n_Pips-pop\nKunkr lagr\n";
+
+    regex_t regex;
+    int rec_rv = regcomp( &regex, "[ _]", REG_EXTENDED | REG_NEWLINE );
+    if ( rec_rv != 0 )
+    {
+        char buffer[ 100 ] = { 0 };
+        regerror( rec_rv, &regex, buffer, 100 );
+        return fwarnx_ret( EXIT_FAILURE, "%s", buffer );
+    }
+
+    str_t *spl;
+    ssize_t count = string_split_regex( &spl, s, &regex, false );
+    if ( count == -1 )
+    {
+        print_stack_trace();
+        return 2;
+    }
+    for ( ssize_t i = 0; i < count; ++i )
+    {
+        printf( "\"%s\"\n", string_escaped( spl[ i ] ) );
+    }
+
+    regfree( &regex );
 
     return 0;
 }

@@ -10,10 +10,10 @@
 
 #include <ctype.h>
 #include <err.h>
+#include <regex.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define UNUSED( EXPR ) ( ( void ) ( EXPR ) )
 
 // string_stripped( string_t ) is implemented separately for memory efficiency
 str_t string_stripped( string_t s )
@@ -224,14 +224,68 @@ ssize_t string_split( str_t **str_arr_cont,
     return ( ssize_t ) count;
 }
 
+ssize_t string_split_regex( str_t **str_arr_cont,
+                            string_t restrict string,
+                            regex_t *restrict regexp,
+                            bool excl_empty )
+{
+    List ls = list_init_type( str_t );
+    if ( ls == NULL )
+    {
+        print_stack_trace();
+        return RV_ERROR;
+    }
+
+    const char *p = string;
+
+    regmatch_t regmatch[ 1 ] = { 0 };
+
+    int ree_rv;
+    do
+    {
+        ree_rv = regexec( regexp, p, 1, regmatch, 0 );
+        if ( ree_rv == REG_NOMATCH )
+        {
+            if ( excl_empty && *p == '\0' )
+                break;
+            str_t dup = strdup( p );
+            list_append( ls, &dup );
+            break;
+        }
+        if ( ree_rv != 0 )
+        {
+            char buffer[ 64 ] = { 0 };
+            regerror( ree_rv, regexp, buffer, 64 );
+            fprintf( stderr, "%s\n", buffer );
+            return RV_ERROR;
+        }
+
+        if ( !excl_empty || regmatch->rm_eo != 1 )
+        {
+            str_t dup = strndup( p, regmatch->rm_so );
+            list_append( ls, &dup );
+        }
+
+        p = p + regmatch->rm_eo;
+    }
+    while ( regmatch->rm_eo != -1 && regmatch->rm_so != -1 );
+
+    ( *str_arr_cont ) = list_items_copy( ls );
+    size_t count      = list_size( ls );
+
+    list_destroy( ls );
+
+    return ( ssize_t ) count;
+}
+
 
 string_t get_program_name( string_t const argv0 )
 {
     const char *program_name = strrchr( argv0, '/' );
     if ( program_name == NULL )
     {
-        return fflwarnx_ret_p( "string must contain at least one '/' (\"%s\")",
-                               program_name );
+        return fwarnx_ret_p( "string must contain at least one '/' (\"%s\")",
+                             program_name );
     }
     return program_name + 1;
 }
