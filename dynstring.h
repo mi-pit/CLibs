@@ -14,17 +14,16 @@ typedef const struct dynamic_string *ConstDynamicString;
 #define DEFAULT_DYNSTRING_CAP 256
 
 
-DynamicString string_init( void );
-DynamicString string_init_cap( size_t capacity );
-DynamicString string_init_as( const char *s );
-void string_destroy( DynamicString );
-void string_destroy_n( DynamicString *dstr_cont );
+DynamicString dynstr_init( void );
+DynamicString dynstr_init_cap( size_t cap );
+DynamicString dynstr_init_as( const char * );
+void dynstr_destroy( DynamicString );
 
-int string_append( DynamicString, char );
-int string_extend( DynamicString, const char * );
+int dynstr_append( DynamicString, char );
+int dynstr_extend( DynamicString, const char * );
 
 char *dynstr_to_str( DynamicString );
-const char *dynstr_data( DynamicString dstr );
+const char *dynstr_data( DynamicString );
 size_t dynstr_len( DynamicString );
 
 #endif //CLIBS_DYNSTRING_H

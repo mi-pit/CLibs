@@ -3,12 +3,10 @@
 //
 #include "dynstring.h"
 
-#include "errors.h"
-#include "misc.h"
-#include "pointer_utils.h"
-#include "string_utils.h"
+#include "errors.h"       /* RV, warn */
+#include "misc.h"         /* min_m */
+#include "string_utils.h" /* types */
 
-#include <err.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -20,7 +18,7 @@ struct dynamic_string {
     size_t cap;
 };
 
-DynamicString string_init_cap( size_t capacity )
+DynamicString dynstr_init_cap( size_t capacity )
 {
     DynamicString new = calloc( 1, sizeof( struct dynamic_string ) );
     if ( new == NULL )
@@ -42,7 +40,7 @@ DynamicString string_init_cap( size_t capacity )
     return new;
 }
 
-DynamicString string_init( void )
+DynamicString dynstr_init( void )
 {
     DynamicString new = calloc( 1, sizeof( struct dynamic_string ) );
     if ( new == NULL )
@@ -64,34 +62,28 @@ DynamicString string_init( void )
     return new;
 }
 
-DynamicString string_init_as( string_t string )
+DynamicString dynstr_init_as( string_t s )
 {
-    size_t len        = strlen( string );
-    DynamicString new = string_init_cap( len + 1 );
+    size_t len        = strlen( s );
+    DynamicString new = dynstr_init_cap( len + 1 );
     if ( new == NULL )
         return NULL;
 
-    strncpy( new->data, string, len );
+    strncpy( new->data, s, len );
     new->len = len;
 
     return new;
 }
 
-void string_destroy( DynamicString dstr )
+void dynstr_destroy( DynamicString dstr )
 {
     free( dstr->data );
     dstr->data = NULL;
     free( dstr );
 }
 
-void string_destroy_n( DynamicString *dstr_cont )
-{
-    free_n( ( *dstr_cont )->data );
-    free_n( *dstr_cont );
-}
 
-
-int string_resize( DynamicString dstr, size_t new_size )
+static int dynstr_resize( DynamicString dstr, size_t new_size )
 {
     char *temp = realloc( dstr->data, new_size );
     if ( temp == NULL )
@@ -107,10 +99,10 @@ int string_resize( DynamicString dstr, size_t new_size )
     return RV_SUCCESS;
 }
 
-int string_append( DynamicString dstr, char app )
+int dynstr_append( DynamicString dstr, char app )
 {
     if ( dstr->len + 1 >= dstr->cap )
-        return_on_fail( string_resize( dstr, dstr->cap * 2 ) != RV_SUCCESS );
+        return_on_fail( dynstr_resize( dstr, dstr->cap * 2 ) != RV_SUCCESS );
 
     dstr->data[ dstr->len ]     = app;
     dstr->data[ dstr->len + 1 ] = '\0';
@@ -119,7 +111,7 @@ int string_append( DynamicString dstr, char app )
     return RV_SUCCESS;
 }
 
-int string_extend( DynamicString dstr, string_t app )
+int dynstr_extend( DynamicString dstr, string_t app )
 {
     size_t app_len  = strlen( app );
     size_t new_size = dstr->len + app_len;
@@ -130,7 +122,7 @@ int string_extend( DynamicString dstr, string_t app )
         while ( new_cap < new_size )
             new_cap *= 2;
 
-        return_on_fail( string_resize( dstr, new_size ) );
+        return_on_fail( dynstr_resize( dstr, new_size ) );
     }
 
     strncpy( dstr->data + dstr->len, app, app_len );
