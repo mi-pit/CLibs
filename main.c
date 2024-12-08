@@ -72,7 +72,7 @@ int main( void )
 
     str_t *spl;
     ssize_t count = string_split_regex( &spl, s, &regex, false );
-    if ( count == -1 )
+    if ( count < 0 )
     {
         print_stack_trace();
         return 2;
@@ -82,7 +82,11 @@ int main( void )
         printf( "\"%s\"\n", string_escaped( spl[ i ] ) );
     }
 
-    regfree( &regex );
+    if ( string_split( &spl, s, "", false ) < 0 )
+        print_stack_trace();
 
-    return 0;
+    regfree( &regex );
+    printf( "hovno bobek\n" );
+
+    exit( EXIT_SUCCESS );
 }

@@ -58,11 +58,6 @@ void print_pointer( const void *data, size_t nbytes )
             *( ( const void ** ) data ) );
 }
 
-void print_ptr( const void *data, size_t nbytes )
-{
-    print_pointer( data, nbytes );
-}
-
 void print_string( const void *data, size_t nbytes )
 {
     if ( nbytes != strlen( data ) )
@@ -89,7 +84,7 @@ void print_List( const void *data, size_t nbytes )
         return;
     }
     ConstList ls = *( List * ) data;
-    list_print( ls );
+    list_printm( ls, LS_PRINT_NOFORMAT );
 }
 
 void print_Set( const void *data, size_t nbytes )

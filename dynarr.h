@@ -4,6 +4,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/cdefs.h>
 
 
 /* Dynamic array */
@@ -41,14 +42,14 @@ typedef const struct dynamic_array *ConstList;
 /**
  * Initializes the lists items to be of size ‹el_size›.\n
  */
-List list_init_size( int el_size );
+List list_init_size( int el_size ) __result_use_check;
 
 /**
  * Initializes the lists items to be of size ‹el_size›.\n
  * \n
  * Sets the print_mode to ‹mode›
  */
-List list_init_size_p( int el_size, int mode );
+List list_init_size_p( int el_size, int mode ) __result_use_check;
 
 /**
  * @returns The element of type ‹type› at the specified index
@@ -169,7 +170,7 @@ int list_copy( ConstList, List *new_ls_container );
  * Returns a copy of the original List, if an error occurs while
  * creating it, the function exits
  */
-List list_copy_p( ConstList );
+List list_copy_p( ConstList ) __result_use_check;
 
 /**
  * Reverses the List – in place
@@ -180,7 +181,7 @@ int list_reverse( List );
 /**
  * Returns a new List with the same items as the original, in a reverse order
  */
-List list_reversed( ConstList );
+List list_reversed( ConstList ) __result_use_check;
 
 /**
  * Compares the lists based on the number of elements,
@@ -239,7 +240,7 @@ void list_destroy( List );
     while ( 0 )
 
 /**
- * Prints the array of a hash_set length and type.\n
+ * Prints the array of a set length and type.\n
  * \n
  * Each item is printed according to the ‹format_str› (as in printf)\n
  * Array starts with '[' and ends with ']\\n', items being separated by ", "\n
@@ -263,29 +264,27 @@ void list_destroy( List );
 /* ––––– Pre–Formatted ––––– */
 
 /**
- * @deprecated
- * list_print, list_printm, list_dprint, list_prints
- * are deprecated, just use list_printf\n
- * \n
  * Prints the contents of the List in one of the following formats:\n
  * \n
- * #define LS_PRINT_NOFORMAT  (-1)-- prints each item according to
- *                                   its def_print_mode field\n
- * #define LS_PRINT_BYTE        0 -- prints two hex digits per byte\n
- * #define LS_PRINT_CHAR        1 -- prints contents as a string\n
- * #define LS_PRINT_INT         2 -- prints a whole number (ssize_t)\n
- * #define LS_PRINT_DEC         3 -- prints a decimal number (double)\n
- * #define LS_PRINT_PTR         4 -- prints an address (void *) as `@%p'\n
- * #define LS_PRINT_LIST        5 -- recursively calls list_printm()
+ * LS_PRINT_NOFORMAT  (-1)-- prints each item according to its def_print_mode field\n
+ * LS_PRINT_BYTE        0 -- prints two hex digits per byte\n
+ * LS_PRINT_CHAR        1 -- prints contents as a string\n
+ * LS_PRINT_INT         2 -- prints a whole number (ssize_t)\n
+ * LS_PRINT_DEC         3 -- prints a decimal number (double)\n
+ * LS_PRINT_PTR         4 -- prints an address (void *) as `@%p'\n
+ * LS_PRINT_LIST        5 -- recursively calls list_printm()
  *                                   on each sub-List\n
  * \n
  * In debug mode, this prints out the whole capacity
  * along with header information.\n
+ * @deprecated
+ * list_print, list_printm, list_prints
+ * are bad, just use list_printf\n
  * \n
  * This function is sort of an afterthought and
  * probably doesn't work very well\n
  */
-void list_print( ConstList );
+void list_print( ConstList ) __deprecated;
 
 void list_printm( ConstList, int print_mode );
 
@@ -301,7 +300,7 @@ size_t list_size( ConstList );
 size_t list_el_size( ConstList );
 
 const void *list_items( ConstList ls );
-void *list_items_copy( ConstList ls );
+void *list_items_copy( ConstList ls ) __result_use_check;
 
 void list_set_print_mode( List ls, int fmt );
 

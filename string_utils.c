@@ -171,12 +171,13 @@ void string_reverse( str_t s )
 
 
 ssize_t string_split( str_t **str_arr_cont,
-                      string_t str,
+                      string_t string,
                       string_t split_tok,
                       bool excl_empty )
 {
     if ( split_tok == NULL || ( strcmp( split_tok, "" ) == 0 ) )
     {
+        // fixme: "" -> split by char
         errno = EINVAL;
         return fflwarnx_ret( RV_EXCEPTION, "%s", "invalid split token" );
     }
@@ -191,7 +192,7 @@ ssize_t string_split( str_t **str_arr_cont,
     size_t split_tok_len = strlen( split_tok );
     size_t count         = 0;
 
-    const char *curr = str;
+    const char *curr = string;
     const char *next;
     while ( curr != NULL )
     {
@@ -279,13 +280,12 @@ ssize_t string_split_regex( str_t **str_arr_cont,
 }
 
 
-string_t get_program_name( string_t const argv0 )
+string_t get_file_name( string_t const full_path )
 {
-    const char *program_name = strrchr( argv0, '/' );
+    const char *program_name = strrchr( full_path, '/' );
     if ( program_name == NULL )
     {
-        return fwarnx_ret_p( "string must contain at least one '/' (\"%s\")",
-                             program_name );
+        return full_path;
     }
     return program_name + 1;
 }
