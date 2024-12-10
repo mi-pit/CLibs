@@ -9,6 +9,10 @@
 #include <stdbool.h>   /* bool */
 #include <sys/types.h> /* ssize_t */
 
+#ifndef __result_use_check
+#define __result_use_check __attribute__( ( warn_unused_result ) )
+#endif //__result_use_check
+
 
 typedef const char *string_t;
 typedef char *str_t;
@@ -19,12 +23,12 @@ typedef char *str_t;
 #endif //ESCAPED_CHARS
 
 str_t string_stripped( string_t ) __result_use_check;
-void string_strip( str_t s );
+void string_strip( str_t );
 
 str_t string_escaped( string_t ) __result_use_check;
 
 str_t string_reversed( string_t ) __result_use_check;
-void string_reverse( str_t s );
+void string_reverse( str_t );
 
 /**
  * Splits ‹str› at places matching ‹split_tok›<br>

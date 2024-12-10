@@ -6,7 +6,6 @@
 #include <stdint.h>
 #include <sys/cdefs.h>
 
-
 #ifndef __result_use_check
 #define __result_use_check __attribute__( ( warn_unused_result ) )
 #endif //__result_use_check

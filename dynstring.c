@@ -135,7 +135,7 @@ int dynstr_slice( DynamicString dynstr, size_t start_idx, ssize_t end_idx )
                            start_idx,
                            end_idx );
 
-    size_t end       = end_idx == -1 ? dynstr->len : end_idx;
+    size_t end       = end_idx == -1 ? dynstr->len : ( size_t ) end_idx;
     const size_t len = end - start_idx;
     memmove( dynstr->data, dynstr->data + start_idx, len );
     dynstr->data[ len ] = '\0';

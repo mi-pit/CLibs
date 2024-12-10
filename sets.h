@@ -75,30 +75,6 @@ int set_subtract( Set, ConstSet sub );
 
 int set_cmp( ConstSet set_1, ConstSet set_2 );
 
-static int clib_set_insert_retval = 0;
-static int clib_set_remove_retval = 0;
-
-#define set_insert_val( set, value, type )                                    \
-    do                                                                        \
-    {                                                                         \
-        type __set_insert_lit_var__ = value;                                  \
-                                                                              \
-        clib_set_insert_retval = set_insert_f( set,                           \
-                                               &__set_insert_lit_var__,       \
-                                               sizeof( __typeof__( value ) ), \
-                                               print( type ) );               \
-    }                                                                         \
-    while ( 0 )
-
-#define set_remove_val( set, value, type )                                  \
-    do                                                                      \
-    {                                                                       \
-        type __set_remove_lit_var__ = value;                                \
-        clib_set_remove_retval =                                            \
-                set_remove( set, &__set_remove_lit_var__, sizeof( type ) ); \
-    }                                                                       \
-    while ( 0 )
-
 
 void set_destroy( Set );
 void set_destroy_n( int n, ... );

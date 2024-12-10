@@ -22,29 +22,27 @@ extern List switch_expr_variables_stack;
 extern List switch_expr_sizes_stack;
 extern List switch_expr_assigned_stack;
 
-static void *swex_aux_variable_ = NULL; // for case matching
 
-
-int swex_push( size_t nbytes, const void *data );
-bool swex_is_assigned();
-int swex_assign( void );
-int swex_pop( void );
+int switch_expression_push( size_t nbytes, const void *data );
+bool switch_expression_is_assigned();
+int switch_expression_assign( void );
+int switch_expression_pop( void );
 
 /**
  * Initializes the swexpr to, in each ‹ case ›,
  * compare it to the data behind the supplied pointer
  */
-#define swex_init_ptr( expr, nbytes ) swex_push( nbytes, ( expr ) );
+#define swex_init_ptr( expr, nbytes ) switch_expression_push( nbytes, ( expr ) );
 
-#define swex_init_str( expr ) swex_push( strlen( expr ), ( expr ) );
+#define swex_init_str( expr ) switch_expression_push( strlen( expr ), ( expr ) );
 
 /**
  * Initializes the swexpr to, in each ‹ case ›, compare it to this expression
  */
-#define swex_init_val( expr_type, expr )                              \
-    {                                                                 \
-        expr_type swex_init_imm_tmp_var = ( expr );                   \
-        swex_push( sizeof( expr_type ), &( swex_init_imm_tmp_var ) ); \
+#define swex_init_val( expr_type, expr )                                           \
+    {                                                                              \
+        expr_type swex_init_imm_tmp_var = ( expr );                                \
+        switch_expression_push( sizeof( expr_type ), &( swex_init_imm_tmp_var ) ); \
     }
 
 /**
@@ -90,29 +88,30 @@ int swex_pop( void );
         type swex_case_imm_aux_var_ = expr_case;                                     \
         memcpy( swex_aux_variable_, &swex_case_imm_aux_var_, sizeof( type ) );       \
     }                                                                                \
-    if ( !swex_is_assigned() &&                                                      \
+    if ( !switch_expression_is_assigned() &&                                         \
          ( *( size_t * ) list_peek( switch_expr_sizes_stack ) ) == sizeof( type ) && \
          memcmp( list_peek( switch_expr_values_stack ),                              \
                  swex_aux_variable_,                                                 \
                  sizeof( type ) ) == 0 )                                             \
-        if ( swex_assign() != 1 )
+        if ( switch_expression_assign() != 1 )
 
 #define swex_case_ptr( expr_case, nbytes )                                             \
-    if ( !swex_is_assigned() &&                                                        \
+    if ( !switch_expression_is_assigned() &&                                           \
          ( *( size_t * ) list_peek( switch_expr_sizes_stack ) ) == sizeof( void * ) && \
          memcmp( list_peek( switch_expr_values_stack ), expr_case, nbytes ) == 0 )     \
-        if ( swex_assign() != 1 )
+        if ( switch_expression_assign() != 1 )
 
 #define swex_case_str( expr_case )                                         \
-    if ( !swex_is_assigned() &&                                            \
+    if ( !switch_expression_is_assigned() &&                               \
          strcmp( list_peek( switch_expr_values_stack ), expr_case ) == 0 ) \
-        if ( swex_assign() != 1 )
+        if ( switch_expression_assign() != 1 )
 
 /**
  * Executes the following statement <b>if and only if</b>
  * no value has been assigned to the switch–target so far
  */
-#define swex_default() if ( !swex_is_assigned() && ( swex_assign() != 1 ) )
+#define swex_default() \
+    if ( !switch_expression_is_assigned() && ( switch_expression_assign() != 1 ) )
 
 /**
  * Frees all memory owned by the swexpr and resets
@@ -125,7 +124,7 @@ int swex_pop( void );
 #define swex_finish()                 \
     do                                \
     {                                 \
-        swex_pop();                   \
+        switch_expression_pop();      \
         free_n( swex_aux_variable_ ); \
     }                                 \
     while ( 0 )
