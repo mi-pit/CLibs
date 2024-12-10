@@ -16,7 +16,7 @@ add_executable(CLibs
         errors.h
         extra_types.h
         foreach.h
-        main.c
+        Tests/main.c
         misc.c
         misc.h
         pointer_utils.c
@@ -33,7 +33,7 @@ add_executable(CLibs
 add_executable(TestSwex
         dynarr.c
         errors.c
-        main.c
+        Tests/main.c
         pointer_utils.c
         swexpr.c
         )

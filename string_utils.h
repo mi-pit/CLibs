@@ -15,7 +15,7 @@ typedef char *str_t;
 
 
 #ifndef ESCAPED_CHARS
-#define ESCAPED_CHARS "\n\t\r\f\v\0"
+#define ESCAPED_CHARS "\n\t\r\f\v"
 #endif //ESCAPED_CHARS
 
 str_t string_stripped( string_t ) __result_use_check;
@@ -66,6 +66,6 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                             bool excl_empty );
 
 
-string_t get_program_name( string_t argv0 );
+string_t get_file_name( string_t full_path );
 
 #endif //CLIBS_STRING_UTILS_H

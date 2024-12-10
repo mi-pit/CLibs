@@ -6,7 +6,16 @@
 #define CLIBS_DYNSTRING_H
 
 #include <stddef.h>
+#include <sys/types.h>
 
+#ifndef __result_use_check
+#define __result_use_check
+#endif
+
+
+/**
+ * Hovno
+ */
 typedef struct dynamic_string *DynamicString;
 typedef const struct dynamic_string *ConstDynamicString;
 
@@ -14,16 +23,68 @@ typedef const struct dynamic_string *ConstDynamicString;
 #define DEFAULT_DYNSTRING_CAP 256
 
 
-DynamicString dynstr_init( void );
-DynamicString dynstr_init_cap( size_t cap );
-DynamicString dynstr_init_as( const char * );
+/* ==== Constructors/Destructors ==== */
+/**
+ * Heap allocates a new DynamicString with a capacity of DEFAULT_DYNSTRING_CAP
+ * @return a new DynamicString or NULL if allocation fails
+ */
+DynamicString dynstr_init( void ) __result_use_check;
+/**
+ * Heap allocates a new DynamicString with a capacity of ‹cap›
+ * @param cap   capacity of the DynamicString
+ * @return      a new DynamicString or NULL if allocation fails
+ */
+DynamicString dynstr_init_cap( size_t cap ) __result_use_check;
+/**
+ * Heap allocates a new DynamicString with the data set to the supplied string.
+ * Capacity is set to the strings length including the terminating zero ('\0')
+ * @return a new DynamicString or NULL if allocation fails
+ */
+DynamicString dynstr_init_as( const char * ) __result_use_check;
+
+/**
+ * Frees all memory associated with the DynamicString
+ */
 void dynstr_destroy( DynamicString );
 
-int dynstr_append( DynamicString, char );
-int dynstr_extend( DynamicString, const char * );
 
+/* ==== Modifiers ==== */
+/**
+ * Appends a string to the end of the DynamicString
+ * @return 0 on success, -1 on allocation error
+ */
+int dynstr_append( DynamicString, const char * );
+/**
+ * Adds a string to the start of the DynamicString
+ * @return 0 on success, -1 on allocation error
+ */
+int dynstr_prepend( DynamicString, const char * );
+
+/**
+ * Sets the string to be a slice of itself, from ‹start_idx› to ‹end_idx›.
+ * If ‹end_idx› == -1, the end index is set to the index of the last character in the
+ * string
+ *
+ * @param start_idx index of the first preserved character
+ * @param end_idx   index of the last preserved character
+ * @return 0 on success, -2 (RV_EXCEPTION) if index is OOB
+ */
+int dynstr_slice( DynamicString, size_t start_idx, ssize_t end_idx );
+
+
+/* ==== Getters ==== */
+/**
+ * Allocates a new string with the DynamicString contents
+ * @return pointer to heap-allocated data
+ */
 char *dynstr_to_str( DynamicString );
+/**
+ * @return a pointer of the DynamicStrings data
+ */
 const char *dynstr_data( DynamicString );
+/**
+ * @return length of the string
+ */
 size_t dynstr_len( DynamicString );
 
 #endif //CLIBS_DYNSTRING_H

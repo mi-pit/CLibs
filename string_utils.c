@@ -6,10 +6,8 @@
 
 #include "dynarr.h" /* List */
 #include "errors.h" /* *warn* */
-#include "swexpr.h" /* swex_* */
 
 #include <ctype.h>
-#include <err.h>
 #include <regex.h>
 #include <stdlib.h>
 #include <string.h>
@@ -113,14 +111,14 @@ str_t string_escaped( string_t s )
     if ( s == NULL )
     {
         errno = EINVAL;
-        return fflwarn_ret_p( "%s", "string must not be null" );
+        return fwarn_ret_p( "%s", "string must not be null" );
     }
 
     size_t len = strlen( s );
 
     str_t new = calloc( len * 2 + 1, 1 );
     if ( new == NULL )
-        return fflwarn_ret_p( "%s", "calloc" );
+        return fwarn_ret_p( "%s", "calloc" );
 
     size_t new_idx = 0;
     for ( size_t i = 0; i < len; ++i, ++new_idx )
@@ -128,18 +126,28 @@ str_t string_escaped( string_t s )
         if ( strchr( ESCAPED_CHARS, s[ i ] ) )
             new[ new_idx++ ] = '\\';
 
-        swex_init_val( char, s[ i ] ) as( new[ new_idx ] )
+        switch ( s[ i ] )
         {
-            swex_case_imm( char, '\n' ) resolve( char, 'n' );
-            swex_case_imm( char, '\t' ) resolve( char, 't' );
-            swex_case_imm( char, '\r' ) resolve( char, 'r' );
-            swex_case_imm( char, '\f' ) resolve( char, 'f' );
-            swex_case_imm( char, '\0' ) resolve( char, '0' );
-            swex_case_imm( char, '\v' ) resolve( char, 'v' );
+            case '\n':
+                new[ new_idx ] = 'n';
+                break;
+            case '\t':
+                new[ new_idx ] = 't';
+                break;
+            case '\r':
+                new[ new_idx ] = 'r';
+                break;
+            case '\f':
+                new[ new_idx ] = 'f';
+                break;
+            case '\v':
+                new[ new_idx ] = 'v';
+                break;
 
-            swex_default() resolve( char, s[ i ] );
+            default:
+                new[ new_idx ] = s[ i ];
+                break;
         }
-        swex_finish();
     }
 
     return new;
@@ -284,8 +292,13 @@ string_t get_file_name( string_t const full_path )
 {
     const char *program_name = strrchr( full_path, '/' );
     if ( program_name == NULL )
-    {
         return full_path;
-    }
-    return program_name + 1;
+    if ( program_name[ 1 ] != '\0' )
+        return program_name + 1;
+
+    for ( const char *ptr = program_name - 1; ptr >= full_path; --ptr )
+        if ( *ptr == '/' )
+            return ptr + 1;
+
+    return full_path;
 }

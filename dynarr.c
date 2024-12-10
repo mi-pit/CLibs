@@ -436,7 +436,8 @@ int list_cmp_elsize( const void *l1, const void *l2 )
 
 void list_destroy( List ls )
 {
-    free_n( ls->items );
+    free( ls->items );
+    ls->items = NULL;
     free( ls );
 }
 

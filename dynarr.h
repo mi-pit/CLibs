@@ -7,6 +7,11 @@
 #include <sys/cdefs.h>
 
 
+#ifndef __result_use_check
+#define __result_use_check
+#endif //__result_use_check
+
+
 /* Dynamic array */
 typedef struct dynamic_array *List;
 /* Immutable List */
