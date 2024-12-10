@@ -8,8 +8,12 @@
 
 
 #ifndef __result_use_check
-#define __result_use_check
+#define __result_use_check __attribute__( ( warn_unused_result ) )
 #endif //__result_use_check
+
+#ifndef __deprecated
+#define __deprecated __attribute__( ( deprecated ) )
+#endif //__deprecated
 
 
 /* Dynamic array */
