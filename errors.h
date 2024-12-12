@@ -87,38 +87,40 @@ void *warnx_ret_p( const char *restrict fmt, ... ) __printflike( 1, 2 );
 /**
  * warn() with function name at the start
  */
-#define fwarn( fmtstr, ... )  warn( FWARN_FMTSTR fmtstr, __func__, __VA_ARGS__ )
-#define fwarnx( fmtstr, ... ) warnx( FWARN_FMTSTR fmtstr, __func__, __VA_ARGS__ )
+#define fwarn( fmtstr, ... )  warn( FWARN_FMTSTR fmtstr, __func__, ##__VA_ARGS__ )
+#define fwarnx( fmtstr, ... ) warnx( FWARN_FMTSTR fmtstr, __func__, ##__VA_ARGS__ )
 #define fwarn_ret( RETVAL, fmtstr, ... ) \
-    warn_ret( RETVAL, FWARN_FMTSTR fmtstr, __func__, __VA_ARGS__ )
+    warn_ret( RETVAL, FWARN_FMTSTR fmtstr, __func__, ##__VA_ARGS__ )
 #define fwarnx_ret( RETVAL, fmtstr, ... ) \
-    warnx_ret( RETVAL, FWARN_FMTSTR fmtstr, __func__, __VA_ARGS__ )
+    warnx_ret( RETVAL, FWARN_FMTSTR fmtstr, __func__, ##__VA_ARGS__ )
 #define fwarn_ret_p( fmtstr, ... ) \
-    warn_ret_p( FWARN_FMTSTR fmtstr, __func__, __VA_ARGS__ )
+    warn_ret_p( FWARN_FMTSTR fmtstr, __func__, ##__VA_ARGS__ )
 #define fwarnx_ret_p( fmtstr, ... ) \
-    warn_ret_p( FWARN_FMTSTR fmtstr, __func__, __VA_ARGS__ )
+    warn_ret_p( FWARN_FMTSTR fmtstr, __func__, ##__VA_ARGS__ )
 
 
 /**
  * warn() with "__FILE_NAME__: __func__:" at the start
  */
 #define fflwarn( fmtstr, ... ) \
-    warn( FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, __VA_ARGS__ )
+    warn( FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, ##__VA_ARGS__ )
 /**
  * warnx() with "__FILE_NAME__: __func__:" at the start
  */
 #define fflwarnx( fmtstr, ... ) \
-    warnx( FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, __VA_ARGS__ )
+    warnx( FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, ##__VA_ARGS__ )
 
 #define fflwarn_ret( rv, fmtstr, ... ) \
-    warn_ret( rv, FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, __VA_ARGS__ )
+    warn_ret( rv, FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, \
+              ##__VA_ARGS__ )
 #define fflwarnx_ret( rv, fmtstr, ... ) \
-    warnx_ret( rv, FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, __VA_ARGS__ )
+    warnx_ret( rv, FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, \
+               ##__VA_ARGS__ )
 
 #define fflwarn_ret_p( fmtstr, ... ) \
-    warn_ret_p( FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, __VA_ARGS__ )
+    warn_ret_p( FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, ##__VA_ARGS__ )
 #define fflwarnx_ret_p( fmtstr, ... ) \
-    warnx_ret_p( FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, __VA_ARGS__ )
+    warnx_ret_p( FFLWARN_FMTSTR fmtstr, __FILE_NAME__, __func__, __LINE__, ##__VA_ARGS__ )
 
 
 #endif //CLIBS_ERRORS_H
