@@ -16,7 +16,7 @@ typedef const struct hash_set *ConstSet;
 #define SET_DEFAULT_CAP 64
 
 /**
- * func is hash_set to print_byte by default
+ * func is set to print_byte by default
  */
 struct set_item {
     void *data;
@@ -59,8 +59,8 @@ bool set_search_item( ConstSet set, const struct set_item *item );
  * @param set_1
  * @param set_2
  * @param result    if the val at result is NULL, the function creates a new
- * hash_set with the proper values. If the val isn't NULL, the function
- * adds the intersecting values to the hash_set in result
+ * hash set with the proper values. If the val isn't NULL, the function
+ * adds the intersecting values to the hash set in result
  * @return -1 on error, else 0
  */
 int set_intersection( ConstSet set_1, ConstSet set_2, Set *result );

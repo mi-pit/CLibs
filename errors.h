@@ -10,6 +10,8 @@
 #include <stdio.h>     /* fprintf */
 #include <sys/cdefs.h> /* __printflike */
 
+#define E_OK 0
+
 
 #ifndef __FILE_NAME__
 
