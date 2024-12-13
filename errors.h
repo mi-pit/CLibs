@@ -27,6 +27,10 @@
 #define __printflike( A, B )
 #endif //__printflike
 
+#ifndef __cold
+#define __cold
+#endif //__cold
+
 
 #define RV_EXCEPTION ( -2 )
 #define RV_ERROR     ( -1 )
@@ -101,7 +105,7 @@ int WarnUniversal( const char *restrict FileName,
                    int err_no,
                    int return_value,
                    const char *__restrict format,
-                   ... ) __printflike( 6, 7 );
+                   ... ) __cold __printflike( 6, 7 );
 
 #define FFL_FMTSTR "%s: %s @ %d"
 
