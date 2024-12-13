@@ -22,12 +22,12 @@ static const bool FALSE = false;
         if ( LIST == NULL )                                    \
             if ( ( LIST = list_init_size( NBYTES ) ) == NULL ) \
             {                                                  \
-                print_stack_trace();                           \
+                f_stack_trace();                           \
                 return RV_ERROR;                               \
             }                                                  \
         if ( list_append( LIST, EXPRESSION ) == RV_ERROR )     \
         {                                                      \
-            print_stack_trace();                               \
+            f_stack_trace();                               \
             return RV_ERROR;                                   \
         }                                                      \
     }                                                          \
@@ -63,7 +63,7 @@ int swex_assign()
     {                                               \
         if ( list_pop( LIST, NULL ) != RV_SUCCESS ) \
         {                                           \
-            print_stack_trace();                    \
+            f_stack_trace();                    \
             return RV_ERROR;                        \
         }                                           \
         if ( list_size( LIST ) == 0 )               \

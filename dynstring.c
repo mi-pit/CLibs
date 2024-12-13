@@ -112,7 +112,7 @@ int dynstr_prepend( DynamicString dynstr, string_t s )
         int rv = dynstr_resize( dynstr, new_size );
         if ( rv != RV_SUCCESS )
         {
-            print_stack_trace();
+            f_stack_trace();
             return rv;
         }
     }

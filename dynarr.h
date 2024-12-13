@@ -25,14 +25,15 @@ typedef const struct dynamic_array *ConstList;
 
 #define LIST_CAP_SIZE_RATIO 4
 
-#define LS_PRINT_NOFORMAT ( -1 ) /* Lets each list to choose its own print method */
-#define LS_PRINT_BYTE     0 /* default; prints any data as pairs of hexadecimal digits */
-#define LS_PRINT_STR      1 /* List contents are strings */
-#define LS_PRINT_INT      2 /* List contents are whole numbers */
-#define LS_PRINT_DEC      3 /* List contents are rational numbers */
-#define LS_PRINT_PTR      4 /* List contents are pointers */
-#define LS_PRINT_LIST     5 /* List contents are other lists */
-
+enum ListPrinters {
+    LS_PRINT_NOFORMAT = ( -1 ), /* Lets each list to choose its own print method */
+    LS_PRINT_BYTE     = 0, /* default; prints any data as pairs of hexadecimal digits */
+    LS_PRINT_STR      = 1, /* List contents are strings */
+    LS_PRINT_INT      = 2, /* List contents are whole numbers */
+    LS_PRINT_DEC      = 3, /* List contents are rational numbers */
+    LS_PRINT_PTR      = 4, /* List contents are pointers */
+    LS_PRINT_LIST     = 5, /* List contents are other lists */
+};
 
 /**
  * Initializes the List to be of type ‹type›
@@ -212,6 +213,7 @@ void list_destroy( List );
 /* ––––––––––––––––––––––––––––––– PRINTERS ––––––––––––––––––––––––––––––– */
 
 /* ––––– Array Print ––––– */
+#define ARRAY_PRINT_STRING_FMTSTR "\\s"
 
 /**
  * Prints the array of a hash_set length and type to a specified file descriptor.\n
@@ -220,26 +222,35 @@ void list_destroy( List );
  * Array starts with '[' and ends with ']\\n'\n
  * Items in array are separated by ‹delim›\n
  * \n
- * If the format string contains "%s", array_printf() prints the whole string,
- * without any delims also formatted according to the format string.\n
+ * If the format string contains the sub-string defined in ARRAY_PRINT_STRING_FMTSTR,
+ * array_printf() prints the whole string without any delimiters, also formatted
+ * according to the format
+ * string.\n
  * However, it doesn't work with variable length specifiers. (e.g. "%.*s")\n
  */
 #define array_printf_d( array, len, type, format_str, delim )                      \
     do                                                                             \
     {                                                                              \
-        if ( strstr( format_str, "\\%s" ) )                                        \
+        const char *sub_fmt_str = strstr( format_str, ARRAY_PRINT_STRING_FMTSTR ); \
+        if ( sub_fmt_str != NULL )                                                 \
         {                                                                          \
-            const char *print_array_format__ = format_str;                         \
+            char *print_array_format__ = strdup( format_str );                     \
+                                                                                   \
+            print_array_format__[ sub_fmt_str - format_str ]     = '%';            \
+            print_array_format__[ sub_fmt_str - format_str + 1 ] = 's';            \
             printf( print_array_format__, ( char * ) array );                      \
+            free( print_array_format__ );                                          \
         }                                                                          \
         else                                                                       \
         {                                                                          \
             printf( "[ " );                                                        \
-            for ( size_t __print_array_idx__ = 0; __print_array_idx__ < len;       \
-                  ++__print_array_idx__ )                                          \
+            for ( size_t print_array_idx__ = 0; print_array_idx__ < len;           \
+                  ++print_array_idx__ )                                            \
             {                                                                      \
-                printf( format_str, ( ( type * ) array )[ __print_array_idx__ ] ); \
-                if ( __print_array_idx__ != len - 1 )                              \
+                const char *print_array_format__ = format_str;                     \
+                printf( print_array_format__,                                      \
+                        ( ( type * ) array )[ print_array_idx__ ] );               \
+                if ( print_array_idx__ != len - 1 )                                \
                     printf( "%s", delim );                                         \
             }                                                                      \
             printf( " ]\n" );                                                      \
@@ -249,13 +260,10 @@ void list_destroy( List );
 
 /**
  * Prints the array of a set length and type.\n
- * \n
- * Each item is printed according to the ‹format_str› (as in printf)\n
- * Array starts with '[' and ends with ']\\n', items being separated by ", "\n
- * \n
- * If the format string contains "%s", array_printf() prints the whole string,
- * without any delims also formatted according to the format string.\n
- * However, it doesn't work with variable length specifiers. (e.g. "%.*s")\n
+ * <p>
+ * Items are separated by ", "\n
+ *
+ * @see \code array_printf_d
 */
 #define array_printf( array, len, type, format ) \
     array_printf_d( array, len, type, format, ", " )
@@ -263,9 +271,11 @@ void list_destroy( List );
 
 /* ––––– List Print –––––*/
 
+///@see \code array_printf_d
 #define list_printf_d( ls, type, format, delim ) \
     array_printf_d( list_items( ls ), list_size( ls ), type, format, delim )
 
+///@see \code array_printf_d
 #define list_printf( ls, type, format ) list_printf_d( ls, type, format, ", " )
 
 

@@ -1,13 +1,12 @@
 #include "dynarr.h"
 
-#include "errors.h"        /* retvals */
-#include "extra_types.h"   /* byte */
-#include "pointer_utils.h" /* free_n */
+#include "errors.h"      /* retvals */
+#include "extra_types.h" /* byte */
 
 #include <err.h>     /* warn, err */
 #include <stdbool.h> /* bool, true, false */
 #include <stdio.h>   /* *print* */
-#include <stdlib.h>  /* malloc, free, bsearch, qsort, exit */
+#include <stdlib.h>  /* malloc, free, bsearch, qsort */
 #include <string.h>  /* mem* */
 
 
@@ -122,7 +121,7 @@ static int list_upsize( List ls, size_t min_cap_add )
 
     void *tmp = realloc( ls->items, new_capacity * ls->el_size );
     if ( tmp == NULL )
-        return fwarn_ret( RV_ERROR, "%s", "realloc" );
+        return fwarn_ret( RV_ERROR, "realloc" );
 
     ls->items    = tmp;
     ls->capacity = new_capacity;
@@ -139,10 +138,7 @@ static int list_downsize( List ls )
 
     void *tmp = realloc( ls->items, new_cap * ls->el_size );
     if ( tmp == NULL )
-    {
-        warn( __func__ );
-        return RV_ERROR;
-    }
+        return fwarn_ret( RV_ERROR, "realloc" );
 
     ls->items    = tmp;
     ls->capacity = new_cap;
@@ -152,11 +148,11 @@ static int list_downsize( List ls )
 
 int list_set_at( List ls, size_t index, const void *data )
 {
-    if ( index > ls->size )
-    {
-        warnx( "list_set_at: index is out of bounds" );
-        return RV_EXCEPTION;
-    }
+    if ( index >= ls->size )
+        return fwarnx_ret( RV_EXCEPTION,
+                           "index %zu is out of bounds for list of length %zu",
+                           index,
+                           ls->size );
 
     memcpy( ( ( byte * ) ls->items ) + ( index * ls->el_size ), data, ls->el_size );
 
@@ -170,12 +166,11 @@ int list_append( List ls, const void *data )
     {
         if ( list_upsize( ls, 1 ) != RV_SUCCESS )
         {
-            print_stack_trace();
+            f_stack_trace();
             return RV_ERROR;
         }
     }
-
-    list_set_at( ls, ls->size++, data );
+    memcpy( ( ( byte * ) ls->items ) + ( ls->size++ * ls->el_size ), data, ls->el_size );
 
     return RV_SUCCESS;
 }
@@ -186,7 +181,7 @@ int list_extend_array( List ls, const void *array, size_t len )
     {
         if ( list_upsize( ls, len ) != RV_SUCCESS )
         {
-            print_stack_trace();
+            f_stack_trace();
             return RV_ERROR;
         }
     }
@@ -204,7 +199,7 @@ int list_extend_list( List ls, ConstList app )
     {
         if ( list_upsize( ls, app->size ) != RV_SUCCESS )
         {
-            print_stack_trace();
+            f_stack_trace();
             return RV_ERROR;
         }
     }
@@ -222,7 +217,7 @@ int list_insert( List ls, size_t at, const void *data )
     {
         if ( list_upsize( ls, 1 ) )
         {
-            print_stack_trace();
+            f_stack_trace();
             return RV_ERROR;
         }
     }
@@ -246,7 +241,7 @@ int list_pop( List ls, void *container )
     {
         if ( list_downsize( ls ) )
         {
-            print_stack_trace();
+            f_stack_trace();
             return RV_ERROR;
         }
     }
@@ -453,7 +448,7 @@ static void list_print_mode( ConstList ls, // NOLINT(misc-no-recursion)
     switch ( print_mode )
     {
         default:
-            warnx( "list_print_static: invalid print format" );
+            fwarnx( "invalid print format" );
             __attribute__( ( fallthrough ) );
         case LS_PRINT_BYTE:
             list_printf_d( ls, byte, "%02x", " " );

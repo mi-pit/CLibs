@@ -19,7 +19,7 @@ typedef char *str_t;
 
 
 #ifndef ESCAPED_CHARS
-#define ESCAPED_CHARS "\n\t\r\f\v"
+#define ESCAPED_CHARS "\n\t\r\f\v\""
 #endif //ESCAPED_CHARS
 
 str_t string_stripped( string_t ) __result_use_check;

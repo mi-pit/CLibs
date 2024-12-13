@@ -158,7 +158,7 @@ str_t string_reversed( string_t s )
 {
     str_t new = strdup( s );
     if ( new == NULL )
-        return warn_ret_p( "%s", "strdup" );
+        return warn_ret_p( NULL, "strdup" );
 
     string_reverse( new );
     return new;
@@ -193,7 +193,7 @@ ssize_t string_split( str_t **str_arr_cont,
     List ls = list_init_type( str_t );
     if ( ls == NULL )
     {
-        print_stack_trace();
+        f_stack_trace();
         return RV_ERROR;
     }
 
@@ -241,7 +241,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
     List ls = list_init_type( str_t );
     if ( ls == NULL )
     {
-        print_stack_trace();
+        f_stack_trace();
         return RV_ERROR;
     }
 
