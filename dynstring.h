@@ -12,10 +12,12 @@
 #define __result_use_check
 #endif
 
+#ifndef __printflike
+#define __printflike( a, b )
+#endif
 
-/**
- * Hovno
- */
+
+/** - */
 typedef struct dynamic_string *DynamicString;
 typedef const struct dynamic_string *ConstDynamicString;
 
@@ -61,6 +63,11 @@ int dynstr_append( DynamicString, const char * );
 int dynstr_prepend( DynamicString, const char * );
 
 /**
+ * Appends a formatted string to the end of a DynamicString
+ */
+int dynstr_appendf( DynamicString dynstr, const char *fmt, ... ) __printflike( 2, 3 );
+
+/**
  * Sets the string to be a slice of itself, from ‹start_idx› to ‹end_idx›.
  * If ‹end_idx› == -1, the end index is set to the index of the last character in the
  * string
@@ -70,6 +77,12 @@ int dynstr_prepend( DynamicString, const char * );
  * @return 0 on success, -2 (RV_EXCEPTION) if index is OOB
  */
 int dynstr_slice( DynamicString, size_t start_idx, ssize_t end_idx );
+
+/**
+ * Resets the dynstr to an empty string
+ * @return RV_ERROR on realloc fail, else RV_SUCCESS
+ */
+void dynstr_zero( DynamicString dynstr );
 
 
 /* ==== Getters ==== */

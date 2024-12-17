@@ -124,6 +124,47 @@ int dynstr_prepend( DynamicString dynstr, string_t s )
     return RV_SUCCESS;
 }
 
+#if defined( _GNU_SOURCE ) || defined( FREE_BSD )
+static int vasprintf( char **strp, const char *fmt, va_list args )
+{
+    va_list vaList;
+    va_copy( vaList, args );
+
+    int size = vsnprintf( NULL, 0, fmt, args );
+
+    if ( size < 0 )
+        return size;
+
+    *strp = malloc( size + 1 );
+    if ( !*strp )
+        return -1;
+
+
+    int result = vsnprintf( *strp, size + 1, fmt, vaList );
+    va_end( args );
+
+    return result;
+}
+#endif
+
+int dynstr_appendf( DynamicString dynstr, const char *fmt, ... )
+{
+    str_t buffer = malloc( strlen( fmt ) );
+
+    va_list vaList;
+    va_start( vaList, fmt );
+    vasprintf( &buffer, fmt, vaList );
+    va_end( vaList );
+
+    if ( dynstr_append( dynstr, buffer ) == RV_ERROR )
+    {
+        f_stack_trace();
+        return RV_ERROR;
+    }
+
+    free( buffer );
+    return RV_SUCCESS;
+}
 
 int dynstr_slice( DynamicString dynstr, size_t start_idx, ssize_t end_idx )
 {
@@ -143,6 +184,13 @@ int dynstr_slice( DynamicString dynstr, size_t start_idx, ssize_t end_idx )
     return RV_SUCCESS;
 }
 
+void dynstr_zero( DynamicString dynstr )
+{
+    memset( dynstr->data, 0, dynstr->cap );
+    dynstr->len = 0;
+}
+
+/* ====/ /==== */
 
 str_t dynstr_to_str( DynamicString dynstr )
 {

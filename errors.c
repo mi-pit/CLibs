@@ -22,7 +22,7 @@ int WarnUniversal( const char *restrict FileName,
     if ( FunctionName != NULL )
         fprintf( stderr, ": %s", FunctionName );
     if ( LineNumber > 0 )
-        fprintf( stderr, "@ %i", LineNumber );
+        fprintf( stderr, " @ %i", LineNumber );
     fprintf( stderr, ": " );
 
     va_list vaList;
