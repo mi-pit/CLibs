@@ -33,7 +33,7 @@ static const bool FALSE = false;
     }                                                          \
     while ( 0 )
 
-int swex_push( size_t nbytes, const void *data )
+int switch_expression_push( size_t nbytes, const void *data )
 {
     try_push( switch_expr_sizes_stack, &nbytes, sizeof( size_t ) );
     try_push( switch_expr_values_stack, data, sizeof( void * ) );
@@ -45,12 +45,12 @@ int swex_push( size_t nbytes, const void *data )
     return RV_SUCCESS;
 }
 
-bool swex_is_assigned()
+bool switch_expression_is_assigned()
 {
     return ( *( bool * ) list_peek( switch_expr_assigned_stack ) );
 }
 
-int swex_assign()
+int switch_expression_assign( void )
 {
     return list_set_at( switch_expr_assigned_stack,
                         list_size( switch_expr_assigned_stack ) - 1,
@@ -74,7 +74,7 @@ int swex_assign()
     }                                               \
     while ( 0 )
 
-int swex_pop( void )
+int switch_expression_pop( void )
 {
     try_pop( switch_expr_values_stack );
     try_pop( switch_expr_assigned_stack );

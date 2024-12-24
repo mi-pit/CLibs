@@ -4,19 +4,28 @@
 #include "errors.h"
 
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#if defined( __APPLE__ ) || defined( __FreeBSD__ )
+#define get_prog_name() getprogname()
+#elif defined( __FILE_NAME__ )
+#define get_prog_name() __FILE_NAME__
+#else
+#define get_prog_name() "current-program"
+#endif
 
-int WarnUniversal( const char *restrict FileName,
-                   const char *restrict FunctionName,
-                   int LineNumber,
-                   int err_no,
-                   int ret_val,
-                   const char *restrict format,
-                   ... )
+
+ptrdiff_t WarnUniversal( const char *restrict FileName,
+                         const char *restrict FunctionName,
+                         int LineNumber,
+                         int err_no,
+                         ptrdiff_t ret_val,
+                         const char *restrict format,
+                         ... )
 {
-    fprintf( stderr, "%s", getprogname() );
+    fprintf( stderr, "%s", get_prog_name() );
     if ( FileName != NULL )
         fprintf( stderr, ": %s", FileName );
     if ( FunctionName != NULL )

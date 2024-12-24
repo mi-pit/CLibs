@@ -17,7 +17,6 @@
 #endif
 
 
-/** - */
 typedef struct dynamic_string *DynamicString;
 typedef const struct dynamic_string *ConstDynamicString;
 
@@ -64,6 +63,8 @@ int dynstr_prepend( DynamicString, const char * );
 
 /**
  * Appends a formatted string to the end of a DynamicString
+ *
+ * @return RV_ERROR on alloc fail, else RV_SUCCESS
  */
 int dynstr_appendf( DynamicString dynstr, const char *fmt, ... ) __printflike( 2, 3 );
 
@@ -78,11 +79,14 @@ int dynstr_appendf( DynamicString dynstr, const char *fmt, ... ) __printflike( 2
  */
 int dynstr_slice( DynamicString, size_t start_idx, ssize_t end_idx );
 
+int dynstr_slice_e( DynamicString, ssize_t end_idx );
+int dynstr_slice_s( DynamicString, size_t start_idx );
+
 /**
  * Resets the dynstr to an empty string
  * @return RV_ERROR on realloc fail, else RV_SUCCESS
  */
-void dynstr_zero( DynamicString dynstr );
+int dynstr_reset( DynamicString dynstr );
 
 
 /* ==== Getters ==== */
@@ -90,14 +94,14 @@ void dynstr_zero( DynamicString dynstr );
  * Allocates a new string with the DynamicString contents
  * @return pointer to heap-allocated data
  */
-char *dynstr_to_str( DynamicString );
+char *dynstr_to_str( ConstDynamicString );
 /**
  * @return a pointer of the DynamicStrings data
  */
-const char *dynstr_data( DynamicString );
+const char *dynstr_data( ConstDynamicString );
 /**
  * @return length of the string
  */
-size_t dynstr_len( DynamicString );
+size_t dynstr_len( ConstDynamicString );
 
 #endif //CLIBS_DYNSTRING_H

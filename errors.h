@@ -50,26 +50,12 @@
     {                                         \
         int func_call_retval = ( func_call ); \
         if ( func_call_retval == RV_ERROR )   \
-        {                                     \
-            f_stack_trace();                  \
             return func_call_retval;          \
-        }                                     \
     }                                         \
     while ( 0 )
 
-#define return_on_fail_ptr( func_call )    \
-    do                                     \
-    {                                      \
-        if ( ( func_call ) != RV_SUCCESS ) \
-        {                                  \
-            f_stack_trace();               \
-            return NULL;                   \
-        }                                  \
-    }                                      \
-    while ( 0 )
-
-
-#define on_fail( func_call ) if ( ( func_call ) != RV_SUCCESS )
+#define on_fail( func_call )  if ( ( func_call ) != RV_SUCCESS )
+#define on_error( func_call ) if ( ( func_call ) == RV_ERROR )
 
 /**
  * Similar to warn(3) (especially warnc)
@@ -86,8 +72,7 @@
  *
  * @example actual function-like macro defined in errors.h:
  * \code
- * #define fwarn( ... ) \
- *     ( void ) WarnUniversal( FUNC_ONLY, NULL, __func__, -1, errno, -1, __VA_ARGS__ )
+ * #define fwarn( ... )  ( void ) WarnUniversal( NULL, __func__, -1, errno, -1, __VA_ARGS__ )
  * \endcode
  *
  * @param FileName      name of the current file (__FILE_NAME__)
@@ -97,15 +82,15 @@
  * @param return_value  returned value
  * @param format        format string
  * @param ...           printf-like arguments for ‹format›
- * @return  @code return_value
+ * @return @code return_value
  */
-int WarnUniversal( const char *restrict FileName,
-                   const char *restrict FunctionName,
-                   int LineNumber,
-                   int err_no,
-                   int return_value,
-                   const char *__restrict format,
-                   ... ) __cold __printflike( 6, 7 );
+ptrdiff_t WarnUniversal( const char *restrict FileName,
+                         const char *restrict FunctionName,
+                         int LineNumber,
+                         int err_no,
+                         ptrdiff_t return_value,
+                         const char *__restrict format,
+                         ... ) __printflike( 6, 7 );
 
 #define FFL_FMTSTR "%s: %s @ %d"
 
@@ -157,12 +142,10 @@ int WarnUniversal( const char *restrict FileName,
     WarnUniversal( NULL, NULL, -1, errno, RETVAL, __VA_ARGS__ )
 #define warnx_ret( RETVAL, ... ) WarnUniversal( NULL, NULL, -1, -1, RETVAL, __VA_ARGS__ )
 
-#define warn_ret_p( RETVAL, ... )           \
-    ( void * ) ( ptrdiff_t ) WarnUniversal( \
-            NULL, NULL, -1, -1, ( int ) ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
-#define warnx_ret_p( RETVAL, ... )          \
-    ( void * ) ( ptrdiff_t ) WarnUniversal( \
-            NULL, NULL, -1, -1, ( int ) ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+#define warn_ret_p( RETVAL, ... ) \
+    ( void * ) WarnUniversal( NULL, NULL, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+#define warnx_ret_p( RETVAL, ... ) \
+    ( void * ) WarnUniversal( NULL, NULL, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
 /**
  * warn() with function name at the start
@@ -173,12 +156,11 @@ int WarnUniversal( const char *restrict FileName,
     WarnUniversal( NULL, __func__, -1, errno, RETVAL, __VA_ARGS__ )
 #define fwarnx_ret( RETVAL, ... ) \
     WarnUniversal( NULL, __func__, -1, -1, RETVAL, __VA_ARGS__ )
-#define fwarn_ret_p( RETVAL, ... )          \
-    ( void * ) ( ptrdiff_t ) WarnUniversal( \
-            NULL, __func__, -1, errno, ( int ) ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
-#define fwarnx_ret_p( RETVAL, ... )         \
-    ( void * ) ( ptrdiff_t ) WarnUniversal( \
-            NULL, __func__, -1, -1, ( int ) ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+#define fwarn_ret_p( RETVAL, ... ) \
+    ( void * ) WarnUniversal(      \
+            NULL, __func__, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+#define fwarnx_ret_p( RETVAL, ... ) \
+    ( void * ) WarnUniversal( NULL, __func__, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
 #define fflwarn( ... ) \
     ( void ) WarnUniversal( __FILE_NAME__, __func__, __LINE__, errno, -1, __VA_ARGS__ )
@@ -188,20 +170,16 @@ int WarnUniversal( const char *restrict FileName,
     WarnUniversal( __FILE_NAME__, __func__, __LINE__, errno, RETVAL, __VA_ARGS__ )
 #define fflwarnx_ret( RETVAL, ... ) \
     WarnUniversal( __FILE_NAME__, __func__, __LINE__, -1, RETVAL, __VA_ARGS__ )
-#define fflwarn_ret_p( RETVAL, ... )                                      \
-    ( void * ) ( ptrdiff_t ) WarnUniversal( __FILE_NAME__,                \
-                                            __func__,                     \
-                                            __LINE__,                     \
-                                            errno,                        \
-                                            ( int ) ( ptrdiff_t ) RETVAL, \
-                                            __VA_ARGS__ )
-#define fflwarnx_ret_p( ... )                                             \
-    ( void * ) ( ptrdiff_t ) WarnUniversal( __FILE_NAME__,                \
-                                            __func__,                     \
-                                            __LINE__,                     \
-                                            -1,                           \
-                                            ( int ) ( ptrdiff_t ) RETVAL, \
-                                            __VA_ARGS__ )
+#define fflwarn_ret_p( RETVAL, ... )                \
+    ( void * ) WarnUniversal( __FILE_NAME__,        \
+                              __func__,             \
+                              __LINE__,             \
+                              errno,                \
+                              ( ptrdiff_t ) RETVAL, \
+                              __VA_ARGS__ )
+#define fflwarnx_ret_p( ... ) \
+    ( void * ) WarnUniversal( \
+            __FILE_NAME__, __func__, __LINE__, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
 
 #endif //CLIBS_ERRORS_H

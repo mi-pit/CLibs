@@ -7,6 +7,7 @@
 #include "misc.h"         /* min_m */
 #include "string_utils.h" /* types */
 
+#include <stdio.h> /* fprintf() */
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,6 +18,7 @@ struct dynamic_string {
 
     size_t cap;
 };
+
 
 DynamicString dynstr_init_cap( size_t capacity )
 {
@@ -52,7 +54,7 @@ DynamicString dynstr_init_as( string_t s )
     if ( new == NULL )
         return NULL;
 
-    strncpy( new->data, s, len );
+    strncpy( new->data, s, len + 1 );
     new->len = len;
 
     return new;
@@ -92,7 +94,7 @@ int dynstr_append( DynamicString dynstr, const char *app )
         return_on_fail( dynstr_resize( dynstr, new_size ) );
     }
 
-    strncpy( dynstr->data + dynstr->len, app, app_len );
+    strcpy( dynstr->data + dynstr->len, app );
     dynstr->data[ new_size ] = '\0';
     dynstr->len              = new_size;
 
@@ -118,13 +120,14 @@ int dynstr_prepend( DynamicString dynstr, string_t s )
     }
 
     memmove( dynstr->data + added_len - 1, dynstr->data, dynstr->len );
-    strncpy( dynstr->data, s, added_len );
-    dynstr->len = new_size;
+    strcpy( dynstr->data, s );
+    dynstr->data[ new_size ] = '\0';
+    dynstr->len              = new_size;
 
     return RV_SUCCESS;
 }
 
-#if defined( _GNU_SOURCE ) || defined( FREE_BSD )
+#if !defined( _GNU_SOURCE ) && !defined( __APPLE__ )
 static int vasprintf( char **strp, const char *fmt, va_list args )
 {
     va_list vaList;
@@ -172,7 +175,7 @@ int dynstr_slice( DynamicString dynstr, size_t start_idx, ssize_t end_idx )
         return fwarnx_ret( RV_EXCEPTION, "start index=%zu out of bounds", start_idx );
     if ( end_idx < -1 || ( end_idx != -1 && start_idx > ( size_t ) end_idx ) )
         return fwarnx_ret( RV_EXCEPTION,
-                           "invalid indices (start=%zu, end=%zu)",
+                           "invalid indices (start=%zu, end=%zi)",
                            start_idx,
                            end_idx );
 
@@ -184,25 +187,54 @@ int dynstr_slice( DynamicString dynstr, size_t start_idx, ssize_t end_idx )
     return RV_SUCCESS;
 }
 
-void dynstr_zero( DynamicString dynstr )
+int dynstr_slice_e( DynamicString dynstr, ssize_t end_idx )
 {
-    memset( dynstr->data, 0, dynstr->cap );
-    dynstr->len = 0;
+    const size_t len =
+            ( end_idx < 0 ) ? ( dynstr->len + 1 + end_idx ) : ( size_t ) end_idx;
+    if ( len >= dynstr->len )
+        return fwarnx_ret( RV_EXCEPTION, "invalid index: %zi", len );
+
+    dynstr->data[ len ] = '\0';
+    dynstr->len         = len;
+    return RV_SUCCESS;
+}
+
+int dynstr_slice_s( DynamicString dynstr, size_t start_idx )
+{
+    if ( start_idx >= dynstr->len )
+        return fwarnx_ret( RV_EXCEPTION, "invalid index: %zu", start_idx );
+
+    const size_t len = dynstr->len - start_idx;
+    memmove( dynstr->data, dynstr->data + start_idx, len );
+    dynstr->data[ len ] = '\0';
+    return RV_SUCCESS;
+}
+
+
+int dynstr_reset( DynamicString dynstr )
+{
+    free( dynstr->data );
+    if ( ( dynstr->data = malloc( DEFAULT_DYNSTRING_CAP ) ) == NULL )
+        return fwarn_ret( RV_ERROR, "malloc" );
+    dynstr->data[ 0 ] = '\0';
+    dynstr->len       = 0;
+    return RV_SUCCESS;
 }
 
 /* ====/ /==== */
 
-str_t dynstr_to_str( DynamicString dynstr )
+str_t dynstr_to_str( ConstDynamicString dynstr )
 {
     return strndup( dynstr->data, dynstr->len );
 }
 
-string_t dynstr_data( DynamicString dynstr )
+
+string_t dynstr_data( ConstDynamicString dynstr )
 {
     return dynstr->data;
 }
 
-size_t dynstr_len( DynamicString dynstr )
+size_t dynstr_len( ConstDynamicString dynstr )
 {
     return dynstr->len;
 }
