@@ -64,10 +64,10 @@
  * @code
  * ‹executable name›: ‹FileName›: ‹FunctionName› @ LineNumber: ‹formatted string›[:strerror(err_no)]
  * @endcode
- * The strerror part is only printed if err_no >= 0
  * </p>
  * <p>
- * If FileName or FunctionName is NULL, then they are not printed
+ * If ‹FileName› or ‹FunctionName› is NULL or if ‹LineNumber› or ‹err_no› equals -1,
+ * then they are not printed.
  * </p>
  *
  * @example actual function-like macro defined in errors.h:
@@ -82,7 +82,8 @@
  * @param return_value  returned value
  * @param format        format string
  * @param ...           printf-like arguments for ‹format›
- * @return @code return_value
+ * @return @code return_value @endcode
+ * @bug %p for some reason sometimes throws compiler errors for non `void *` pointers
  */
 ptrdiff_t WarnUniversal( const char *restrict FileName,
                          const char *restrict FunctionName,

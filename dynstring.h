@@ -78,7 +78,6 @@ int dynstr_appendf( DynamicString dynstr, const char *fmt, ... ) __printflike( 2
  * @return 0 on success, -2 (RV_EXCEPTION) if index is OOB
  */
 int dynstr_slice( DynamicString, size_t start_idx, ssize_t end_idx );
-
 int dynstr_slice_e( DynamicString, ssize_t end_idx );
 int dynstr_slice_s( DynamicString, size_t start_idx );
 

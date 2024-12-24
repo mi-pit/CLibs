@@ -7,9 +7,9 @@
 #include "misc.h"         /* min_m */
 #include "string_utils.h" /* types */
 
-#include <stdio.h> /* fprintf() */
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h>  /* fprintf() */
+#include <stdlib.h> /* alloc */
+#include <string.h> /* this one should be obvious */
 
 
 struct dynamic_string {
@@ -79,6 +79,7 @@ static int dynstr_resize( DynamicString dynstr, size_t new_size )
 
     return RV_SUCCESS;
 }
+
 
 int dynstr_append( DynamicString dynstr, const char *app )
 {
