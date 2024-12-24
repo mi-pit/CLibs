@@ -30,6 +30,31 @@ str_t string_escaped( string_t ) __result_use_check;
 str_t string_reversed( string_t ) __result_use_check;
 void string_reverse( str_t );
 
+
+#define STRSPLIT_EXCLUDE_EMPTY   0x01
+#define STRSPLIT_KEEP_DELIM_PRE  0x02
+#define STRSPLIT_KEEP_DELIM_POST 0x04
+
+/**
+ * Flags for the string_split[_regex] functions
+ * <p>
+ * @code
+ * STRSPLIT_EXCLUDE_EMPTY   // = 0x01
+ *     - resulting string array doesn't include empty strings ("")
+ *
+ * STRSPLIT_KEEP_DELIM_PRE  // = 0x02
+ *     - items include the delimiting strings;
+ *       the delim is included at the end of the previous item
+ *
+ * STRSPLIT_KEEP_DELIM_POST // = 0x04
+ *     - items include the delimiting strings;
+ *       the delim is included at the start of the next item
+ *
+ * STRSPLIT_KEEP_DELIM_PRE and STRSPLIT_KEEP_DELIM_POST are not compatible: fixme
+ * @endcode
+ */
+typedef int strsplit_mode_t;
+
 /**
  * Splits ‹str› at places matching ‹split_tok›<br>
  * Result may or may not contain empty strings depending on ‹excl_empty›<br>
@@ -39,8 +64,7 @@ void string_reverse( str_t );
  *                      string array is allocated in this function
  * @param string        string to be split
  * @param split_tok     boundary
- * @param excl_empty    if true, the resulting string array will not contain empty
- *                      strings ("")
+ * @param mode          see strsplit_mode_t
  * @return number of strings in the result,
  *         -1 on allocation fail,
  *         -2 if split_tok is invalid
@@ -48,7 +72,7 @@ void string_reverse( str_t );
 ssize_t string_split( str_t **str_arr_cont,
                       string_t string,
                       string_t split_tok,
-                      bool excl_empty );
+                      strsplit_mode_t mode );
 /**
  * Splits ‹str› at places matching ‹regex›<br>
  * Result may or may not contain empty strings depending on ‹excl_empty›<br>
@@ -65,9 +89,9 @@ ssize_t string_split( str_t **str_arr_cont,
  *         -2 if split_tok is invalid
  */
 ssize_t string_split_regex( str_t **str_arr_cont,
-                            string_t string,
-                            regex_t *restrict regexp,
-                            bool excl_empty );
+                            string_t __restrict string,
+                            regex_t *__restrict regexp,
+                            strsplit_mode_t mode );
 
 
 string_t get_file_name( string_t full_path );

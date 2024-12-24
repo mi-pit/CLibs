@@ -93,7 +93,7 @@ int list_set_at( List, size_t index, const void *data );
  * @return -1 if realloc fails while creating space for the new elements,
  * otherwise returns 0
  */
-int list_extend_array( List, const void *array, size_t len );
+int list_extend( List, const void *array, size_t array_len );
 
 /**
  *
@@ -130,7 +130,7 @@ int list_insert( List, size_t index, const void *data );
  * @param ls pointer to a valid List struct
  * @param container pointer to valid space in memory
  * of at least ‹ls.el_size› bytes
- * @return 1 if List is empty, -1 if malloc fails; else 0
+ * @return RV_EXCEPTION if List is empty, RV_ERROR if malloc fails; else RV_SUCCESS (0)
  */
 int list_pop( List, void *container );
 
@@ -169,9 +169,9 @@ void list_sort( List, int ( *cmp )( const void *, const void * ) );
 
 /**
  * Creates a copy of the List and stores it in ‹new_ls_cont›
- * @param ls old List to be copied
- * @param new_ls_cont pointer to your place in memory to store a List pointer
- * @return  (-1) if an error occurs, else 0
+ * @param ls            old List to be copied
+ * @param new_ls_cont   pointer to your place in memory to store a List pointer
+ * @return RV_ERROR if an error occurs, else RV_SUCCESS
  */
 int list_copy( ConstList, List *new_ls_container );
 
@@ -183,7 +183,7 @@ List list_copy_p( ConstList ) __result_use_check;
 
 /**
  * Reverses the List – in place
- * @return  (-1) if an error occurs, else 0
+ * @return RV_ERROR if an error occurs, else RV_SUCCESS
  */
 int list_reverse( List );
 
@@ -302,14 +302,16 @@ void list_destroy( List );
  * This function is sort of an afterthought and
  * probably doesn't work very well\n
  */
-void list_print( ConstList ) __deprecated;
+void list_print( ConstList ) __deprecated_msg( "use list_printf if possible" );
 
-void list_printm( ConstList, int print_mode );
+void list_printm( ConstList, int print_mode )
+        __deprecated_msg( "use list_printf if possible" );
 
 /**
  * Works like list_printm(), but also prints the List size
  */
-void list_prints( ConstList, int print_mode );
+void list_prints( ConstList, int print_mode )
+        __deprecated_msg( "use list_printf if possible" );
 
 /* ––––– GETTERS ––––– */
 

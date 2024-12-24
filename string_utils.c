@@ -179,15 +179,14 @@ void string_reverse( str_t s )
 
 
 ssize_t string_split( str_t **str_arr_cont,
-                      string_t string,
-                      string_t split_tok,
-                      bool excl_empty )
+                      const string_t string,
+                      const string_t split_tok,
+                      strsplit_mode_t mode )
 {
     if ( split_tok == NULL || ( strcmp( split_tok, "" ) == 0 ) )
     {
         // fixme: "" -> split by char
-        errno = EINVAL;
-        return fflwarnx_ret( RV_EXCEPTION, "%s", "invalid split token" );
+        return fwarnx_ret( RV_EXCEPTION, "invalid split token" );
     }
 
     List ls = list_init_type( str_t );
@@ -204,25 +203,31 @@ ssize_t string_split( str_t **str_arr_cont,
     const char *next;
     while ( curr != NULL )
     {
-        size_t offset = ( count != 0 ? split_tok_len : 0 );
-        next          = strstr( curr + offset, split_tok );
+        next = strstr( curr + ( count == 0 ? 0 : split_tok_len ), split_tok );
 
-        if ( !excl_empty || strlen( curr + offset ) != 0 )
+        size_t offset;
+        if ( count == 0 || mode & STRSPLIT_KEEP_DELIM_POST )
+            offset = 0;
+        else
+            offset = split_tok_len;
+
+        if ( !( mode & STRSPLIT_EXCLUDE_EMPTY ) || strlen( curr + offset ) != 0 )
         {
             str_t dup;
             if ( next == NULL )
                 dup = strdup( curr + offset );
             else
-                dup = strndup( curr + offset, next - curr - offset );
+                dup = strndup(
+                        curr + offset,
+                        next - curr - offset +
+                                ( mode & STRSPLIT_KEEP_DELIM_PRE ? split_tok_len : 0 ) );
             if ( dup == NULL )
-                return fflwarn_ret( RV_ERROR, "%s", "strdup" );
+                return fflwarn_ret( RV_ERROR, "strdup" );
 
             list_append( ls, &dup );
             ++count;
         }
 
-        if ( next == NULL )
-            break;
         curr = next;
     }
 
@@ -234,9 +239,9 @@ ssize_t string_split( str_t **str_arr_cont,
 }
 
 ssize_t string_split_regex( str_t **str_arr_cont,
-                            string_t restrict string,
-                            regex_t *restrict regexp,
-                            bool excl_empty )
+                            string_t __restrict string,
+                            regex_t *__restrict regexp,
+                            strsplit_mode_t mode )
 {
     List ls = list_init_type( str_t );
     if ( ls == NULL )
@@ -255,7 +260,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
         ree_rv = regexec( regexp, p, 1, regmatch, 0 );
         if ( ree_rv == REG_NOMATCH )
         {
-            if ( excl_empty && *p == '\0' )
+            if ( ( mode & STRSPLIT_EXCLUDE_EMPTY ) && *p == '\0' )
                 break;
             str_t dup = strdup( p );
             list_append( ls, &dup );
@@ -269,7 +274,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
             return RV_ERROR;
         }
 
-        if ( !excl_empty || regmatch->rm_eo != 1 )
+        if ( !( mode & STRSPLIT_EXCLUDE_EMPTY ) || regmatch->rm_eo != 1 )
         {
             str_t dup = strndup( p, regmatch->rm_so );
             list_append( ls, &dup );
@@ -287,6 +292,8 @@ ssize_t string_split_regex( str_t **str_arr_cont,
     return ( ssize_t ) count;
 }
 
+
+//
 
 string_t get_file_name( string_t const full_path )
 {

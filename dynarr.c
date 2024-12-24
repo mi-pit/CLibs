@@ -52,13 +52,13 @@ List list_init_size( int el_size )
 {
     struct dynamic_array *ls = calloc( 1, sizeof( struct dynamic_array ) );
     if ( ls == NULL )
-        return fwarn_ret_p( "%s", "calloc" );
+        return fwarn_ret_p( NULL, "calloc" );
 
     ls->items = calloc( LIST_DEF_SIZE, el_size );
     if ( ls->items == NULL )
     {
         free( ls );
-        return fwarn_ret_p( "%s", "calloc" );
+        return fwarn_ret_p( NULL, "calloc" );
     }
     ls->capacity = LIST_DEF_SIZE;
     ls->el_size  = el_size;
@@ -83,7 +83,7 @@ const void *list_get( ConstList ls, size_t idx )
 const void *list_peek( ConstList ls )
 {
     if ( ls->size == 0 )
-        return fwarnx_ret_p( "%s", "list contains no elements" );
+        return fwarnx_ret_p( NULL, "list contains no elements" );
 
     return list_get( ls, list_size( ls ) - 1 );
 }
@@ -103,10 +103,10 @@ void *list_at_last( List ls )
 
 /**
  * Changes (realloc) the lists capacity to be:\n
- * – twice resolve large\n
+ * – twice as large\n
  * or\n
  * – just large enough to fit its own items + min_cap_add\n
- * whichever is smaller.\n
+ * whichever is bigger.\n
  * \n
  * Therefore, the List always has enough space
  * to hold all of its items + min_cap_add
@@ -129,7 +129,7 @@ static int list_upsize( List ls, size_t min_cap_add )
 }
 
 /**
- * Changes (realloc) the lists capacity to be half resolve large\n
+ * Changes (realloc) the lists capacity to be half as large\n
  * @return -1 if realloc fails, else 0
  */
 static int list_downsize( List ls )
@@ -175,7 +175,7 @@ int list_append( List ls, const void *data )
     return RV_SUCCESS;
 }
 
-int list_extend_array( List ls, const void *array, size_t len )
+int list_extend( List ls, const void *array, size_t len )
 {
     if ( ls->capacity < ls->size + len )
     {
@@ -454,7 +454,7 @@ static void list_print_mode( ConstList ls, // NOLINT(misc-no-recursion)
             list_printf_d( ls, byte, "%02x", " " );
             break;
         case LS_PRINT_INT:
-            list_printf( ls, ssize_t, "%zd" );
+            list_printf( ls, long long int, "%lli" );
             break;
         case LS_PRINT_DEC:
             list_printf( ls, double, "%.2f" );
@@ -463,7 +463,7 @@ static void list_print_mode( ConstList ls, // NOLINT(misc-no-recursion)
             list_printf( ls, void *, "@%p" );
             break;
         case LS_PRINT_STR:
-            list_printf( ls, const char *, "\"%s\"\n" );
+            list_printf( ls, const char *, "\"" ARRAY_PRINT_STRING_FMTSTR "\"\n" );
             break;
         case LS_PRINT_NOFORMAT:
             list_print_mode( ls, ls->def_print_mode, print_size );
@@ -542,7 +542,7 @@ void *list_items_copy( ConstList ls )
 {
     void *copy = calloc( ls->size, ls->el_size );
     if ( copy == NULL )
-        return fwarn_ret_p( "%s", "calloc" );
+        return fwarn_ret_p( NULL, "calloc" );
 
     memcpy( copy, ls->items, ls->size * ls->el_size );
     return copy;
