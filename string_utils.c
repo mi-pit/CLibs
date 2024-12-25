@@ -51,7 +51,7 @@ str_t string_stripped( string_t s )
     str_len   = end_idx - start_idx + 1;
     str_t new = malloc( str_len + 1 );
     if ( new == NULL )
-        return fflwarn_ret_p( "%s", "malloc" );
+        return fflwarn_ret_p( NULL, "malloc" );
 
     for ( size_t i = 0; i < str_len; ++i )
     {
@@ -106,27 +106,24 @@ void string_strip( str_t s )
 }
 
 
-str_t string_escaped( string_t s )
+str_t string_escaped( string_t old )
 {
-    if ( s == NULL )
-    {
-        errno = EINVAL;
-        return fwarn_ret_p( "%s", "string must not be null" );
-    }
+    if ( old == NULL )
+        return fwarnx_ret_p( NULL, "string must not be null" );
 
-    size_t len = strlen( s );
+    size_t len = strlen( old );
 
     str_t new = calloc( len * 2 + 1, 1 );
     if ( new == NULL )
-        return fwarn_ret_p( "%s", "calloc" );
+        return fwarn_ret_p( NULL, "calloc" );
 
     size_t new_idx = 0;
     for ( size_t i = 0; i < len; ++i, ++new_idx )
     {
-        if ( strchr( ESCAPED_CHARS, s[ i ] ) )
+        if ( strchr( ESCAPED_CHARS, old[ i ] ) )
             new[ new_idx++ ] = '\\';
 
-        switch ( s[ i ] )
+        switch ( old[ i ] )
         {
             case '\n':
                 new[ new_idx ] = 'n';
@@ -144,8 +141,8 @@ str_t string_escaped( string_t s )
                 new[ new_idx ] = 'v';
                 break;
 
-            default:
-                new[ new_idx ] = s[ i ];
+            default: // backslash, double-quote, ...?
+                new[ new_idx ] = old[ i ];
                 break;
         }
     }

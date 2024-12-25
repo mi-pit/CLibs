@@ -7,6 +7,7 @@
 
 #include <regex.h>     /* regex_t */
 #include <stdbool.h>   /* bool */
+#include <string.h>    /* import */
 #include <sys/types.h> /* ssize_t */
 
 #ifndef __result_use_check
@@ -19,7 +20,7 @@ typedef char *str_t;
 
 
 #ifndef ESCAPED_CHARS
-#define ESCAPED_CHARS "\n\t\r\f\v\""
+#define ESCAPED_CHARS "\n\t\r\f\v\"\\"
 #endif //ESCAPED_CHARS
 
 str_t string_stripped( string_t ) __result_use_check;
