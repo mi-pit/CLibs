@@ -1,110 +1,20 @@
+//
+// Created by MacBook on 25.12.2024.
+//
+
 #include "print_functions.h"
 
-#include "dictionary.h"
-#include "dynarr.h"
-#include "errors.h"
-#include "extra_types.h"
-#include "pointer_utils.h"
-#include "sets.h"
-#include "string_utils.h"
-
-#include <err.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-
-void print_byte( const void *data, size_t nbytes )
+int PrintLNUniversal( FILE *__restrict file, const char *__restrict format, ... )
 {
-    printf( "'" );
-    for ( size_t i = 0; i < nbytes; ++i )
-    {
-        if ( i != 0 )
-            printf( " " );
-        byte n = deref_as_offset( byte, data, i );
-        printf( "%02x", n );
-    }
-    printf( "'" );
-}
+    va_list vaList;
+    va_start( vaList, format );
+    int rv = vfprintf( file, format, vaList );
+    va_end( vaList );
 
-define_print_func( int, "%-d" );
+    if ( rv < 0 )
+        return rv;
 
-define_print_func( size_t, "%-zu" );
+    rv += fprintf( file, "\n" );
 
-define_print_func( ssize_t, "%- zd" );
-
-define_print_func( char, "'%c'" );
-
-define_print_func( float, "%.2f" );
-
-define_print_func( double, "%.4f" );
-
-define_print_func( int8_t, "%3d" );
-
-
-void print_pointer( const void *data, size_t nbytes )
-{
-    if ( nbytes != sizeof( void * ) )
-    {
-        fflwarn( "%s", "invalid data size" );
-        return;
-    }
-
-    printf( "'"
-            "pointer"
-            ": "
-            "\"%p\""
-            "'",
-            *( ( const void ** ) data ) );
-}
-
-void print_string( const void *data, size_t nbytes )
-{
-    if ( nbytes != strlen( data ) )
-    {
-        warnx( "%s: strlen != nbytes", __func__ );
-        return;
-    }
-    char *s = string_escaped( data );
-    printf( "\"%s\"", s );
-    free( s );
-}
-
-void print_str( const void *data, size_t nbytes )
-{
-    print_string( data, nbytes );
-}
-
-
-void print_List( const void *data, size_t nbytes )
-{
-    if ( nbytes != sizeof( List ) )
-    {
-        printf( "%s: invalid data", __func__ );
-        return;
-    }
-    ConstList ls = *( List * ) data;
-    list_printm( ls, LS_PRINT_NOFORMAT );
-}
-
-void print_Set( const void *data, size_t nbytes )
-{
-    if ( nbytes != sizeof( Set ) )
-    {
-        printf( "%s: invalid data", __func__ );
-        return;
-    }
-    ConstSet s = *( Set * ) data;
-    set_print( s );
-}
-
-void print_Dict( const void *data, size_t nbytes )
-{
-    if ( nbytes != sizeof( Dict ) )
-    {
-        printf( "%s: invalid data", __func__ );
-        return;
-    }
-    ConstDict dict = *( Dict * ) data;
-    dict_print( dict );
+    return rv;
 }
