@@ -436,6 +436,12 @@ void list_destroy( List ls )
     free( ls );
 }
 
+void list_destroy_p( List *lsp )
+{
+    list_destroy( *lsp );
+    *lsp = NULL;
+}
+
 
 /* ––––––––––––––––––––––––––––––– PRINTERS ––––––––––––––––––––––––––––––– */
 

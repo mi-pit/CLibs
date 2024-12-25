@@ -188,6 +188,8 @@ ssize_t string_split( str_t **str_arr_cont,
         // fixme: "" -> split by char
         return fwarnx_ret( RV_EXCEPTION, "invalid split token" );
     }
+    if ( string == NULL )
+        return fwarnx_ret( RV_EXCEPTION, "string cannot be null" );
 
     List ls = list_init_type( str_t );
     if ( ls == NULL )
@@ -197,45 +199,51 @@ ssize_t string_split( str_t **str_arr_cont,
     }
 
     size_t split_tok_len = strlen( split_tok );
-    size_t count         = 0;
 
-    const char *curr = string;
-    const char *next;
-    while ( curr != NULL )
+    bool is_first = true;
+    const char *curr;
+    const char *next = string;
+    while ( ( curr = next ) != NULL )
     {
-        next = strstr( curr + ( count == 0 ? 0 : split_tok_len ), split_tok );
+        size_t start_offset =
+                ( is_first || mode & STRSPLIT_KEEP_DELIM_POST ) ? 0 : split_tok_len;
 
-        size_t offset;
-        if ( count == 0 || mode & STRSPLIT_KEEP_DELIM_POST )
-            offset = 0;
-        else
-            offset = split_tok_len;
-
-        if ( !( mode & STRSPLIT_EXCLUDE_EMPTY ) || strlen( curr + offset ) != 0 )
+        if ( is_first )
         {
-            str_t dup;
-            if ( next == NULL )
-                dup = strdup( curr + offset );
-            else
-                dup = strndup(
-                        curr + offset,
-                        next - curr - offset +
-                                ( mode & STRSPLIT_KEEP_DELIM_PRE ? split_tok_len : 0 ) );
-            if ( dup == NULL )
-                return fflwarn_ret( RV_ERROR, "strdup" );
+            next     = strstr( curr, split_tok );
+            is_first = false;
+        }
+        else
+            next = strstr( curr + split_tok_len, split_tok );
 
-            list_append( ls, &dup );
-            ++count;
+        const char *start = curr + start_offset;
+        size_t end_offset = ( mode & STRSPLIT_KEEP_DELIM_PRE ) ? split_tok_len : 0;
+
+        if ( mode & STRSPLIT_EXCLUDE_EMPTY &&
+             ( ( next == NULL && *start == '\0' ) ||
+               ( next != NULL && ( ( next - start + end_offset ) == 0 ) ) ) )
+            continue;
+
+        str_t dup = next == NULL ? strdup( start )
+                                 : strndup( start, next - start + end_offset );
+        if ( dup == NULL )
+        {
+            list_destroy( ls );
+            return fflwarn_ret( RV_ERROR, "strdup" );
         }
 
-        curr = next;
+        if ( list_append( ls, &dup ) != RV_SUCCESS )
+        {
+            list_destroy( ls );
+            return RV_ERROR;
+        }
     }
 
+    ssize_t count     = ( ssize_t ) list_size( ls );
     ( *str_arr_cont ) = list_items_copy( ls );
 
     list_destroy( ls );
-
-    return ( ssize_t ) count;
+    return count;
 }
 
 ssize_t string_split_regex( str_t **str_arr_cont,
