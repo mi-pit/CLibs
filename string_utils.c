@@ -244,8 +244,8 @@ ssize_t string_split( str_t **str_arr_cont,
 }
 
 ssize_t string_split_regex( str_t **str_arr_cont,
-                            string_t __restrict string,
-                            regex_t *__restrict regexp,
+                            string_t const __restrict string,
+                            const regex_t *const __restrict regexp,
                             strsplit_mode_t mode )
 {
     List ls = list_init_type( str_t );
@@ -255,39 +255,58 @@ ssize_t string_split_regex( str_t **str_arr_cont,
         return RV_ERROR;
     }
 
-    const char *p = string;
+    const char *searched = string;
 
-    regmatch_t regmatch[ 1 ] = { 0 };
+    regmatch_t regmatch = { 0 };
 
-    int ree_rv;
+    const char *last_end = NULL;
     do
     {
-        ree_rv = regexec( regexp, p, 1, regmatch, 0 );
+        int ree_rv = regexec( regexp, searched, 1, &regmatch, 0 );
         if ( ree_rv == REG_NOMATCH )
         {
-            if ( ( mode & STRSPLIT_EXCLUDE_EMPTY ) && *p == '\0' )
+            const char *to_dup =
+                    ( !( mode & STRSPLIT_KEEP_DELIM_POST ) || last_end == NULL )
+                            ? searched
+                            : last_end;
+            if ( ( mode & STRSPLIT_EXCLUDE_EMPTY ) && *to_dup == '\0' )
                 break;
-            str_t dup = strdup( p );
+            str_t dup = strdup( to_dup );
             list_append( ls, &dup );
             break;
         }
         if ( ree_rv != 0 )
         {
-            char buffer[ 64 ] = { 0 };
-            regerror( ree_rv, regexp, buffer, 64 );
-            fprintf( stderr, "%s\n", buffer );
+            char buffer[ 128 ] = { 0 };
+            regerror( ree_rv, regexp, buffer, sizeof buffer );
+            fwarnx( "%s", buffer );
+            list_destroy( ls );
             return RV_ERROR;
         }
 
-        if ( !( mode & STRSPLIT_EXCLUDE_EMPTY ) || regmatch->rm_eo != 1 )
-        {
-            str_t dup = strndup( p, regmatch->rm_so );
-            list_append( ls, &dup );
-        }
+        const char *actual_start =
+                ( !( mode & STRSPLIT_KEEP_DELIM_POST ) || last_end == NULL ) ? searched
+                                                                             : last_end;
 
-        p = p + regmatch->rm_eo;
+        size_t end_offset_from_searched =
+                ( mode & STRSPLIT_KEEP_DELIM_PRE ) ? regmatch.rm_eo : regmatch.rm_so;
+
+        size_t actual_len = ( searched + end_offset_from_searched ) - actual_start;
+
+        if ( actual_len != 0 || !( mode & STRSPLIT_EXCLUDE_EMPTY ) )
+        {
+            str_t duped = strndup( actual_start, actual_len );
+            if ( list_append( ls, &duped ) != RV_SUCCESS )
+            {
+                f_stack_trace();
+                list_destroy( ls );
+                return RV_ERROR;
+            }
+        }
+        last_end = searched + end_offset_from_searched;
+        searched = searched + regmatch.rm_eo;
     }
-    while ( regmatch->rm_eo != -1 && regmatch->rm_so != -1 );
+    while ( regmatch.rm_eo != -1 && regmatch.rm_so != -1 );
 
     ( *str_arr_cont ) = list_items_copy( ls );
     size_t count      = list_size( ls );
