@@ -5,9 +5,17 @@ set(CMAKE_C_STANDARD 99)
 
 include_directories(.)
 
-add_executable(TestStringUtils
-        Tests/test_string_utils.c
+add_executable(TestStringStrip
+        Tests/test_strstrip.c
         string_utils.c
         dynarr.c
         errors.c
+        )
+
+add_executable(TestStringEscape
+        Tests/test_string_escape.c
+        string_utils.c
+        dynarr.c
+        errors.c
+        print_functions.c
         )

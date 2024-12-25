@@ -3,11 +3,11 @@
 //
 
 #include "../string_utils.h"
-#include "errors.h"
 
-#include <assert.h>
-#include <stdlib.h> /* free */
-#include <string.h>
+#include <assert.h> /* assert */
+#include <stdarg.h> /* va_list */
+#include <stdlib.h> /* free(), exit() */
+#include <string.h> /* strcmp() */
 
 #define LOREM_IPSUM                                                                      \
     "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nullam rhoncus aliquam "  \
@@ -46,7 +46,7 @@ static void test_one( string_t haystack,
     str_t *spl;
     ssize_t rv = string_split( &spl, haystack, split_tok, mode );
     if ( rv < 0 )
-        err( 1, "fatal error" );
+        exit( 1 );
 
     size_t n_got = ( size_t ) rv;
     assert( n_got == n_split );
