@@ -4,3 +4,5 @@
 !CMakeLists.txt
 !*.c
 !*.h
+
+!/Tests/
