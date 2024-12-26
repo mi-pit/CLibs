@@ -41,7 +41,7 @@ static void free_spl( const size_t count, str_t strings[ count ] )
     }
 }
 
-static bool PrintSplArray = false;
+bool PrintSplArray = false;
 
 static void test_one_str( string_t haystack,
                           string_t split_tok,
@@ -59,14 +59,14 @@ static void test_one_str( string_t haystack,
     if ( PrintSplArray )
         array_printf_d( spl, n_got, string_t, "\"%s\"", "\n" );
 
-    assert_that( n_got == n_split, "%lu != %lu", n_got, n_split );
+    assert_that( n_got == n_split, "%zu == %zu", n_got, n_split );
 
     va_list vaList;
     va_start( vaList, n_split );
     for ( size_t i = 0; i < n_got; ++i )
     {
         string_t cmp = va_arg( vaList, string_t );
-        assert_that( strcmp( spl[ i ], cmp ) == 0, "%s != %s", spl[ i ], cmp );
+        assert_that( strcmp( spl[ i ], cmp ) == 0, "\"%s\" == \"%s\"", spl[ i ], cmp );
     }
     va_end( vaList );
 
@@ -99,14 +99,14 @@ static void test_one_regex( string_t haystack,
     if ( PrintSplArray )
         array_printf_d( spl, n_got, string_t, "\"%s\"", "\n" );
 
-    assert_that( n_got == n_split, "%lu != %lu", n_got, n_split );
+    assert_that( n_got == n_split, "%zu == %zu", n_got, n_split );
 
     va_list vaList;
     va_start( vaList, n_split );
     for ( size_t i = 0; i < n_got; ++i )
     {
         string_t cmp = va_arg( vaList, string_t );
-        assert_that( strcmp( spl[ i ], cmp ) == 0, "\"%s\" != \"%s\"", spl[ i ], cmp );
+        assert_that( strcmp( spl[ i ], cmp ) == 0, "\"%s\" == \"%s\"", spl[ i ], cmp );
     }
     va_end( vaList );
 
@@ -195,6 +195,8 @@ static void test_str( void )
                   ",,Ho,,",
                   ",,ps,,",
                   ",," );
+
+    test_one_str( "ABCDEF", "", 0, 6, "A", "B", "C", "D", "E", "F" );
 }
 
 static void test_regex( void )
@@ -247,7 +249,6 @@ static void test_regex( void )
     test_one_regex(
             ";;a,,b,c,;d;e", "[,;]", 0, 0, 9, "", "", "a", "", "b", "c", "", "d", "e" );
 
-    PrintSplArray = true;
     test_one_regex( ";;a,,b,c,;d;e",
                     "[,;]",
                     0,
@@ -258,10 +259,36 @@ static void test_regex( void )
                     "c",
                     "d",
                     "e" );
+
+    test_one_regex( ";;a,,b,c,;d;e",
+                    "[,;]",
+                    0,
+                    STRSPLIT_KEEP_DELIM_PRE | STRSPLIT_KEEP_DELIM_POST,
+                    9,
+                    ";",
+                    ";;",
+                    ";a,",
+                    ",,",
+                    ",b,",
+                    ",c,",
+                    ",;",
+                    ";d;",
+                    ";e" );
+
+    test_one_regex( ",,,,,,,", ",", 0, STRSPLIT_EXCLUDE_EMPTY, 0 );
 }
+
+#define RUN_TEST( FUNC_CALL )                      \
+    do                                             \
+    {                                              \
+        printf( "running  \"" #FUNC_CALL "\"\n" ); \
+        ( FUNC_CALL );                             \
+        printf( "finished \"" #FUNC_CALL "\"\n" ); \
+    }                                              \
+    while ( 0 )
 
 int main( void )
 {
-    test_str();
-    test_regex();
+    RUN_TEST( test_str() );
+    RUN_TEST( test_regex() );
 }

@@ -9,12 +9,16 @@
 
 #include <stdlib.h> /* exit */
 
-#define assert_that( EXPRESSION, ... )                   \
-    do                                                   \
-    {                                                    \
-        if ( !( EXPRESSION ) )                           \
-            exit( fwarnx_ret( RV_ERROR, __VA_ARGS__ ) ); \
-    }                                                    \
+/**
+ * if EXPRESSION evaluates to false, the program warns
+ * according to the varargs & exits with code -1
+ */
+#define assert_that( EXPRESSION, ... )                                       \
+    do                                                                       \
+    {                                                                        \
+        if ( !( EXPRESSION ) )                                               \
+            exit( fwarnx_ret( RV_ERROR, "Assertion error: " __VA_ARGS__ ) ); \
+    }                                                                        \
     while ( 0 )
 
 #endif //CLIBS_ASSERT_THAT_H

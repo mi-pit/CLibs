@@ -180,13 +180,22 @@ ssize_t string_split( str_t **str_arr_cont,
                       const string_t split_tok,
                       strsplit_mode_t mode )
 {
-    if ( split_tok == NULL || ( strcmp( split_tok, "" ) == 0 ) )
-    {
-        // fixme: "" -> split by char
+    if ( split_tok == NULL )
         return fwarnx_ret( RV_EXCEPTION, "invalid split token" );
-    }
     if ( string == NULL )
         return fwarnx_ret( RV_EXCEPTION, "string cannot be null" );
+
+    if ( strcmp( split_tok, "" ) == 0 )
+    {
+        size_t count = strlen( string );
+        for ( size_t i = 0; i < count; ++i )
+        {
+            ( *str_arr_cont )[ i ]      = malloc( 2 );
+            ( *str_arr_cont )[ i ][ 0 ] = string[ i ];
+            ( *str_arr_cont )[ i ][ 1 ] = '\0';
+        }
+        return ( ssize_t ) count;
+    }
 
     List ls = list_init_type( str_t );
     if ( ls == NULL )
@@ -259,16 +268,16 @@ ssize_t string_split_regex( str_t **str_arr_cont,
 
     regmatch_t regmatch = { 0 };
 
-    const char *last_end = NULL;
+    const char *next_start = NULL;
     do
     {
         int ree_rv = regexec( regexp, searched, 1, &regmatch, 0 );
         if ( ree_rv == REG_NOMATCH )
         {
             const char *to_dup =
-                    ( !( mode & STRSPLIT_KEEP_DELIM_POST ) || last_end == NULL )
+                    ( !( mode & STRSPLIT_KEEP_DELIM_POST ) || next_start == NULL )
                             ? searched
-                            : last_end;
+                            : next_start;
             if ( ( mode & STRSPLIT_EXCLUDE_EMPTY ) && *to_dup == '\0' )
                 break;
             str_t dup = strdup( to_dup );
@@ -285,8 +294,9 @@ ssize_t string_split_regex( str_t **str_arr_cont,
         }
 
         const char *actual_start =
-                ( !( mode & STRSPLIT_KEEP_DELIM_POST ) || last_end == NULL ) ? searched
-                                                                             : last_end;
+                ( !( mode & STRSPLIT_KEEP_DELIM_POST ) || next_start == NULL )
+                        ? searched
+                        : next_start;
 
         size_t end_offset_from_searched =
                 ( mode & STRSPLIT_KEEP_DELIM_PRE ) ? regmatch.rm_eo : regmatch.rm_so;
@@ -303,8 +313,10 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                 return RV_ERROR;
             }
         }
-        last_end = searched + end_offset_from_searched;
-        searched = searched + regmatch.rm_eo;
+        next_start = ( mode & STRSPLIT_KEEP_DELIM_POST )
+                             ? searched + regmatch.rm_so
+                             : searched + end_offset_from_searched;
+        searched += regmatch.rm_eo;
     }
     while ( regmatch.rm_eo != -1 && regmatch.rm_so != -1 );
 

@@ -5,13 +5,17 @@
 #ifndef CLIBS_ERRORS_H
 #define CLIBS_ERRORS_H
 
-#include <err.h>       /* include */
-#include <errno.h>     /* include */
-#include <printf.h>    /* include fprintf (for stack_traces) */
+/* for this header */
+#include <errno.h>     /* for WarnUniversal + include */
 #include <stddef.h>    /* ptrdiff_t */
 #include <sys/cdefs.h> /* __printflike */
 
+/* for user */
+#include <err.h>    /* include */
+#include <printf.h> /* include fprintf (for stack_traces) */
 
+
+/* errno value */
 #define E_OK 0 /* No error */
 
 
@@ -32,10 +36,16 @@
 #endif //__cold
 
 
-#define RV_EXCEPTION ( -2 )
-#define RV_ERROR     ( -1 )
-#define RV_SUCCESS   0
+#define RV_EXCEPTION ( -2 ) /* Non-fatal, recoverable error e.g. OOB index */
+#define RV_ERROR     ( -1 ) /* Fatal, un-recoverable error */
+#define RV_SUCCESS   0      /* Success */
 
+/**
+ * Returns the value (of type ‹int›) of the function call or variable
+ * if it doesn't equal RV_SUCCESS
+ *
+ * @see @code return_on_error() @endcode
+ */
 #define return_on_fail( func_call )           \
     do                                        \
     {                                         \
@@ -45,6 +55,12 @@
     }                                         \
     while ( 0 )
 
+/**
+ * Returns the value (of type ‹int›) of the function call or variable
+ * if it equals RV_ERROR
+ *
+ * @see @code return_on_fail() @endcode
+ */
 #define return_on_error( func_call )          \
     do                                        \
     {                                         \
@@ -93,8 +109,6 @@ ptrdiff_t WarnUniversal( const char *restrict FileName,
                          const char *__restrict format,
                          ... ) __printflike( 6, 7 );
 
-#define FFL_FMTSTR "%s: %s @ %d"
-
 
 /**
  * prints
@@ -136,20 +150,26 @@ ptrdiff_t WarnUniversal( const char *restrict FileName,
  */
 #define ffl_stack_trace() \
     ( ( void ) fprintf(   \
-            stderr, "\tin " FFL_FMTSTR "\n", __FILE_NAME__, __func__, __LINE__ ) )
+            stderr, "\tin %s: %s @ %d\n", __FILE_NAME__, __func__, __LINE__ ) )
 
 
+/**
+ * Warns like warn(3) and returns RETVAL
+ */
 #define warn_ret( RETVAL, ... ) \
     WarnUniversal( NULL, NULL, -1, errno, RETVAL, __VA_ARGS__ )
 #define warnx_ret( RETVAL, ... ) WarnUniversal( NULL, NULL, -1, -1, RETVAL, __VA_ARGS__ )
 
+/**
+ * Warns like warn(3) and returns RETVAL which is a pointer
+ */
 #define warn_ret_p( RETVAL, ... ) \
     ( void * ) WarnUniversal( NULL, NULL, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 #define warnx_ret_p( RETVAL, ... ) \
     ( void * ) WarnUniversal( NULL, NULL, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
 /**
- * warn() with function name at the start
+ * warn(3) with function name at the start
  */
 #define fwarn( ... )  ( void ) WarnUniversal( NULL, __func__, -1, errno, -1, __VA_ARGS__ )
 #define fwarnx( ... ) ( void ) WarnUniversal( NULL, __func__, -1, -1, -1, __VA_ARGS__ )
