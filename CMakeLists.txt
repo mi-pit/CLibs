@@ -9,20 +9,16 @@ add_executable(TestStringStrip
         Tests/test_strsplit.c
         string_utils.c
         dynarr.c
-        errors.c
         )
 
 add_executable(TestStringEscape
         Tests/test_string_escape.c
         string_utils.c
         dynarr.c
-        errors.c
-        print_functions.c
         )
 
 add_executable(TestUpperLower
         Tests/test_upper_lower.c
         string_utils.c
-        errors.c
         dynarr.c
         )

@@ -1,12 +1,12 @@
 #ifndef CLIBS_DYNAMIC_ARRAY_H
 #define CLIBS_DYNAMIC_ARRAY_H
 
-
 #include "array_printf.h"
 
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/cdefs.h>
+
 
 #ifndef __result_use_check
 #define __result_use_check __attribute__( ( warn_unused_result ) )

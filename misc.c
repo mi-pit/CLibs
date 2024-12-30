@@ -3,7 +3,6 @@
 #include "extra_types.h"
 
 #include <ctype.h>
-#include <string.h>
 
 
 int64_t hash_func( const void *data, size_t nbytes )
@@ -39,11 +38,11 @@ int64_t digitsof( uint64_t num, int base )
     if ( base <= 0 )
         return -1;
 
-    int ndigs;
+    int64_t ndigs;
     for ( ndigs = 0; num > 0; num /= base, ++ndigs )
         ;
 
-    return ( int ) ndigs;
+    return ndigs;
 }
 
 int64_t power( int64_t base, int64_t exp )

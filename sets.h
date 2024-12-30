@@ -2,7 +2,7 @@
 #define CLIBS_SETS_H
 
 
-#include "extra_types.h"     /* GenericData */
+#include "extra_types.h"          /* GenericData */
 #include "item_print_functions.h" /* PrintFunction */
 
 #include <stdbool.h>

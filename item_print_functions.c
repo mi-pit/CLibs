@@ -50,12 +50,7 @@ void print_pointer( const void *data, size_t nbytes )
         return;
     }
 
-    printf( "'"
-            "pointer"
-            ": "
-            "\"%p\""
-            "'",
-            *( ( const void ** ) data ) );
+    printf( "'pointer: \"%p\"'", *( ( void ** ) data ) );
 }
 
 void print_string( const void *data, size_t nbytes )

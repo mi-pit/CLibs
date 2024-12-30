@@ -3,7 +3,7 @@
 //
 
 #include "../string_utils.h"
-#include "./assert_that.h"
+#include "../assert_that.h"
 #include "array_printf.h"
 
 #include <err.h>

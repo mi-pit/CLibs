@@ -65,12 +65,12 @@ bool is_within( int64_t low, int64_t num, int64_t high );
 /**
  * Smaller of the two numbers
  */
-#define min_m( a, b ) ( ( a ) < ( b ) ) ? ( a ) : ( b )
+#define min_m( a, b ) ( ( a ) < ( b ) ? ( a ) : ( b ) )
 
 /**
  * Bigger of the two numbers
  */
-#define max_m( a, b ) ( ( a ) > ( b ) ) ? ( a ) : ( b )
+#define max_m( a, b ) ( ( a ) > ( b ) ? ( a ) : ( b ) )
 
 /**
  * Sign ( -1, 0, 1 ) of the number
