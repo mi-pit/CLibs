@@ -2,7 +2,7 @@
 // Created by MacBook on 25.12.2024.
 //
 
-#include "print_functions.h"
+#include "print_ln.h"
 
 int PrintLNUniversal( FILE *__restrict file, const char *__restrict format, ... )
 {

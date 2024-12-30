@@ -5,22 +5,15 @@
 #include <ctype.h>
 
 
-int64_t hash_func( const void *data, size_t nbytes )
+uint64_t hash_func( const void *data, size_t nbytes )
 {
-    union {
-        int64_t number;
-        byte byte_array[ sizeof( int64_t ) ];
-    } hash;
-    hash.number = ( int64_t ) nbytes;
+    uint64_t hash = 5381 * nbytes;
 
     const byte *gen_data = ( byte * ) data;
     for ( size_t i = 0; i < nbytes; ++i )
-    {
-        hash.byte_array[ i % sizeof( int64_t ) ] =
-                ( byte ) ( hash.byte_array[ i % sizeof( int64_t ) ] ^ gen_data[ i ] );
-    }
+        hash = ( ( hash << 5 ) + hash ) + gen_data[ i ];
 
-    return hash.number;
+    return hash;
 }
 
 

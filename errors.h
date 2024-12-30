@@ -50,7 +50,7 @@
     do                                        \
     {                                         \
         int func_call_retval = ( func_call ); \
-        if ( func_call_retval != RV_SUCCESS ) \
+        if ( func_call_retval < RV_SUCCESS )  \
             return func_call_retval;          \
     }                                         \
     while ( 0 )

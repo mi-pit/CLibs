@@ -42,7 +42,7 @@ declare_cmp_function( int64_t );
     REQUIRE_SEMICOLON
 
 
-int64_t hash_func( const void *, size_t );
+uint64_t hash_func( const void *, size_t );
 
 
 /**
