@@ -68,6 +68,13 @@ str_t string_reversed( string_t ) __result_use_check;
 void string_reverse( str_t );
 
 
+void string_to_upper( str_t );
+str_t string_as_upper( string_t );
+
+void string_to_lower( str_t );
+str_t string_as_lower( string_t );
+
+
 #define STRSPLIT_EXCLUDE_EMPTY   0x01
 #define STRSPLIT_KEEP_DELIM_PRE  0x02
 #define STRSPLIT_KEEP_DELIM_POST 0x04

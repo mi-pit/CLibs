@@ -175,6 +175,72 @@ void string_reverse( str_t s )
 }
 
 
+void string_to_upper( str_t str )
+{
+    size_t idx = 0;
+    while ( str[ idx ] != '\0' )
+    {
+        if ( str[ idx ] >= 'a' && str[ idx ] <= 'z' )
+            str[ idx ] -= 0x20;
+
+        ++idx;
+    }
+}
+
+str_t string_as_upper( string_t old )
+{
+    size_t len = strlen( old );
+
+    str_t new = malloc( len + 1 );
+    if ( new == NULL )
+        return fwarn_ret_p( NULL, "malloc" );
+
+    new[ len ] = '\0';
+
+    for ( size_t i = 0; i < len; ++i )
+    {
+        char c = old[ i ];
+        if ( c >= 'a' && c <= 'z' )
+            c -= 0x20;
+        new[ i ] = c;
+    }
+    return new;
+}
+
+
+void string_to_lower( str_t str )
+{
+    size_t idx = 0;
+    while ( str[ idx ] != '\0' )
+    {
+        if ( str[ idx ] >= 'A' && str[ idx ] <= 'Z' )
+            str[ idx ] += 0x20;
+
+        ++idx;
+    }
+}
+
+str_t string_as_lower( string_t old )
+{
+    size_t len = strlen( old );
+
+    str_t new = malloc( len + 1 );
+    if ( new == NULL )
+        return fwarn_ret_p( NULL, "malloc" );
+
+    new[ len ] = '\0';
+
+    for ( size_t i = 0; i < len; ++i )
+    {
+        char c = old[ i ];
+        if ( c >= 'A' && c <= 'Z' )
+            c += 0x20;
+        new[ i ] = c;
+    }
+    return new;
+}
+
+
 ssize_t string_split( str_t **str_arr_cont,
                       const string_t string,
                       const string_t split_tok,

@@ -19,3 +19,10 @@ add_executable(TestStringEscape
         errors.c
         print_functions.c
         )
+
+add_executable(TestUpperLower
+        Tests/test_upper_lower.c
+        string_utils.c
+        errors.c
+        dynarr.c
+        )
