@@ -5,7 +5,7 @@
 #ifndef CLIBS_ASSERT_THAT_H
 #define CLIBS_ASSERT_THAT_H
 
-#include "../errors.h" /* warn */
+#include "errors.h" /* warn */
 
 #include <stdlib.h> /* exit */
 
