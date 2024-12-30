@@ -84,7 +84,7 @@ void print_List( const void *data, size_t nbytes )
         return;
     }
     ConstList ls = *( List * ) data;
-    list_printm( ls, LS_PRINT_NOFORMAT );
+    list_print( ls );
 }
 
 void print_Set( const void *data, size_t nbytes )

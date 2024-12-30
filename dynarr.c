@@ -498,7 +498,7 @@ static void list_print_static( ConstList ls, // NOLINT(misc-no-recursion)
     }
     if ( ls->items == NULL )
     {
-        printf( "List ( %p ) has no items\n", ( void * ) ls );
+        printf( "List (%p) has no items\n", ( void * ) ls );
         return;
     }
 

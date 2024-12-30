@@ -250,16 +250,14 @@ void list_destroy_p( List *lsp );
  * This function is sort of an afterthought and
  * probably doesn't work very well\n
  */
-void list_print( ConstList ) __deprecated_msg( "use list_printf if possible" );
+void list_print( ConstList );
 
-void list_printm( ConstList, int print_mode )
-        __deprecated_msg( "use list_printf if possible" );
+void list_printm( ConstList, int print_mode );
 
 /**
  * Works like list_printm(), but also prints the List size
  */
-void list_prints( ConstList, int print_mode )
-        __deprecated_msg( "use list_printf if possible" );
+void list_prints( ConstList, int print_mode );
 
 /* ––––– GETTERS ––––– */
 
