@@ -49,63 +49,66 @@
 #define PRINT_COLOR "%s"
 
 
+#define TEST_NAME_CREATOR( TOK ) RUNTEST_##TOK
+
+
 #define TEST( HANDLE )                                          \
-    void TEST_##HANDLE( void )                                  \
+    void TEST_NAME_CREATOR( HANDLE )( void )                    \
     {                                                           \
-        int TEST_failed_total   = 0;                            \
-        int TEST_ran_total      = 0;                            \
-        const char *test_handle = #HANDLE;                      \
+        int TEST_NAME_CREATOR( failed_total )        = 0;       \
+        int TEST_NAME_CREATOR( ran_total )           = 0;       \
+        const char *TEST_NAME_CREATOR( test_handle ) = #HANDLE; \
         printf( PRINT_COLOR "[TEST] " PRINT_COLOR #HANDLE "\n", \
                 COLOR_YELLOW,                                   \
                 COLOR_DEFAULT );
 
-#define END_TEST                                                                  \
-    printf( COLOR_YELLOW "[TEST] " COLOR_DEFAULT "%s: ran %i tests, " PRINT_COLOR \
-                         "%i successful" COLOR_DEFAULT ", " PRINT_COLOR           \
-                         "%i failed\n" COLOR_DEFAULT,                             \
-            test_handle,                                                          \
-            TEST_ran_total,                                                       \
-            TEST_ran_total - TEST_failed_total == 0 ? COLOR_RED : COLOR_GREEN,    \
-            TEST_ran_total - TEST_failed_total,                                   \
-            TEST_failed_total == 0 ? COLOR_GREEN : COLOR_RED,                     \
-            TEST_failed_total );                                                  \
+#define END_TEST                                                                    \
+    printf( COLOR_YELLOW "[TEST] " COLOR_DEFAULT "%s: ran %i tests, " PRINT_COLOR   \
+                         "%i successful" COLOR_DEFAULT ", " PRINT_COLOR             \
+                         "%i failed\n" COLOR_DEFAULT,                               \
+            TEST_NAME_CREATOR( test_handle ),                                       \
+            TEST_NAME_CREATOR( ran_total ),                                         \
+            TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ) == 0 \
+                    ? COLOR_RED                                                     \
+                    : COLOR_GREEN,                                                  \
+            TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ),     \
+            TEST_NAME_CREATOR( failed_total ) == 0 ? COLOR_GREEN : COLOR_RED,       \
+            TEST_NAME_CREATOR( failed_total ) );                                    \
     }
 
 
-#define RUN( HANDLE ) TEST_##HANDLE()
+#define RUN( HANDLE ) TEST_NAME_CREATOR( HANDLE )()
 
 
-#ifndef MAX
 #define MAX( A, B ) ( ( ( A ) > ( B ) ) ? ( A ) : ( B ) )
-#endif //MAX
-
-#ifndef MIN
 #define MIN( A, B ) ( ( ( A ) < ( B ) ) ? ( A ) : ( B ) )
-#endif //MIN
 
-#define UNIT_TEST( CONDITION )                                                          \
-    do                                                                                  \
-    {                                                                                   \
-        printf( PRINT_COLOR "    [UNIT TEST] " PRINT_COLOR #CONDITION " ",              \
-                COLOR_YELLOW,                                                           \
-                COLOR_DEFAULT );                                                        \
-        size_t run_test_test_name_str_len = strlen( #CONDITION );                       \
-        bool run_test_success             = CONDITION;                                  \
-        const size_t LIMIT_ =                                                           \
-                MIN( 300 - ( 32 + run_test_test_name_str_len ),                         \
-                     MAX( 0,                                                            \
-                          COLUMN_MAX_LENGHT - ( 32 + run_test_test_name_str_len ) ) ) + \
-                1;                                                                      \
-        for ( size_t run_test_idx = 0; run_test_idx < LIMIT_; ++run_test_idx )          \
-            printf( "." );                                                              \
-        printf( " " PRINT_COLOR "%s" PRINT_COLOR "\n",                                  \
-                run_test_success ? COLOR_GREEN : COLOR_RED,                             \
-                run_test_success ? "SUCCESS" : "FAILURE",                               \
-                COLOR_DEFAULT );                                                        \
-        if ( !run_test_success )                                                        \
-            ++TEST_failed_total;                                                        \
-        ++TEST_ran_total;                                                               \
-    }                                                                                   \
+#define UNIT_TEST( CONDITION )                                                      \
+    do                                                                              \
+    {                                                                               \
+        printf( PRINT_COLOR "    [UNIT TEST] " PRINT_COLOR #CONDITION " ",          \
+                COLOR_YELLOW,                                                       \
+                COLOR_DEFAULT );                                                    \
+        size_t TEST_NAME_CREATOR( test_name_len ) = strlen( #CONDITION );           \
+        bool TEST_NAME_CREATOR( success )         = CONDITION;                      \
+        const size_t TEST_NAME_CREATOR( LIMIT ) =                                   \
+                MIN( 300 - ( 32 + TEST_NAME_CREATOR( test_name_len ) ),             \
+                     MAX( 0,                                                        \
+                          COLUMN_MAX_LENGHT -                                       \
+                                  ( 32 + TEST_NAME_CREATOR( test_name_len ) ) ) ) + \
+                1;                                                                  \
+        for ( size_t TEST_NAME_CREATOR( index ) = 0;                                \
+              TEST_NAME_CREATOR( index ) < TEST_NAME_CREATOR( LIMIT );              \
+              ++TEST_NAME_CREATOR( index ) )                                        \
+            printf( "." );                                                          \
+        printf( " " PRINT_COLOR "%s" PRINT_COLOR "\n",                              \
+                TEST_NAME_CREATOR( success ) ? COLOR_GREEN : COLOR_RED,             \
+                TEST_NAME_CREATOR( success ) ? "SUCCESS" : "FAILURE",               \
+                COLOR_DEFAULT );                                                    \
+        if ( !TEST_NAME_CREATOR( success ) )                                        \
+            ++TEST_NAME_CREATOR( failed_total );                                    \
+        ++TEST_NAME_CREATOR( ran_total );                                           \
+    }                                                                               \
     while ( 0 )
 
 #endif //CLIBS_RUN_TEST_H
