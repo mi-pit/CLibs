@@ -5,6 +5,7 @@
 #include "string_utils.h"
 
 #include "dynarr.h" /* List */
+#include "dynstring.h"
 #include "errors.h" /* *warn* */
 
 #include <ctype.h>
@@ -240,6 +241,51 @@ str_t string_as_lower( string_t old )
 }
 
 
+str_t string_replaced( string_t const str, string_t old, string_t new )
+{
+    if ( *old == '\0' )
+        return fwarnx_ret_p( NULL, "cannot replace \"%s\"", old );
+
+    const char *curr     = str;
+    DynamicString result = dynstr_init();
+    do
+    {
+        const char *next = strstr( curr, old );
+        if ( next == NULL )
+        {
+            if ( dynstr_append( result, curr ) != RV_SUCCESS )
+                goto ERROR;
+            break;
+        }
+        size_t app_len = next - curr;
+        if ( app_len > 0 )
+            if ( dynstr_appendn( result, curr, app_len ) != RV_SUCCESS )
+                goto ERROR;
+
+        if ( dynstr_append( result, new ) != RV_SUCCESS )
+            goto ERROR;
+
+        if ( next == NULL )
+            break;
+        curr = next + strlen( old );
+    }
+    while ( *curr != '\0' );
+
+    str_t ret = dynstr_to_str( result );
+    if ( ret == NULL )
+        f_stack_trace();
+
+    dynstr_destroy( result );
+
+    return ret;
+
+ERROR:
+    f_stack_trace();
+    dynstr_destroy( result );
+    return NULL;
+}
+
+
 ssize_t string_split( str_t **str_arr_cont,
                       const string_t string,
                       const string_t split_tok,
@@ -255,7 +301,12 @@ ssize_t string_split( str_t **str_arr_cont,
         size_t count = strlen( string );
         for ( size_t i = 0; i < count; ++i )
         {
-            ( *str_arr_cont )[ i ]      = malloc( 2 );
+            if ( ( ( *str_arr_cont )[ i ] = malloc( 2 ) ) == NULL )
+            {
+                while ( i-- > 0 )
+                    free( ( *str_arr_cont )[ i ] );
+                return RV_ERROR;
+            }
             ( *str_arr_cont )[ i ][ 0 ] = string[ i ];
             ( *str_arr_cont )[ i ][ 1 ] = '\0';
         }

@@ -43,3 +43,19 @@ add_executable(TestLeet
         pointer_utils.c
         misc.c
         )
+
+add_executable(TestReplace
+        Tests/test_replace.c
+        string_utils.c
+        dynarr.c
+        errors.c
+        dynstring.c
+        )
+
+add_executable(TestMisc
+        Tests/test_misc.c
+        string_utils.c
+        errors.c
+        dynstring.c
+        dynarr.c
+        )

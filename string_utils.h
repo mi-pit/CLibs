@@ -68,11 +68,34 @@ str_t string_reversed( string_t ) __result_use_check;
 void string_reverse( str_t );
 
 
+/**
+ * Replaces all lowercase letters to corresponding uppercase letters
+ */
 void string_to_upper( str_t );
+/**
+ * Creates a new string with all lowercase letters replaced with uppercase ones
+ * @return new string, should be freed
+ */
 str_t string_as_upper( string_t ) __result_use_check;
 
+/**
+ * Replaces all uppercase letters to corresponding lowercase letters
+ */
 void string_to_lower( str_t );
+/**
+ * Creates a new string with all uppercase letters replaced with lowercase ones
+ * @return new string, should be freed
+ */
 str_t string_as_lower( string_t ) __result_use_check;
+
+
+/**
+ * Creates a new string with all occurrences of the sub-string ‹old› replaced with ‹new›
+ * @param old
+ * @param new
+ * @return new string, should be freed
+ */
+str_t string_replaced( string_t, string_t old, string_t new ) __result_use_check;
 
 
 #define STRSPLIT_EXCLUDE_EMPTY   0x01

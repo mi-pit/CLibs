@@ -12,9 +12,7 @@
 typedef int64_t Number;
 typedef size_t count_t;
 
-#define X( ... )
-
-#define TypeNumber 1
+#define TypeNumber 2
 
 #if TypeNumber == 1
 #define Type Number
@@ -30,7 +28,7 @@ define_print_func( pointer_t, "%p" );
 
 Type majority_element( List nums )
 {
-    Dict X( Type, count_t ) freq = dict_init();
+    Dict freq = dict_init();
 
     foreach_ls( Type, num, nums )
     {
@@ -39,7 +37,7 @@ Type majority_element( List nums )
         dict_insert( freq, &num, sizeof num, &count, sizeof count );
     }
 
-    dict_printn_as( freq, print_Number, print_size_t );
+    dict_printn_as( freq, print_function( Type ), print_size_t );
 
     foreach_ls( Type, num, nums )
     {
@@ -118,8 +116,13 @@ int main( void )
                       2,
                       1001000 );
 #elif TypeNumber == 2
-    test_one_majelem(
-            void *, NULL, 5, NULL, NULL, ( void * ) 0x100, ( void * ) 0xFFFFFFF, NULL );
+    test_one_majelem( void *,
+                      NULL,
+                      4,
+                      NULL,
+                      list_init_type( int ),
+                      list_init_type( size_t ),
+                      list_init_size( -1 ) );
 #endif
 
     return 0;
