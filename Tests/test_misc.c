@@ -32,8 +32,8 @@ END_TEST
 TEST( all_fail )
 {
     UNIT_TEST( false );
-    UNIT_TEST( fopen( "nonexistant", "r" ) != NULL );
-    UNIT_TEST( fopen( "another nonexistant", "r" ) != NULL );
+    UNIT_TEST( fopen( "nonexistent", "r" ) != NULL );
+    UNIT_TEST( fopen( "another nonexistent", "r" ) != NULL );
 }
 END_TEST
 
