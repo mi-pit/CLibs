@@ -22,6 +22,18 @@ struct key_value_pair {
     bool removed;
 };
 
+struct const_kvp {
+    const void *key;
+    size_t key_size;
+    PrintFunction key_print;
+
+    const void *val;
+    size_t val_size;
+    PrintFunction val_print;
+
+    bool removed;
+};
+
 
 #define DICT_DEF_SIZE 64
 

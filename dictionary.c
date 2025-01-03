@@ -4,7 +4,6 @@
 #include "misc.h"
 #include "pointer_utils.h"
 
-#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,17 +49,15 @@ Dict dict_init( void )
 {
     struct key_value_pair_set *dict = calloc( 1, sizeof( struct key_value_pair_set ) );
     if ( dict == NULL )
-    {
-        warn( __func__ );
-        return NULL;
-    }
+        return fwarn_ret_p( NULL, "calloc" );
 
     dict->items = calloc( DICT_DEF_SIZE, sizeof( struct key_value_pair ) );
     if ( dict->items == NULL )
     {
-        warn( __func__ );
-        return NULL;
+        free( dict );
+        return fwarn_ret_p( NULL, "calloc" );
     }
+
     dict->capacity = DICT_DEF_SIZE;
 
     return dict;
@@ -77,11 +74,11 @@ int dict_insert_f( struct key_value_pair_set *dict,
     // todo: resize
     uint64_t hash = hash_func( key, key_size );
 
-    const struct key_value_pair new_item = {
+    struct const_kvp new_item = {
         .key_size = key_size,
         .val_size = val_size,
-        .key      = ( void      *) key, // still const
-        .val      = ( void      *) val, //
+        .key      = key,
+        .val      = val,
     };
 
     for ( size_t i = 0; i < dict->capacity; ++i )

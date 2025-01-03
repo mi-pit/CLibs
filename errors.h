@@ -13,6 +13,7 @@
 /* for user */
 #include <err.h>    /* include */
 #include <printf.h> /* include fprintf (for stack_traces) */
+#include <string.h>
 
 
 /* errno value */
@@ -101,13 +102,51 @@
  * @return @code return_value @endcode
  * @bug %p for some reason sometimes throws compiler errors for non `void *` pointers
  */
-ptrdiff_t WarnUniversal( const char *restrict FileName,
-                         const char *restrict FunctionName,
-                         int LineNumber,
-                         int err_no,
-                         ptrdiff_t return_value,
-                         const char *__restrict format,
-                         ... ) __printflike( 6, 7 );
+static ptrdiff_t WarnUniversal( const char *restrict FileName,
+                                const char *restrict FunctionName,
+                                int LineNumber,
+                                int err_no,
+                                ptrdiff_t return_value,
+                                const char *__restrict format,
+                                ... ) __printflike( 6, 7 );
+
+#if defined( __APPLE__ ) || defined( __FreeBSD__ )
+#include <stdlib.h>
+#define get_prog_name() getprogname()
+#elif defined( __FILE_NAME__ )
+#define get_prog_name() __FILE_NAME__
+#else
+#define get_prog_name() "current-program"
+#endif
+
+static ptrdiff_t WarnUniversal( const char *restrict FileName,
+                                const char *restrict FunctionName,
+                                int LineNumber,
+                                int err_no,
+                                ptrdiff_t return_value,
+                                const char *__restrict format,
+                                ... )
+{
+    fprintf( stderr, "%s", get_prog_name() );
+    if ( FileName != NULL )
+        fprintf( stderr, ": %s", FileName );
+    if ( FunctionName != NULL )
+        fprintf( stderr, ": %s", FunctionName );
+    if ( LineNumber > 0 )
+        fprintf( stderr, " @ %i", LineNumber );
+    fprintf( stderr, ": " );
+
+    va_list vaList;
+    va_start( vaList, format );
+    vfprintf( stderr, format, vaList );
+    va_end( vaList );
+
+    if ( err_no >= 0 )
+        fprintf( stderr, ": %s", strerror( err_no ) );
+    fprintf( stderr, "\n" );
+
+    return return_value;
+}
 
 
 /**
