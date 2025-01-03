@@ -24,19 +24,15 @@ DynamicString dynstr_init_cap( size_t capacity )
 {
     DynamicString new = calloc( 1, sizeof( struct dynamic_string ) );
     if ( new == NULL )
-    {
-        fflwarn( "%s", "calloc" );
-        return NULL;
-    }
+        return fwarn_ret_p( NULL, "calloc" );
 
     new->cap  = capacity;
     new->len  = 0;
     new->data = calloc( new->cap, 1 );
     if ( new->data == NULL )
     {
-        fflwarn( "%s", "calloc" );
         free( new );
-        return NULL;
+        return fwarn_ret_p( NULL, "calloc" );
     }
 
     return new;
@@ -71,10 +67,10 @@ static int dynstr_resize( DynamicString dynstr, size_t new_size )
 {
     char *temp = realloc( dynstr->data, new_size );
     if ( temp == NULL )
-        return fwarn_ret( RV_ERROR, "realloc%s", "" );
+        return fwarn_ret( RV_ERROR, "realloc" );
 
     dynstr->data = temp;
-    dynstr->cap  = ( ssize_t ) new_size;
+    dynstr->cap  = new_size;
     dynstr->len  = min_m( dynstr->cap, dynstr->len );
 
     return RV_SUCCESS;
@@ -101,6 +97,27 @@ int dynstr_append( DynamicString dynstr, const char *app )
 
     return RV_SUCCESS;
 }
+
+int dynstr_appendn( DynamicString dynstr, const char *app, size_t len )
+{
+    size_t new_size = dynstr->len + len;
+    if ( new_size >= dynstr->cap )
+    {
+        size_t new_cap = dynstr->cap;
+        /* get next smallest power of 2 */
+        while ( new_cap < new_size )
+            new_cap *= 2;
+
+        return_on_fail( dynstr_resize( dynstr, new_size ) );
+    }
+
+    strncpy( dynstr->data + dynstr->len, app, len );
+    dynstr->data[ new_size ] = '\0';
+    dynstr->len              = new_size;
+
+    return RV_SUCCESS;
+}
+
 
 int dynstr_prepend( DynamicString dynstr, string_t s )
 {
@@ -226,7 +243,10 @@ int dynstr_reset( DynamicString dynstr )
 
 str_t dynstr_to_str( ConstDynamicString dynstr )
 {
-    return strndup( dynstr->data, dynstr->len );
+    str_t ret = strndup( dynstr->data, dynstr->len );
+    if ( ret == NULL )
+        fwarn( "strndup" );
+    return ret;
 }
 
 

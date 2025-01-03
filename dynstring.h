@@ -55,6 +55,8 @@ void dynstr_destroy( DynamicString );
  * @return 0 on success, -1 on allocation error
  */
 int dynstr_append( DynamicString, const char * );
+int dynstr_appendn( DynamicString dynstr, const char *app, size_t len );
+
 /**
  * Adds a string to the start of the DynamicString
  * @return 0 on success, -1 on allocation error

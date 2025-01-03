@@ -13,12 +13,13 @@
  * if EXPRESSION evaluates to false, the program warns
  * according to the varargs & exits with code -1
  */
-#define assert_that( EXPRESSION, ... )                                         \
-    do                                                                         \
-    {                                                                          \
-        if ( !( EXPRESSION ) )                                                 \
-            exit( fflwarnx_ret( RV_ERROR, "Assertion error: " __VA_ARGS__ ) ); \
-    }                                                                          \
+#define assert_that( EXPRESSION, ... )                                                \
+    do                                                                                \
+    {                                                                                 \
+        if ( !( EXPRESSION ) )                                                        \
+            exit( fflwarnx_ret( RV_ERROR,                                             \
+                                "Assertion error: " #EXPRESSION ": " __VA_ARGS__ ) ); \
+    }                                                                                 \
     while ( 0 )
 
 #endif //CLIBS_ASSERT_THAT_H
