@@ -7,7 +7,6 @@
 #include "../foreach.h"
 #include "../pointer_utils.h"
 
-#include <inttypes.h>
 
 typedef int64_t Number;
 typedef size_t count_t;
@@ -16,6 +15,7 @@ typedef size_t count_t;
 
 #if TypeNumber == 1
 #define Type Number
+#include <inttypes.h>
 define_print_func( Number, "%" PRIi64 );
 
 #elif TypeNumber == 2
