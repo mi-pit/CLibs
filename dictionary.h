@@ -25,12 +25,6 @@ struct key_value_pair {
 
 #define DICT_DEF_SIZE 64
 
-
-enum DictInsertRV {
-    DICTINSERT_INSERTED   = 1,
-    DICTINSERT_KEY_WAS_IN = 2,
-};
-
 enum DictRemoveRV {
     DICTREMOVE_REMOVED   = 1,
     DICTREMOVE_NOT_FOUND = 2,
@@ -42,29 +36,46 @@ Dict dict_init( void );
 
 /**
  * Only compares the data in key and key_size
+ * @param item_1 const struct key_value_pair *
+ * @param item_2 const struct key_value_pair *
  * @return  -1, 0, 1 like memcmp
  */
-int item_key_cmp( const void *, const void * );
+int item_key_cmp( const void *item_1, const void *item_2 );
 int item_val_cmp( const void *, const void * );
 int item_cmp( const void *, const void * );
 
-// clang-format off
 int dict_insert_f( Dict,
-                   const void *key, size_t key_size,
-                   const void *val, size_t val_size,
-                   PrintFunction key_print, PrintFunction val_print );
+                   const void *key,
+                   size_t key_size,
+                   const void *val,
+                   size_t val_size,
+                   PrintFunction key_print,
+                   PrintFunction val_print );
 
+/**
+ * Inserts the value pointed to by ‹val› into the dictionary
+ * with the key pointed to by ‹key›
+ *
+ * @param key key pointer
+ * @param key_size sizeof key
+ * @param val val pointer
+ * @param val_size sizeof val
+ * @return
+ */
 int dict_insert( Dict,
-                 const void *key, size_t key_size,
-                 const void *val, size_t val_size );
+                 const void *key,
+                 size_t key_size,
+                 const void *val,
+                 size_t val_size );
 
 const struct key_value_pair *dict_get( ConstDict, const void *key, size_t key_size );
 
-const void * dict_get_val( ConstDict, const void *key, size_t key_size );
+const void *dict_get_val( ConstDict, const void *key, size_t key_size );
 int dict_set_val( Dict,
-                  const void *key, size_t key_size,
-                  const void *val, size_t val_size );
-// clang-format on
+                  const void *key,
+                  size_t key_size,
+                  const void *val,
+                  size_t val_size );
 
 int dict_remove( Dict, const void *data, size_t nbytes );
 
@@ -82,28 +93,33 @@ void dict_destroy( Dict );
 
 /* -------- PRINT -------- */
 
-#define dict_printn( dict )         \
-    do                              \
-    {                               \
-        printf( "\"" #dict "\" " ); \
-        dict_print( dict );         \
-    }                               \
+/** Maximum items printed on one line */
+#define DICT_PRINT_LINE_MAX_ITEMS 4
+
+#define dict_printn( DICTIONARY )         \
+    do                                    \
+    {                                     \
+        printf( "\"" #DICTIONARY "\" " ); \
+        dict_print( DICTIONARY );         \
+    }                                     \
     while ( 0 )
 
-#define dict_printn_as( dict, key_func, val_func ) \
-    do                                             \
-    {                                              \
-        printf( "\"" #dict "\" " );                \
-        dict_print_as( dict, key_func, val_func ); \
-    }                                              \
+#define dict_printn_as( DICTIONARY, key_func, val_func ) \
+    do                                                   \
+    {                                                    \
+        printf( "\"" #DICTIONARY "\" " );                \
+        dict_print_as( DICTIONARY, key_func, val_func ); \
+    }                                                    \
     while ( 0 )
 
+/**
+ * Prints the contents of the dictionary as "‹key›: ‹val›"
+ */
 void dict_print( ConstDict );
 void dict_print_as( ConstDict, PrintFunction key_print, PrintFunction val_print );
 
 void kvp_print( const struct key_value_pair *item, const char *kv_sep );
 void kvp_print_as( const struct key_value_pair *item,
-                   bool user_func,
                    PrintFunction key_print,
                    PrintFunction val_print,
                    const char *kv_sep );

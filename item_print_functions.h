@@ -4,6 +4,7 @@
 #include "extra_types.h" /* byte */
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 
@@ -14,15 +15,16 @@
 
 typedef void ( *PrintFunction )( const void *, size_t );
 
+static bool PrintType = false;
 
 #ifndef TYPE_SEPARATOR
 #define TYPE_SEPARATOR ": "
 #endif //TYPE_SEPARATOR
 
+#define item_print_function( type ) print_##type
+#define print_function( type )      item_print_function( type )
 
-#define print( type ) print_##type
-
-#define declare_print_func( name ) void print( name )( const void *, size_t )
+#define declare_print_func( name ) void print_function( name )( const void *, size_t )
 
 /* Default */
 declare_print_func( byte );
@@ -50,16 +52,24 @@ declare_print_func( Dict );
 #define REQUIRE_SEMICOLON struct DECLARATION_MACRO_UNUSED_STRUCT
 #endif //REQUIRE_SEMICOLON
 
-#define define_print_func( type, format_str )                                    \
-    void print( type )( const void *data, size_t nbytes )                        \
-    {                                                                            \
-        if ( nbytes != sizeof( type ) )                                          \
-        {                                                                        \
-            printf( "%s: invalid data", __func__ );                              \
-            return;                                                              \
-        }                                                                        \
-        printf( "'" #type TYPE_SEPARATOR format_str "'", *( ( type * ) data ) ); \
-    }                                                                            \
+#define define_print_func( type, format_str )                      \
+    void print_function( type )( const void *data, size_t nbytes ) \
+    {                                                              \
+        if ( nbytes != sizeof( type ) )                            \
+        {                                                          \
+            fprintf( stderr, "%s: invalid data", __func__ );       \
+            return;                                                \
+        }                                                          \
+                                                                   \
+        if ( PrintType )                                           \
+        {                                                          \
+            printf( "‹" );                                         \
+            printf( #type TYPE_SEPARATOR );                        \
+        }                                                          \
+        printf( format_str, *( ( type * ) data ) );                \
+        if ( PrintType )                                           \
+            printf( "›" );                                         \
+    }                                                              \
     REQUIRE_SEMICOLON
 
 #endif //CLIBS_PRINT_FUNCTIONS_H

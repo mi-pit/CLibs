@@ -31,7 +31,7 @@
  * @param item  name of the new variable
  * @param array array of type 'type[]'
  */
-#define foreach_arr( type, item, array )                              \
+#define foreach_arr( type, item, array )                             \
     foreach_helper_init( sizeof( array ) / sizeof *( array ), item ) \
             foreach_helper_assign( type, item, ( array )[ foreach_index_##item ] )
 
@@ -52,9 +52,9 @@
  * @param item  name of the new variable
  * @param ls string
  */
-#define foreach_ls( type, item, ls )                                    \
-    foreach_helper_init( list_size( ls ), item ) foreach_helper_assign( \
-            type, item, list_access( ls, foreach_index_##item, type ) )
+#define foreach_ls( TYPE, ITEM_NAME, LIST_VAR )                                    \
+    foreach_helper_init( list_size( LIST_VAR ), ITEM_NAME ) foreach_helper_assign( \
+            TYPE, ITEM_NAME, list_access( LIST_VAR, foreach_index_##ITEM_NAME, TYPE ) )
 
 
 #endif //CLIBS_FOREACH_H

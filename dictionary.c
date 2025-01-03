@@ -4,7 +4,6 @@
 #include "misc.h"
 #include "pointer_utils.h"
 
-#include <assert.h>
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,33 +75,33 @@ int dict_insert_f( struct key_value_pair_set *dict,
                    PrintFunction val_print )
 {
     // todo: resize
-    ssize_t hash = hash_func( key, key_size );
+    uint64_t hash = hash_func( key, key_size );
 
     const struct key_value_pair new_item = {
         .key_size = key_size,
         .val_size = val_size,
         .key      = ( void      *) key, // still const
-        .val      = ( void      *) val,
+        .val      = ( void      *) val, //
     };
 
     for ( size_t i = 0; i < dict->capacity; ++i )
     {
         size_t index                = ( hash + i ) % dict->capacity;
         struct key_value_pair *item = dict->items + index;
-        if ( item_key_cmp( &new_item, item ) == 0 )
-            return DICTINSERT_KEY_WAS_IN;
 
-        if ( item->key != NULL )
+        if ( item->key != NULL && item_key_cmp( &new_item, item ) != 0 )
             continue;
 
-        assert( item->val == NULL );
-        assert( item->key_size == 0 );
-        assert( item->val_size == 0 );
+        if ( item->key == NULL )
+            dict->size++;
+
+        free( item->key );
+        free( item->val );
 
         if ( ( item->key = malloc( key_size ) ) == NULL )
-            return fflwarn_ret( RV_ERROR, "%s", "malloc" );
+            return fwarn_ret( RV_ERROR, "malloc" );
         if ( ( item->val = malloc( val_size ) ) == NULL )
-            return fflwarn_ret( RV_ERROR, "%s", "malloc" );
+            return fwarn_ret( RV_ERROR, "malloc" );
 
         memcpy( item->key, key, key_size );
         memcpy( item->val, val, val_size );
@@ -112,9 +111,7 @@ int dict_insert_f( struct key_value_pair_set *dict,
         item->val_print = val_print;
         item->removed   = false;
 
-        ++dict->size;
-
-        return DICTINSERT_INSERTED;
+        return RV_SUCCESS;
     }
 
     return RV_ERROR;
@@ -133,7 +130,7 @@ static struct key_value_pair *dict_get_non_const( ConstDict dict,
                                                   const void *data,
                                                   size_t nbytes )
 {
-    ssize_t hash = hash_func( data, nbytes );
+    uint64_t hash = hash_func( data, nbytes );
 
     const struct key_value_pair search_for = {
         .key      = ( void      *) data,
@@ -179,17 +176,17 @@ int dict_set_val( Dict dict,
     free( item->val );
     item->val = malloc( val_size );
     if ( item->val == NULL )
-        return fflwarn_ret( RV_ERROR, "%s", "malloc" );
+        return fwarn_ret( RV_ERROR, "malloc" );
 
     item->val_size = val_size;
     memcpy( item->val, val, val_size );
-    return 0;
+    return RV_SUCCESS;
 }
 
 
 int dict_remove( struct key_value_pair_set *dict, const void *key_data, size_t key_size )
 {
-    ssize_t hash = hash_func( key_data, key_size );
+    uint64_t hash = hash_func( key_data, key_size );
 
     struct key_value_pair search = {
         .key      = ( void      *) key_data,
@@ -213,6 +210,7 @@ int dict_remove( struct key_value_pair_set *dict, const void *key_data, size_t k
         item->val_size  = 0;
         item->removed   = true;
         item->key_print = item->val_print = print_byte;
+        dict->size--;
         return DICTREMOVE_REMOVED;
     }
 
@@ -251,22 +249,23 @@ struct key_value_pair *dict_items_as_array( ConstDict dict )
 
 void kvp_print( const struct key_value_pair *item, const char *kv_sep )
 {
-    kvp_print_as( item, false, NULL, NULL, kv_sep );
+    kvp_print_as( item, NULL, NULL, kv_sep );
 }
 
 void kvp_print_as( const struct key_value_pair *item,
-                   bool user_func,
                    PrintFunction key_print,
                    PrintFunction val_print,
                    const char *kv_sep )
 {
-    ( user_func ? key_print : item->key_print )( item->key, item->key_size );
+    printf( "|" );
+    ( key_print != NULL ? key_print : item->key_print )( item->key, item->key_size );
     printf( "%s", kv_sep );
-    ( user_func ? val_print : item->val_print )( item->val, item->val_size );
+    ( val_print != NULL ? val_print : item->val_print )( item->val, item->val_size );
+    printf( "|" );
 }
 
+
 static void dict_print_d( const struct key_value_pair_set *dict,
-                          bool user_func,
                           PrintFunction key_print,
                           PrintFunction val_print )
 {
@@ -280,17 +279,18 @@ static void dict_print_d( const struct key_value_pair_set *dict,
         if ( item->key == NULL )
             continue;
 
-        delim = ( item->key_size > 16 || n % 5 == 0 ) ? ",\n\t" : ", ";
+        delim = ( item->key_size > 16 || n % DICT_PRINT_LINE_MAX_ITEMS == 0 ) ? ",\n\t"
+                                                                              : ", ";
         if ( n == 0 )
-            delim = dict->size > 5 ? "\n\t" : " ";
+            delim = dict->size > DICT_PRINT_LINE_MAX_ITEMS ? "\n\t" : " ";
         printf( "%s", delim );
 
-        kvp_print_as( item, user_func, key_print, val_print, ": " );
+        kvp_print_as( item, key_print, val_print, ": " );
 
         ++n;
     }
 
-    if ( dict->size > 5 )
+    if ( dict->size > DICT_PRINT_LINE_MAX_ITEMS )
         printf( "\n" );
     else if ( !strchr( delim, '\n' ) )
         printf( " " );
@@ -299,14 +299,14 @@ static void dict_print_d( const struct key_value_pair_set *dict,
 
 void dict_print( const struct key_value_pair_set *dict )
 {
-    dict_print_d( dict, false, NULL, NULL );
+    dict_print_d( dict, NULL, NULL );
 }
 
 void dict_print_as( const struct key_value_pair_set *dict,
                     PrintFunction key_print,
                     PrintFunction val_print )
 {
-    dict_print_d( dict, true, key_print, val_print );
+    dict_print_d( dict, key_print, val_print );
 }
 
 

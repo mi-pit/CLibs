@@ -180,7 +180,7 @@ void string_to_upper( str_t str )
     size_t idx = 0;
     while ( str[ idx ] != '\0' )
     {
-        if ( str[ idx ] >= 'a' && str[ idx ] <= 'z' )
+        if ( islower( str[ idx ] ) )
             str[ idx ] -= 0x20;
 
         ++idx;
@@ -200,20 +200,19 @@ str_t string_as_upper( string_t old )
     for ( size_t i = 0; i < len; ++i )
     {
         char c = old[ i ];
-        if ( c >= 'a' && c <= 'z' )
+        if ( islower( c ) )
             c -= 0x20;
         new[ i ] = c;
     }
     return new;
 }
 
-
 void string_to_lower( str_t str )
 {
     size_t idx = 0;
     while ( str[ idx ] != '\0' )
     {
-        if ( str[ idx ] >= 'A' && str[ idx ] <= 'Z' )
+        if ( isupper( str[ idx ] ) )
             str[ idx ] += 0x20;
 
         ++idx;
@@ -233,7 +232,7 @@ str_t string_as_lower( string_t old )
     for ( size_t i = 0; i < len; ++i )
     {
         char c = old[ i ];
-        if ( c >= 'A' && c <= 'Z' )
+        if ( isupper( c ) )
             c += 0x20;
         new[ i ] = c;
     }

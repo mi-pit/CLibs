@@ -33,3 +33,13 @@ add_executable(TestHashFunc
         errors.c
         item_print_functions.c
         )
+
+add_executable(TestLeet
+        Tests/test_leet.c
+        dictionary.c
+        dynarr.c
+        item_print_functions.c
+        errors.c
+        pointer_utils.c
+        misc.c
+        )

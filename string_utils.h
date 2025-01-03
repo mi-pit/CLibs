@@ -69,10 +69,10 @@ void string_reverse( str_t );
 
 
 void string_to_upper( str_t );
-str_t string_as_upper( string_t );
+str_t string_as_upper( string_t ) __result_use_check;
 
 void string_to_lower( str_t );
-str_t string_as_lower( string_t );
+str_t string_as_lower( string_t ) __result_use_check;
 
 
 #define STRSPLIT_EXCLUDE_EMPTY   0x01
