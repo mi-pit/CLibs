@@ -5,6 +5,8 @@
 #ifndef CLIBS_RUN_TEST_H
 #define CLIBS_RUN_TEST_H
 
+#include <stdio.h>
+
 
 #ifndef COLUMN_MAX_LENGHT
 #define COLUMN_MAX_LENGHT 164
@@ -46,6 +48,20 @@
 #define COLOR_GREEN  "\033[32m"
 #define COLOR_YELLOW "\033[33m"
 
+
+#ifndef COLOR_FAIL
+#define COLOR_FAIL COLOR_RED
+#endif //COLOR_FAIL
+
+#ifndef COLOR_SUCC
+#define COLOR_SUCC COLOR_GREEN
+#endif //COLOR_SUCC
+
+#ifndef COLOR_NOTE
+#define COLOR_NOTE COLOR_YELLOW
+#endif //COLOR_NOTE
+
+
 #define PRINT_COLOR "%s"
 
 
@@ -69,10 +85,10 @@
             TEST_NAME_CREATOR( test_handle ),                                       \
             TEST_NAME_CREATOR( ran_total ),                                         \
             TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ) == 0 \
-                    ? COLOR_RED                                                     \
-                    : COLOR_GREEN,                                                  \
+                    ? COLOR_FAIL                                                    \
+                    : COLOR_SUCC,                                                   \
             TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ),     \
-            TEST_NAME_CREATOR( failed_total ) == 0 ? COLOR_GREEN : COLOR_RED,       \
+            TEST_NAME_CREATOR( failed_total ) == 0 ? COLOR_SUCC : COLOR_FAIL,       \
             TEST_NAME_CREATOR( failed_total ) );                                    \
     }
 
@@ -83,6 +99,14 @@
 #define MAX( A, B ) ( ( ( A ) > ( B ) ) ? ( A ) : ( B ) )
 #define MIN( A, B ) ( ( ( A ) < ( B ) ) ? ( A ) : ( B ) )
 
+/**
+ * If condition evaluates to true, "SUCCESS" is printed
+ * in the color defined in COLOR_SUCC (green by default).
+ * <p>
+ * If condition evaluates to false, "FAILURE" is printed
+ * in the color defined in COLOR_FAIL (red by default)
+ * and an optional message is printed (has to be string literal)
+ */
 #define UNIT_TEST( CONDITION )                                                      \
     do                                                                              \
     {                                                                               \
@@ -102,7 +126,7 @@
               ++TEST_NAME_CREATOR( index ) )                                        \
             printf( "." );                                                          \
         printf( " " PRINT_COLOR "%s" PRINT_COLOR "\n",                              \
-                TEST_NAME_CREATOR( success ) ? COLOR_GREEN : COLOR_RED,             \
+                TEST_NAME_CREATOR( success ) ? COLOR_SUCC : COLOR_FAIL,             \
                 TEST_NAME_CREATOR( success ) ? "SUCCESS" : "FAILURE",               \
                 COLOR_DEFAULT );                                                    \
         if ( !TEST_NAME_CREATOR( success ) )                                        \

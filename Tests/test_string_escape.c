@@ -2,23 +2,32 @@
 // Created by MacBook on 25.12.2024.
 //
 
-#include "string_utils.h"
+#include "../run_test.h"
+#include "../string_utils.h"
 
-#include <assert.h>
+#include <stdlib.h>
 
-void test_one_to_lower( string_t old, string_t new )
+static bool test_one( string_t old, string_t new )
 {
     str_t esc = string_escaped( old );
-    assert( strcmp( esc, new ) == 0 );
+    bool rv   = strcmp( esc, new ) == 0;
+    free( esc );
+    return rv;
 }
+
+TEST( escape )
+{
+    UNIT_TEST( test_one( "Hopspop", "Hopspop" ) );
+    UNIT_TEST( test_one( "Hopspop\n", "Hopspop\\n" ) );
+    UNIT_TEST( test_one( "Hopspop\nKokot\n", "Hopspop\\nKokot\\n" ) );
+    UNIT_TEST( test_one( "\"Hopspop\"\n", "\\\"Hopspop\\\"\\n" ) );
+    UNIT_TEST( test_one( "Hopspop\\nKokot\n", "Hopspop\\\\nKokot\\n" ) );
+    UNIT_TEST( test_one( "Hopspop\0Kokot\n", "Hopspop" ) );
+    UNIT_TEST( test_one( "\n\r\v\t\\\"", "\\n\\r\\v\\t\\\\\\\"" ) );
+}
+END_TEST
 
 int main( void )
 {
-    test_one_to_lower( "Hopspop", "Hopspop" );
-    test_one_to_lower( "Hopspop\n", "Hopspop\\n" );
-    test_one_to_lower( "Hopspop\nKokot\n", "Hopspop\\nKokot\\n" );
-    test_one_to_lower( "\"Hopspop\"\n", "\\\"Hopspop\\\"\\n" );
-    test_one_to_lower( "Hopspop\\nKokot\n", "Hopspop\\\\nKokot\\n" );
-    test_one_to_lower( "Hopspop\0Kokot\n", "Hopspop" );
-    test_one_to_lower( "\n\r\v\t\\\"", "\\n\\r\\v\\t\\\\\\\"" );
+    RUN( escape );
 }

@@ -5,7 +5,7 @@ set(CMAKE_C_STANDARD 99)
 
 include_directories(.)
 
-add_executable(TestStringStrip
+add_executable(TestStringSplit
         Tests/test_strsplit.c
         string_utils.c
         dynstring.c
