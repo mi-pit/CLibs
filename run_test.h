@@ -5,8 +5,8 @@
 #ifndef CLIBS_RUN_TEST_H
 #define CLIBS_RUN_TEST_H
 
+#include <stdbool.h>
 #include <stdio.h>
-
 
 #ifndef COLUMN_MAX_LENGHT
 #define COLUMN_MAX_LENGHT 164
@@ -17,27 +17,29 @@
  * @example
  * @code
  * TEST( test_example )
- *     UNIT_TEST( true );
- *     UNIT_TEST( true );
- *     UNIT_TEST( false );
- *     UNIT_TEST( true );
+ *     UNIT_TEST( 1 == 1 );
+ *     UNIT_TEST( 1 == 2 );
+ *     UNIT_TEST( 2 == 1 );
+ *     UNIT_TEST( 2 == 2 );
  * END_TEST()
  *
  * int main( void )
  * {
  *     RUN( test_example );
+ *     FINISH_TESTING();
  * }
  *
  * @endcode
  * <p>
  * prints:
- * @code "
- * [TEST] test_example
- *     [UNIT TEST] true .................... SUCCESS
- *     [UNIT TEST] true .................... SUCCESS
- *     [UNIT TEST] false ................... FAILURE
- *     [UNIT TEST] true .................... SUCCESS
- * [TEST] test_example: ran 4 tests, 3 successful, 1 failed
+ * @code
+ * "[TEST] test_example
+ *     [UNIT TEST] 1 == 1 ................... SUCCESS
+ *     [UNIT TEST] 1 == 2 ................... FAILURE
+ *     [UNIT TEST] 2 == 1 ................... FAILURE
+ *     [UNIT TEST] 2 == 2 ................... SUCCESS
+ * [TEST] test_example: ran 4 tests, 2 successful, 2 failed
+ * [SUMMARY] total tests failed: 1
  * "
  * @endcode
  */
@@ -68,8 +70,11 @@
 #define TEST_NAME_CREATOR( TOK ) RUNTEST_##TOK
 
 
+static int TEST_NAME_CREATOR( TOTAL_FAILED ) = 0;
+
+
 #define TEST( HANDLE )                                          \
-    void TEST_NAME_CREATOR( HANDLE )( void )                    \
+    int TEST_NAME_CREATOR( HANDLE )( void )                     \
     {                                                           \
         int TEST_NAME_CREATOR( failed_total )        = 0;       \
         int TEST_NAME_CREATOR( ran_total )           = 0;       \
@@ -90,10 +95,17 @@
             TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ),     \
             TEST_NAME_CREATOR( failed_total ) == 0 ? COLOR_SUCC : COLOR_FAIL,       \
             TEST_NAME_CREATOR( failed_total ) );                                    \
+    return TEST_NAME_CREATOR( failed_total ) == 0 ? 0 : 1;                          \
     }
 
 
-#define RUN( HANDLE ) TEST_NAME_CREATOR( HANDLE )()
+#define RUN( HANDLE ) TEST_NAME_CREATOR( TOTAL_FAILED ) += TEST_NAME_CREATOR( HANDLE )()
+
+#define FINISH_TESTING()                                                                \
+    ( ( void ) printf( COLOR_NOTE "[SUMMARY]" COLOR_DEFAULT                             \
+                                  " total tests failed: " COLOR_NOTE "%i" COLOR_DEFAULT \
+                                  "\n",                                                 \
+                       TEST_NAME_CREATOR( TOTAL_FAILED ) ) )
 
 
 #define MAX( A, B ) ( ( ( A ) > ( B ) ) ? ( A ) : ( B ) )
@@ -113,7 +125,7 @@
         printf( PRINT_COLOR "    [UNIT TEST] " PRINT_COLOR #CONDITION " ",          \
                 COLOR_YELLOW,                                                       \
                 COLOR_DEFAULT );                                                    \
-        size_t TEST_NAME_CREATOR( test_name_len ) = strlen( #CONDITION );           \
+        size_t TEST_NAME_CREATOR( test_name_len ) = sizeof #CONDITION;              \
         bool TEST_NAME_CREATOR( success )         = CONDITION;                      \
         const size_t TEST_NAME_CREATOR( LIMIT ) =                                   \
                 MIN( 300 - ( 32 + TEST_NAME_CREATOR( test_name_len ) ),             \

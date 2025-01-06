@@ -5,22 +5,8 @@ set(CMAKE_C_STANDARD 99)
 
 include_directories(.)
 
-add_executable(TestStringSplit
-        Tests/test_strsplit.c
-        string_utils.c
-        dynstring.c
-        dynarr.c
-        )
-
-add_executable(TestStringEscape
-        Tests/test_string_escape.c
-        string_utils.c
-        dynstring.c
-        dynarr.c
-        )
-
-add_executable(TestUpperLower
-        Tests/test_upper_lower.c
+add_executable(Test
+        Tests/tests.c
         string_utils.c
         dynarr.c
         dynstring.c
@@ -40,13 +26,6 @@ add_executable(TestLeet
         item_print_functions.c
         pointer_utils.c
         misc.c
-        )
-
-add_executable(TestReplace
-        Tests/test_replace.c
-        string_utils.c
-        dynarr.c
-        dynstring.c
         )
 
 add_executable(TestMisc
