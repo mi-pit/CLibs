@@ -2,7 +2,7 @@
 // Created by MacBook on 03.01.2025.
 //
 
-#include "../run_test.h"
+#include "../unit_tests.h"
 
 
 TEST( all_fail )

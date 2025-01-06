@@ -6,25 +6,15 @@
 #include "../dynstring.h"
 #include "../foreach.h"
 #include "../misc.h"
-#include "../run_test.h"
 #include "../string_utils.h"
+#include "../swexpr.h"
+#include "../unit_tests.h"
 
 #include <stdlib.h>
 
 #define Tester static bool
 // todo?: #define TESTER( NAME ) static bool test_one_##NAME
 
-
-typedef void( StringToUL )( str_t );
-typedef str_t( StringAsUL )( string_t );
-
-static void free_spl( const size_t count, str_t strings[ count ] )
-{
-    for ( size_t i = 0; i < count; ++i )
-    {
-        free( strings[ i ] );
-    }
-}
 
 Tester test_one_replace( string_t orig, string_t old, string_t new, string_t expected )
 {
@@ -34,6 +24,39 @@ Tester test_one_replace( string_t orig, string_t old, string_t new, string_t exp
 
     return rv;
 }
+
+TEST( replace )
+{
+    UNIT_TEST( test_one_replace( "Hopspop", "p", "-", "Ho-s-o-" ) );
+    UNIT_TEST( test_one_replace( "Hops Pop", "p", "-", "Ho-s Po-" ) );
+    UNIT_TEST( test_one_replace( "Hopspop", "p", "12", "Ho12s12o12" ) );
+    UNIT_TEST( test_one_replace( "HoHo a PiPi", "Ho", "Pi", "PiPi a PiPi" ) );
+
+    UNIT_TEST( test_one_replace( "HoHo a PiPi", "Ho", "-", "-- a PiPi" ) );
+
+    UNIT_TEST( test_one_replace(
+            "Karel Vana, Karel Hoptysek a Karel \"Homosexual\" Hudlecka",
+            "Karel",
+            "0",
+            "0 Vana, 0 Hoptysek a 0 \"Homosexual\" Hudlecka" ) );
+
+    UNIT_TEST( test_one_replace(
+            "Karel Vana, Karel Hoptysek a Karel \"Homosexual\" Hudlecka",
+            "Homosexual",
+            "Mistr v prevlekani",
+            "Karel Vana, Karel Hoptysek a Karel \"Mistr v prevlekani\" Hudlecka" ) );
+
+
+    UNIT_TEST( test_one_replace( "Hopspop", "p", "", "Hoso" ) );
+    UNIT_TEST( test_one_replace( "Hopspop", "Hopspop", "Hopspop", "Hopspop" ) );
+    UNIT_TEST( test_one_replace( "Hopspop", "Hopspop", "Hopcpop", "Hopcpop" ) );
+    UNIT_TEST( test_one_replace( "Hopspop", "P", "_", "Hopspop" ) );
+
+    UNIT_TEST( string_replaced( "To je jedno", "", "tohle taky" ) == NULL );
+}
+END_TEST
+
+
 Tester test_one_appendn( string_t init, string_t app, size_t len, string_t expected )
 {
     DynamicString dynstr = dynstr_init_as( init );
@@ -46,12 +69,43 @@ Tester test_one_appendn( string_t init, string_t app, size_t len, string_t expec
 
     return rv;
 }
+
+TEST( appendn )
+{
+    UNIT_TEST( test_one_appendn( "Hops", "pop", 3, "Hopspop" ) );
+    UNIT_TEST( test_one_appendn( "Hops", "pop", 1, "Hopsp" ) );
+    UNIT_TEST( test_one_appendn( "", *( &"Hopspop" ) + 1, 3, "ops" ) );
+}
+END_TEST
+
+
 Tester test_one_escape( string_t old, string_t new )
 {
     str_t esc = string_escaped( old );
     bool rv   = strcmp( esc, new ) == 0;
     free( esc );
     return rv;
+}
+
+TEST( escape )
+{
+    UNIT_TEST( test_one_escape( "Hopspop", "Hopspop" ) );
+    UNIT_TEST( test_one_escape( "Hopspop\n", "Hopspop\\n" ) );
+    UNIT_TEST( test_one_escape( "Hopspop\nKokot\n", "Hopspop\\nKokot\\n" ) );
+    UNIT_TEST( test_one_escape( "\"Hopspop\"\n", "\\\"Hopspop\\\"\\n" ) );
+    UNIT_TEST( test_one_escape( "Hopspop\\nKokot\n", "Hopspop\\\\nKokot\\n" ) );
+    UNIT_TEST( test_one_escape( "Hopspop\0Kokot\n", "Hopspop" ) );
+    UNIT_TEST( test_one_escape( "\n\r\v\t\\\"", "\\n\\r\\v\\t\\\\\\\"" ) );
+}
+END_TEST
+
+
+static void free_spl( const size_t count, str_t strings[ count ] )
+{
+    for ( size_t i = 0; i < count; ++i )
+    {
+        free( strings[ i ] );
+    }
 }
 Tester test_one_strspl_str( string_t haystack,
                             string_t split_tok,
@@ -135,157 +189,6 @@ Tester test_one_strspl_regex( string_t haystack,
 
     return rv;
 }
-Tester test_one_string_to_UL( StringToUL func, string_t old, string_t new )
-{
-    str_t s = strdup( old );
-    func( s );
-    bool rv = strcmp( s, new ) == 0;
-    free( s );
-    return rv;
-}
-Tester test_one_string_as_UL( StringAsUL func, string_t old, string_t res )
-{
-    str_t got = func( old );
-    bool rv   = strcmp( got, res ) == 0;
-    free( got );
-    return rv;
-}
-Tester test_one_reverse( string_t orig, string_t result )
-{
-    str_t rev = strdup( orig );
-    string_reverse( rev );
-    bool rv = strcmp( rev, result ) == 0;
-    free( rev );
-
-    if ( !rv )
-        return rv;
-
-    rev = string_reversed( orig );
-    rv  = strcmp( rev, result ) == 0;
-    free( rev );
-    return rv;
-}
-Tester test_one_foreach_arr( const int64_t arr[], const size_t count )
-{
-    foreach_arr( int64_t, num, arr, count )
-    {
-        if ( num != arr[ foreach_index_num ] )
-            return false;
-    }
-    return true;
-}
-Tester test_one_foreach_ls( ConstList const numbers_ls,
-                            const int64_t numbers_arr[],
-                            const size_t count )
-{
-    assert_that( list_size( numbers_ls ) == count, "list size != array size" );
-
-    foreach_ls( int64_t, num, numbers_ls )
-    {
-        if ( num != numbers_arr[ foreach_index_num ] )
-            return false;
-    }
-    return true;
-}
-Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
-{
-    foreach_uni( int64_t, num, numbers_arr[ foreach_index_num ], count )
-    {
-        if ( num != numbers_arr[ foreach_index_num ] )
-            return false;
-    }
-    return true;
-}
-Tester test_one_foreach_str( string_t str )
-{
-    foreach_str( c, str )
-    {
-        if ( foreach_cap_c != strlen( str ) )
-        {
-            fflwarnx( "foreach_cap" );
-            return false;
-        }
-        if ( c != str[ foreach_index_c ] )
-        {
-            fflwarnx( "c != str[ foreach_idx ]" );
-            return false;
-        }
-    }
-    return true;
-}
-Tester test_one_foreach_dynstr( string_t str )
-{
-    DynamicString dynstr = dynstr_init_as( str );
-    assert_that( dynstr != NULL, "dynstr init" );
-    assert_that( strlen( str ) == dynstr_len( dynstr ), "dynstr len" );
-
-    foreach_str( c, dynstr_data( dynstr ) )
-    {
-        if ( foreach_cap_c != strlen( str ) )
-        {
-            fflwarnx( "foreach_cap" );
-            return false;
-        }
-        if ( c != str[ foreach_index_c ] )
-        {
-            fflwarnx( "c != str[ foreach_idx ]" );
-            return false;
-        }
-    }
-    return true;
-}
-
-
-TEST( replace )
-{
-    UNIT_TEST( test_one_replace( "Hopspop", "p", "-", "Ho-s-o-" ) );
-    UNIT_TEST( test_one_replace( "Hops Pop", "p", "-", "Ho-s Po-" ) );
-    UNIT_TEST( test_one_replace( "Hopspop", "p", "12", "Ho12s12o12" ) );
-    UNIT_TEST( test_one_replace( "HoHo a PiPi", "Ho", "Pi", "PiPi a PiPi" ) );
-
-    UNIT_TEST( test_one_replace( "HoHo a PiPi", "Ho", "-", "-- a PiPi" ) );
-
-    UNIT_TEST( test_one_replace(
-            "Karel Vana, Karel Hoptysek a Karel \"Homosexual\" Hudlecka",
-            "Karel",
-            "0",
-            "0 Vana, 0 Hoptysek a 0 \"Homosexual\" Hudlecka" ) );
-
-    UNIT_TEST( test_one_replace(
-            "Karel Vana, Karel Hoptysek a Karel \"Homosexual\" Hudlecka",
-            "Homosexual",
-            "Mistr v prevlekani",
-            "Karel Vana, Karel Hoptysek a Karel \"Mistr v prevlekani\" Hudlecka" ) );
-
-
-    UNIT_TEST( test_one_replace( "Hopspop", "p", "", "Hoso" ) );
-    UNIT_TEST( test_one_replace( "Hopspop", "Hopspop", "Hopspop", "Hopspop" ) );
-    UNIT_TEST( test_one_replace( "Hopspop", "Hopspop", "Hopcpop", "Hopcpop" ) );
-    UNIT_TEST( test_one_replace( "Hopspop", "P", "_", "Hopspop" ) );
-
-    UNIT_TEST( string_replaced( "To je jedno", "", "tohle taky" ) == NULL );
-}
-END_TEST
-
-TEST( appendn )
-{
-    UNIT_TEST( test_one_appendn( "Hops", "pop", 3, "Hopspop" ) );
-    UNIT_TEST( test_one_appendn( "Hops", "pop", 1, "Hopsp" ) );
-    UNIT_TEST( test_one_appendn( "", *( &"Hopspop" ) + 1, 3, "ops" ) );
-}
-END_TEST
-
-TEST( escape )
-{
-    UNIT_TEST( test_one_escape( "Hopspop", "Hopspop" ) );
-    UNIT_TEST( test_one_escape( "Hopspop\n", "Hopspop\\n" ) );
-    UNIT_TEST( test_one_escape( "Hopspop\nKokot\n", "Hopspop\\nKokot\\n" ) );
-    UNIT_TEST( test_one_escape( "\"Hopspop\"\n", "\\\"Hopspop\\\"\\n" ) );
-    UNIT_TEST( test_one_escape( "Hopspop\\nKokot\n", "Hopspop\\\\nKokot\\n" ) );
-    UNIT_TEST( test_one_escape( "Hopspop\0Kokot\n", "Hopspop" ) );
-    UNIT_TEST( test_one_escape( "\n\r\v\t\\\"", "\\n\\r\\v\\t\\\\\\\"" ) );
-}
-END_TEST
 
 #define HOVEN_IPSUM "Hovno. Prdel. Sracka. Kokot."
 
@@ -488,6 +391,17 @@ TEST( strspl_regex )
 }
 END_TEST
 
+
+typedef void( StringToUL )( str_t );
+Tester test_one_string_to_UL( StringToUL func, string_t old, string_t new )
+{
+    str_t s = strdup( old );
+    func( s );
+    bool rv = strcmp( s, new ) == 0;
+    free( s );
+    return rv;
+}
+
 TEST( string_to_UL )
 {
     UNIT_TEST(
@@ -507,6 +421,15 @@ TEST( string_to_UL )
     UNIT_TEST( test_one_string_to_UL( string_to_upper, "hello", "HELLO" ) );
 }
 END_TEST
+
+typedef str_t( StringAsUL )( string_t );
+Tester test_one_string_as_UL( StringAsUL func, string_t old, string_t res )
+{
+    str_t got = func( old );
+    bool rv   = strcmp( got, res ) == 0;
+    free( got );
+    return rv;
+}
 
 TEST( string_as_UL )
 {
@@ -528,6 +451,23 @@ TEST( string_as_UL )
 }
 END_TEST
 
+
+Tester test_one_reverse( string_t orig, string_t result )
+{
+    str_t rev = strdup( orig );
+    string_reverse( rev );
+    bool rv = strcmp( rev, result ) == 0;
+    free( rev );
+
+    if ( !rv )
+        return rv;
+
+    rev = string_reversed( orig );
+    rv  = strcmp( rev, result ) == 0;
+    free( rev );
+    return rv;
+}
+
 TEST( reverse )
 {
     UNIT_TEST( test_one_reverse( "Hovno", "onvoH" ) );
@@ -541,6 +481,77 @@ TEST( reverse )
     UNIT_TEST( test_one_reverse( "\n\r\"\0\"", "\"\r\n" ) );
 }
 END_TEST
+
+
+Tester test_one_foreach_arr( const int64_t arr[], const size_t count )
+{
+    foreach_arr( int64_t, num, arr, count )
+    {
+        if ( num != arr[ foreach_index_num ] )
+            return false;
+    }
+    return true;
+}
+Tester test_one_foreach_ls( ConstList const numbers_ls,
+                            const int64_t numbers_arr[],
+                            const size_t count )
+{
+    assert_that( list_size( numbers_ls ) == count, "list size != array size" );
+
+    foreach_ls( int64_t, num, numbers_ls )
+    {
+        if ( num != numbers_arr[ foreach_index_num ] )
+            return false;
+    }
+    return true;
+}
+Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
+{
+    foreach_uni( int64_t, num, numbers_arr[ foreach_index_num ], count )
+    {
+        if ( num != numbers_arr[ foreach_index_num ] )
+            return false;
+    }
+    return true;
+}
+Tester test_one_foreach_str( string_t str )
+{
+    foreach_str( c, str )
+    {
+        if ( foreach_cap_c != strlen( str ) )
+        {
+            fflwarnx( "foreach_cap" );
+            return false;
+        }
+        if ( c != str[ foreach_index_c ] )
+        {
+            fflwarnx( "c != str[ foreach_idx ]" );
+            return false;
+        }
+    }
+    return true;
+}
+Tester test_one_foreach_dynstr( string_t str )
+{
+    DynamicString dynstr = dynstr_init_as( str );
+    assert_that( dynstr != NULL, "dynstr init" );
+    assert_that( strlen( str ) == dynstr_len( dynstr ), "dynstr len" );
+
+    foreach_str( c, dynstr_data( dynstr ) )
+    {
+        if ( foreach_cap_c != strlen( str ) )
+        {
+            fflwarnx( "foreach_cap" );
+            return false;
+        }
+        if ( c != str[ foreach_index_c ] )
+        {
+            fflwarnx( "c != str[ foreach_idx ]" );
+            return false;
+        }
+    }
+    return true;
+}
 
 TEST( foreach )
 {
@@ -568,6 +579,119 @@ TEST( foreach )
 END_TEST
 
 
+static int get_swex_val( int branch_1, int branch_2, string_t branch_3 )
+{
+    swex_init_val( int, branch_1 ) as_new( int, rv )
+    {
+        swex_case_imm( int, 1 )
+        {
+            swex_init_val( int, branch_2 ) as( rv )
+            {
+                swex_case_imm( int, 1 )
+                {
+                    resolve( int, 10 );
+                }
+                swex_case_imm( int, 2 )
+                {
+                    swex_init_str( branch_3 ) as( rv )
+                    {
+                        swex_case_str( "1" )
+                        {
+                            resolve( int, 100 );
+                        }
+                        swex_default()
+                        {
+                            resolve( int, -100 );
+                        }
+                    }
+                    swex_finish();
+                }
+                swex_default()
+                {
+                    resolve( int, -10 );
+                }
+            }
+            swex_finish();
+        }
+        swex_case_imm( int, 2 )
+        {
+            resolve( int, 2 );
+        }
+
+        swex_default()
+        {
+            resolve( int, -1 );
+        }
+    }
+    swex_finish();
+
+    return rv;
+}
+Tester test_one_swex( int branch_1, int branch_2, string_t branch_3, int rv )
+{
+    return get_swex_val( branch_1, branch_2, branch_3 ) == rv;
+}
+
+TEST( swex )
+{
+    UNIT_TEST( test_one_swex( -1, 0, NULL, -1 ) );
+    UNIT_TEST( test_one_swex( -1, 124, "hops", -1 ) );
+    UNIT_TEST( test_one_swex( -100, 0, NULL, -1 ) );
+
+    UNIT_TEST( test_one_swex( 2, 0, NULL, 2 ) );
+    UNIT_TEST( test_one_swex( 2, 325, "NULL", 2 ) );
+
+    UNIT_TEST( test_one_swex( 1, 1, NULL, 10 ) );
+    UNIT_TEST( test_one_swex( 1, 1, "HOPSOPPO", 10 ) );
+
+    UNIT_TEST( test_one_swex( 1, -11, NULL, -10 ) );
+
+    UNIT_TEST( test_one_swex( 1, 2, "1", 100 ) );
+    UNIT_TEST( test_one_swex( 1, 2, "Hovno", -100 ) );
+}
+END_TEST
+
+
+Tester test_one_strip( string_t orig, string_t desired )
+{
+    str_t s = strdup( orig );
+    assert_that( s != NULL, "strdup" );
+    string_strip( s );
+    bool rv = strcmp( s, desired ) == 0;
+    free( s );
+    if ( !rv )
+        return false;
+
+    s  = string_stripped( orig );
+    rv = strcmp( s, desired ) == 0;
+    free( s );
+    return rv;
+}
+
+TEST( strip )
+{
+    UNIT_TEST( test_one_strip( "Hello", "Hello" ) );
+    UNIT_TEST( test_one_strip( " Hello", "Hello" ) );
+    UNIT_TEST( test_one_strip( "Hello ", "Hello" ) );
+    UNIT_TEST( test_one_strip( " Hello ", "Hello" ) );
+
+    UNIT_TEST( test_one_strip( " Hello \0 TOTO TU NENI", "Hello" ) );
+
+    UNIT_TEST( test_one_strip( "\n\t\tHello \t\r \v ", "Hello" ) );
+    UNIT_TEST( test_one_strip( "\n\t\tHello \t\rKokote\v ", "Hello \t\rKokote" ) );
+}
+END_TEST
+
+TEST( misc )
+{
+    UNIT_TEST( strcmp( get_file_name( "/Users/macbook/Hovno" ), "Hovno" ) == 0 );
+    UNIT_TEST( strcmp( get_file_name( "Hovno" ), "Hovno" ) == 0 );
+    UNIT_TEST( strcmp( get_file_name( "/a" ), "a" ) == 0 );
+    UNIT_TEST( strcmp( get_file_name( "./a" ), "a" ) == 0 );
+}
+END_TEST
+
+
 int main( int argc, string_t argv[] )
 {
     UNUSED( argc && argv );
@@ -587,6 +711,12 @@ int main( int argc, string_t argv[] )
     RUN( reverse );
 
     RUN( foreach );
+
+    RUN( swex );
+
+    RUN( strip );
+
+    RUN( misc );
 
     FINISH_TESTING();
 }

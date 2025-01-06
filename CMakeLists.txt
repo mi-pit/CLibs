@@ -10,6 +10,7 @@ add_executable(Test
         string_utils.c
         dynarr.c
         dynstring.c
+        swexpr.c
         )
 
 add_executable(TestHashFunc
@@ -29,7 +30,7 @@ add_executable(TestLeet
         )
 
 add_executable(TestMisc
-        Tests/test_misc.c
+        Tests/test_unit_tests.c
         string_utils.c
         dynstring.c
         dynarr.c

@@ -32,9 +32,9 @@
 #define __printflike( A, B )
 #endif //__printflike
 
-#ifndef __cold
-#define __cold
-#endif //__cold
+#ifndef __unused
+#define __unused __attribute__( ( __unused__ ) )
+#endif //__unused
 
 
 #define RV_EXCEPTION ( -2 ) /* Non-fatal, recoverable error e.g. OOB index */
@@ -108,7 +108,7 @@ static ptrdiff_t WarnUniversal( const char *restrict FileName,
                                 int err_no,
                                 ptrdiff_t return_value,
                                 const char *__restrict format,
-                                ... ) __printflike( 6, 7 );
+                                ... ) __printflike( 6, 7 ) __unused;
 
 #if defined( __APPLE__ ) || defined( __FreeBSD__ )
 #include <stdlib.h>

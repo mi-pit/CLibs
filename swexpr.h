@@ -5,7 +5,7 @@
 #define CLIBS_SWEXPR_H
 
 #include "dynarr.h"        /* List (stack) */
-#include "pointer_utils.h" /* deref_as(), free_n() */
+#include "pointer_utils.h" /* deref_as() */
 
 #include <err.h>     /* err() */
 #include <errno.h>   /* ENOMEM */
@@ -82,7 +82,10 @@ int switch_expression_pop( void );
 #define swex_case_imm( type, expr_case )                                             \
     {                                                                                \
         if ( swex_aux_variable_ != NULL )                                            \
-            free_n( swex_aux_variable_ );                                            \
+        {                                                                            \
+            free( swex_aux_variable_ );                                              \
+            swex_aux_variable_ = NULL;                                               \
+        }                                                                            \
         swex_aux_variable_ = malloc( sizeof( type ) );                               \
         if ( swex_aux_variable_ == NULL )                                            \
             err( ENOMEM, "swex_case_imm" ); /* todo: <- here */                      \
@@ -122,12 +125,13 @@ int switch_expression_pop( void );
  * Not calling this function will cause undefined behaviour and calling it prematurely
  * will probably cause a NULL pointer dereference.
  */
-#define swex_finish()                 \
-    do                                \
-    {                                 \
-        switch_expression_pop();      \
-        free_n( swex_aux_variable_ ); \
-    }                                 \
+#define swex_finish()               \
+    do                              \
+    {                               \
+        switch_expression_pop();    \
+        free( swex_aux_variable_ ); \
+        swex_aux_variable_ = NULL;  \
+    }                               \
     while ( 0 )
 
 #endif //CLIBS_SWEXPR_H

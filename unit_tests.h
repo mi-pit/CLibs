@@ -2,8 +2,8 @@
 // Created by MacBook on 03.01.2025.
 //
 
-#ifndef CLIBS_RUN_TEST_H
-#define CLIBS_RUN_TEST_H
+#ifndef CLIBS_UNIT_TESTS_H
+#define CLIBS_UNIT_TESTS_H
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -67,10 +67,14 @@
 #define PRINT_COLOR "%s"
 
 
-#define TEST_NAME_CREATOR( TOK ) RUNTEST_##TOK
+#define TEST_NAME_CREATOR( TOK ) CLIBS_UNIT_TESTS_##TOK
 
 
 static int TEST_NAME_CREATOR( TOTAL_FAILED ) = 0;
+static int TEST_NAME_CREATOR( TOTAL_RAN )    = 0;
+
+static int TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) = 0;
+static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
 
 
 #define TEST( HANDLE )                                          \
@@ -95,18 +99,41 @@ static int TEST_NAME_CREATOR( TOTAL_FAILED ) = 0;
             TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ),     \
             TEST_NAME_CREATOR( failed_total ) == 0 ? COLOR_SUCC : COLOR_FAIL,       \
             TEST_NAME_CREATOR( failed_total ) );                                    \
+    TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) += TEST_NAME_CREATOR( failed_total );    \
+    TEST_NAME_CREATOR( TOTAL_RAN_UNIT ) += TEST_NAME_CREATOR( ran_total );          \
     return TEST_NAME_CREATOR( failed_total ) == 0 ? 0 : 1;                          \
     }
 
 
-#define RUN( HANDLE ) TEST_NAME_CREATOR( TOTAL_FAILED ) += TEST_NAME_CREATOR( HANDLE )()
+#define RUN( HANDLE )                                                       \
+    do                                                                      \
+    {                                                                       \
+        TEST_NAME_CREATOR( TOTAL_FAILED ) += TEST_NAME_CREATOR( HANDLE )(); \
+        ++TEST_NAME_CREATOR( TOTAL_RAN );                                   \
+    }                                                                       \
+    while ( 0 )
+
 
 #define FINISH_TESTING()                                                                \
-    ( ( void ) printf( COLOR_NOTE "[SUMMARY]" COLOR_DEFAULT                             \
-                                  " total tests failed: " COLOR_NOTE "%i" COLOR_DEFAULT \
-                                  "\n",                                                 \
-                       TEST_NAME_CREATOR( TOTAL_FAILED ) ) )
-
+    do                                                                                  \
+    {                                                                                   \
+        puts( "" );                                                                     \
+        printf( COLOR_NOTE "[SUMMARY]" COLOR_DEFAULT                                    \
+                           " total unit tests ran: " COLOR_NOTE "%i" COLOR_DEFAULT      \
+                           ", total unit tests failed: " PRINT_COLOR "%i" COLOR_DEFAULT \
+                           "\n",                                                        \
+                TEST_NAME_CREATOR( TOTAL_RAN_UNIT ),                                    \
+                TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) == 0 ? COLOR_SUCC : COLOR_FAIL,  \
+                TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) );                               \
+                                                                                        \
+        printf( COLOR_NOTE "[SUMMARY]" COLOR_DEFAULT " total tests ran: " COLOR_NOTE    \
+                           "%i" COLOR_DEFAULT ", total tests failed: " PRINT_COLOR      \
+                           "%i" COLOR_DEFAULT "\n",                                     \
+                TEST_NAME_CREATOR( TOTAL_RAN ),                                         \
+                TEST_NAME_CREATOR( TOTAL_FAILED ) == 0 ? COLOR_SUCC : COLOR_FAIL,       \
+                TEST_NAME_CREATOR( TOTAL_FAILED ) );                                    \
+    }                                                                                   \
+    while ( 0 )
 
 #define MAX( A, B ) ( ( ( A ) > ( B ) ) ? ( A ) : ( B ) )
 #define MIN( A, B ) ( ( ( A ) < ( B ) ) ? ( A ) : ( B ) )
@@ -147,4 +174,4 @@ static int TEST_NAME_CREATOR( TOTAL_FAILED ) = 0;
     }                                                                               \
     while ( 0 )
 
-#endif //CLIBS_RUN_TEST_H
+#endif //CLIBS_UNIT_TESTS_H
