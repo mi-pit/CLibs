@@ -1,18 +1,6 @@
 //
 // Created by MacBook on 03.01.2025.
 //
-
-#ifndef CLIBS_UNIT_TESTS_H
-#define CLIBS_UNIT_TESTS_H
-
-#include <stdbool.h>
-#include <stdio.h>
-
-#ifndef LINE_MAX_WIDTH
-#define LINE_MAX_WIDTH 165
-#endif
-
-
 /**
  * @example
  * @code
@@ -44,11 +32,32 @@
  * @endcode
  */
 
-#define COLOR_DEFAULT "\033[0m"
+#ifndef CLIBS_UNIT_TESTS_H
+#define CLIBS_UNIT_TESTS_H
 
-#define COLOR_RED    "\033[31m"
-#define COLOR_GREEN  "\033[32m"
-#define COLOR_YELLOW "\033[33m"
+#include <stdbool.h>
+#include <stdio.h>
+
+#ifndef LINE_MAX_WIDTH
+#define LINE_MAX_WIDTH 165
+#endif
+
+
+/**
+ * When supplied with the correct ANSI color code,
+ * this macro creates the escape code for the corresponding color
+ */
+#define COLOR_CREATOR( NUM ) "\033[" #NUM "m"
+
+#define COLOR_DEFAULT COLOR_CREATOR( 0 )
+
+#define COLOR_RED     COLOR_CREATOR( 31 )
+#define COLOR_GREEN   COLOR_CREATOR( 32 )
+#define COLOR_YELLOW  COLOR_CREATOR( 33 )
+#define COLOR_BLUE    COLOR_CREATOR( 34 )
+#define COLOR_MAGENTA COLOR_CREATOR( 35 )
+#define COLOR_CYAN    COLOR_CREATOR( 36 )
+#define COLOR_WHITE   COLOR_CREATOR( 37 )
 
 
 #ifndef COLOR_FAIL
@@ -60,8 +69,12 @@
 #endif //COLOR_SUCC
 
 #ifndef COLOR_NOTE
-#define COLOR_NOTE COLOR_YELLOW
+#define COLOR_NOTE COLOR_CYAN
 #endif //COLOR_NOTE
+
+#ifndef COLOR_TEST_TAG
+#define COLOR_TEST_TAG COLOR_YELLOW
+#endif //COLOR_TEST_TAG
 
 
 #define PRINT_COLOR "%s"
@@ -83,14 +96,12 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
         int TEST_NAME_CREATOR( failed_total )        = 0;       \
         int TEST_NAME_CREATOR( ran_total )           = 0;       \
         const char *TEST_NAME_CREATOR( test_handle ) = #HANDLE; \
-        printf( PRINT_COLOR "[TEST] " PRINT_COLOR #HANDLE "\n", \
-                COLOR_YELLOW,                                   \
-                COLOR_DEFAULT );
+        printf( COLOR_TEST_TAG "[TEST] " COLOR_DEFAULT #HANDLE "\n" );
 
 #define END_TEST                                                                    \
-    printf( COLOR_YELLOW "[TEST] " COLOR_DEFAULT "%s: ran %i tests, " PRINT_COLOR   \
-                         "%i successful" COLOR_DEFAULT ", " PRINT_COLOR             \
-                         "%i failed\n" COLOR_DEFAULT,                               \
+    printf( COLOR_TEST_TAG "[TEST] " COLOR_DEFAULT "%s: ran %i tests, " PRINT_COLOR \
+                           "%i successful" COLOR_DEFAULT ", " PRINT_COLOR           \
+                           "%i failed\n" COLOR_DEFAULT,                             \
             TEST_NAME_CREATOR( test_handle ),                                       \
             TEST_NAME_CREATOR( ran_total ),                                         \
             TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ) == 0 \
@@ -149,9 +160,7 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
 #define UNIT_TEST( CONDITION )                                                      \
     do                                                                              \
     {                                                                               \
-        printf( PRINT_COLOR "    [UNIT TEST] " PRINT_COLOR #CONDITION " ",          \
-                COLOR_YELLOW,                                                       \
-                COLOR_DEFAULT );                                                    \
+        printf( COLOR_TEST_TAG "    [UNIT TEST] " COLOR_DEFAULT #CONDITION " " );   \
         size_t TEST_NAME_CREATOR( test_name_len ) = sizeof #CONDITION;              \
         bool TEST_NAME_CREATOR( success )         = CONDITION;                      \
         const size_t TEST_NAME_CREATOR( LIMIT ) =                                   \
