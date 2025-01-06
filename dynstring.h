@@ -77,7 +77,7 @@ int dynstr_appendf( DynamicString dynstr, const char *fmt, ... ) __printflike( 2
  *
  * @param start_idx index of the first preserved character
  * @param end_idx   index of the last preserved character
- * @return 0 on success, -2 (RV_EXCEPTION) if index is OOB
+ * @return 0 on success, RV_EXCEPTION if index is OOB
  */
 int dynstr_slice( DynamicString, size_t start_idx, ssize_t end_idx );
 int dynstr_slice_e( DynamicString, ssize_t end_idx );
@@ -95,7 +95,7 @@ int dynstr_reset( DynamicString dynstr );
  * Allocates a new string with the DynamicString contents
  * @return pointer to heap-allocated data
  */
-char *dynstr_to_str( ConstDynamicString );
+char *dynstr_to_str( ConstDynamicString ) __result_use_check;
 /**
  * @return a pointer of the DynamicStrings data
  */

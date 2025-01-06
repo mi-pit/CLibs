@@ -98,27 +98,26 @@ str_t string_as_lower( string_t ) __result_use_check;
 str_t string_replaced( string_t, string_t old, string_t new ) __result_use_check;
 
 
-#define STRSPLIT_EXCLUDE_EMPTY   0x01
-#define STRSPLIT_KEEP_DELIM_PRE  0x02
-#define STRSPLIT_KEEP_DELIM_POST 0x04
+#define STRSPLIT_EXCLUDE_EMPTY     0x01
+#define STRSPLIT_KEEP_DELIM_BEFORE 0x02
+#define STRSPLIT_KEEP_DELIM_AFTER  0x04
 
 /**
  * Flags for the string_split[_regex] functions
- * <p>
  * @code
- * STRSPLIT_EXCLUDE_EMPTY   // = 0x01
+ * STRSPLIT_EXCLUDE_EMPTY       // = 0x01
  *     - resulting string array doesn't include empty strings ("")
  *
- * STRSPLIT_KEEP_DELIM_PRE  // = 0x02
+ * STRSPLIT_KEEP_DELIM_BEFORE   // = 0x02
  *     - items include the delimiting strings;
  *       the delim is included at the end of the previous item
  *
- * STRSPLIT_KEEP_DELIM_POST // = 0x04
+ * STRSPLIT_KEEP_DELIM_AFTER    // = 0x04
  *     - items include the delimiting strings;
  *       the delim is included at the start of the next item
  * @endcode
  */
-typedef int strsplit_mode_t;
+typedef unsigned int strsplit_mode_t;
 
 /**
  * Splits ‹str› at places matching ‹split_tok›<br>

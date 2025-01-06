@@ -9,6 +9,8 @@
 
 #define UNUSED( expr ) ( void ) ( expr )
 
+#define countof( ARRAY ) ( sizeof( ARRAY ) / sizeof( *ARRAY ) )
+
 
 #define cmpeq( cmp_retval ) ( ( cmp_retval ) == 0 )
 

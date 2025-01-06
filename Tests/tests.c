@@ -2,7 +2,9 @@
 // Created by MacBook on 06.01.2025.
 //
 #include "../assert_that.h"
+#include "../dynarr.h"
 #include "../dynstring.h"
+#include "../foreach.h"
 #include "../misc.h"
 #include "../run_test.h"
 #include "../string_utils.h"
@@ -10,6 +12,11 @@
 #include <stdlib.h>
 
 #define Tester static bool
+// todo?: #define TESTER( NAME ) static bool test_one_##NAME
+
+
+typedef void( StringToUL )( str_t );
+typedef str_t( StringAsUL )( string_t );
 
 static void free_spl( const size_t count, str_t strings[ count ] )
 {
@@ -55,7 +62,10 @@ Tester test_one_strspl_str( string_t haystack,
     str_t *spl;
     ssize_t strspl_rv = string_split( &spl, haystack, split_tok, mode );
     if ( strspl_rv < 0 )
+    {
+        ffl_stack_trace();
         exit( 1 );
+    }
 
     size_t n_got = ( size_t ) strspl_rv;
 
@@ -97,7 +107,10 @@ Tester test_one_strspl_regex( string_t haystack,
     str_t *spl;
     ssize_t strspl_rv = string_split_regex( &spl, haystack, &reg, mode );
     if ( strspl_rv < 0 )
-        exit( 1 );
+    {
+        ffl_stack_trace();
+        exit( -1 );
+    }
 
     size_t n_got = ( size_t ) strspl_rv;
 
@@ -122,10 +135,6 @@ Tester test_one_strspl_regex( string_t haystack,
 
     return rv;
 }
-
-typedef void( StringToUL )( str_t );
-typedef str_t( StringAsUL )( string_t );
-
 Tester test_one_string_to_UL( StringToUL func, string_t old, string_t new )
 {
     str_t s = strdup( old );
@@ -140,6 +149,90 @@ Tester test_one_string_as_UL( StringAsUL func, string_t old, string_t res )
     bool rv   = strcmp( got, res ) == 0;
     free( got );
     return rv;
+}
+Tester test_one_reverse( string_t orig, string_t result )
+{
+    str_t rev = strdup( orig );
+    string_reverse( rev );
+    bool rv = strcmp( rev, result ) == 0;
+    free( rev );
+
+    if ( !rv )
+        return rv;
+
+    rev = string_reversed( orig );
+    rv  = strcmp( rev, result ) == 0;
+    free( rev );
+    return rv;
+}
+Tester test_one_foreach_arr( const int64_t arr[], const size_t count )
+{
+    foreach_arr( int64_t, num, arr, count )
+    {
+        if ( num != arr[ foreach_index_num ] )
+            return false;
+    }
+    return true;
+}
+Tester test_one_foreach_ls( ConstList const numbers_ls,
+                            const int64_t numbers_arr[],
+                            const size_t count )
+{
+    assert_that( list_size( numbers_ls ) == count, "list size != array size" );
+
+    foreach_ls( int64_t, num, numbers_ls )
+    {
+        if ( num != numbers_arr[ foreach_index_num ] )
+            return false;
+    }
+    return true;
+}
+Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
+{
+    foreach_uni( int64_t, num, numbers_arr[ foreach_index_num ], count )
+    {
+        if ( num != numbers_arr[ foreach_index_num ] )
+            return false;
+    }
+    return true;
+}
+Tester test_one_foreach_str( string_t str )
+{
+    foreach_str( c, str )
+    {
+        if ( foreach_cap_c != strlen( str ) )
+        {
+            fflwarnx( "foreach_cap" );
+            return false;
+        }
+        if ( c != str[ foreach_index_c ] )
+        {
+            fflwarnx( "c != str[ foreach_idx ]" );
+            return false;
+        }
+    }
+    return true;
+}
+Tester test_one_foreach_dynstr( string_t str )
+{
+    DynamicString dynstr = dynstr_init_as( str );
+    assert_that( dynstr != NULL, "dynstr init" );
+    assert_that( strlen( str ) == dynstr_len( dynstr ), "dynstr len" );
+
+    foreach_str( c, dynstr_data( dynstr ) )
+    {
+        if ( foreach_cap_c != strlen( str ) )
+        {
+            fflwarnx( "foreach_cap" );
+            return false;
+        }
+        if ( c != str[ foreach_index_c ] )
+        {
+            fflwarnx( "c != str[ foreach_idx ]" );
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -204,7 +297,7 @@ TEST( strspl_str )
 {
     UNIT_TEST( test_one_strspl_str( HOVEN_IPSUM,
                                     ".",
-                                    STRSPLIT_KEEP_DELIM_PRE,
+                                    STRSPLIT_KEEP_DELIM_BEFORE,
                                     5,
                                     "Hovno.",
                                     " Prdel.",
@@ -214,7 +307,7 @@ TEST( strspl_str )
 
     UNIT_TEST( test_one_strspl_str( HOVEN_IPSUM,
                                     ".",
-                                    STRSPLIT_KEEP_DELIM_POST,
+                                    STRSPLIT_KEEP_DELIM_AFTER,
                                     5,
                                     "Hovno",
                                     ". Prdel",
@@ -224,7 +317,7 @@ TEST( strspl_str )
 
     UNIT_TEST( test_one_strspl_str( HOVEN_IPSUM,
                                     ". ",
-                                    STRSPLIT_KEEP_DELIM_PRE,
+                                    STRSPLIT_KEEP_DELIM_BEFORE,
                                     4,
                                     "Hovno. ",
                                     "Prdel. ",
@@ -252,7 +345,7 @@ TEST( strspl_str )
     /* "", ",", ",Ho", ",", ",ps", ",", "," */
     UNIT_TEST( test_one_strspl_str( ",,Ho,,ps,,",
                                     ",",
-                                    STRSPLIT_KEEP_DELIM_POST,
+                                    STRSPLIT_KEEP_DELIM_AFTER,
                                     7,
                                     "",
                                     ",",
@@ -265,7 +358,7 @@ TEST( strspl_str )
     /* same as before, without the "" */
     UNIT_TEST( test_one_strspl_str( ",,Ho,,ps,,",
                                     ",",
-                                    STRSPLIT_KEEP_DELIM_POST | STRSPLIT_EXCLUDE_EMPTY,
+                                    STRSPLIT_KEEP_DELIM_AFTER | STRSPLIT_EXCLUDE_EMPTY,
                                     6,
                                     ",",
                                     ",Ho",
@@ -274,14 +367,15 @@ TEST( strspl_str )
                                     ",",
                                     "," ) );
 
-    UNIT_TEST( test_one_strspl_str( ",,Ho,,ps,,",
-                                    ",,",
-                                    STRSPLIT_KEEP_DELIM_PRE | STRSPLIT_KEEP_DELIM_POST,
-                                    4,
-                                    ",,",
-                                    ",,Ho,,",
-                                    ",,ps,,",
-                                    ",," ) );
+    UNIT_TEST(
+            test_one_strspl_str( ",,Ho,,ps,,",
+                                 ",,",
+                                 STRSPLIT_KEEP_DELIM_BEFORE | STRSPLIT_KEEP_DELIM_AFTER,
+                                 4,
+                                 ",,",
+                                 ",,Ho,,",
+                                 ",,ps,,",
+                                 ",," ) );
 
     UNIT_TEST( test_one_strspl_str( "ABCDEF", "", 0, 6, "A", "B", "C", "D", "E", "F" ) );
 }
@@ -295,11 +389,30 @@ TEST( strspl_regex )
     UNIT_TEST( test_one_strspl_regex( "Hopspop\nPipspop\nKokot\n",
                                       "pop\n",
                                       REG_NEWLINE,
-                                      STRSPLIT_KEEP_DELIM_PRE,
+                                      STRSPLIT_KEEP_DELIM_BEFORE,
                                       3,
                                       "Hopspop\n",
                                       "Pipspop\n",
                                       "Kokot\n" ) );
+
+    UNIT_TEST( test_one_strspl_regex( "Hopspop\nPipspop\nKokot\n",
+                                      "\n",
+                                      REG_NEWLINE,
+                                      STRSPLIT_KEEP_DELIM_BEFORE | STRSPLIT_EXCLUDE_EMPTY,
+                                      3,
+                                      "Hopspop\n",
+                                      "Pipspop\n",
+                                      "Kokot\n" ) );
+
+    UNIT_TEST( test_one_strspl_regex( "Hopspop\nPipspop\nKokot\n",
+                                      "\n",
+                                      REG_NEWLINE,
+                                      STRSPLIT_KEEP_DELIM_AFTER | STRSPLIT_EXCLUDE_EMPTY,
+                                      4,
+                                      "Hopspop",
+                                      "\nPipspop",
+                                      "\nKokot",
+                                      "\n" ) );
 
     UNIT_TEST( test_one_strspl_regex( HOVEN_IPSUM,
                                       "\\.",
@@ -324,7 +437,7 @@ TEST( strspl_regex )
     UNIT_TEST( test_one_strspl_regex( INCONSISTENT_CSV_STR,
                                       "[,;]",
                                       0,
-                                      STRSPLIT_KEEP_DELIM_PRE,
+                                      STRSPLIT_KEEP_DELIM_BEFORE,
                                       4,
                                       "Hovno,",
                                       "Prdel;",
@@ -334,7 +447,7 @@ TEST( strspl_regex )
     UNIT_TEST( test_one_strspl_regex( INCONSISTENT_CSV_STR,
                                       "[,;]",
                                       0,
-                                      STRSPLIT_KEEP_DELIM_POST,
+                                      STRSPLIT_KEEP_DELIM_AFTER,
                                       4,
                                       "Hovno",
                                       ",Prdel",
@@ -355,20 +468,21 @@ TEST( strspl_regex )
                                       "d",
                                       "e" ) );
 
-    UNIT_TEST( test_one_strspl_regex( ";;a,,b,c,;d;e",
-                                      "[,;]",
-                                      0,
-                                      STRSPLIT_KEEP_DELIM_PRE | STRSPLIT_KEEP_DELIM_POST,
-                                      9,
-                                      ";",
-                                      ";;",
-                                      ";a,",
-                                      ",,",
-                                      ",b,",
-                                      ",c,",
-                                      ",;",
-                                      ";d;",
-                                      ";e" ) );
+    UNIT_TEST(
+            test_one_strspl_regex( ";;a,,b,c,;d;e",
+                                   "[,;]",
+                                   0,
+                                   STRSPLIT_KEEP_DELIM_BEFORE | STRSPLIT_KEEP_DELIM_AFTER,
+                                   9,
+                                   ";",
+                                   ";;",
+                                   ";a,",
+                                   ",,",
+                                   ",b,",
+                                   ",c,",
+                                   ",;",
+                                   ";d;",
+                                   ";e" ) );
 
     UNIT_TEST( test_one_strspl_regex( ",,,,,,,", ",", 0, STRSPLIT_EXCLUDE_EMPTY, 0 ) );
 }
@@ -414,6 +528,45 @@ TEST( string_as_UL )
 }
 END_TEST
 
+TEST( reverse )
+{
+    UNIT_TEST( test_one_reverse( "Hovno", "onvoH" ) );
+    UNIT_TEST( test_one_reverse( "", "" ) );
+    UNIT_TEST( test_one_reverse( "A", "A" ) );
+
+    UNIT_TEST( test_one_reverse( "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                                 "ZYXWVUTSRQPONMLKJIHGFEDCBA" ) );
+
+    UNIT_TEST( test_one_reverse( "Karel\tVana\n", "\nanaV\tleraK" ) );
+    UNIT_TEST( test_one_reverse( "\n\r\"\0\"", "\"\r\n" ) );
+}
+END_TEST
+
+TEST( foreach )
+{
+    List numbers_ls = list_init_type( int64_t );
+    assert_that( numbers_ls != NULL, "list init" );
+    int64_t numbers_arr[] = {
+        1, 2, 4, 6, 7, -1, 2323, 3195,
+    };
+    assert_that( list_extend( numbers_ls, numbers_arr, countof( numbers_arr ) ) ==
+                         RV_SUCCESS,
+                 "list extend" );
+
+    UNIT_TEST( test_one_foreach_arr( numbers_arr, countof( numbers_arr ) ) );
+    UNIT_TEST( test_one_foreach_ls( numbers_ls, numbers_arr, countof( numbers_arr ) ) );
+    UNIT_TEST( test_one_foreach_uni( numbers_arr, countof( numbers_arr ) ) );
+
+    UNIT_TEST( test_one_foreach_str( "" ) );
+    UNIT_TEST( test_one_foreach_str( "HOVNO" ) );
+    UNIT_TEST( test_one_foreach_str( "a\nb'\0'" ) );
+
+    UNIT_TEST( test_one_foreach_dynstr( "" ) );
+    UNIT_TEST( test_one_foreach_dynstr( "HOVNO" ) );
+    UNIT_TEST( test_one_foreach_dynstr( "a\nb'\0'" ) );
+}
+END_TEST
+
 
 int main( int argc, string_t argv[] )
 {
@@ -430,6 +583,10 @@ int main( int argc, string_t argv[] )
 
     RUN( string_to_UL );
     RUN( string_as_UL );
+
+    RUN( reverse );
+
+    RUN( foreach );
 
     FINISH_TESTING();
 }

@@ -8,9 +8,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#ifndef COLUMN_MAX_LENGHT
-#define COLUMN_MAX_LENGHT 164
-#endif //COLUMN_MAX_LENGHT
+#ifndef LINE_MAX_WIDTH
+#define LINE_MAX_WIDTH 165
+#endif
 
 
 /**
@@ -130,7 +130,7 @@ static int TEST_NAME_CREATOR( TOTAL_FAILED ) = 0;
         const size_t TEST_NAME_CREATOR( LIMIT ) =                                   \
                 MIN( 300 - ( 32 + TEST_NAME_CREATOR( test_name_len ) ),             \
                      MAX( 0,                                                        \
-                          COLUMN_MAX_LENGHT -                                       \
+                          LINE_MAX_WIDTH -                                          \
                                   ( 32 + TEST_NAME_CREATOR( test_name_len ) ) ) ) + \
                 1;                                                                  \
         for ( size_t TEST_NAME_CREATOR( index ) = 0;                                \

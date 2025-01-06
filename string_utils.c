@@ -328,7 +328,7 @@ ssize_t string_split( str_t **str_arr_cont,
     while ( ( curr = next ) != NULL )
     {
         size_t start_offset =
-                ( is_first || mode & STRSPLIT_KEEP_DELIM_POST ) ? 0 : split_tok_len;
+                ( is_first || mode & STRSPLIT_KEEP_DELIM_AFTER ) ? 0 : split_tok_len;
 
         if ( is_first )
         {
@@ -339,7 +339,7 @@ ssize_t string_split( str_t **str_arr_cont,
             next = strstr( curr + split_tok_len, split_tok );
 
         const char *start = curr + start_offset;
-        size_t end_offset = ( mode & STRSPLIT_KEEP_DELIM_PRE ) ? split_tok_len : 0;
+        size_t end_offset = ( mode & STRSPLIT_KEEP_DELIM_BEFORE ) ? split_tok_len : 0;
 
         if ( mode & STRSPLIT_EXCLUDE_EMPTY &&
              ( ( next == NULL && *start == '\0' ) ||
@@ -391,7 +391,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
         if ( ree_rv == REG_NOMATCH )
         {
             const char *to_dup =
-                    ( !( mode & STRSPLIT_KEEP_DELIM_POST ) || next_start == NULL )
+                    ( !( mode & STRSPLIT_KEEP_DELIM_AFTER ) || next_start == NULL )
                             ? searched
                             : next_start;
             if ( ( mode & STRSPLIT_EXCLUDE_EMPTY ) && *to_dup == '\0' )
@@ -410,12 +410,12 @@ ssize_t string_split_regex( str_t **str_arr_cont,
         }
 
         const char *actual_start =
-                ( !( mode & STRSPLIT_KEEP_DELIM_POST ) || next_start == NULL )
+                ( !( mode & STRSPLIT_KEEP_DELIM_AFTER ) || next_start == NULL )
                         ? searched
                         : next_start;
 
         size_t end_offset_from_searched =
-                ( mode & STRSPLIT_KEEP_DELIM_PRE ) ? regmatch.rm_eo : regmatch.rm_so;
+                ( mode & STRSPLIT_KEEP_DELIM_BEFORE ) ? regmatch.rm_eo : regmatch.rm_so;
 
         size_t actual_len = ( searched + end_offset_from_searched ) - actual_start;
 
@@ -429,7 +429,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                 return RV_ERROR;
             }
         }
-        next_start = ( mode & STRSPLIT_KEEP_DELIM_POST )
+        next_start = ( mode & STRSPLIT_KEEP_DELIM_AFTER )
                              ? searched + regmatch.rm_so
                              : searched + end_offset_from_searched;
         searched += regmatch.rm_eo;
