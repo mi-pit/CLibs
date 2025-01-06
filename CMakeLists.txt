@@ -29,9 +29,4 @@ add_executable(TestLeet
         misc.c
         )
 
-add_executable(TestMisc
-        Tests/test_unit_tests.c
-        string_utils.c
-        dynstring.c
-        dynarr.c
-        )
+add_executable(TestTests Tests/test_unit_tests.c)

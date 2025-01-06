@@ -22,10 +22,18 @@ TEST( test_example )
 }
 END_TEST
 
+TEST( this_one_actually_passes )
+{
+    UNIT_TEST( true );
+}
+END_TEST
+
+
 int main( void )
 {
     RUN( all_fail );
     RUN( test_example );
+    RUN( this_one_actually_passes );
 
     FINISH_TESTING();
 }

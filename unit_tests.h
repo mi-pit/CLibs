@@ -51,6 +51,7 @@
 
 #define COLOR_DEFAULT COLOR_CREATOR( 0 )
 
+#define COLOR_BLACK   COLOR_CREATOR( 30 )
 #define COLOR_RED     COLOR_CREATOR( 31 )
 #define COLOR_GREEN   COLOR_CREATOR( 32 )
 #define COLOR_YELLOW  COLOR_CREATOR( 33 )
@@ -173,10 +174,9 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
               TEST_NAME_CREATOR( index ) < TEST_NAME_CREATOR( LIMIT );              \
               ++TEST_NAME_CREATOR( index ) )                                        \
             printf( "." );                                                          \
-        printf( " " PRINT_COLOR "%s" PRINT_COLOR "\n",                              \
+        printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",                            \
                 TEST_NAME_CREATOR( success ) ? COLOR_SUCC : COLOR_FAIL,             \
-                TEST_NAME_CREATOR( success ) ? "SUCCESS" : "FAILURE",               \
-                COLOR_DEFAULT );                                                    \
+                TEST_NAME_CREATOR( success ) ? "SUCCESS" : "FAILURE" );             \
         if ( !TEST_NAME_CREATOR( success ) )                                        \
             ++TEST_NAME_CREATOR( failed_total );                                    \
         ++TEST_NAME_CREATOR( ran_total );                                           \
