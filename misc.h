@@ -112,7 +112,7 @@ int64_t digitsof( uint64_t num, unsigned base );
  * @param exp
  * @return `base` ^ `exp`
  */
-int64_t power( int64_t base, int64_t exp );
+int64_t power( int64_t base, uint64_t exp );
 
 /**
  * Reverses the digits of the number `n`.

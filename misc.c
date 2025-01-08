@@ -45,7 +45,7 @@ int64_t digitsof( uint64_t num, unsigned base )
     return ndigs;
 }
 
-int64_t power( int64_t base, int64_t exp )
+int64_t power( int64_t base, uint64_t exp )
 {
     int64_t res = 1;
     while ( exp > 0 )
