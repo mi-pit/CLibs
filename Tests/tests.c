@@ -716,9 +716,9 @@ TEST( misc_c )
     UNIT_TEST( min_64( 10, 2 ) == 2 );
     UNIT_TEST( min_64( -10, 2 ) == -10 );
 
-    UNIT_TEST( sgn_m( 1204 ) > 0 );
-    UNIT_TEST( sgn_m( -11 ) < 0 );
-    UNIT_TEST( sgn_m( 0 ) == 0 );
+    UNIT_TEST( sgn_64( 1204 ) > 0 );
+    UNIT_TEST( sgn_64( -11 ) < 0 );
+    UNIT_TEST( sgn_64( 0 ) == 0 );
 
     UNIT_TEST( is_within( 0, 1, 2 ) );
     UNIT_TEST( is_within( -10, 20, 20 ) );
@@ -742,6 +742,7 @@ TEST( misc_c )
     UNIT_TEST( power( 2, 5 ) == 32 );
     UNIT_TEST( power( 2, 31 ) - 1 == INT32_MAX );
     UNIT_TEST( power( 10, 3 ) == 1000 );
+    UNIT_TEST( power( 100, 0 ) == 1 );
 
     UNIT_TEST( test_one_reverse_int( 123, 10, 321 ) );
     UNIT_TEST( test_one_reverse_int( 120, 10, 21 ) );

@@ -35,6 +35,11 @@ int64_t max_64( int64_t a, int64_t b )
     return ( ( a ) > ( b ) ? ( a ) : ( b ) );
 }
 
+int64_t sgn_64( int64_t n )
+{
+    return n == 0 ? 0 : n < 0 ? -1 : 1;
+}
+
 
 int64_t digitsof( uint64_t num, unsigned base )
 {

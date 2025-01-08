@@ -90,11 +90,11 @@ int64_t min_64( int64_t a, int64_t b );
  * Bigger of the two numbers
  */
 int64_t max_64( int64_t a, int64_t b );
-
 /**
  * Sign ( -1, 0, 1 ) of the number
  */
-#define sgn_m( n ) ( n == 0 ? 0 : n < 0 ? -1 : 1 )
+int64_t sgn_64( int64_t n );
+
 
 /**
  * Returns how many digits ‹num› has in base ‹base›
