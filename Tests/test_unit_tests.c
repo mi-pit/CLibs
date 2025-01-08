@@ -37,9 +37,9 @@ int main( void )
     int a, b, c, d;
     UNUSED( a, b, c, d );
 
-    RUN( all_fail );
-    RUN( test_example );
-    RUN( this_one_actually_passes );
+    RUN_TEST( all_fail );
+    RUN_TEST( test_example );
+    RUN_TEST( this_one_actually_passes );
 
     FINISH_TESTING();
 }

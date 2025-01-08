@@ -5,6 +5,7 @@
 #ifndef CLIBS_DYNSTRING_H
 #define CLIBS_DYNSTRING_H
 
+#include <stdarg.h>
 #include <stddef.h>
 #include <sys/types.h>
 
@@ -51,11 +52,36 @@ void dynstr_destroy( DynamicString );
 
 /* ==== Modifiers ==== */
 /**
- * Appends a string to the end of the DynamicString
+ * Appends a string to the end of the DynamicString.
+ * <p>
+ * `app` may not be NULL
+ *
  * @return 0 on success, -1 on allocation error
  */
-int dynstr_append( DynamicString, const char * );
-int dynstr_appendn( DynamicString dynstr, const char *app, size_t len );
+int dynstr_append( DynamicString, const char *app );
+/**
+ * Appends at most `len` characters to the end of the dynstr
+ * <p>
+ * `app` may not be NULL
+ *
+ * @param dynstr
+ * @param app       appended string
+ * @param len       maximum number of chars appended
+ * @return RV_SUCCESS on success, RV_ERROR on allocation error
+ */
+int dynstr_appendn( DynamicString, const char *app, size_t len );
+/**
+ * Appends a formatted string to the end of a DynamicString
+ *
+ * @return RV_ERROR on alloc fail, else RV_SUCCESS
+ */
+int dynstr_appendf( DynamicString, const char *fmt, ... ) __printflike( 2, 3 );
+/**
+ * Appends a formatted string to the end of a DynamicString
+ *
+ * @return RV_ERROR on alloc fail, else RV_SUCCESS
+ */
+int dynstr_vappendf( DynamicString, const char *fmt, va_list vargs );
 
 /**
  * Adds a string to the start of the DynamicString
@@ -63,17 +89,38 @@ int dynstr_appendn( DynamicString dynstr, const char *app, size_t len );
  */
 int dynstr_prepend( DynamicString, const char * );
 
-/**
- * Appends a formatted string to the end of a DynamicString
- *
- * @return RV_ERROR on alloc fail, else RV_SUCCESS
- */
-int dynstr_appendf( DynamicString dynstr, const char *fmt, ... ) __printflike( 2, 3 );
 
 /**
  * Sets the string to be a slice of itself, from ‹start_idx› to ‹end_idx›.
- * If ‹end_idx› == -1, the end index is set to the index of the last character in the
- * string
+ * If ‹end_idx› < 0, the end index is set as the offset
+ * from the '\0' character in the string
+ * @example
+ * @code
+ * DynamicString dynstr = dynstr_init_as( "Hello, world!" );
+ * dynstr_slice( dynstr, 0, -1 ); // => "Hello, world!"
+ *
+ * DynamicString dynstr = dynstr_init_as( "Hello, world!" );
+ * dynstr_slice( dynstr, 2, -1 ); // => "llo, world!"
+ *
+ * DynamicString dynstr = dynstr_init_as( "Hello, world!" );
+ * dynstr_slice( dynstr, 0, -3 ); // => "Hello, worl"
+ *
+ * DynamicString dynstr = dynstr_init_as( "Hello, world!" );
+ * dynstr_slice( dynstr, 0, 4 );  // => "Hell"
+ *
+ * DynamicString dynstr = dynstr_init_as( "Hello, world!" );
+ * dynstr_slice( dynstr, 2, -3 ); // => "llo, worl"
+ *
+ * DynamicString dynstr = dynstr_init_as( "Hello, world!" );
+ * dynstr_slice( dynstr, 2, 4 );  // => "ll"
+ *
+ * DynamicString dynstr = dynstr_init_as( "Hello, world!" );
+ * dynstr_slice( dynstr, 1, 2 );  // => "e"
+ *
+ * DynamicString dynstr = dynstr_init_as( "Hello, world!" );
+ * dynstr_slice( dynstr, 2, 1 );  // => returns RV_EXCEPTION
+ *                                //    (contents of dynstr are unchanged)
+ * @endcode
  *
  * @param start_idx index of the first preserved character
  * @param end_idx   index of the last preserved character

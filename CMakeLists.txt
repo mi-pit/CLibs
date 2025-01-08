@@ -12,7 +12,7 @@ add_executable(Tests
         dynstring.c
         swexpr.c
         misc.c
-        )
+        Tests/test_string_utils.h Tests/test_dynstr.h)
 
 add_executable(TestHashFunc
         Tests/test_hash_func.c
