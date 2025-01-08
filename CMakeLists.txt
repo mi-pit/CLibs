@@ -5,12 +5,13 @@ set(CMAKE_C_STANDARD 99)
 
 include_directories(.)
 
-add_executable(Test
+add_executable(Tests
         Tests/tests.c
         string_utils.c
         dynarr.c
         dynstring.c
         swexpr.c
+        misc.c
         )
 
 add_executable(TestHashFunc
@@ -29,4 +30,7 @@ add_executable(TestLeet
         misc.c
         )
 
-add_executable(TestTests Tests/test_unit_tests.c)
+add_executable(TestTests
+        Tests/test_unit_tests.c
+        misc.c
+        )

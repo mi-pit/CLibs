@@ -560,13 +560,14 @@ TEST( foreach )
     int64_t numbers_arr[] = {
         1, 2, 4, 6, 7, -1, 2323, 3195,
     };
-    assert_that( list_extend( numbers_ls, numbers_arr, countof( numbers_arr ) ) ==
+    assert_that( list_extend( numbers_ls, numbers_arr, sizeof_arr( numbers_arr ) ) ==
                          RV_SUCCESS,
                  "list extend" );
 
-    UNIT_TEST( test_one_foreach_arr( numbers_arr, countof( numbers_arr ) ) );
-    UNIT_TEST( test_one_foreach_ls( numbers_ls, numbers_arr, countof( numbers_arr ) ) );
-    UNIT_TEST( test_one_foreach_uni( numbers_arr, countof( numbers_arr ) ) );
+    UNIT_TEST( test_one_foreach_arr( numbers_arr, sizeof_arr( numbers_arr ) ) );
+    UNIT_TEST(
+            test_one_foreach_ls( numbers_ls, numbers_arr, sizeof_arr( numbers_arr ) ) );
+    UNIT_TEST( test_one_foreach_uni( numbers_arr, sizeof_arr( numbers_arr ) ) );
 
     UNIT_TEST( test_one_foreach_str( "" ) );
     UNIT_TEST( test_one_foreach_str( "HOVNO" ) );
@@ -682,7 +683,7 @@ TEST( strip )
 }
 END_TEST
 
-TEST( misc )
+TEST( strings_misc )
 {
     UNIT_TEST( strcmp( get_file_name( "/Users/macbook/Hovno" ), "Hovno" ) == 0 );
     UNIT_TEST( strcmp( get_file_name( "Hovno" ), "Hovno" ) == 0 );
@@ -691,11 +692,67 @@ TEST( misc )
 }
 END_TEST
 
-
-int main( int argc, string_t argv[] )
+Tester test_one_reverse_int( int64_t n, unsigned base, int64_t res )
 {
-    UNUSED( argc && argv );
+    return reverse_integer( n, base ) == res;
+}
 
+TEST( misc_c )
+{
+    UNIT_TEST( max_64( 1, 2 ) == 2 );
+    UNIT_TEST( max_64( 3, 2 ) == 3 );
+    UNIT_TEST( max_64( 3, -2 ) == 3 );
+    {
+        int a = 1;
+        int b = 1;
+        UNIT_TEST( max_64( a, ++b ) == 2 );
+    }
+    {
+        int a = 1;
+        int b = 1;
+        UNIT_TEST( max_64( a, b++ ) == 1 );
+    }
+    UNIT_TEST( min_64( 1, 2 ) == 1 );
+    UNIT_TEST( min_64( 10, 2 ) == 2 );
+    UNIT_TEST( min_64( -10, 2 ) == -10 );
+
+    UNIT_TEST( sgn_m( 1204 ) > 0 );
+    UNIT_TEST( sgn_m( -11 ) < 0 );
+    UNIT_TEST( sgn_m( 0 ) == 0 );
+
+    UNIT_TEST( is_within( 0, 1, 2 ) );
+    UNIT_TEST( is_within( -10, 20, 20 ) );
+    UNIT_TEST( is_within( -10, -10, 20 ) );
+    UNIT_TEST( !is_within( -10, -11, 20 ) );
+    UNIT_TEST( !is_within( 10, 5, 20 ) );
+
+    {
+        int a = 1, b = 2;
+        UNIT_TEST( cmp_int( &a, &b ) != 0 );
+    }
+    {
+        int arr[ 10 ];
+        UNIT_TEST( sizeof_arr( arr ) == 10 );
+    }
+
+    UNIT_TEST( digitsof( 1, 10 ) == 1 );
+    UNIT_TEST( digitsof( 10, 10 ) == 2 );
+    UNIT_TEST( digitsof( 7, 2 ) == 3 );
+
+    UNIT_TEST( power( 2, 5 ) == 32 );
+    UNIT_TEST( power( 2, 31 ) - 1 == INT32_MAX );
+    UNIT_TEST( power( 10, 3 ) == 1000 );
+
+    UNIT_TEST( test_one_reverse_int( 123, 10, 321 ) );
+    UNIT_TEST( test_one_reverse_int( 120, 10, 21 ) );
+    UNIT_TEST( test_one_reverse_int( 7, 2, 7 ) );
+    UNIT_TEST( test_one_reverse_int( 8, 2, 1 ) );
+    UNIT_TEST( test_one_reverse_int( 1, 2, 1 ) );
+}
+END_TEST
+
+int main( void )
+{
     RUN( replace );
 
     RUN( appendn );
@@ -716,7 +773,9 @@ int main( int argc, string_t argv[] )
 
     RUN( strip );
 
-    RUN( misc );
+    RUN( strings_misc );
+
+    RUN( misc_c );
 
     FINISH_TESTING();
 }

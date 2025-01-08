@@ -74,7 +74,17 @@ int dict_insert_f( struct key_value_pair_set *dict,
     // todo: resize
     uint64_t hash = hash_func( key, key_size );
 
-    struct const_kvp new_item = {
+    struct const_kvp {
+        const void *key;
+        size_t key_size;
+        PrintFunction key_print;
+
+        const void *val;
+        size_t val_size;
+        PrintFunction val_print;
+
+        bool removed;
+    } new_item = {
         .key_size = key_size,
         .val_size = val_size,
         .key      = key,
@@ -181,7 +191,9 @@ int dict_set_val( Dict dict,
 }
 
 
-int dict_remove( struct key_value_pair_set *dict, const void *key_data, size_t key_size )
+enum DictRemoveRV dict_remove( struct key_value_pair_set *dict,
+                               const void *key_data,
+                               size_t key_size )
 {
     uint64_t hash = hash_func( key_data, key_size );
 

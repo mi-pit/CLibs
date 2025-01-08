@@ -71,7 +71,7 @@ static int dynstr_resize( DynamicString dynstr, size_t new_size )
 
     dynstr->data = temp;
     dynstr->cap  = new_size;
-    dynstr->len  = min_m( dynstr->cap, dynstr->len );
+    dynstr->len  = min_64( dynstr->cap, dynstr->len );
 
     return RV_SUCCESS;
 }

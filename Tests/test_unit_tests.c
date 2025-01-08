@@ -2,7 +2,10 @@
 // Created by MacBook on 03.01.2025.
 //
 
+#include "../misc.h"
 #include "../unit_tests.h"
+
+#include <string.h>
 
 
 TEST( all_fail )
@@ -31,6 +34,9 @@ END_TEST
 
 int main( void )
 {
+    int a, b, c, d;
+    UNUSED( a, b, c, d );
+
     RUN( all_fail );
     RUN( test_example );
     RUN( this_one_actually_passes );

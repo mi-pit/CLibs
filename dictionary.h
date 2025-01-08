@@ -22,18 +22,6 @@ struct key_value_pair {
     bool removed;
 };
 
-struct const_kvp {
-    const void *key;
-    size_t key_size;
-    PrintFunction key_print;
-
-    const void *val;
-    size_t val_size;
-    PrintFunction val_print;
-
-    bool removed;
-};
-
 
 #define DICT_DEF_SIZE 64
 
@@ -89,7 +77,7 @@ int dict_set_val( Dict,
                   const void *val,
                   size_t val_size );
 
-int dict_remove( Dict, const void *data, size_t nbytes );
+enum DictRemoveRV dict_remove( Dict, const void *data, size_t nbytes );
 
 
 /* -------- SIZE/CAP -------- */
