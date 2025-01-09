@@ -3,9 +3,10 @@
 //
 
 #include "../assert_that.h"
-#include "../dynstring.h"
+#include "../misc.h"
 #include "../string_utils.h"
 #include "../unit_tests.h"
+#include "Structs/dynstring.h"
 
 #include <assert.h>
 

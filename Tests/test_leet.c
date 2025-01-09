@@ -2,10 +2,10 @@
 // Created by MacBook on 03.01.2025.
 //
 #include "../assert_that.h"
-#include "../dictionary.h"
-#include "../dynarr.h"
 #include "../foreach.h"
 #include "../pointer_utils.h"
+#include "Structs/dictionary.h"
+#include "Structs/dynarr.h"
 
 
 typedef int64_t Number;

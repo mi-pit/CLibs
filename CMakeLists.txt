@@ -8,23 +8,23 @@ include_directories(.)
 add_executable(Tests
         Tests/tests.c
         string_utils.c
-        dynarr.c
-        dynstring.c
+        Structs/dynarr.c
+        Structs/dynstring.c
         swexpr.c
         misc.c
-        Tests/test_string_utils.h Tests/test_dynstr.h)
+        )
 
 add_executable(TestHashFunc
         Tests/test_hash_func.c
         misc.c
-        sets.c
+        Structs/sets.c
         item_print_functions.c
         )
 
 add_executable(TestLeet
         Tests/test_leet.c
-        dictionary.c
-        dynarr.c
+        Structs/dictionary.c
+        Structs/dynarr.c
         item_print_functions.c
         pointer_utils.c
         misc.c

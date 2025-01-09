@@ -4,8 +4,8 @@
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
 
-#include "dynarr.h"        /* List (stack) */
-#include "pointer_utils.h" /* deref_as() */
+#include "pointer_utils.h"  /* deref_as() */
+#include "Structs/dynarr.h" /* List (stack) */
 
 #include <err.h>     /* err() */
 #include <errno.h>   /* ENOMEM */

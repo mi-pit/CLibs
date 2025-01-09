@@ -4,9 +4,9 @@
 
 #include "string_utils.h"
 
-#include "dynarr.h" /* List */
-#include "dynstring.h"
-#include "errors.h" /* *warn* */
+#include "errors.h"         /* *warn* */
+#include "Structs/dynarr.h" /* List */
+#include "Structs/dynstring.h"
 
 #include <ctype.h>
 #include <regex.h>
