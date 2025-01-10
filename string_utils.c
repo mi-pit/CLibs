@@ -271,7 +271,7 @@ str_t string_replaced( string_t const str, string_t old, string_t new )
     }
     while ( *curr != '\0' );
 
-    str_t ret = dynstr_to_str( result );
+    str_t ret = dynstr_data_copy( result );
     if ( ret == NULL )
         f_stack_trace();
 

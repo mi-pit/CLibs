@@ -85,15 +85,34 @@ bool is_within( int64_t low, int64_t num, int64_t high );
 /**
  * Smaller of the two numbers
  */
-int64_t min_64( int64_t a, int64_t b );
+static inline int64_t min_64( int64_t a, int64_t b )
+{
+    return ( ( a ) < ( b ) ? ( a ) : ( b ) );
+}
+
 /**
  * Bigger of the two numbers
  */
-int64_t max_64( int64_t a, int64_t b );
+static inline int64_t max_64( int64_t a, int64_t b )
+{
+    return ( ( a ) > ( b ) ? ( a ) : ( b ) );
+}
+
 /**
  * Sign ( -1, 0, 1 ) of the number
  */
-int64_t sgn_64( int64_t n );
+static inline int64_t sgn_64( int64_t n )
+{
+    return n == 0 ? 0 : n < 0 ? -1 : 1;
+}
+
+/**
+ * Absolute value of the number
+ */
+static inline int64_t abs_64( int64_t n )
+{
+    return n < 0 ? -n : n;
+}
 
 
 /**

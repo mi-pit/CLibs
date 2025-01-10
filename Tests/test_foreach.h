@@ -6,12 +6,14 @@
 #define CLIBS_TEST_FOREACH_H
 
 #include "../assert_that.h"
-#include "../foreach.h" //
 #include "../misc.h"
 #include "../string_utils.h"
+#include "../Structs/dynarr.h"
+#include "../Structs/dynstring.h"
 #include "../unit_tests.h"
-#include "Structs/dynarr.h"
-#include "Structs/dynstring.h"
+
+// must be after dynarr.h
+#include "../foreach.h"
 
 
 Tester test_one_foreach_arr( const int64_t arr[], const size_t count )

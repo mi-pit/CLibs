@@ -1,7 +1,7 @@
 #ifndef CLIBS_DYNAMIC_ARRAY_H
 #define CLIBS_DYNAMIC_ARRAY_H
 
-#include "array_printf.h"
+#include "../array_printf.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -118,7 +118,7 @@ int list_extend_list( List ls, ConstList app );
  *
  * List ls_outer = list_init( List );
  * List ls_inner = list_init( char );
- * list_append( ls_inner, &ls_outer );
+ * list_append( ls_outer, &ls_inner );
  * @endcode
  */
 int list_append( List, const void *datap );

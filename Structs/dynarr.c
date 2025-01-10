@@ -1,7 +1,8 @@
+
 #include "dynarr.h"
 
-#include "errors.h"      /* retvals */
-#include "extra_types.h" /* byte */
+#include "../errors.h"      /* retvals */
+#include "../extra_types.h" /* byte */
 
 #include <err.h>     /* warn, err */
 #include <stdbool.h> /* bool, true, false */

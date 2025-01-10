@@ -11,11 +11,13 @@
 #include <assert.h>
 
 
-Tester test_one_append( string_t init, string_t app, string_t expected )
+typedef int( PendFunction )( DynamicString, string_t );
+
+Tester test_one_pend( string_t init, string_t app, string_t expected, PendFunction func )
 {
     DynamicString dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr alloc" );
-    assert_that( dynstr_append( dynstr, app ) == RV_SUCCESS, "append rv" );
+    assert_that( func( dynstr, app ) == RV_SUCCESS, "append rv" );
 
     bool rv = strcmp( dynstr_data( dynstr ), expected ) == 0;
 
@@ -26,9 +28,14 @@ Tester test_one_append( string_t init, string_t app, string_t expected )
 
 static TEST( append )
 {
-    UNIT_TEST( test_one_append( "Hops", "pop", "Hopspop" ) );
-    UNIT_TEST( test_one_append( "", *( &"Hopspop" ) + 1, "opspop" ) );
-    UNIT_TEST( test_one_append( "Hops", "", "Hops" ) );
+    UNIT_TEST( test_one_pend( "Hops", "pop", "Hopspop", dynstr_append ) );
+    UNIT_TEST( test_one_pend( "", *( &"Hopspop" ) + 1, "opspop", dynstr_append ) );
+    UNIT_TEST( test_one_pend( "Hops", "", "Hops", dynstr_append ) );
+
+    UNIT_TEST( test_one_pend( "Hops", "pop", "popHops", dynstr_prepend ) );
+    UNIT_TEST( test_one_pend( "Vana", "Karel", "KarelVana", dynstr_prepend ) );
+    UNIT_TEST( test_one_pend( "", *( &"Hopspop" ) + 1, "opspop", dynstr_prepend ) );
+    UNIT_TEST( test_one_pend( "Hops", "", "Hops", dynstr_prepend ) );
 }
 END_TEST
 

@@ -142,11 +142,11 @@ int dynstr_reset( DynamicString dynstr );
  * Allocates a new string with the DynamicString contents
  * @return pointer to heap-allocated data
  */
-char *dynstr_to_str( ConstDynamicString ) __result_use_check;
+char *dynstr_data_copy( ConstDynamicString ) __result_use_check;
 /**
  * @return a pointer of the DynamicStrings data
  */
-const char *dynstr_data( ConstDynamicString );
+char *dynstr_data( DynamicString );
 /**
  * @return length of the string
  */

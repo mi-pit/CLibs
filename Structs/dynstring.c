@@ -3,9 +3,9 @@
 //
 #include "dynstring.h"
 
-#include "errors.h"       /* RV, warn */
-#include "misc.h"         /* min_m */
-#include "string_utils.h" /* str_t, string_t */
+#include "../errors.h"       /* RV, warn */
+#include "../misc.h"         /* min_m */
+#include "../string_utils.h" /* str_t, string_t */
 
 #include <stdio.h>  /* fprintf() */
 #include <stdlib.h> /* alloc */
@@ -199,10 +199,10 @@ int dynstr_prepend( DynamicString dynstr, string_t s )
     if ( new_size >= dynstr->cap )
     {
         size_t new_cap = dynstr->cap;
-        while ( new_cap < new_size )
+        while ( new_cap <= new_size )
             new_cap *= 2;
 
-        int rv = dynstr_resize( dynstr, new_size );
+        int rv = dynstr_resize( dynstr, new_cap );
         if ( rv != RV_SUCCESS )
         {
             f_stack_trace();
@@ -210,8 +210,8 @@ int dynstr_prepend( DynamicString dynstr, string_t s )
         }
     }
 
-    memmove( dynstr->data + added_len - 1, dynstr->data, dynstr->len );
-    strcpy( dynstr->data, s );
+    memmove( dynstr->data + added_len, dynstr->data, dynstr->len );
+    memcpy( dynstr->data, s, added_len );
     dynstr->data[ new_size ] = '\0';
     dynstr->len              = new_size;
 
@@ -277,7 +277,7 @@ int dynstr_reset( DynamicString dynstr )
 
 /* ==== */ /* ==== */
 
-str_t dynstr_to_str( ConstDynamicString dynstr )
+str_t dynstr_data_copy( ConstDynamicString dynstr )
 {
     str_t ret = strndup( dynstr->data, dynstr->len );
     if ( ret == NULL )
@@ -286,7 +286,7 @@ str_t dynstr_to_str( ConstDynamicString dynstr )
 }
 
 
-string_t dynstr_data( ConstDynamicString dynstr )
+str_t dynstr_data( DynamicString dynstr )
 {
     return dynstr->data;
 }
