@@ -5,8 +5,8 @@
 #include "../assert_that.h"
 #include "../misc.h"
 #include "../string_utils.h"
+#include "../Structs/dynstring.h"
 #include "../unit_tests.h"
-#include "Structs/dynstring.h"
 
 #include <assert.h>
 

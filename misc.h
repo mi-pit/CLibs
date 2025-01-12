@@ -1,7 +1,7 @@
 #ifndef CLIBS_MISC_H
 #define CLIBS_MISC_H
 
-#include "extra_types.h"
+#include "attributes.h" /* LibraryDefined */
 
 #include <stdbool.h> /* bool (is_within) */
 #include <stddef.h>  /* size_t */
@@ -80,12 +80,16 @@ uint64_t hash_func( const void *, size_t len );
  * @param high  upper bound
  * @return true if ‹ low \<= num \<= high ›
  */
-bool is_within( int64_t low, int64_t num, int64_t high );
+LibraryDefined inline bool is_within( int64_t low, int64_t num, int64_t high )
+{
+    return ( ( num ) >= ( low ) && ( num ) <= ( high ) );
+}
+
 
 /**
  * Smaller of the two numbers
  */
-static inline int64_t min_64( int64_t a, int64_t b )
+LibraryDefined inline int64_t min_64( int64_t a, int64_t b )
 {
     return ( ( a ) < ( b ) ? ( a ) : ( b ) );
 }
@@ -93,7 +97,7 @@ static inline int64_t min_64( int64_t a, int64_t b )
 /**
  * Bigger of the two numbers
  */
-static inline int64_t max_64( int64_t a, int64_t b )
+LibraryDefined inline int64_t max_64( int64_t a, int64_t b )
 {
     return ( ( a ) > ( b ) ? ( a ) : ( b ) );
 }
@@ -101,17 +105,9 @@ static inline int64_t max_64( int64_t a, int64_t b )
 /**
  * Sign ( -1, 0, 1 ) of the number
  */
-static inline int64_t sgn_64( int64_t n )
+LibraryDefined inline int64_t sgn_64( int64_t n )
 {
     return n == 0 ? 0 : n < 0 ? -1 : 1;
-}
-
-/**
- * Absolute value of the number
- */
-static inline int64_t abs_64( int64_t n )
-{
-    return n < 0 ? -n : n;
 }
 
 

@@ -6,6 +6,7 @@
 #define CLIBS_BIGINT_H
 
 
+#include "../attributes.h"
 #include "dynarr.h"
 
 #include <stdbool.h>
@@ -23,13 +24,18 @@ struct bigint {
 };
 
 
-struct bigint *bigint_init();
-struct bigint *bigint_init_as( int64_t );
+int bigint_init_p( struct bigint * );
+Constructor struct bigint *bigint_init();
+Constructor struct bigint *bigint_init_as( int64_t );
+
+/// Frees all inner memory in the bigint struct
+void bigint_destroy_l( struct bigint );
+/// Frees all memory owned by the struct, including itself
 void bigint_destroy( struct bigint * );
 
 size_t bigint_sizeof( const struct bigint * );
 
-char *bigint_to_string( const struct bigint * );
+Constructor char *bigint_to_string( const struct bigint * );
 
 
 int bigint_add_i( struct bigint *, int64_t );

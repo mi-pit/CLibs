@@ -43,8 +43,8 @@
 // todo?: #define TESTER( NAME ) static bool test_one_##NAME
 
 
-#ifndef LINE_MAX_WIDTH
-#define LINE_MAX_WIDTH 165
+#ifndef LINE_PREF_WIDTH
+#define LINE_PREF_WIDTH 158
 #endif
 
 
@@ -95,8 +95,6 @@ static int TEST_NAME_CREATOR( TOTAL_RAN )    = 0;
 static int TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) = 0;
 static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
 
-
-#define DECLARE_TEST( HANDLE ) int TEST_NAME_CREATOR( HANDLE )( void )
 
 #define TEST( HANDLE )                                          \
     int TEST_NAME_CREATOR( HANDLE )( void )                     \
@@ -155,40 +153,40 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
     }                                                                                   \
     while ( 0 )
 
-#define MAX( A, B ) ( ( ( A ) > ( B ) ) ? ( A ) : ( B ) )
-#define MIN( A, B ) ( ( ( A ) < ( B ) ) ? ( A ) : ( B ) )
-
 /**
  * If condition evaluates to true, "SUCCESS" is printed
  * in the color defined in COLOR_SUCC (green by default).
  * <p>
  * If condition evaluates to false, "FAILURE" is printed
  * in the color defined in COLOR_FAIL (red by default)
- * and an optional message is printed (has to be string literal)
  */
-#define UNIT_TEST( CONDITION )                                                       \
-    do                                                                               \
-    {                                                                                \
-        printf( COLOR_TEST_TAG "    [UNIT TEST] " COLOR_DEFAULT "%s ", #CONDITION ); \
-        size_t TEST_NAME_CREATOR( test_name_len ) = sizeof #CONDITION;               \
-        bool TEST_NAME_CREATOR( success )         = CONDITION;                       \
-        const size_t TEST_NAME_CREATOR( LIMIT ) =                                    \
-                MIN( 300 - ( 32 + TEST_NAME_CREATOR( test_name_len ) ),              \
-                     MAX( 0,                                                         \
-                          LINE_MAX_WIDTH -                                           \
-                                  ( 32 + TEST_NAME_CREATOR( test_name_len ) ) ) ) +  \
-                1;                                                                   \
-        for ( size_t TEST_NAME_CREATOR( index ) = 0;                                 \
-              TEST_NAME_CREATOR( index ) < TEST_NAME_CREATOR( LIMIT );               \
-              ++TEST_NAME_CREATOR( index ) )                                         \
-            printf( "." );                                                           \
-        printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",                             \
-                TEST_NAME_CREATOR( success ) ? COLOR_SUCC : COLOR_FAIL,              \
-                TEST_NAME_CREATOR( success ) ? "SUCCESS" : "FAILURE" );              \
-        if ( !TEST_NAME_CREATOR( success ) )                                         \
-            ++TEST_NAME_CREATOR( failed_total );                                     \
-        ++TEST_NAME_CREATOR( ran_total );                                            \
-    }                                                                                \
+#define UNIT_TEST( CONDITION )                                                          \
+    do                                                                                  \
+    {                                                                                   \
+        printf( COLOR_TEST_TAG "    [UNIT TEST] " COLOR_DEFAULT "%s ", #CONDITION );    \
+        const size_t TEST_NAME_CREATOR( MSG_CONST_PART_LEN ) = 25;                      \
+        const size_t TEST_NAME_CREATOR( TEST_NAME_LEN ) = ( sizeof( #CONDITION ) ) - 1; \
+        ssize_t TEST_NAME_CREATOR( NDOTS ) =                                            \
+                LINE_PREF_WIDTH - ( TEST_NAME_CREATOR( MSG_CONST_PART_LEN ) +           \
+                                    TEST_NAME_CREATOR( TEST_NAME_LEN ) );               \
+        if ( TEST_NAME_CREATOR( NDOTS ) < 0 )                                           \
+        {                                                                               \
+            printf( "\n                 " );                                            \
+            TEST_NAME_CREATOR( NDOTS ) =                                                \
+                    LINE_PREF_WIDTH - TEST_NAME_CREATOR( MSG_CONST_PART_LEN );          \
+        }                                                                               \
+        bool TEST_NAME_CREATOR( success ) = CONDITION;                                  \
+        for ( size_t TEST_NAME_CREATOR( index ) = 0;                                    \
+              TEST_NAME_CREATOR( index ) < ( size_t ) TEST_NAME_CREATOR( NDOTS );       \
+              ++TEST_NAME_CREATOR( index ) )                                            \
+            printf( "." );                                                              \
+        printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",                                \
+                TEST_NAME_CREATOR( success ) ? COLOR_SUCC : COLOR_FAIL,                 \
+                TEST_NAME_CREATOR( success ) ? "SUCCESS" : "FAILURE" );                 \
+        if ( !TEST_NAME_CREATOR( success ) )                                            \
+            ++TEST_NAME_CREATOR( failed_total );                                        \
+        ++TEST_NAME_CREATOR( ran_total );                                               \
+    }                                                                                   \
     while ( 0 )
 
 #endif //CLIBS_UNIT_TESTS_H

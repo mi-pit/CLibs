@@ -49,11 +49,6 @@ int64_t power( int64_t base, uint64_t exp )
     return res;
 }
 
-inline bool is_within( int64_t low, int64_t num, int64_t high )
-{
-    return ( ( num ) >= ( low ) && ( num ) <= ( high ) );
-}
-
 int64_t reverse_integer( int64_t n, unsigned base )
 {
     int64_t digits = digitsof( n, base );

@@ -34,7 +34,6 @@ add_executable(TestLeet
         Structs/dictionary.c
         Structs/dynarr.c
         item_print_functions.c
-        pointer_utils.c
         misc.c
         )
 

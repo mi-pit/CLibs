@@ -5,12 +5,17 @@
 #ifndef CLIBS_ASSERT_THAT_H
 #define CLIBS_ASSERT_THAT_H
 
+/* for this header */
 #include "errors.h" /* warn */
 
 #include <stdlib.h> /* exit */
 
+/* includes */
+#include <assert.h> /* include */
+
+
 #ifndef CLIBS_ASSERT_THAT_H_EXIT_VAL
-#define CLIBS_ASSERT_THAT_H_EXIT_VAL RV_ERROR
+#define CLIBS_ASSERT_THAT_H_EXIT_VAL RV_EXCEPTION
 #endif //defined CLIBS_ASSERT_THAT_H_EXIT_VAL
 
 /**
@@ -33,8 +38,12 @@
  * @endcode
  *
  * @note
- * The error code returned is – by default – `RV_ERROR` from `errors.h`,
+ * The error code returned is – by default – `RV_EXCEPTION` from `errors.h`,
  * but may be redefined.
+ * @code
+ * // like this:
+ * #define CLIBS_ASSERT_THAT_H_EXIT_VAL RV_EXCEPTION
+ * @endcode
  */
 #define assert_that( EXPRESSION, ... )                                                \
     do                                                                                \
