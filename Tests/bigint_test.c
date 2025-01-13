@@ -94,17 +94,18 @@ static TEST( mul_uint_strings )
 END_TEST
 
 
-Tester test_number_array( struct bigint *bi, size_t count, ... )
+Tester test_number_array( struct bigint *bi, size_t count, const uint64_t arr[ count ] )
 {
     if ( list_size( bi->numbers ) != count )
         return false;
 
-    va_list args;
-    va_start( args, count );
     for ( size_t i = 0; i < count; ++i )
-        if ( va_arg( args, uint64_t ) != list_access( bi->numbers, i, uint64_t ) )
+    {
+        uint64_t in_num = list_access( bi->numbers, i, uint64_t );
+        uint64_t arg    = arr[ i ];
+        if ( arg != in_num )
             return false;
-    va_end( args );
+    }
 
     return true;
 }
@@ -113,7 +114,7 @@ static TEST( init )
 {
     struct bigint bi;
     bigint_init_p( &bi );
-    UNIT_TEST( test_number_array( &bi, 1, 0 ) );
+    UNIT_TEST( test_number_array( &bi, 1, ( uint64_t[] ){ 0 } ) );
 
     bigint_destroy_l( bi );
 }
@@ -122,19 +123,19 @@ END_TEST
 static TEST( add )
 {
     struct bigint *bi = bigint_init();
-    UNIT_TEST( test_number_array( bi, 1, 0 ) );
+    UNIT_TEST( test_number_array( bi, 1, ( uint64_t[] ){ 0 } ) );
 
     bigint_add_i( bi, INT64_MAX );
-    UNIT_TEST( test_number_array( bi, 1, INT64_MAX ) );
+    UNIT_TEST( test_number_array( bi, 1, ( uint64_t[] ){ INT64_MAX } ) );
 
     bigint_add_i( bi, INT64_MAX );
-    UNIT_TEST( test_number_array( bi, 1, 2UL * INT64_MAX ) );
+    UNIT_TEST( test_number_array( bi, 1, ( uint64_t[] ){ 2UL * INT64_MAX } ) );
 
     bigint_add_i( bi, 2 );
-    UNIT_TEST( test_number_array( bi, 2, 0, 1 ) );
+    UNIT_TEST( test_number_array( bi, 2, ( uint64_t[] ){ 0, 1 } ) );
 
     bigint_add_i( bi, 2 );
-    UNIT_TEST( test_number_array( bi, 2, 2, 1 ) );
+    UNIT_TEST( test_number_array( bi, 2, ( uint64_t[] ){ 2, 1 } ) );
 
     for ( int i = 0; i < 3; ++i )
     {
@@ -148,6 +149,30 @@ static TEST( add )
 
         UNIT_TEST( is_correct );
     }
+
+    set_number_array( bi, 2, ( uint64_t[] ){ UINT64_MAX, UINT64_MAX } );
+    bigint_add_i( bi, 1 );
+    UNIT_TEST( test_number_array( bi, 3, ( uint64_t[] ){ 0, 0, 1 } ) );
+
+    set_number_array(
+            bi, 5, ( uint64_t[] ){ UINT64_MAX, UINT64_MAX, UINT64_MAX, UINT64_MAX, 1 } );
+    bigint_add_i( bi, 1 );
+    UNIT_TEST( test_number_array( bi, 5, ( uint64_t[] ){ 0, 0, 0, 0, 2 } ) );
+
+    set_number_array(
+            bi,
+            5,
+            ( uint64_t[] ){ UINT64_MAX, UINT64_MAX, UINT64_MAX - 1, UINT64_MAX, 1 } );
+    bigint_add_i( bi, 1 );
+    UNIT_TEST( test_number_array(
+            bi, 5, ( uint64_t[] ){ 0, 0, UINT64_MAX, UINT64_MAX, 1 } ) );
+
+    set_number_array(
+            bi,
+            5,
+            ( uint64_t[] ){ INT64_MAX + 2ULL, UINT64_MAX, UINT64_MAX, UINT64_MAX, 1 } );
+    bigint_add_i( bi, INT64_MAX );
+    UNIT_TEST( test_number_array( bi, 5, ( uint64_t[] ){ 0, 0, 0, 0, 2ULL } ) );
 
     bigint_destroy( bi );
 }
@@ -166,6 +191,8 @@ Tester try_to_init_as_to_string( int64_t init )
 
     bool rv = cmpeq( strcmp( str_got, str_wanted ) );
 
+    free( str_got );
+    free( str_wanted );
     bigint_destroy( i );
 
     return rv;
@@ -188,7 +215,7 @@ static TEST( init_and_string )
     struct bigint *bi = bigint_init();
     assert( bi != NULL );
     assert( list_size( bi->numbers ) > 0 );
-    UNIT_TEST( test_number_array( bi, 1, 0 ) );
+    UNIT_TEST( test_number_array( bi, 1, ( uint64_t[] ){ 0 } ) );
     uint64_t ap = UINT64_MAX;
     list_set_at( bi->numbers, 0, &ap );
 

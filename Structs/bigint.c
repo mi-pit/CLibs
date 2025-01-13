@@ -83,8 +83,8 @@ str_t mul_uint_strings( string_t str_1, string_t str_2 )
         digit_t carry = 0;
         for ( ssize_t j = ( ssize_t ) len_2 - 1; j >= 0; --j )
         {
-            digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry +
-                           ( result[ i + j + 1 ] - '0' );
+            digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry
+                           + ( result[ i + j + 1 ] - '0' );
             result[ i + j + 1 ] = ( char ) ( ( prod % 10 ) + '0' ); // Store the digit
             carry               = prod / 10;                        // Carry over
         }
@@ -280,7 +280,9 @@ void bigint_destroy( struct bigint *bp )
 }
 
 
-int bigint_add_i( struct bigint *bi, int64_t n )
+Private int bigint_add_level( struct bigint *const bi,
+                              const int64_t n,
+                              const size_t level )
 {
     if ( n == 0 )
         return RV_SUCCESS;
@@ -293,11 +295,10 @@ int bigint_add_i( struct bigint *bi, int64_t n )
     int64_t norm_n = bi->sign * n;
     bool overflow  = INT64_MAX < low || ( int64_t ) low > norm_n;
     //TODO:
-    // fix overflow in high
     // bool underflow = norm_n < 0 && low < -norm_n;
     if ( overflow )
     {
-        if ( list_size( bi->numbers ) == 1 )
+        if ( list_size( bi->numbers ) == level + 1 )
         {
             uint64_t high = 1;
             if ( list_append( bi->numbers, &high ) != RV_SUCCESS )
@@ -308,10 +309,19 @@ int bigint_add_i( struct bigint *bi, int64_t n )
         }
         else
         {
-            *( uint64_t * ) list_at( bi->numbers, 1 ) += 1;
+            uint64_t old = list_access( bi->numbers, level + 1, uint64_t );
+            list_access( bi->numbers, level + 1, uint64_t ) += 1;
+
+            if ( old == UINT64_MAX )
+                return_on_fail( bigint_add_level( bi, 1, level + 1 ) );
         }
     }
     low += norm_n;
     assert( list_set_at( bi->numbers, 0, &low ) == RV_SUCCESS );
     return RV_SUCCESS;
+}
+
+int bigint_add_i( struct bigint *bi, int64_t n )
+{
+    return bigint_add_level( bi, n, 0 );
 }
