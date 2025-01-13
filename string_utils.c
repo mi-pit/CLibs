@@ -4,6 +4,7 @@
 
 #include "string_utils.h"
 
+#include "attributes.h"
 #include "errors.h"         /* *warn* */
 #include "Structs/dynarr.h" /* List */
 #include "Structs/dynstring.h"
@@ -286,6 +287,28 @@ ERROR:
 }
 
 
+Private ssize_t string_split_empty( str_t **str_arr_cont, const string_t string )
+{
+    size_t count      = strlen( string );
+    ( *str_arr_cont ) = calloc( count, sizeof( str_t * ) );
+    if ( ( *str_arr_cont ) == NULL )
+        return fwarn_ret( RV_ERROR, "string array calloc" );
+
+    for ( size_t i = 0; i < count; ++i )
+    {
+        if ( ( ( *str_arr_cont )[ i ] = malloc( 2 ) ) == NULL )
+        {
+            while ( i-- > 0 )
+                free( ( *str_arr_cont )[ i ] );
+            free( *str_arr_cont );
+            return fwarn_ret( RV_ERROR, "string malloc" );
+        }
+        ( *str_arr_cont )[ i ][ 0 ] = string[ i ];
+        ( *str_arr_cont )[ i ][ 1 ] = '\0';
+    }
+    return ( ssize_t ) count;
+}
+
 ssize_t string_split( str_t **str_arr_cont,
                       const string_t string,
                       const string_t split_tok,
@@ -298,19 +321,9 @@ ssize_t string_split( str_t **str_arr_cont,
 
     if ( strcmp( split_tok, "" ) == 0 )
     {
-        size_t count = strlen( string );
-        for ( size_t i = 0; i < count; ++i )
-        {
-            if ( ( ( *str_arr_cont )[ i ] = malloc( 2 ) ) == NULL )
-            {
-                while ( i-- > 0 )
-                    free( ( *str_arr_cont )[ i ] );
-                return RV_ERROR;
-            }
-            ( *str_arr_cont )[ i ][ 0 ] = string[ i ];
-            ( *str_arr_cont )[ i ][ 1 ] = '\0';
-        }
-        return ( ssize_t ) count;
+        ssize_t rv = string_split_empty( str_arr_cont, string );
+        on_fail( ( int ) rv ) f_stack_trace();
+        return rv;
     }
 
     List ls = list_init_type( str_t );
@@ -341,9 +354,9 @@ ssize_t string_split( str_t **str_arr_cont,
         const char *start = curr + start_offset;
         size_t end_offset = ( mode & STRSPLIT_KEEP_DELIM_BEFORE ) ? split_tok_len : 0;
 
-        if ( mode & STRSPLIT_EXCLUDE_EMPTY &&
-             ( ( next == NULL && *start == '\0' ) ||
-               ( next != NULL && ( ( next - start + end_offset ) == 0 ) ) ) )
+        if ( mode & STRSPLIT_EXCLUDE_EMPTY
+             && ( ( next == NULL && *start == '\0' )
+                  || ( next != NULL && ( ( next - start + end_offset ) == 0 ) ) ) )
             continue;
 
         str_t dup = next == NULL ? strdup( start )

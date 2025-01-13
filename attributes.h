@@ -45,7 +45,7 @@
 #endif
 
 
-#define private static UsageOptional
+#define Private static UsageOptional
 
 /// The function is static and it may go unused
 #define LibraryDefined static UsageOptional

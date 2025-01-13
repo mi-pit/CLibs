@@ -67,8 +67,8 @@ Tester test_one_init_as( string_t init )
     size_t str_len       = strlen( init );
     DynamicString dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "init" );
-    bool rv = cmpeq( strcmp( dynstr_data( dynstr ), init ) ) &&
-              dynstr_len( dynstr ) == str_len;
+    bool rv = cmpeq( strcmp( dynstr_data( dynstr ), init ) )
+              && dynstr_len( dynstr ) == str_len;
     dynstr_destroy( dynstr );
     return rv;
 }

@@ -7,6 +7,7 @@
 #include "../misc.h"         /* min_m */
 #include "../string_utils.h" /* str_t, string_t */
 
+#include <assert.h>
 #include <stdio.h>  /* fprintf() */
 #include <stdlib.h> /* alloc */
 #include <string.h> /* this one should be obvious */
@@ -69,8 +70,10 @@ void dynstr_destroy( DynamicString dynstr )
 }
 
 
-static int dynstr_resize( DynamicString dynstr, size_t new_size )
+Private int dynstr_resize( DynamicString dynstr, size_t new_size )
 {
+    assert( new_size > dynstr->len );
+
     char *temp = realloc( dynstr->data, new_size );
     if ( temp == NULL )
         return fwarn_ret( RV_ERROR, "realloc" );
@@ -78,6 +81,7 @@ static int dynstr_resize( DynamicString dynstr, size_t new_size )
     dynstr->data = temp;
     dynstr->cap  = new_size;
     dynstr->len  = min_64( ( int64_t ) dynstr->cap, ( int64_t ) dynstr->len );
+    dynstr->data[ dynstr->len ] = '\0';
 
     return RV_SUCCESS;
 }
@@ -87,14 +91,14 @@ int dynstr_append( DynamicString dynstr, const char *app )
 {
     size_t app_len  = strlen( app );
     size_t new_size = dynstr->len + app_len;
-    if ( new_size >= dynstr->cap )
+    if ( new_size + 1 >= dynstr->cap )
     {
         size_t new_cap = dynstr->cap;
         /* get next smallest power of 2 */
-        while ( new_cap < new_size )
+        while ( new_cap <= new_size + 1 )
             new_cap *= 2;
 
-        return_on_fail( dynstr_resize( dynstr, new_size ) );
+        return_on_fail( dynstr_resize( dynstr, new_cap ) );
     }
 
     strcpy( dynstr->data + dynstr->len, app );
@@ -107,14 +111,14 @@ int dynstr_append( DynamicString dynstr, const char *app )
 int dynstr_appendn( DynamicString dynstr, const char *app, size_t len )
 {
     size_t new_size = dynstr->len + len;
-    if ( new_size >= dynstr->cap )
+    if ( new_size + 1 >= dynstr->cap )
     {
         size_t new_cap = dynstr->cap;
         /* get next smallest power of 2 */
-        while ( new_cap < new_size )
+        while ( new_size + 1 >= new_cap )
             new_cap *= 2;
 
-        return_on_fail( dynstr_resize( dynstr, new_size ) );
+        return_on_fail( dynstr_resize( dynstr, new_cap ) );
     }
 
     strncpy( dynstr->data + dynstr->len, app, len );
@@ -129,7 +133,7 @@ int dynstr_appendn( DynamicString dynstr, const char *app, size_t len )
  * Like `vsprintf`, except it heap-allocates memory for the resulting string.
  * (*strp) may be passed to free(3)
  */
-static int vasprintf( char **strp, const char *fmt, va_list args )
+int vasprintf( char **strp, const char *fmt, va_list args )
 {
     va_list vaList;
     va_copy( vaList, args );

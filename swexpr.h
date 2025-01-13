@@ -35,16 +35,22 @@ int switch_expression_pop( void );
  */
 #define swex_init_ptr( expr, nbytes ) switch_expression_push( nbytes, ( expr ) );
 
-#define swex_init_str( expr ) switch_expression_push( strlen( expr ), ( expr ) );
+#define swex_init_str( expr )                                              \
+    const char *swex_init_imm_tmp_var_##expr_type##_##expr##__ = ( expr ); \
+    switch_expression_push( strlen( expr ),                                \
+                            &( swex_init_imm_tmp_var_##expr_type##_##expr##__ ) );
 
 /**
  * Initializes the swexpr to, in each ‹ case ›, compare it to this expression
  */
-#define swex_init_val( expr_type, expr )                                           \
-    {                                                                              \
-        expr_type swex_init_imm_tmp_var = ( expr );                                \
-        switch_expression_push( sizeof( expr_type ), &( swex_init_imm_tmp_var ) ); \
-    }
+#define swex_init_val( expr_type, expr )                                     \
+    expr_type swex_init_imm_tmp_var_##expr_type##_##expr##__ = ( expr );     \
+    expr_type *swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ =           \
+            &( swex_init_imm_tmp_var_##expr_type##_##expr##__ );             \
+    assert( switch_expression_push(                                          \
+                    sizeof( expr_type ),                                     \
+                    &( swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ ) ) \
+            == RV_SUCCESS );
 
 /**
  * Uses an existing variable to store the result from ‹ resolve ›
@@ -68,9 +74,8 @@ int switch_expression_pop( void );
 /**
  * Assigns the 'result' into the swexpr variable
  */
-#define resolve( result_type, result )                                                  \
-    deref_as( result_type, *( void ** ) list_at_last( switch_expr_variables_stack ) ) = \
-            result
+#define resolve( result_type, result ) \
+    *deref_as( result_type *, list_at_last( switch_expr_variables_stack ) ) = result
 
 /**
  * Next statement/block is executed if the currently "switched"
@@ -92,22 +97,28 @@ int switch_expression_pop( void );
         type swex_case_imm_aux_var_ = expr_case;                                     \
         memcpy( swex_aux_variable_, &swex_case_imm_aux_var_, sizeof( type ) );       \
     }                                                                                \
-    if ( !switch_expression_is_assigned() &&                                         \
-         ( *( size_t * ) list_peek( switch_expr_sizes_stack ) ) == sizeof( type ) && \
-         memcmp( list_peek( switch_expr_values_stack ),                              \
-                 swex_aux_variable_,                                                 \
-                 sizeof( type ) ) == 0 )                                             \
+    if ( !switch_expression_is_assigned()                                            \
+         && ( *( size_t * ) list_peek( switch_expr_sizes_stack ) ) == sizeof( type ) \
+         && memcmp( *( void ** ) list_peek( switch_expr_values_stack ),              \
+                    swex_aux_variable_,                                              \
+                    sizeof( type ) )                                                 \
+                    == 0 )                                                           \
         if ( switch_expression_assign() != 1 )
 
 #define swex_case_ptr( expr_case, nbytes )                                             \
-    if ( !switch_expression_is_assigned() &&                                           \
-         ( *( size_t * ) list_peek( switch_expr_sizes_stack ) ) == sizeof( void * ) && \
-         memcmp( list_peek( switch_expr_values_stack ), expr_case, nbytes ) == 0 )     \
+    if ( !switch_expression_is_assigned()                                              \
+         && ( *( size_t * ) list_peek( switch_expr_sizes_stack ) ) == sizeof( void * ) \
+         && memcmp( *( void ** ) list_peek( switch_expr_values_stack ),                \
+                    expr_case,                                                         \
+                    nbytes )                                                           \
+                    == 0 )                                                             \
         if ( switch_expression_assign() != 1 )
 
-#define swex_case_str( expr_case )                                         \
-    if ( !switch_expression_is_assigned() &&                               \
-         strcmp( list_peek( switch_expr_values_stack ), expr_case ) == 0 ) \
+#define swex_case_str( expr_case )                                            \
+    if ( !switch_expression_is_assigned()                                     \
+         && strcmp( *( const char ** ) list_peek( switch_expr_values_stack ), \
+                    expr_case )                                               \
+                    == 0 )                                                    \
         if ( switch_expression_assign() != 1 )
 
 /**

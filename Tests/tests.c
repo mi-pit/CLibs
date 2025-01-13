@@ -4,10 +4,16 @@
 // tests
 #include "test_dynstr.h"
 #include "test_foreach.h"
+#include "test_list.h"
 #include "test_misc_c.h"
 #include "test_string_utils.h"
 #include "test_swex.h"
 
+
+void run_list( void )
+{
+    RUN_TEST( list_init );
+}
 
 void run_dynstr( void )
 {
@@ -48,11 +54,12 @@ void run_misc_c( void )
 
 int main( void )
 {
-    run_misc_c();
-    run_foreach();
-    run_swex();
-    run_string_utils();
-    run_dynstr();
+    /**/ run_misc_c();       /***/
+    /**/ run_foreach();      /***/
+    /**/ run_swex();         /***/
+    /**/ run_string_utils(); /***/
+    /**/ run_dynstr();       /***/
+    /** run_list();         /***/
 
     FINISH_TESTING();
 }

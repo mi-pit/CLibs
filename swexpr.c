@@ -16,21 +16,20 @@ static const bool TRUE  = true;
 static const bool FALSE = false;
 
 
-#define try_push( LIST, EXPRESSION, NBYTES )                   \
-    do                                                         \
-    {                                                          \
-        if ( LIST == NULL )                                    \
-            if ( ( LIST = list_init_size( NBYTES ) ) == NULL ) \
-            {                                                  \
-                f_stack_trace();                               \
-                return RV_ERROR;                               \
-            }                                                  \
-        if ( list_append( LIST, EXPRESSION ) == RV_ERROR )     \
-        {                                                      \
-            f_stack_trace();                                   \
-            return RV_ERROR;                                   \
-        }                                                      \
-    }                                                          \
+#define try_push( LIST, EXPRESSION, NBYTES )                               \
+    do                                                                     \
+    {                                                                      \
+        if ( LIST == NULL && ( LIST = list_init_size( NBYTES ) ) == NULL ) \
+        {                                                                  \
+            f_stack_trace();                                               \
+            return RV_ERROR;                                               \
+        }                                                                  \
+        if ( list_append( LIST, EXPRESSION ) == RV_ERROR )                 \
+        {                                                                  \
+            f_stack_trace();                                               \
+            return RV_ERROR;                                               \
+        }                                                                  \
+    }                                                                      \
     while ( 0 )
 
 int switch_expression_push( size_t nbytes, const void *data )

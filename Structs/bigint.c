@@ -15,7 +15,7 @@
 #include <inttypes.h>
 
 
-private inline sign_t sign_flip( sign_t s )
+Private inline sign_t sign_flip( sign_t s )
 {
     return s == SIGN_NEG ? SIGN_POS : SIGN_NEG;
 }
