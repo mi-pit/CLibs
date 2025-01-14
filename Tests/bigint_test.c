@@ -2,7 +2,7 @@
 // Created by MacBook on 09.01.2025.
 //
 
-#include "../Structs/bigint.h"
+#include "../Structs/bigint.h" /* also includes dynarr.h */
 
 #include "../assert_that.h"  /* assert_that(), #include "errors.h" */
 #include "../misc.h"         /* cmpeq */
@@ -12,10 +12,16 @@
 #include <assert.h>
 #include <inttypes.h>
 
-/// Sets the bi->numbers list to be size := `count` & contents := varargs
-static void set_number_array( struct bigint *bi,
-                              size_t count,
-                              const uint64_t numbers[ count ] )
+/**
+ * Sets the bi->numbers list to be
+ * @code
+ * size := count;
+ * contents := numbers;
+ * @endcode
+ */
+Private void set_number_array( struct bigint *bi,
+                               size_t count,
+                               const uint64_t numbers[ count ] )
 {
     for ( size_t i = 0; i < list_size( bi->numbers ); ++i )
     {
@@ -98,6 +104,9 @@ Tester test_number_array( struct bigint *bi, size_t count, const uint64_t arr[ c
 {
     if ( list_size( bi->numbers ) != count )
         return false;
+
+    printf( "\n" );
+    // array_printf( arr, count, uint64_t, "%llu" );
 
     for ( size_t i = 0; i < count; ++i )
     {

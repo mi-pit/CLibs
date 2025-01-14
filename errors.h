@@ -6,6 +6,8 @@
 #define CLIBS_ERRORS_H
 
 /* for this header */
+#include "attributes.h" /* PrintfLike, LibraryDefined */
+
 #include <errno.h>     /* for WarnUniversal + include */
 #include <stddef.h>    /* ptrdiff_t */
 #include <sys/cdefs.h> /* __printflike */
@@ -102,13 +104,14 @@
  * @return @code return_value @endcode
  * @bug %p for some reason sometimes throws compiler errors for non `void *` pointers
  */
-static ptrdiff_t WarnUniversal( const char *restrict FileName,
-                                const char *restrict FunctionName,
-                                int LineNumber,
-                                int err_no,
-                                ptrdiff_t return_value,
-                                const char *__restrict format,
-                                ... ) __printflike( 6, 7 ) __unused;
+LibraryDefined UseResult PrintfLike( 6, 7 ) ptrdiff_t
+        WarnUniversal( const char *restrict FileName,
+                       const char *restrict FunctionName,
+                       int LineNumber,
+                       int err_no,
+                       ptrdiff_t return_value,
+                       const char *__restrict format,
+                       ... );
 
 #if defined( __APPLE__ ) || defined( __FreeBSD__ )
 #include <stdlib.h>
@@ -119,13 +122,13 @@ static ptrdiff_t WarnUniversal( const char *restrict FileName,
 #define get_prog_name() "current-program"
 #endif
 
-static ptrdiff_t WarnUniversal( const char *restrict FileName,
-                                const char *restrict FunctionName,
-                                int LineNumber,
-                                int err_no,
-                                ptrdiff_t return_value,
-                                const char *__restrict format,
-                                ... )
+ptrdiff_t WarnUniversal( const char *restrict FileName,
+                         const char *restrict FunctionName,
+                         int LineNumber,
+                         int err_no,
+                         ptrdiff_t return_value,
+                         const char *__restrict format,
+                         ... )
 {
     fprintf( stderr, "%s", get_prog_name() );
     if ( FileName != NULL )

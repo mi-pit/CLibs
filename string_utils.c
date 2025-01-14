@@ -326,7 +326,7 @@ ssize_t string_split( str_t **str_arr_cont,
         return rv;
     }
 
-    List ls = list_init_type( str_t );
+    struct dynamic_array *ls = list_init_type( str_t );
     if ( ls == NULL )
     {
         f_stack_trace();
@@ -386,7 +386,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                             const regex_t *const __restrict regexp,
                             strsplit_mode_t mode )
 {
-    List ls = list_init_type( str_t );
+    struct dynamic_array *ls = list_init_type( str_t );
     if ( ls == NULL )
     {
         f_stack_trace();

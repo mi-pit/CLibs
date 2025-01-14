@@ -5,7 +5,6 @@
 #ifndef CLIBS_BIGINT_H
 #define CLIBS_BIGINT_H
 
-
 #include "../attributes.h"
 #include "dynarr.h"
 
@@ -19,7 +18,7 @@ typedef enum {
 } sign_t;
 
 struct bigint {
-    List /* of unsigned 64-bit ints */ numbers;
+    struct dynamic_array *numbers;
     sign_t sign;
 };
 

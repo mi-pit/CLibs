@@ -59,7 +59,7 @@ int main( void )
     /**/ run_swex();         /***/
     /**/ run_string_utils(); /***/
     /**/ run_dynstr();       /***/
-    /** run_list();         /***/
+    /** run_list();         ***/
 
     FINISH_TESTING();
 }

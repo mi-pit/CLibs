@@ -25,7 +25,7 @@ Tester test_one_foreach_arr( const int64_t arr[], const size_t count )
     }
     return true;
 }
-Tester test_one_foreach_ls( ConstList const numbers_ls,
+Tester test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
                             const int64_t numbers_arr[],
                             const size_t count )
 {
@@ -88,7 +88,7 @@ Tester test_one_foreach_dynstr( string_t str )
 
 static TEST( foreach )
 {
-    List numbers_ls = list_init_type( int64_t );
+    struct dynamic_array *numbers_ls = list_init_type( int64_t );
     assert_that( numbers_ls != NULL, "list init" );
     int64_t numbers_arr[] = {
         1, 2, 4, 6, 7, -1, 2323, 3195,

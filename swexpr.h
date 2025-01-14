@@ -13,14 +13,10 @@
 #include <string.h>  /* memcpy() */
 
 
-/* TODO
- *  check swex functions return values
- */
-
-extern List switch_expr_values_stack;
-extern List switch_expr_variables_stack;
-extern List switch_expr_sizes_stack;
-extern List switch_expr_assigned_stack;
+struct dynamic_array extern *switch_expr_values_stack;
+struct dynamic_array extern *switch_expr_variables_stack;
+struct dynamic_array extern *switch_expr_sizes_stack;
+struct dynamic_array extern *switch_expr_assigned_stack;
 
 void *swex_aux_variable_;
 

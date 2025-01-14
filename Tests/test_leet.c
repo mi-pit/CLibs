@@ -2,10 +2,12 @@
 // Created by MacBook on 03.01.2025.
 //
 #include "../assert_that.h"
-#include "../foreach.h"
 #include "../pointer_utils.h"
-#include "Structs/dictionary.h"
-#include "Structs/dynarr.h"
+#include "../Structs/dictionary.h"
+#include "../Structs/dynarr.h"
+
+// after dynarr
+#include "../foreach.h"
 
 
 typedef int64_t Number;
@@ -26,7 +28,7 @@ define_print_func( pointer_t, "%p" );
 #endif //TypeNumber
 
 
-Type majority_element( List nums )
+Type majority_element( struct dynamic_array *nums )
 {
     Dict freq = dict_init();
 
@@ -60,18 +62,18 @@ Type majority_element( List nums )
 }
 
 
-#define test_one_majelem( TYPE, DESIRED, LS_LEN, ... )        \
-    do                                                        \
-    {                                                         \
-        List values                 = list_init_type( TYPE ); \
-        TYPE values_array[ LS_LEN ] = { __VA_ARGS__ };        \
-        list_extend( values, values_array, LS_LEN );          \
-        TYPE found = majority_element( values );              \
-        assert_that( found == DESIRED,                        \
-                     "found %lli expected %lli",              \
-                     ( long long ) found,                     \
-                     ( long long ) DESIRED );                 \
-    }                                                         \
+#define test_one_majelem( TYPE, DESIRED, LS_LEN, ... )         \
+    do                                                         \
+    {                                                          \
+        struct dynamic_array *values = list_init_type( TYPE ); \
+        TYPE values_array[ LS_LEN ]  = { __VA_ARGS__ };        \
+        list_extend( values, values_array, LS_LEN );           \
+        TYPE found = majority_element( values );               \
+        assert_that( found == DESIRED,                         \
+                     "found %lli expected %lli",               \
+                     ( long long ) found,                      \
+                     ( long long ) DESIRED );                  \
+    }                                                          \
     while ( 0 )
 
 

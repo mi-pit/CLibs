@@ -6,10 +6,10 @@
 
 #include "errors.h" /* RV, print_stack_trace() */
 
-List switch_expr_values_stack    = NULL;
-List switch_expr_variables_stack = NULL;
-List switch_expr_sizes_stack     = NULL;
-List switch_expr_assigned_stack  = NULL;
+struct dynamic_array *switch_expr_values_stack    = NULL;
+struct dynamic_array *switch_expr_variables_stack = NULL;
+struct dynamic_array *switch_expr_sizes_stack     = NULL;
+struct dynamic_array *switch_expr_assigned_stack  = NULL;
 
 
 static const bool TRUE  = true;

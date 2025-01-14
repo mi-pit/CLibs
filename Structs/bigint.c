@@ -168,7 +168,8 @@ CLEANUP:
 
 #define N_POWER64_STRINGS 8
 
-static string_t POWER64_STRINGS[ N_POWER64_STRINGS ] = {
+/// Lookup table for `get_listelem_power_str()`
+Private string_t const POWER64_STRINGS[ N_POWER64_STRINGS ] = {
     "1",
     STRING_2_TO_64,
     "340282366920938463463374607431768211456",
@@ -187,7 +188,6 @@ static str_t get_listelem_power_str( uint64_t n, size_t power )
     str_t buffer;
     if ( power < N_POWER64_STRINGS )
     {
-        // lookup table for efficiency
         buffer = strdup( POWER64_STRINGS[ power ] );
         if ( buffer == NULL )
             return fwarn_ret_p( NULL, "strdup" );

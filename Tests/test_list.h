@@ -10,7 +10,7 @@
 #include "../unit_tests.h"
 
 
-Tester test_list_array_uint64( List ls, size_t size, const uint64_t array[ size ] )
+Tester test_list_array_uint64( struct dynamic_array *ls, size_t size, const uint64_t array[ size ] )
 {
     for ( size_t i = 0; i < size; ++i )
         if ( array[ i ] != ( ( uint64_t * ) list_items( ls ) )[ i ] )
@@ -20,7 +20,7 @@ Tester test_list_array_uint64( List ls, size_t size, const uint64_t array[ size 
 
 Private TEST( list_init )
 {
-    List ls = list_init_type( uint64_t );
+    struct dynamic_array *ls = list_init_type( uint64_t );
     UNIT_TEST( list_el_size( ls ) == sizeof( uint64_t ) );
     UNIT_TEST( list_size( ls ) == 0 );
     UNIT_TEST( list_items( ls ) != NULL );
