@@ -34,6 +34,14 @@
 /// Function's return value must be used.
 #define UseResult __attribute__( ( __warn_unused_result__ ) )
 
+
+#if HAS_ATTRIBUTE( cold )
+#define Cold __attribute__( ( __cold__ ) )
+#else
+#define Cold
+#endif
+
+
 /**
  * Function allocates memory for an object.
  * Function's return value must be used.

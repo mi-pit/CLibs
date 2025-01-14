@@ -7,6 +7,7 @@
 
 /* for this header */
 #include "attributes.h" /* PrintfLike, LibraryDefined */
+#include "terminal_colors.h"
 
 #include <errno.h>     /* for WarnUniversal + include */
 #include <stddef.h>    /* ptrdiff_t */
@@ -29,14 +30,6 @@
 
 #define __FILE_NAME__ __FILE__
 #endif //__FILE_NAME__
-
-#ifndef __printflike
-#define __printflike( A, B )
-#endif //__printflike
-
-#ifndef __unused
-#define __unused __attribute__( ( __unused__ ) )
-#endif //__unused
 
 
 #define RV_EXCEPTION ( -2 ) /* Non-fatal, recoverable error e.g. OOB index */
@@ -76,6 +69,21 @@
 #define on_fail( func_call )  if ( ( func_call ) != RV_SUCCESS )
 #define on_error( func_call ) if ( ( func_call ) == RV_ERROR )
 
+
+#if defined( __APPLE__ ) || defined( __FreeBSD__ )
+#include <stdlib.h>
+#define get_prog_name() getprogname()
+#elif defined( __FILE_NAME__ )
+#define get_prog_name() __FILE_NAME__
+#else
+#define get_prog_name() "current-program"
+#endif
+
+
+#ifndef COLOR_WARNING
+#define COLOR_WARNING COLOR_RED
+#endif //COLOR_WARNING
+
 /**
  * Similar to warn(3) (especially warnc)
  * <p>
@@ -104,53 +112,36 @@
  * @return @code return_value @endcode
  * @bug %p for some reason sometimes throws compiler errors for non `void *` pointers
  */
-LibraryDefined UseResult PrintfLike( 6, 7 ) ptrdiff_t
+LibraryDefined UseResult PrintfLike( 6, 7 ) Cold ptrdiff_t
         WarnUniversal( const char *restrict FileName,
                        const char *restrict FunctionName,
                        int LineNumber,
                        int err_no,
                        ptrdiff_t return_value,
                        const char *__restrict format,
-                       ... );
-
-#if defined( __APPLE__ ) || defined( __FreeBSD__ )
-#include <stdlib.h>
-#define get_prog_name() getprogname()
-#elif defined( __FILE_NAME__ )
-#define get_prog_name() __FILE_NAME__
-#else
-#define get_prog_name() "current-program"
-#endif
-
-ptrdiff_t WarnUniversal( const char *restrict FileName,
-                         const char *restrict FunctionName,
-                         int LineNumber,
-                         int err_no,
-                         ptrdiff_t return_value,
-                         const char *__restrict format,
-                         ... )
+                       ... )
 {
-    fprintf( stderr, "%s", get_prog_name() );
+    PrintInColor( stderr, COLOR_WARNING, "%s", get_prog_name() );
     if ( FileName != NULL )
-        fprintf( stderr, ": %s", FileName );
+        PrintInColor( stderr, COLOR_WARNING, ": %s", FileName );
     if ( FunctionName != NULL )
-        fprintf( stderr, ": %s", FunctionName );
+        PrintInColor( stderr, COLOR_WARNING, ": %s", FunctionName );
     if ( LineNumber > 0 )
-        fprintf( stderr, " @ %i", LineNumber );
-    fprintf( stderr, ": " );
+        PrintInColor( stderr, COLOR_WARNING, " @ %i", LineNumber );
+    PrintInColor( stderr, COLOR_WARNING, ": " );
 
     va_list vaList;
     va_start( vaList, format );
-    vfprintf( stderr, format, vaList );
+    VPrintInColor( stderr, COLOR_WARNING, format, vaList );
     va_end( vaList );
 
     if ( err_no >= 0 )
-        fprintf( stderr, ": %s", strerror( err_no ) );
-    fprintf( stderr, "\n" );
+        PrintInColor( stderr, COLOR_WARNING, ": %s", strerror( err_no ) );
+
+    PrintInColor( stderr, COLOR_WARNING, "\n" );
 
     return return_value;
 }
-
 
 /**
  * prints
@@ -184,15 +175,19 @@ ptrdiff_t WarnUniversal( const char *restrict FileName,
  *     in main
  * \endcode
  */
-#define f_stack_trace() ( ( void ) fprintf( stderr, "\tin %s\n", __func__ ) )
+#define f_stack_trace() PrintInColor( stderr, COLOR_WARNING, "\tin %s\n", __func__ )
 
 /**
  * Like f_stack_trace, just with __FILE_NAME__ and __LINE__
  * @see \code f_stack_trace()
  */
-#define ffl_stack_trace() \
-    ( ( void ) fprintf(   \
-            stderr, "\tin %s: %s @ %d\n", __FILE_NAME__, __func__, __LINE__ ) )
+#define ffl_stack_trace()               \
+    PrintInColor( stderr,               \
+                  COLOR_WARNING,        \
+                  "\tin %s: %s @ %d\n", \
+                  __FILE_NAME__,        \
+                  __func__,             \
+                  __LINE__ )
 
 
 /**

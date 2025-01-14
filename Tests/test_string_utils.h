@@ -247,6 +247,8 @@ TEST( strspl_str )
                                  ",," ) );
 
     UNIT_TEST( test_one_strspl_str( "ABCDEF", "", 0, 6, "A", "B", "C", "D", "E", "F" ) );
+
+    UNIT_TEST( test_one_strspl_str( "", "", 0, 0 ) );
 }
 END_TEST
 
@@ -434,7 +436,7 @@ Tester test_one_reverse_str( string_t orig, string_t result )
     return rv;
 }
 
-TEST( reverse_str )
+Private TEST( reverse_str )
 {
     UNIT_TEST( test_one_reverse_str( "Hovno", "onvoH" ) );
     UNIT_TEST( test_one_reverse_str( "", "" ) );

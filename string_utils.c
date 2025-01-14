@@ -322,7 +322,8 @@ ssize_t string_split( str_t **str_arr_cont,
     if ( strcmp( split_tok, "" ) == 0 )
     {
         ssize_t rv = string_split_empty( str_arr_cont, string );
-        on_fail( ( int ) rv ) f_stack_trace();
+        if ( rv == RV_ERROR )
+            f_stack_trace();
         return rv;
     }
 
