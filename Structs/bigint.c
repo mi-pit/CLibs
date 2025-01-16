@@ -4,7 +4,7 @@
 
 #include "bigint.h"
 
-#include "../errors.h"
+#include "../Errors/errors.h"
 #include "../foreach.h"
 #include "../misc.h"
 #include "../pointer_utils.h"

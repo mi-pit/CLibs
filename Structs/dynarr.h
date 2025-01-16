@@ -17,6 +17,7 @@ typedef struct dynamic_array List;
 
 #define LIST_CAP_SIZE_RATIO 4
 
+
 enum ListPrinters {
     LS_PRINT_NOFORMAT = ( -1 ), /* Lets each list to choose its own print method */
     LS_PRINT_BYTE     = 0,      /* default;

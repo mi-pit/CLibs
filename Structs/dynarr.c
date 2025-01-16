@@ -49,6 +49,12 @@ struct dynamic_array {
 };
 
 
+Private inline void *list_at_non_safe( const struct dynamic_array *ls, size_t idx )
+{
+    return ( byte * ) ls->items + idx * ls->el_size;
+}
+
+
 /* –––––––––––––––––––––––––––––– FUNCTIONAL –––––––––––––––––––––––––––––– */
 
 struct dynamic_array *list_init_size( size_t el_size )
@@ -78,12 +84,12 @@ struct dynamic_array *list_init_size_p( size_t el_size, int mode )
 
 
 /* Immutable */
-const void *list_get( const struct dynamic_array *ls, size_t idx )
+const void *list_see( const struct dynamic_array *ls, size_t idx )
 {
     if ( idx >= ls->size )
         return fwarnx_ret_p( NULL, "index %zu is out of bounds", idx );
 
-    return ( const byte * ) ls->items + idx * ls->el_size;
+    return list_at_non_safe( ls, idx );
 }
 
 const void *list_peek( const struct dynamic_array *ls )
@@ -91,7 +97,7 @@ const void *list_peek( const struct dynamic_array *ls )
     if ( ls->size == 0 )
         return fwarnx_ret_p( NULL, "list contains no elements" );
 
-    return list_get( ls, list_size( ls ) - 1 );
+    return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
 
 
@@ -101,7 +107,7 @@ void *list_at( struct dynamic_array *ls, size_t idx )
     if ( idx >= ls->size )
         return fwarnx_ret_p( NULL, "index %zu is out of bounds", idx );
 
-    return ( byte * ) ls->items + idx * ls->el_size;
+    return list_at_non_safe( ls, idx );
 }
 
 void *list_at_last( struct dynamic_array *ls )
@@ -109,7 +115,7 @@ void *list_at_last( struct dynamic_array *ls )
     if ( ls->size == 0 )
         return fwarnx_ret_p( NULL, "list contains no elements" );
 
-    return list_at( ls, list_size( ls ) - 1 );
+    return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
 
 
@@ -124,12 +130,12 @@ void *list_at_last( struct dynamic_array *ls )
  * to hold all of its items + min_cap_add
  * @return -1 if realloc fails, else 0
  */
-static int list_upsize( struct dynamic_array *ls, size_t min_cap_add )
+Private int list_upsize( struct dynamic_array *ls, size_t min_cap_add )
 {
     size_t new_capacity = ls->capacity * 2;
 
     if ( ( ls->capacity + min_cap_add ) * ls->el_size > new_capacity )
-        new_capacity = ( ls->capacity + min_cap_add ) * ls->el_size;
+        new_capacity = ( ls->capacity + min_cap_add * ls->el_size ) * 2u;
 
     void *tmp = realloc( ls->items, new_capacity * ls->el_size );
     if ( tmp == NULL )
@@ -144,7 +150,7 @@ static int list_upsize( struct dynamic_array *ls, size_t min_cap_add )
  * Changes (realloc) the lists capacity to be half as large\n
  * @return -1 if realloc fails, else 0
  */
-static int list_downsize( struct dynamic_array *ls )
+Private int list_downsize( struct dynamic_array *ls )
 {
     size_t new_cap = ls->capacity / 2;
 
@@ -165,6 +171,9 @@ int list_set_at( struct dynamic_array *ls, size_t index, const void *data )
                            "index %zu is out of bounds for list of length %zu",
                            index,
                            ls->size );
+
+    if ( data == NULL )
+        return fwarnx_ret( RV_EXCEPTION, "data cannot be NULL" );
 
     memcpy( ( ( byte * ) ls->items ) + ( index * ls->el_size ), data, ls->el_size );
 
@@ -198,10 +207,7 @@ int list_extend( struct dynamic_array *ls, const void *array, size_t len )
         }
     }
 
-    byte *last = list_size( ls ) == 0 ? ls->items
-                                      : ( byte * ) list_at_last( ls ) + ls->el_size;
-    assert_that( last != NULL, "last == NULL" );
-    memcpy( last, array, len * ls->el_size );
+    memcpy( list_at_non_safe( ls, ls->size ), array, len * ls->el_size );
 
     ls->size += len;
 
@@ -219,7 +225,7 @@ int list_extend_list( struct dynamic_array *ls, const struct dynamic_array *app 
         }
     }
 
-    memcpy( list_at( ls, ls->size ), app->items, app->size * app->el_size );
+    memcpy( list_at_non_safe( ls, ls->size ), app->items, app->size * app->el_size );
 
     ls->size += app->size;
 
@@ -228,6 +234,9 @@ int list_extend_list( struct dynamic_array *ls, const struct dynamic_array *app 
 
 int list_insert( struct dynamic_array *ls, size_t at, const void *data )
 {
+    if ( at > ls->size )
+        return fwarnx_ret( RV_EXCEPTION, "index %zu is out of bounds", at );
+
     if ( ls->size + 1 >= ls->capacity )
     {
         if ( list_upsize( ls, 1 ) )
@@ -237,9 +246,11 @@ int list_insert( struct dynamic_array *ls, size_t at, const void *data )
         }
     }
 
-    memmove( list_at( ls, at + 1 ), list_at( ls, at ), ( ls->size - at ) * ls->el_size );
+    memmove( list_at_non_safe( ls, at + 1 ),
+             list_at_non_safe( ls, at ),
+             ( ls->size - at ) * ls->el_size );
 
-    memcpy( list_at( ls, at ), data, ls->el_size );
+    memcpy( list_at_non_safe( ls, at ), data, ls->el_size );
 
     ++ls->size;
 
@@ -247,14 +258,20 @@ int list_insert( struct dynamic_array *ls, size_t at, const void *data )
 }
 
 
+Private inline void list_remove_last_nonsafe( struct dynamic_array *ls )
+{
+    memset( list_at_last( ls ), 0, ls->el_size );
+    --ls->size;
+}
+
 int list_pop( struct dynamic_array *ls, void *container )
 {
-    if ( ls->size <= 0 )
+    if ( ls->size == 0 )
         return fwarnx_ret( RV_EXCEPTION, "popping from an empty List" );
 
     if ( ls->capacity / LIST_CAP_SIZE_RATIO > ls->size )
     {
-        if ( list_downsize( ls ) )
+        if ( list_downsize( ls ) != RV_SUCCESS )
         {
             f_stack_trace();
             return RV_ERROR;
@@ -262,11 +279,10 @@ int list_pop( struct dynamic_array *ls, void *container )
     }
 
     if ( container != NULL )
-        memcpy( container, list_at( ls, ls->size - 1 ), ls->el_size );
+        // copy popped element to container
+        memcpy( container, list_at_last( ls ), ls->el_size );
 
-    memset( ( byte * ) ls->items + ( ls->size - 1 ) * ls->el_size, 0, ls->el_size );
-
-    --ls->size;
+    list_remove_last_nonsafe( ls );
 
     return RV_SUCCESS;
 }
@@ -276,17 +292,21 @@ int list_remove( struct dynamic_array *ls, size_t index, void *container )
     if ( index > ls->size )
         return fwarnx_ret( RV_EXCEPTION, "index %zu is out of bounds", index );
 
+    if ( index == ls->size - 1 )
+        return list_pop( ls, container );
+
     if ( ls->capacity / LIST_CAP_SIZE_RATIO > ls->size )
         if ( list_downsize( ls ) )
             return RV_ERROR;
 
-    memcpy( container, ( ( byte * ) ls->items ) + ( index ) *ls->el_size, ls->el_size );
+    if ( container != NULL )
+        memcpy( container, list_at( ls, index ), ls->el_size );
 
-    memmove( ( ( byte * ) ls->items ) + index,
-             ( ( byte * ) ls->items ) + ( index + 1 ) * ls->el_size,
+    memmove( list_at( ls, index ),
+             list_at( ls, index - 1 ),
              ( ls->size - index ) * ls->el_size );
 
-    ls->size--;
+    --ls->size;
 
     return RV_SUCCESS;
 }
@@ -300,13 +320,16 @@ int list_remove_fast( struct dynamic_array *ls, size_t index, void *container )
         if ( list_downsize( ls ) )
             return RV_ERROR;
 
-    memmove( container, ( ( byte * ) ls->items ) + index * ls->el_size, ls->el_size );
+    if ( container != NULL )
+        // put element at index into the container
+        memmove( container, list_at( ls, index ), ls->el_size );
 
-    memmove( ( ( byte * ) ls->items ) + index * ls->el_size,
-             ( ( byte * ) ls->items ) + ( ls->size - 1 ) * ls->el_size,
-             ls->el_size );
+    // put last element at ‹index›
+    memmove( list_at( ls, index ), list_at_last( ls ), ls->el_size );
 
-    list_pop( ls, NULL );
+    // pop last element
+    memset( list_at_last( ls ), 0, ls->el_size );
+    --ls->size;
 
     return RV_SUCCESS;
 }
@@ -332,8 +355,8 @@ int64_t list_bsearch_i( const struct dynamic_array *ls,
 const void *list_lsearch_p( const struct dynamic_array *ls, const void *needle )
 {
     for ( size_t i = 0; i < ls->size; ++i )
-        if ( memcmp( list_get( ls, i ), needle, ls->el_size ) == 0 )
-            return list_get( ls, i );
+        if ( memcmp( list_see( ls, i ), needle, ls->el_size ) == 0 )
+            return list_see( ls, i );
 
     return NULL;
 }
@@ -346,8 +369,7 @@ int64_t list_lsearch_i( const struct dynamic_array *ls, const void *needle )
     return res - ( byte * ) ls->items;
 }
 
-inline void list_sort( struct dynamic_array *ls,
-                       int ( *cmp )( const void *, const void * ) )
+void list_sort( struct dynamic_array *ls, int ( *cmp )( const void *, const void * ) )
 {
     qsort( ls->items, ls->size, ls->el_size, cmp );
 }
@@ -355,12 +377,15 @@ inline void list_sort( struct dynamic_array *ls,
 
 int list_reverse( struct dynamic_array *ls )
 {
+    if ( ls->size == 0 )
+        return RV_SUCCESS;
+
     byte *buffer = malloc( ls->el_size );
     if ( buffer == NULL )
         return fwarn_ret( RV_ERROR, "buffer allocation" );
 
     void *l = ls->items;
-    void *r = list_at( ls, ls->size - 1 );
+    void *r = list_at_non_safe( ls, ls->size - 1 );
 
     for ( size_t i = 0; i < ls->size / 2; ++i )
     {

@@ -5,7 +5,7 @@
 #include "string_utils.h"
 
 #include "attributes.h"
-#include "errors.h"         /* *warn* */
+#include "Errors/errors.h" /* *warn* */
 #include "Structs/dynarr.h" /* List */
 #include "Structs/dynstring.h"
 

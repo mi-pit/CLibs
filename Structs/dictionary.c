@@ -1,6 +1,6 @@
 #include "dictionary.h"
 
-#include "errors.h"
+#include "Errors/errors.h"
 #include "misc.h"
 #include "pointer_utils.h"
 

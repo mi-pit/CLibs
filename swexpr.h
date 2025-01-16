@@ -21,7 +21,7 @@ struct dynamic_array extern *switch_expr_assigned_stack;
 void *swex_aux_variable_;
 
 int switch_expression_push( size_t nbytes, const void *data );
-bool switch_expression_is_assigned();
+bool switch_expression_is_assigned( void );
 int switch_expression_assign( void );
 int switch_expression_pop( void );
 

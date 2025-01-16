@@ -3,9 +3,9 @@
 //
 #include "dynstring.h"
 
-#include "../errors.h"       /* RV, warn */
 #include "../misc.h"         /* min_m */
 #include "../string_utils.h" /* str_t, string_t */
+#include "../Errors/errors.h"   /* RV, warn */
 
 #include <assert.h>
 #include <stdio.h>  /* fprintf() */
