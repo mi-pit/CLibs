@@ -34,7 +34,8 @@ void bigint_destroy( struct bigint * );
 
 size_t bigint_sizeof( const struct bigint * );
 
-Constructor char *bigint_to_string( const struct bigint * );
+UseResult char *bigint_to_string( const struct bigint * );
+UseResult List *bigint_get_number_array( const struct bigint * );
 
 
 int bigint_add_i( struct bigint *, int64_t );

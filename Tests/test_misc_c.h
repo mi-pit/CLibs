@@ -48,7 +48,7 @@ static TEST( misc_c )
     }
     {
         int arr[ 10 ];
-        UNIT_TEST( sizeof_arr( arr ) == 10 );
+        UNIT_TEST( countof( arr ) == 10 );
     }
 
     UNIT_TEST( digitsof( 1, 10 ) == 1 );

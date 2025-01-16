@@ -93,14 +93,14 @@ static TEST( foreach )
     int64_t numbers_arr[] = {
         1, 2, 4, 6, 7, -1, 2323, 3195,
     };
-    assert_that( list_extend( numbers_ls, numbers_arr, sizeof_arr( numbers_arr ) ) ==
+    assert_that( list_extend( numbers_ls, numbers_arr, countof( numbers_arr ) ) ==
                          RV_SUCCESS,
                  "list extend" );
 
-    UNIT_TEST( test_one_foreach_arr( numbers_arr, sizeof_arr( numbers_arr ) ) );
+    UNIT_TEST( test_one_foreach_arr( numbers_arr, countof( numbers_arr ) ) );
     UNIT_TEST(
-            test_one_foreach_ls( numbers_ls, numbers_arr, sizeof_arr( numbers_arr ) ) );
-    UNIT_TEST( test_one_foreach_uni( numbers_arr, sizeof_arr( numbers_arr ) ) );
+            test_one_foreach_ls( numbers_ls, numbers_arr, countof( numbers_arr ) ) );
+    UNIT_TEST( test_one_foreach_uni( numbers_arr, countof( numbers_arr ) ) );
 
     UNIT_TEST( test_one_foreach_str( "" ) );
     UNIT_TEST( test_one_foreach_str( "HOVNO" ) );

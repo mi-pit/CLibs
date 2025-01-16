@@ -267,6 +267,18 @@ str_t bigint_to_string( const struct bigint *const bi )
     return sum;
 }
 
+List *bigint_get_number_array( const struct bigint *bi )
+{
+    List *ls;
+    int rv = list_copy( bi->numbers, &ls );
+    on_fail( rv )
+    {
+        f_stack_trace();
+        return NULL;
+    }
+    return ls;
+}
+
 
 void bigint_destroy_l( struct bigint bi )
 {

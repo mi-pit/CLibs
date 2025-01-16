@@ -105,9 +105,6 @@ Tester test_number_array( struct bigint *bi, size_t count, const uint64_t arr[ c
     if ( list_size( bi->numbers ) != count )
         return false;
 
-    printf( "\n" );
-    // array_printf( arr, count, uint64_t, "%llu" );
-
     for ( size_t i = 0; i < count; ++i )
     {
         uint64_t in_num = list_access( bi->numbers, i, uint64_t );
@@ -311,6 +308,22 @@ static TEST( to_string_bigger )
 }
 END_TEST
 
+TEST( get_array )
+{
+    struct bigint *bi = bigint_init();
+    assert_that( bi != NULL, "bi init" );
+    uint64_t arr[ 10 ];
+    for ( int i = 0; i < countof( arr ); ++i )
+        arr[ i ] = ( i + 1 ) * 2;
+    set_number_array( bi, countof( arr ), arr );
+
+    List *ls = bigint_get_number_array( bi );
+    list_destroy( bi->numbers );
+    bi->numbers = ls;
+    UNIT_TEST( test_number_array( bi, countof( arr ), arr ) );
+}
+END_TEST
+
 
 int main( void )
 {
@@ -321,6 +334,8 @@ int main( void )
     RUN_TEST( add );
     RUN_TEST( init_and_string );
     RUN_TEST( to_string_bigger );
+
+    RUN_TEST( get_array );
 
     FINISH_TESTING();
 }

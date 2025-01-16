@@ -365,11 +365,12 @@ ssize_t string_split( str_t **str_arr_cont,
         if ( dup == NULL )
         {
             list_destroy( ls );
-            return fflwarn_ret( RV_ERROR, "strdup" );
+            return fwarn_ret( RV_ERROR, "strdup" );
         }
 
-        if ( list_append( ls, &dup ) != RV_SUCCESS )
+        on_fail( list_append( ls, &dup ) )
         {
+            f_stack_trace();
             list_destroy( ls );
             return RV_ERROR;
         }

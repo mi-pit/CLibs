@@ -10,7 +10,9 @@
 #include "../unit_tests.h"
 
 
-Tester test_list_array_uint64( struct dynamic_array *ls, size_t size, const uint64_t array[ size ] )
+Tester test_list_array_uint64( struct dynamic_array *ls,
+                               size_t size,
+                               const uint64_t array[ size ] )
 {
     for ( size_t i = 0; i < size; ++i )
         if ( array[ i ] != ( ( uint64_t * ) list_items( ls ) )[ i ] )

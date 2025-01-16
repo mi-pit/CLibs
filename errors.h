@@ -6,17 +6,16 @@
 #define CLIBS_ERRORS_H
 
 /* for this header */
-#include "attributes.h" /* PrintfLike, LibraryDefined */
-#include "terminal_colors.h"
+#include "attributes.h"      /* PrintfLike, LibraryDefined */
+#include "misc.h"            /* UNUSED() */
+#include "terminal_colors.h" /* COLORs, PrintInColor */
 
-#include <errno.h>     /* for WarnUniversal + include */
-#include <stddef.h>    /* ptrdiff_t */
-#include <sys/cdefs.h> /* __printflike */
+#include <errno.h>  /* for WarnUniversal + include */
+#include <stddef.h> /* ptrdiff_t */
+#include <string.h> /* strerror() */
 
 /* for user */
-#include <err.h>    /* include */
-#include <printf.h> /* include fprintf (for stack_traces) */
-#include <string.h>
+#include <err.h> /* include */
 
 
 /* errno value */
@@ -121,6 +120,7 @@ LibraryDefined UseResult PrintfLike( 6, 7 ) Cold ptrdiff_t
                        const char *__restrict format,
                        ... )
 {
+#ifndef SUPPRESS_WARNINGS
     PrintInColor( stderr, COLOR_WARNING, "%s", get_prog_name() );
     if ( FileName != NULL )
         PrintInColor( stderr, COLOR_WARNING, ": %s", FileName );
@@ -139,6 +139,9 @@ LibraryDefined UseResult PrintfLike( 6, 7 ) Cold ptrdiff_t
         PrintInColor( stderr, COLOR_WARNING, ": %s", strerror( err_no ) );
 
     PrintInColor( stderr, COLOR_WARNING, "\n" );
+#else
+    UNUSED( FileName, FunctionName, LineNumber, err_no, format );
+#endif //SUPPRESS_WARNINGS
 
     return return_value;
 }

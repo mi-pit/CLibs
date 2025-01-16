@@ -69,7 +69,7 @@ uint64_t hash_func( const void *, size_t len );
  * Size of stack allocated array<br>
  * Apparently might be officially added to C
  */
-#define sizeof_arr( array ) ( sizeof( array ) / sizeof *( array ) )
+#define countof( array ) ( sizeof( array ) / sizeof *( array ) )
 
 /**
  * Tests if ‹num› is within the specified bounds\n
