@@ -4,7 +4,7 @@
 
 #include "bigint.h"
 
-#include "../Errors/errors.h"
+#include "../Dev/errors.h"
 #include "../foreach.h"
 #include "../misc.h"
 #include "../pointer_utils.h"
@@ -38,7 +38,7 @@ int bigint_init_p( struct bigint *bi )
     return RV_SUCCESS;
 }
 
-struct bigint *bigint_init()
+struct bigint *bigint_init( void )
 {
     struct bigint *new = new ( struct bigint );
     if ( new == NULL )

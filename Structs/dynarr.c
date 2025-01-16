@@ -10,6 +10,14 @@
 #include <string.h>  /* mem* */
 
 
+#define ListIndexOOBExceptionString( LIST, INDEX ) \
+    "index %zu out of bounds for list of size %zu", INDEX, ( LIST )->size - 1
+
+#define ListEmptyExceptionString "list is empty"
+
+#define ListNullPointerExceptionString( ARG ) #ARG " may not be null"
+
+
 /**
  * A dynamic array. (List)<br>
  * The List can store any elements of arbitrary size.
@@ -77,7 +85,9 @@ struct dynamic_array *list_init_size( size_t el_size )
 struct dynamic_array *list_init_size_p( size_t el_size, int mode )
 {
     struct dynamic_array *new_ls = list_init_size( el_size );
-    if ( new_ls != NULL )
+    if ( new_ls == NULL )
+        f_stack_trace();
+    else
         new_ls->def_print_mode = mode;
     return new_ls;
 }
@@ -87,7 +97,7 @@ struct dynamic_array *list_init_size_p( size_t el_size, int mode )
 const void *list_see( const struct dynamic_array *ls, size_t idx )
 {
     if ( idx >= ls->size )
-        return fwarnx_ret_p( NULL, "index %zu is out of bounds", idx );
+        return fwarnx_ret_p( NULL, ListIndexOOBExceptionString( ls, idx ) );
 
     return list_at_non_safe( ls, idx );
 }
@@ -95,7 +105,7 @@ const void *list_see( const struct dynamic_array *ls, size_t idx )
 const void *list_peek( const struct dynamic_array *ls )
 {
     if ( ls->size == 0 )
-        return fwarnx_ret_p( NULL, "list contains no elements" );
+        return fwarnx_ret_p( NULL, ListEmptyExceptionString );
 
     return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
@@ -105,7 +115,7 @@ const void *list_peek( const struct dynamic_array *ls )
 void *list_at( struct dynamic_array *ls, size_t idx )
 {
     if ( idx >= ls->size )
-        return fwarnx_ret_p( NULL, "index %zu is out of bounds", idx );
+        return fwarnx_ret_p( NULL, ListIndexOOBExceptionString( ls, idx ) );
 
     return list_at_non_safe( ls, idx );
 }
@@ -113,7 +123,7 @@ void *list_at( struct dynamic_array *ls, size_t idx )
 void *list_at_last( struct dynamic_array *ls )
 {
     if ( ls->size == 0 )
-        return fwarnx_ret_p( NULL, "list contains no elements" );
+        return fwarnx_ret_p( NULL, ListEmptyExceptionString );
 
     return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
@@ -167,13 +177,10 @@ Private int list_downsize( struct dynamic_array *ls )
 int list_set_at( struct dynamic_array *ls, size_t index, const void *data )
 {
     if ( index >= ls->size )
-        return fwarnx_ret( RV_EXCEPTION,
-                           "index %zu is out of bounds for list of length %zu",
-                           index,
-                           ls->size );
+        return fwarnx_ret( RV_EXCEPTION, ListIndexOOBExceptionString( ls, index ) );
 
     if ( data == NULL )
-        return fwarnx_ret( RV_EXCEPTION, "data cannot be NULL" );
+        return fwarnx_ret( RV_EXCEPTION, ListNullPointerExceptionString( data ) );
 
     memcpy( ( ( byte * ) ls->items ) + ( index * ls->el_size ), data, ls->el_size );
 
@@ -235,11 +242,11 @@ int list_extend_list( struct dynamic_array *ls, const struct dynamic_array *app 
 int list_insert( struct dynamic_array *ls, size_t at, const void *data )
 {
     if ( at > ls->size )
-        return fwarnx_ret( RV_EXCEPTION, "index %zu is out of bounds", at );
+        return fwarnx_ret( RV_EXCEPTION, ListIndexOOBExceptionString( ls, at ) );
 
     if ( ls->size + 1 >= ls->capacity )
     {
-        if ( list_upsize( ls, 1 ) )
+        on_fail( list_upsize( ls, 1 ) )
         {
             f_stack_trace();
             return RV_ERROR;
@@ -267,7 +274,7 @@ Private inline void list_remove_last_nonsafe( struct dynamic_array *ls )
 int list_pop( struct dynamic_array *ls, void *container )
 {
     if ( ls->size == 0 )
-        return fwarnx_ret( RV_EXCEPTION, "popping from an empty List" );
+        return fwarnx_ret( RV_EXCEPTION, ListEmptyExceptionString );
 
     if ( ls->capacity / LIST_CAP_SIZE_RATIO > ls->size )
     {
@@ -290,7 +297,7 @@ int list_pop( struct dynamic_array *ls, void *container )
 int list_remove( struct dynamic_array *ls, size_t index, void *container )
 {
     if ( index > ls->size )
-        return fwarnx_ret( RV_EXCEPTION, "index %zu is out of bounds", index );
+        return fwarnx_ret( RV_EXCEPTION, ListIndexOOBExceptionString( ls, index ) );
 
     if ( index == ls->size - 1 )
         return list_pop( ls, container );
@@ -314,7 +321,7 @@ int list_remove( struct dynamic_array *ls, size_t index, void *container )
 int list_remove_fast( struct dynamic_array *ls, size_t index, void *container )
 {
     if ( index >= ls->size )
-        return fwarnx_ret( RV_EXCEPTION, "index %zu is out of bounds", index );
+        return fwarnx_ret( RV_EXCEPTION, ListIndexOOBExceptionString( ls, index ) );
 
     if ( ls->capacity / LIST_CAP_SIZE_RATIO > ls->size )
         if ( list_downsize( ls ) )

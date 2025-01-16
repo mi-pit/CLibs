@@ -313,7 +313,7 @@ TEST( get_array )
     struct bigint *bi = bigint_init();
     assert_that( bi != NULL, "bi init" );
     uint64_t arr[ 10 ];
-    for ( int i = 0; i < countof( arr ); ++i )
+    for ( size_t i = 0; i < countof( arr ); ++i )
         arr[ i ] = ( i + 1 ) * 2;
     set_number_array( bi, countof( arr ), arr );
 

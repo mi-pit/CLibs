@@ -43,13 +43,29 @@ enum ListPrinters {
 /**
  * Initializes the lists items to be of size ‹el_size›.\n
  */
-UseResult struct dynamic_array *list_init_size( size_t el_size );
+Constructor struct dynamic_array *list_init_size( size_t el_size );
 /**
  * Initializes the lists items to be of size ‹el_size›.\n
  * \n
  * Sets the print_mode to ‹mode›
  */
-UseResult struct dynamic_array *list_init_size_p( size_t el_size, int mode );
+Constructor struct dynamic_array *list_init_size_p( size_t el_size, int mode );
+
+/**
+ * Creates a copy of the List and stores it in ‹new_ls_cont›
+ * @param ls            old List to be copied
+ * @param new_ls_cont   pointer to your place in memory to store a List pointer
+ * @return RV_ERROR if an error occurs, else RV_SUCCESS
+ */
+int list_copy( const struct dynamic_array *, struct dynamic_array **new_ls_container );
+/**
+ * Creates a copy of the original List
+ * @return newly allocated list pointer (see `list_init_*`)
+ *         with a shallow copy of the data inside.
+ *         This list may be passed to `free()`
+ */
+Constructor struct dynamic_array *list_copy_p( const struct dynamic_array * );
+
 
 /**
  * @returns The element of type ‹type› at the specified index
@@ -153,21 +169,6 @@ int64_t list_lsearch_i( const struct dynamic_array *, const void *needle );
  * @param cmp   compare function for the elements of the List
  */
 void list_sort( struct dynamic_array *, int ( *cmp )( const void *, const void * ) );
-
-
-/**
- * Creates a copy of the List and stores it in ‹new_ls_cont›
- * @param ls            old List to be copied
- * @param new_ls_cont   pointer to your place in memory to store a List pointer
- * @return RV_ERROR if an error occurs, else RV_SUCCESS
- */
-int list_copy( const struct dynamic_array *, struct dynamic_array **new_ls_container );
-
-/**
- * Returns a copy of the original List, if an error occurs while
- * creating it, the function exits
- */
-UseResult struct dynamic_array *list_copy_p( const struct dynamic_array * );
 
 /**
  * Reverses the List – in place

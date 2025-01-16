@@ -9,53 +9,52 @@
 
 #ifdef __has_attribute
 #define HAS_ATTRIBUTE( TOK ) __has_attribute( TOK )
-#else //!def __has_attribute
+#else // ndef __has_attribute
 /* false */
 #define HAS_ATTRIBUTE( TOK ) 0
-#endif //__has_attribute
+#endif // __has_attribute
 
 #if HAS_ATTRIBUTE( unused )
 /// Stops compiler warnings when the function/variable is unused
 #define UsageOptional __attribute__( ( __unused__ ) )
-#else
+#else // unused
 #define UsageOptional
-#endif
+#endif // unused
 
 #if HAS_ATTRIBUTE( format )
 /// Tells the compiler which varargs correspond to a format string
 #define PrintfLike( FORMAT_STRING, FIRST_VAR_ARG ) \
     __attribute__( ( __format__( __printf__, FORMAT_STRING, FIRST_VAR_ARG ) ) )
-#else
+#else // format
 #define PrintfLike( FORMAT_STRING, FIRST_VAR_ARG )
-#endif
+#endif // format
 
 
 #if HAS_ATTRIBUTE( warn_unused_result )
 /// Function's return value must be used.
 #define UseResult __attribute__( ( __warn_unused_result__ ) )
+#else // warn_unused_result
+#define UseResult
+#endif // warn_unused_result
 
 
 #if HAS_ATTRIBUTE( cold )
 #define Cold __attribute__( ( __cold__ ) )
-#else
+#else // cold
 #define Cold
-#endif
+#endif // cold
 
 
 /**
  * Function allocates memory for an object.
- * Function's return value must be used.
+ * Not using function's return value results in a memory leak (or worse).
  */
 #define Constructor UseResult
-#else
-#define UseResult
-#define Constructor
-#endif
 
-
+/// Function is not visible outside of the current file
 #define Private static UsageOptional
 
-/// The function is static and it may go unused
+/// Function is defined in a header file
 #define LibraryDefined static UsageOptional
 
 
