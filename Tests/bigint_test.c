@@ -4,10 +4,10 @@
 
 #include "../Structs/bigint.h" /* also includes dynarr.h */
 
-#include "../assert_that.h"  /* assert_that(), #include "errors.h" */
-#include "../misc.h"         /* cmpeq */
-#include "../string_utils.h" /* str types */
-#include "../unit_tests.h"   /* TEST, UNIT_TEST, RUN_TEST, FINISH_TESTING */
+#include "../Dev/assert_that.h" /* assert_that(), #include "errors.h" */
+#include "../Dev/unit_tests.h"  /* TEST, UNIT_TEST, RUN_TEST, FINISH_TESTING */
+#include "../misc.h"            /* cmpeq */
+#include "../string_utils.h"    /* str types */
 
 #include <assert.h>
 #include <inttypes.h>

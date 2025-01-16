@@ -13,6 +13,7 @@
 void run_list( void )
 {
     RUN_TEST( list_init );
+    RUN_TEST( list_basic );
 }
 
 void run_dynstr( void )
@@ -54,12 +55,12 @@ void run_misc_c( void )
 
 int main( void )
 {
-    /**/ run_misc_c();       /***/
-    /**/ run_foreach();      /***/
-    /**/ run_swex();         /***/
-    /**/ run_string_utils(); /***/
-    /**/ run_dynstr();       /***/
-    /** run_list();         ***/
+    /** run_misc_c();       ***/
+    /** run_foreach();      ***/
+    /** run_swex();         ***/
+    /** run_string_utils(); ***/
+    /** run_dynstr();       ***/
+    /**/ run_list(); /***/
 
     FINISH_TESTING();
 }

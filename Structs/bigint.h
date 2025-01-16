@@ -5,7 +5,7 @@
 #ifndef CLIBS_BIGINT_H
 #define CLIBS_BIGINT_H
 
-#include "../attributes.h"
+#include "../Dev/attributes.h"
 #include "dynarr.h"
 
 #include <stdbool.h>

@@ -70,8 +70,13 @@ int switch_expression_pop( void );
 /**
  * Assigns the 'result' into the swexpr variable
  */
-#define resolve( result_type, result ) \
-    *deref_as( result_type *, list_at_last( switch_expr_variables_stack ) ) = result
+#define resolve( result_type, result )                                            \
+    do                                                                            \
+    {                                                                             \
+        *deref_as( result_type *, list_at_last( switch_expr_variables_stack ) ) = \
+                result;                                                           \
+    }                                                                             \
+    while ( 0 )
 
 /**
  * Next statement/block is executed if the currently "switched"

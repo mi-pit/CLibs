@@ -1,7 +1,7 @@
 #ifndef CLIBS_MISC_H
 #define CLIBS_MISC_H
 
-#include "attributes.h" /* LibraryDefined */
+#include "Dev/attributes.h" /* LibraryDefined */
 
 #include <stdbool.h> /* bool (is_within) */
 #include <stddef.h>  /* size_t */

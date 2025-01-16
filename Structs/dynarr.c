@@ -1,7 +1,7 @@
 
 #include "dynarr.h"
 
-#include "../assert_that.h" /* assert_that(), errors.h include */
+#include "../Dev/errors.h"  /* RVs, fwarn* */
 #include "../extra_types.h" /* byte */
 
 #include <stdbool.h> /* bool, true, false */

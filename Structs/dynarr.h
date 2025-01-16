@@ -1,8 +1,8 @@
 #ifndef CLIBS_DYNAMIC_ARRAY_H
 #define CLIBS_DYNAMIC_ARRAY_H
 
-#include "../array_printf.h" /* for list_printf */
-#include "../attributes.h"   /* Private */
+#include "../array_printf.h"   /* for list_printf */
+#include "../Dev/attributes.h" /* Private */
 
 #include <stddef.h>
 #include <stdint.h>
@@ -33,7 +33,6 @@ enum ListPrinters {
  * Initializes the List to be of type ‹type›
  */
 #define list_init_type( type ) list_init_size( sizeof( type ) )
-
 /**
  * Initializes the List to be of type ‹type›\n
  * \n
@@ -41,12 +40,10 @@ enum ListPrinters {
  */
 #define list_init_type_p( type, print_mode ) \
     list_init_size_p( sizeof( type ), print_mode )
-
 /**
  * Initializes the lists items to be of size ‹el_size›.\n
  */
 UseResult struct dynamic_array *list_init_size( size_t el_size );
-
 /**
  * Initializes the lists items to be of size ‹el_size›.\n
  * \n
@@ -57,15 +54,14 @@ UseResult struct dynamic_array *list_init_size_p( size_t el_size, int mode );
 /**
  * @returns The element of type ‹type› at the specified index
  */
-const void *list_get( const struct dynamic_array *ls, size_t idx );
-
+const void *list_see( const struct dynamic_array *ls, size_t idx );
 /**
  *
  * @return Returns the address of the last element
  */
 const void *list_peek( const struct dynamic_array *ls );
 
-#define list_access( list, idx, type ) ( *( ( type * ) list_get( list, idx ) ) )
+#define list_access( list, idx, type ) ( *( ( type * ) list_see( list, idx ) ) )
 
 /**
  * @return An address of ‹idx›'th element in the List
@@ -88,7 +84,6 @@ int list_set_at( struct dynamic_array *, size_t index, const void *data );
  * otherwise returns 0
  */
 int list_extend( struct dynamic_array *, const void *array, size_t array_len );
-
 /**
  *
  * @param ls    a List to be extended
@@ -97,7 +92,6 @@ int list_extend( struct dynamic_array *, const void *array, size_t array_len );
  * otherwise returns 0
  */
 int list_extend_list( struct dynamic_array *ls, const struct dynamic_array *app );
-
 /**
  * Appends an element to the end of the List.\n
  * The function assumes ‹data›
@@ -114,9 +108,13 @@ int list_extend_list( struct dynamic_array *ls, const struct dynamic_array *app 
  * @endcode
  */
 int list_append( struct dynamic_array *, const void *datap );
-
+/**
+ * Inserts data to list at specified index, all following data is moved one place forward
+ * @param index index of new element
+ * @param data  pointer to data of size ls::el_size
+ * @return RV_SUCCESS
+ */
 int list_insert( struct dynamic_array *, size_t index, const void *data );
-
 
 /**
  * Removes the last element from the List, puts the result as_new ‹container›.\n
@@ -127,13 +125,11 @@ int list_insert( struct dynamic_array *, size_t index, const void *data );
  * @return RV_EXCEPTION if List is empty, RV_ERROR if malloc fails; else RV_SUCCESS (0)
  */
 int list_pop( struct dynamic_array *, void *container );
-
 /**
  * Removes the element at ‹index› by swapping it with
  * the last element and popping
  */
 int list_remove_fast( struct dynamic_array *, size_t index, void *container );
-
 /**
  * Removes the element at ‹index› by moving the following elements
  * back by one space
@@ -144,13 +140,11 @@ int list_remove( struct dynamic_array *, size_t index, void *container );
 const void *list_bsearch_p( const struct dynamic_array *,
                             const void *needle,
                             int ( *cmp )( const void *, const void * ) );
-
 int64_t list_bsearch_i( const struct dynamic_array *,
                         const void *needle,
                         int ( *cmp )( const void *, const void * ) );
 
 const void *list_lsearch_p( const struct dynamic_array *, const void *needle );
-
 int64_t list_lsearch_i( const struct dynamic_array *, const void *needle );
 
 /**
@@ -242,9 +236,7 @@ void list_destroy_p( struct dynamic_array **lsp );
  * probably doesn't work very well\n
  */
 void list_print( const struct dynamic_array * );
-
 void list_printm( const struct dynamic_array *, int print_mode );
-
 /**
  * Works like list_printm(), but also prints the List size
  */

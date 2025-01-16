@@ -2,8 +2,7 @@
 // Created by MacBook on 30.12.2024.
 //
 
-#include "../assert_that.h"
-#include "../misc.h"
+#include "../Dev/assert_that.h"
 #include "Structs/sets.h"
 
 #include <stdlib.h>

@@ -5,12 +5,12 @@
 #ifndef CLIBS_TEST_FOREACH_H
 #define CLIBS_TEST_FOREACH_H
 
-#include "../assert_that.h"
+#include "../Dev/assert_that.h"
+#include "../Dev/unit_tests.h"
 #include "../misc.h"
 #include "../string_utils.h"
 #include "../Structs/dynarr.h"
 #include "../Structs/dynstring.h"
-#include "../unit_tests.h"
 
 // must be after dynarr.h
 #include "../foreach.h"
@@ -93,13 +93,12 @@ static TEST( foreach )
     int64_t numbers_arr[] = {
         1, 2, 4, 6, 7, -1, 2323, 3195,
     };
-    assert_that( list_extend( numbers_ls, numbers_arr, countof( numbers_arr ) ) ==
-                         RV_SUCCESS,
+    assert_that( list_extend( numbers_ls, numbers_arr, countof( numbers_arr ) )
+                         == RV_SUCCESS,
                  "list extend" );
 
     UNIT_TEST( test_one_foreach_arr( numbers_arr, countof( numbers_arr ) ) );
-    UNIT_TEST(
-            test_one_foreach_ls( numbers_ls, numbers_arr, countof( numbers_arr ) ) );
+    UNIT_TEST( test_one_foreach_ls( numbers_ls, numbers_arr, countof( numbers_arr ) ) );
     UNIT_TEST( test_one_foreach_uni( numbers_arr, countof( numbers_arr ) ) );
 
     UNIT_TEST( test_one_foreach_str( "" ) );

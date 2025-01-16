@@ -6,5 +6,5 @@
 !*.h
 
 !/Tests/
-!/Errors/
+!/Dev/
 !/Structs/
