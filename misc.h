@@ -13,11 +13,50 @@
 #define UNUSED( ... ) ( ( void ) ( ( void ) __VA_ARGS__ ) ) /* Why does this work? */
 
 
+typedef enum {
+    SIGN_NEG = -1,
+    SIGN_POS = 1,
+} sign_t;
+
+
+/**
+ * @return 1 if sign was -1 and vice versa
+ * @see @code sign_t @endcode
+ */
+LibraryDefined Mathematical inline sign_t sgn_flip( sign_t sign )
+{
+    return -sign;
+}
+
+/**
+ * Sign ( -1, 0, 1 ) of the number
+ */
+LibraryDefined Mathematical inline int64_t sgn_64( int64_t n )
+{
+    return n == 0 ? 0 : n < 0 ? -1 : 1;
+}
+
+/**
+ * Smaller of the two numbers
+ */
+LibraryDefined Mathematical inline int64_t min_64( int64_t a, int64_t b )
+{
+    return ( ( a ) < ( b ) ? ( a ) : ( b ) );
+}
+
+/**
+ * Bigger of the two numbers
+ */
+LibraryDefined Mathematical inline int64_t max_64( int64_t a, int64_t b )
+{
+    return ( ( a ) > ( b ) ? ( a ) : ( b ) );
+}
+
+
 /**
  * Evaluates as true the cmp function as true if the elements are equal
  */
 #define cmpeq( cmp_retval ) ( ( cmp_retval ) == 0 )
-
 
 /**
  * Declares a cmp function of type `TYPE`.
@@ -87,31 +126,6 @@ LibraryDefined inline bool is_within( int64_t low, int64_t num, int64_t high )
 
 
 /**
- * Smaller of the two numbers
- */
-LibraryDefined inline int64_t min_64( int64_t a, int64_t b )
-{
-    return ( ( a ) < ( b ) ? ( a ) : ( b ) );
-}
-
-/**
- * Bigger of the two numbers
- */
-LibraryDefined inline int64_t max_64( int64_t a, int64_t b )
-{
-    return ( ( a ) > ( b ) ? ( a ) : ( b ) );
-}
-
-/**
- * Sign ( -1, 0, 1 ) of the number
- */
-LibraryDefined inline int64_t sgn_64( int64_t n )
-{
-    return n == 0 ? 0 : n < 0 ? -1 : 1;
-}
-
-
-/**
  * Returns how many digits ‹num› has in base ‹base›
  *
  * @param num   Any natural number
@@ -142,7 +156,7 @@ int64_t power( int64_t base, uint64_t exp );
  * @endcode
  * @param n     number to be reversed
  * @param base  numeric base of the number
- * @return
+ * @return digit-wise reverse of the original
  */
 int64_t reverse_integer( int64_t n, unsigned base );
 

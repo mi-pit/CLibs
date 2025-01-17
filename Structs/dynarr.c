@@ -190,7 +190,7 @@ int list_set_at( struct dynamic_array *ls, size_t index, const void *data )
 
 int list_append( struct dynamic_array *ls, const void *data )
 {
-    if ( ls->size + 1 > ls->capacity )
+    if ( ls->size + 1 >= ls->capacity )
     {
         if ( list_upsize( ls, 1 ) != RV_SUCCESS )
         {
@@ -198,7 +198,8 @@ int list_append( struct dynamic_array *ls, const void *data )
             return RV_ERROR;
         }
     }
-    memcpy( ( ( byte * ) ls->items ) + ( ls->size++ * ls->el_size ), data, ls->el_size );
+    ++ls->size;
+    memcpy( list_at_last( ls ), data, ls->el_size );
 
     return RV_SUCCESS;
 }

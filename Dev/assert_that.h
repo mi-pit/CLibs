@@ -11,7 +11,7 @@
 #include <stdlib.h> /* exit */
 
 /* includes */
-#include <assert.h> /* include */
+#include <assert.h>
 
 
 #ifndef CLIBS_ASSERT_THAT_H_EXIT_VAL

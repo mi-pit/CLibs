@@ -44,6 +44,12 @@
 #define Cold
 #endif // cold
 
+#if HAS_ATTRIBUTE( const )
+#define Const __attribute__( ( __const__ ) )
+#else // const
+#define Const
+#endif // const
+
 
 /**
  * Function allocates memory for an object.
@@ -51,11 +57,16 @@
  */
 #define Constructor UseResult
 
-/// Function is not visible outside of the current file
+/** Function is not visible outside of the current file */
 #define Private static UsageOptional
 
-/// Function is defined in a header file
+/** Function is defined in a header file */
 #define LibraryDefined static UsageOptional
 
+/**
+ * Function has no effect except for the return value.
+ * Function's return value only depends on its parameters.
+ */
+#define Mathematical Const
 
 #endif //CLIBS_ATTRIBUTES_H
