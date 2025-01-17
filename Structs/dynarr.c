@@ -69,13 +69,13 @@ struct dynamic_array *list_init_size( size_t el_size )
 {
     struct dynamic_array *ls = calloc( 1, sizeof( struct dynamic_array ) );
     if ( ls == NULL )
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
 
     ls->items = calloc( LIST_DEF_SIZE, el_size );
     if ( ls->items == NULL )
     {
         free( ls );
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
     }
     ls->capacity = LIST_DEF_SIZE;
     ls->el_size  = el_size;
@@ -97,7 +97,7 @@ struct dynamic_array *list_init_size_p( size_t el_size, int mode )
 const void *list_see( const struct dynamic_array *ls, size_t idx )
 {
     if ( idx >= ls->size )
-        return fwarnx_ret_p( NULL, ListIndexOOBExceptionString( ls, idx ) );
+        return ( void * ) fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
 
     return list_at_non_safe( ls, idx );
 }
@@ -105,7 +105,7 @@ const void *list_see( const struct dynamic_array *ls, size_t idx )
 const void *list_peek( const struct dynamic_array *ls )
 {
     if ( ls->size == 0 )
-        return fwarnx_ret_p( NULL, ListEmptyExceptionString );
+        return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
 
     return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
@@ -115,7 +115,7 @@ const void *list_peek( const struct dynamic_array *ls )
 void *list_at( struct dynamic_array *ls, size_t idx )
 {
     if ( idx >= ls->size )
-        return fwarnx_ret_p( NULL, ListIndexOOBExceptionString( ls, idx ) );
+        return ( void * ) fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
 
     return list_at_non_safe( ls, idx );
 }
@@ -123,7 +123,7 @@ void *list_at( struct dynamic_array *ls, size_t idx )
 void *list_at_last( struct dynamic_array *ls )
 {
     if ( ls->size == 0 )
-        return fwarnx_ret_p( NULL, ListEmptyExceptionString );
+        return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
 
     return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
@@ -596,7 +596,7 @@ void *list_items_copy( const struct dynamic_array *ls )
 {
     void *copy = calloc( ls->size, ls->el_size );
     if ( copy == NULL )
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
 
     memcpy( copy, ls->items, ls->size * ls->el_size );
     return copy;

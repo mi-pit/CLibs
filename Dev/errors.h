@@ -196,16 +196,9 @@ LibraryDefined UseResult PrintfLike( 6, 7 ) Cold ptrdiff_t
  * Warns like warn(3) and returns RETVAL
  */
 #define warn_ret( RETVAL, ... ) \
-    WarnUniversal( NULL, NULL, -1, errno, RETVAL, __VA_ARGS__ )
-#define warnx_ret( RETVAL, ... ) WarnUniversal( NULL, NULL, -1, -1, RETVAL, __VA_ARGS__ )
-
-/**
- * Warns like warn(3) and returns RETVAL which is a pointer
- */
-#define warn_ret_p( RETVAL, ... ) \
-    ( void * ) WarnUniversal( NULL, NULL, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
-#define warnx_ret_p( RETVAL, ... ) \
-    ( void * ) WarnUniversal( NULL, NULL, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+    WarnUniversal( NULL, NULL, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+#define warnx_ret( RETVAL, ... ) \
+    WarnUniversal( NULL, NULL, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
 /**
  * warn(3) with function name at the start
@@ -213,32 +206,23 @@ LibraryDefined UseResult PrintfLike( 6, 7 ) Cold ptrdiff_t
 #define fwarn( ... )  ( void ) WarnUniversal( NULL, __func__, -1, errno, -1, __VA_ARGS__ )
 #define fwarnx( ... ) ( void ) WarnUniversal( NULL, __func__, -1, -1, -1, __VA_ARGS__ )
 #define fwarn_ret( RETVAL, ... ) \
-    WarnUniversal( NULL, __func__, -1, errno, RETVAL, __VA_ARGS__ )
+    WarnUniversal( NULL, __func__, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 #define fwarnx_ret( RETVAL, ... ) \
-    WarnUniversal( NULL, __func__, -1, -1, RETVAL, __VA_ARGS__ )
-#define fwarn_ret_p( RETVAL, ... ) \
-    ( void * ) WarnUniversal(      \
-            NULL, __func__, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
-#define fwarnx_ret_p( RETVAL, ... ) \
-    ( void * ) WarnUniversal( NULL, __func__, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+    WarnUniversal( NULL, __func__, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
 #define fflwarn( ... ) \
     ( void ) WarnUniversal( __FILE_NAME__, __func__, __LINE__, errno, -1, __VA_ARGS__ )
 #define fflwarnx( ... ) \
     ( void ) WarnUniversal( __FILE_NAME__, __func__, __LINE__, -1, -1, __VA_ARGS__ )
-#define fflwarn_ret( RETVAL, ... ) \
-    WarnUniversal( __FILE_NAME__, __func__, __LINE__, errno, RETVAL, __VA_ARGS__ )
+#define fflwarn_ret( RETVAL, ... )       \
+    WarnUniversal( __FILE_NAME__,        \
+                   __func__,             \
+                   __LINE__,             \
+                   errno,                \
+                   ( ptrdiff_t ) RETVAL, \
+                   __VA_ARGS__ )
 #define fflwarnx_ret( RETVAL, ... ) \
-    WarnUniversal( __FILE_NAME__, __func__, __LINE__, -1, RETVAL, __VA_ARGS__ )
-#define fflwarn_ret_p( RETVAL, ... )                \
-    ( void * ) WarnUniversal( __FILE_NAME__,        \
-                              __func__,             \
-                              __LINE__,             \
-                              errno,                \
-                              ( ptrdiff_t ) RETVAL, \
-                              __VA_ARGS__ )
-#define fflwarnx_ret_p( ... ) \
-    ( void * ) WarnUniversal( \
+    WarnUniversal(                  \
             __FILE_NAME__, __func__, __LINE__, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
 

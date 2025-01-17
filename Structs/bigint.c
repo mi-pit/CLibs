@@ -42,7 +42,7 @@ struct bigint *bigint_init( void )
 {
     struct bigint *new = new ( struct bigint );
     if ( new == NULL )
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
 
     bigint_init_p( new );
 
@@ -74,7 +74,7 @@ str_t mul_uint_strings( string_t str_1, string_t str_2 )
     // Allocate memory for the result (zero-initialized)
     char *result = calloc( result_len + 1, 1 );
     if ( !result )
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
     memset( result, '0', result_len );
 
     // Perform multiplication using the "long multiplication" algorithm
@@ -190,13 +190,13 @@ static str_t get_listelem_power_str( uint64_t n, size_t power )
     {
         buffer = strdup( POWER64_STRINGS[ power ] );
         if ( buffer == NULL )
-            return fwarn_ret_p( NULL, "strdup" );
+            return ( void * ) fwarn_ret( NULL, "strdup" );
     }
     else
     {
         buffer = strdup( POWER64_STRINGS[ N_POWER64_STRINGS - 1 ] );
         if ( buffer == NULL )
-            return fwarn_ret_p( NULL, "strdup" );
+            return ( void * ) fwarn_ret( NULL, "strdup" );
 
         for ( size_t i = N_POWER64_STRINGS - 1; i < power; ++i )
         {
@@ -213,7 +213,7 @@ static str_t get_listelem_power_str( uint64_t n, size_t power )
 
     str_t n_str;
     if ( asprintf( &n_str, "%" PRIu64, n ) == -1 )
-        return fwarn_ret_p( NULL, "asprintf" );
+        return ( void * ) fwarn_ret( NULL, "asprintf" );
 
     str_t result = mul_uint_strings( buffer, n_str );
     free( buffer );
@@ -231,7 +231,7 @@ str_t bigint_to_string( const struct bigint *const bi )
         {
             // init
             if ( asprintf( &sum, "%" PRIu64, n ) == -1 )
-                return fwarn_ret_p( NULL, "asprintf" );
+                return ( void * ) fwarn_ret( NULL, "asprintf" );
 
             continue;
         }

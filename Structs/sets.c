@@ -77,12 +77,12 @@ Set set_init_cap( size_t capacity )
 {
     Set new_set = calloc( 1, sizeof( struct hash_set ) );
     if ( new_set == NULL )
-        return fflwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fflwarn_ret( NULL, "calloc" );
 
     if ( ( new_set->items = calloc( capacity, sizeof( struct set_item ) ) ) == NULL )
     {
         free( new_set );
-        return fflwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fflwarn_ret( NULL, "calloc" );
     }
 
     new_set->capacity = capacity;
