@@ -4,12 +4,12 @@
 
 #include "bigint.h"
 
-#include "Dev/errors.h"
-#include "foreach.h"
-#include "misc.h"
-#include "pointer_utils.h"
-#include "string_utils.h"
-#include "Structs/dynstring.h"
+#include "../Dev/errors.h"
+#include "../foreach.h"
+#include "../misc.h"
+#include "../pointer_utils.h"
+#include "../string_utils.h"
+#include "./dynstring.h"
 
 #include <assert.h>
 #include <inttypes.h>

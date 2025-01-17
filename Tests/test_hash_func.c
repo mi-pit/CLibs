@@ -3,8 +3,8 @@
 //
 
 #include "../Dev/assert_that.h" /* assert_that(), include errors.h */
-#include "misc.h"               /* hash_func() */
-#include "Structs/sets.h"       /* Set */
+#include "../misc.h"            /* hash_func() */
+#include "../Structs/sets.h"    /* Set */
 
 #include <stdlib.h>
 

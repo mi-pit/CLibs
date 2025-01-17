@@ -1,8 +1,8 @@
 
 #include "dynarr.h"
 
-#include "Dev/errors.h"  /* RVs, fwarn* */
-#include "extra_types.h" /* byte */
+#include "../Dev/errors.h"  /* RVs, fwarn* */
+#include "../extra_types.h" /* byte */
 
 #include <stdbool.h> /* bool, true, false */
 #include <stdio.h>   /* *print* */

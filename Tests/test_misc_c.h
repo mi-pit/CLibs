@@ -5,8 +5,8 @@
 #ifndef CLIBS_TEST_MISC_C_H
 #define CLIBS_TEST_MISC_C_H
 
-#include "Dev/unit_tests.h" /* ... */
-#include "misc.h"           /* ... */
+#include "../Dev/unit_tests.h" /* ... */
+#include "../misc.h"           /* ... */
 
 Tester test_one_reverse_int( int64_t n, unsigned base, int64_t res )
 {

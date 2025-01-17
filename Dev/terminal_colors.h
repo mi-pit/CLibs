@@ -5,7 +5,7 @@
 #ifndef CLIBS_TERMINAL_COLORS_H
 #define CLIBS_TERMINAL_COLORS_H
 
-#include "Dev/attributes.h" /* PrintfLike(), LibraryDefined */
+#include "attributes.h" /* PrintfLike(), LibraryDefined */
 
 #include <stdarg.h>
 #include <stdio.h>

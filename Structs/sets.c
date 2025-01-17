@@ -1,7 +1,7 @@
 #include "sets.h"
 
-#include "Dev/errors.h" /* RVs, warns, ... */
-#include "misc.h"       /* cmp_size_t */
+#include "../Dev/errors.h" /* RVs, warns, ... */
+#include "../misc.h"       /* cmp_size_t */
 
 #include <assert.h> /* assert */
 #include <stdarg.h> /* va_list, ... */

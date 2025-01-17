@@ -35,7 +35,7 @@
 #ifndef CLIBS_UNIT_TESTS_H
 #define CLIBS_UNIT_TESTS_H
 
-#include "Dev/terminal_colors.h" /* colors */
+#include "terminal_colors.h" /* colors */
 
 #include <stdbool.h> /* * */
 #include <stdio.h>   /* printf */

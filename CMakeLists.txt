@@ -11,8 +11,6 @@ add_link_options(-fsanitize=address)
 add_compile_options(-fsanitize=undefined)
 add_link_options(-fsanitize=undefined)
 
-include_directories(.)
-
 
 add_executable(Tests
         Tests/tests.c

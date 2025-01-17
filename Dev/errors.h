@@ -6,8 +6,8 @@
 #define CLIBS_ERRORS_H
 
 /* for this header */
-#include "Dev/attributes.h"      /* PrintfLike, LibraryDefined */
-#include "Dev/terminal_colors.h" /* COLORs, PrintInColor */
+#include "attributes.h"      /* PrintfLike, LibraryDefined */
+#include "terminal_colors.h" /* COLORs, PrintInColor */
 
 #include <errno.h>  /* for WarnUniversal + include */
 #include <stddef.h> /* ptrdiff_t */

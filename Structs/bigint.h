@@ -5,8 +5,8 @@
 #ifndef CLIBS_BIGINT_H
 #define CLIBS_BIGINT_H
 
-#include "Dev/attributes.h" /* Constructor */
-#include "Structs/dynarr.h" /* List */
+#include "../Dev/attributes.h" /* Constructor */
+#include "./dynarr.h"          /* List */
 
 #include <stdbool.h> /* ... */
 #include <stdint.h>  /* uint64_t */
