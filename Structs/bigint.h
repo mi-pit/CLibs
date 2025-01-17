@@ -5,11 +5,11 @@
 #ifndef CLIBS_BIGINT_H
 #define CLIBS_BIGINT_H
 
-#include "../Dev/attributes.h"
-#include "dynarr.h"
+#include "Dev/attributes.h" /* Constructor */
+#include "Structs/dynarr.h" /* List */
 
-#include <stdbool.h>
-#include <stdint.h> /* uint64_t */
+#include <stdbool.h> /* ... */
+#include <stdint.h>  /* uint64_t */
 
 
 typedef enum {
@@ -24,7 +24,7 @@ struct bigint {
 
 
 int bigint_init_p( struct bigint * );
-Constructor struct bigint *bigint_init();
+Constructor struct bigint *bigint_init( void );
 Constructor struct bigint *bigint_init_as( int64_t );
 
 /// Frees all inner memory in the bigint struct

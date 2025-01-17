@@ -2,12 +2,12 @@
 // Created by MacBook on 09.01.2025.
 //
 
-#include "../Structs/bigint.h" /* also includes dynarr.h */
+#include "Structs/bigint.h" /* also includes dynarr.h */
 
-#include "../Dev/assert_that.h" /* assert_that(), #include "errors.h" */
-#include "../Dev/unit_tests.h"  /* TEST, UNIT_TEST, RUN_TEST, FINISH_TESTING */
-#include "../misc.h"            /* cmpeq */
-#include "../string_utils.h"    /* str types */
+#include "Dev/assert_that.h" /* assert_that(), #include "errors.h" */
+#include "Dev/unit_tests.h"  /* TEST, UNIT_TEST, RUN_TEST, FINISH_TESTING */
+#include "misc.h"            /* cmpeq */
+#include "string_utils.h"    /* str types */
 
 #include <assert.h>
 #include <inttypes.h>

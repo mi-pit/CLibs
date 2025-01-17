@@ -4,7 +4,6 @@
 
 #include "string_utils.h"
 
-#include "Dev/attributes.h"
 #include "Dev/errors.h"     /* *warn* */
 #include "Structs/dynarr.h" /* List */
 #include "Structs/dynstring.h"

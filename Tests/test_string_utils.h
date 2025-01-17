@@ -1,9 +1,10 @@
 //
 // Created by MacBook on 08.01.2025.
 //
-#include "../Dev/assert_that.h"
-#include "../Dev/unit_tests.h"
-#include "../string_utils.h"
+
+#include "Dev/assert_that.h"
+#include "Dev/unit_tests.h"
+#include "string_utils.h"
 
 
 Tester test_one_replace( string_t orig, string_t old, string_t new, string_t expected )

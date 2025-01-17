@@ -2,8 +2,9 @@
 // Created by MacBook on 30.12.2024.
 //
 
-#include "../Dev/assert_that.h"
-#include "Structs/sets.h"
+#include "../Dev/assert_that.h" /* assert_that(), include errors.h */
+#include "misc.h"               /* hash_func() */
+#include "Structs/sets.h"       /* Set */
 
 #include <stdlib.h>
 
@@ -52,4 +53,6 @@ int main( void )
     assert_that( set_search( set, &buffer, sizeof( char * ) ), "&buffer" );
     assert_that( set_search( set, p, sizeof( char ) ), "p" );
     assert_that( set_search( set, &p, sizeof( char * ) ), "&p" );
+
+    set_destroy( set );
 }

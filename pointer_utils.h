@@ -5,7 +5,7 @@
 #ifndef CLIBS_POINTER_UTILS_H
 #define CLIBS_POINTER_UTILS_H
 
-#include "Dev/attributes.h" /* UsageOptional */
+#include "Dev/attributes.h" /* LibraryDefined */
 
 #include <stdarg.h> /* va_* */
 #include <stdlib.h> /* free(), NULL */

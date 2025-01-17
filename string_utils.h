@@ -5,14 +5,12 @@
 #ifndef CLIBS_STRING_UTILS_H
 #define CLIBS_STRING_UTILS_H
 
+#include "Dev/attributes.h" /* UseResult */
+
 #include <regex.h>     /* regex_t */
 #include <stdbool.h>   /* bool */
 #include <string.h>    /* import */
 #include <sys/types.h> /* ssize_t */
-
-#ifndef __result_use_check
-#define __result_use_check __attribute__( ( warn_unused_result ) )
-#endif //__result_use_check
 
 
 typedef const char *string_t;
@@ -24,7 +22,7 @@ typedef char *str_t;
  * @return  New string – copy of the original with no whitespace at either end.
  *          Pointer should be freed with free(3).
  */
-str_t string_stripped( string_t ) __result_use_check;
+UseResult str_t string_stripped( string_t );
 /**
  * Removes all whitespace from either end of the string.
  * This is done in place.
@@ -53,14 +51,14 @@ void string_strip( str_t );
  * @endcode
  * @return New escaped string. Pointer should be freed with free(3).
  */
-str_t string_escaped( string_t ) __result_use_check;
+UseResult str_t string_escaped( string_t );
 
 /**
  * Creates a new string with the same characters as the supplied one, reversed.
  *
  * @return New reversed string. Pointer should be freed with free(3).
  */
-str_t string_reversed( string_t ) __result_use_check;
+UseResult str_t string_reversed( string_t );
 /**
  * Reverses the string.
  * This is done in place.
@@ -76,7 +74,7 @@ void string_to_upper( str_t );
  * Creates a new string with all lowercase letters replaced with uppercase ones
  * @return new string, should be freed
  */
-str_t string_as_upper( string_t ) __result_use_check;
+UseResult str_t string_as_upper( string_t );
 
 /**
  * Replaces all uppercase letters to corresponding lowercase letters
@@ -86,7 +84,7 @@ void string_to_lower( str_t );
  * Creates a new string with all uppercase letters replaced with lowercase ones
  * @return new string, should be freed
  */
-str_t string_as_lower( string_t ) __result_use_check;
+UseResult str_t string_as_lower( string_t );
 
 
 /**
@@ -95,7 +93,7 @@ str_t string_as_lower( string_t ) __result_use_check;
  * @param new
  * @return new string, should be freed
  */
-str_t string_replaced( string_t, string_t old, string_t new ) __result_use_check;
+UseResult str_t string_replaced( string_t, string_t old, string_t new );
 
 
 #define STRSPLIT_EXCLUDE_EMPTY     0x01

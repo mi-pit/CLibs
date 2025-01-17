@@ -5,8 +5,4 @@
 
 typedef int8_t byte;
 
-#ifndef _SSIZE_T
-typedef int64_t ssize_t;
-#endif
-
 #endif //CLIBS_EXTRA_TYPES_H

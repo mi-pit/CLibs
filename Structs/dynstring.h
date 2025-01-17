@@ -5,17 +5,11 @@
 #ifndef CLIBS_DYNSTRING_H
 #define CLIBS_DYNSTRING_H
 
+#include "Dev/attributes.h" /* Constructor */
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <sys/types.h>
-
-#ifndef __result_use_check
-#define __result_use_check
-#endif
-
-#ifndef __printflike
-#define __printflike( a, b )
-#endif
 
 
 typedef struct dynamic_string *DynamicString;
@@ -30,19 +24,19 @@ typedef const struct dynamic_string *ConstDynamicString;
  * Heap allocates a new DynamicString with a capacity of DEFAULT_DYNSTRING_CAP
  * @return a new DynamicString or NULL if allocation fails
  */
-DynamicString dynstr_init( void ) __result_use_check;
+Constructor DynamicString dynstr_init( void );
 /**
  * Heap allocates a new DynamicString with a capacity of ‹cap›
  * @param cap   capacity of the DynamicString
  * @return      a new DynamicString or NULL if allocation fails
  */
-DynamicString dynstr_init_cap( size_t cap ) __result_use_check;
+Constructor DynamicString dynstr_init_cap( size_t cap );
 /**
  * Heap allocates a new DynamicString with the data set to the supplied string.
  * Capacity is set to the strings length including the terminating zero ('\0')
  * @return a new DynamicString or NULL if allocation fails
  */
-DynamicString dynstr_init_as( const char * ) __result_use_check;
+Constructor DynamicString dynstr_init_as( const char * );
 
 /**
  * Frees all memory associated with the DynamicString
@@ -75,7 +69,7 @@ int dynstr_appendn( DynamicString, const char *app, size_t len );
  *
  * @return RV_ERROR on alloc fail, else RV_SUCCESS
  */
-int dynstr_appendf( DynamicString, const char *fmt, ... ) __printflike( 2, 3 );
+PrintfLike( 2, 3 ) int dynstr_appendf( DynamicString, const char *fmt, ... );
 /**
  * Appends a formatted string to the end of a DynamicString
  *
@@ -142,7 +136,7 @@ int dynstr_reset( DynamicString dynstr );
  * Allocates a new string with the DynamicString contents
  * @return pointer to heap-allocated data
  */
-char *dynstr_data_copy( ConstDynamicString ) __result_use_check;
+UseResult char *dynstr_data_copy( ConstDynamicString );
 /**
  * @return a pointer of the DynamicStrings data
  */

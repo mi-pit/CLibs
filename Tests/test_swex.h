@@ -5,9 +5,9 @@
 #ifndef CLIBS_TEST_SWEX_H
 #define CLIBS_TEST_SWEX_H
 
-#include "../Dev/unit_tests.h"
-#include "../string_utils.h"
-#include "../swexpr.h"
+#include "Dev/unit_tests.h"
+#include "string_utils.h"
+#include "swexpr.h"
 
 static int get_swex_val( int branch_1, int branch_2, string_t branch_3 )
 {

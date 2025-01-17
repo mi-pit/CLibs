@@ -6,9 +6,8 @@
 #define CLIBS_ERRORS_H
 
 /* for this header */
-#include "attributes.h"      /* PrintfLike, LibraryDefined */
-#include "misc.h"            /* UNUSED() */
-#include "terminal_colors.h" /* COLORs, PrintInColor */
+#include "Dev/attributes.h"      /* PrintfLike, LibraryDefined */
+#include "Dev/terminal_colors.h" /* COLORs, PrintInColor */
 
 #include <errno.h>  /* for WarnUniversal + include */
 #include <stddef.h> /* ptrdiff_t */
@@ -140,7 +139,7 @@ LibraryDefined UseResult PrintfLike( 6, 7 ) Cold ptrdiff_t
 
     PrintInColor( stderr, COLOR_WARNING, "\n" );
 #else
-    UNUSED( FileName, FunctionName, LineNumber, err_no, format );
+    ( ( void ) ( ( void ) FileName, FunctionName, LineNumber, err_no, format ) );
 #endif //SUPPRESS_WARNINGS
 
     return return_value;

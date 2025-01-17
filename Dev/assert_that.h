@@ -6,7 +6,7 @@
 #define CLIBS_ASSERT_THAT_H
 
 /* for this header */
-#include "errors.h" /* warn */
+#include "Dev/errors.h" /* warn */
 
 #include <stdlib.h> /* exit */
 

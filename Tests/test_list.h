@@ -5,9 +5,9 @@
 #ifndef CLIBS_TEST_LIST_H
 #define CLIBS_TEST_LIST_H
 
-#include "../Dev/attributes.h"
-#include "../Dev/unit_tests.h"
-#include "../Structs/dynarr.h"
+#include "Dev/attributes.h" /* Private */
+#include "Dev/unit_tests.h" /* ... */
+#include "Structs/dynarr.h" /* ... */
 
 
 Tester test_list_array_uint64( struct dynamic_array *ls,

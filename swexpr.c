@@ -4,12 +4,13 @@
 
 #include "swexpr.h"
 
-#include "Dev/errors.h" /* RV, print_stack_trace() */
+#include "Dev/errors.h" /* RV, f_stack_trace() */
 
-struct dynamic_array *switch_expr_values_stack    = NULL;
-struct dynamic_array *switch_expr_variables_stack = NULL;
-struct dynamic_array *switch_expr_sizes_stack     = NULL;
-struct dynamic_array *switch_expr_assigned_stack  = NULL;
+
+List *switch_expr_values_stack    = NULL;
+List *switch_expr_variables_stack = NULL;
+List *switch_expr_sizes_stack     = NULL;
+List *switch_expr_assigned_stack  = NULL;
 
 
 static const bool TRUE  = true;
@@ -44,7 +45,7 @@ int switch_expression_push( size_t nbytes, const void *data )
     return RV_SUCCESS;
 }
 
-bool switch_expression_is_assigned()
+bool switch_expression_is_assigned( void )
 {
     return ( *( bool * ) list_peek( switch_expr_assigned_stack ) );
 }

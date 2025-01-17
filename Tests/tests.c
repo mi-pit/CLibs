@@ -1,13 +1,15 @@
 //
 // Created by MacBook on 06.01.2025.
 //
+
 // tests
-#include "test_dynstr.h"
-#include "test_foreach.h"
-#include "test_list.h"
-#include "test_misc_c.h"
-#include "test_string_utils.h"
-#include "test_swex.h"
+
+#include "Tests/test_dynstr.h"
+#include "Tests/test_foreach.h"
+#include "Tests/test_list.h"
+#include "Tests/test_misc_c.h"
+#include "Tests/test_string_utils.h"
+#include "Tests/test_swex.h"
 
 
 void run_list( void )
