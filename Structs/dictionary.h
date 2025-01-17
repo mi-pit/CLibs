@@ -1,7 +1,7 @@
 #ifndef CLIBS_DICTIONARY_H
 #define CLIBS_DICTIONARY_H
 
-#include "item_print_functions.h"
+#include "../item_print_functions.h"
 
 #include <stdbool.h>
 

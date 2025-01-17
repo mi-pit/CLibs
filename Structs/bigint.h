@@ -5,12 +5,11 @@
 #ifndef CLIBS_BIGINT_H
 #define CLIBS_BIGINT_H
 
+#include "../Dev/attributes.h" /* Constructor */
+#include "./dynarr.h"          /* List */
 
-#include "../attributes.h"
-#include "dynarr.h"
-
-#include <stdbool.h>
-#include <stdint.h> /* uint64_t */
+#include <stdbool.h> /* ... */
+#include <stdint.h>  /* uint64_t */
 
 
 typedef enum {
@@ -19,13 +18,13 @@ typedef enum {
 } sign_t;
 
 struct bigint {
-    List /* of unsigned 64-bit ints */ numbers;
+    struct dynamic_array *numbers;
     sign_t sign;
 };
 
 
 int bigint_init_p( struct bigint * );
-Constructor struct bigint *bigint_init();
+Constructor struct bigint *bigint_init( void );
 Constructor struct bigint *bigint_init_as( int64_t );
 
 /// Frees all inner memory in the bigint struct
@@ -35,7 +34,8 @@ void bigint_destroy( struct bigint * );
 
 size_t bigint_sizeof( const struct bigint * );
 
-Constructor char *bigint_to_string( const struct bigint * );
+UseResult char *bigint_to_string( const struct bigint * );
+UseResult List *bigint_get_number_array( const struct bigint * );
 
 
 int bigint_add_i( struct bigint *, int64_t );

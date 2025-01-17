@@ -1,104 +1,131 @@
 
 #include "dynarr.h"
 
-#include "../errors.h"      /* retvals */
+#include "../Dev/errors.h"  /* RVs, fwarn* */
 #include "../extra_types.h" /* byte */
 
-#include <err.h>     /* warn, err */
 #include <stdbool.h> /* bool, true, false */
 #include <stdio.h>   /* *print* */
 #include <stdlib.h>  /* malloc, free, bsearch, qsort */
 #include <string.h>  /* mem* */
 
 
+#define ListIndexOOBExceptionString( LIST, INDEX ) \
+    "index %zu out of bounds for list of size %zu", INDEX, ( LIST )->size - 1
+
+#define ListEmptyExceptionString "list is empty"
+
+#define ListNullPointerExceptionString( ARG ) #ARG " may not be null"
+
+
 /**
- * A dynamic array. (List)\n
- * The List can store any elements of arbitrary size.\n
- * \n
- * A new List can (and should) be created with list_init_* functions\n
- * \n
+ * A dynamic array. (List)<br>
+ * The List can store any elements of arbitrary size.
+ * <p>
+ * A new List can (and should) be created with list_init_* functions
+ * <p>
  * list_init_type* functions take as its `type' argument the C keyword
- * e.g. 'char'\n
- * \n
+ * e.g. 'char'
+ * <br>
  * list_init_size* functions take as its `el_size' argument
  * the number of bytes (acquired by sizeof)
- * for the desired type to be stored\n
- * \n
- * All elements must be the same number of bytes long\n
- * \n
- * the list_init_*_p functions take a second parameter
+ * for the desired type to be stored
+ * <p>
+ * The list_init_*_p functions take a second parameter
  * – a constant for the print functions. This field can be changed
- * later.\n
- * \n
+ * later with list_set_print_mode().
+ * <p>
  * list_init_* functions allocate and initialize a List
- * with these default values:\n
- * List::capacity = LIST_DEF_SIZE\n
- * List::size = 0\n
- * List::items = pointer to heap allocated memory of width ‹capacity›, hash_set to 0\n
- * List::el_size = width of a single element\n
+ * with these default values:
+ * @code
+ * List::capacity = LIST_DEF_SIZE
+ * List::size     = 0
+ * List::items    = pointer to heap allocated memory of width ‹capacity›, set to 0
+ * List::el_size  = width of a single element
+ * @endcode
+ *
+ * @attention
+ * All elements must be the same number of bytes long
 */
 struct dynamic_array {
-    size_t capacity; // amount of allocated memory slots for items
-    size_t size;     // number of items stored in List
-    void *items;     // an array of any type
-    int el_size;     // sizeof a single items
+    size_t capacity; // Amount of allocated memory slots for items
+    size_t size;     // Number of items stored in List
+    void *items;     // Array of any type
+    size_t el_size;  // sizeof a single item
 
-    int def_print_mode; // for print functions
+    enum ListPrinters def_print_mode; // for print functions
 };
+
+
+Private inline void *list_at_non_safe( const struct dynamic_array *ls, size_t idx )
+{
+    return ( byte * ) ls->items + idx * ls->el_size;
+}
 
 
 /* –––––––––––––––––––––––––––––– FUNCTIONAL –––––––––––––––––––––––––––––– */
 
-List list_init_size( int el_size )
+struct dynamic_array *list_init_size( size_t el_size )
 {
     struct dynamic_array *ls = calloc( 1, sizeof( struct dynamic_array ) );
     if ( ls == NULL )
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
 
     ls->items = calloc( LIST_DEF_SIZE, el_size );
     if ( ls->items == NULL )
     {
         free( ls );
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
     }
     ls->capacity = LIST_DEF_SIZE;
     ls->el_size  = el_size;
     return ls;
 }
 
-List list_init_size_p( int el_size, int mode )
+struct dynamic_array *list_init_size_p( size_t el_size, int mode )
 {
-    List new_ls = list_init_size( el_size );
-    if ( new_ls != NULL )
+    struct dynamic_array *new_ls = list_init_size( el_size );
+    if ( new_ls == NULL )
+        f_stack_trace();
+    else
         new_ls->def_print_mode = mode;
     return new_ls;
 }
 
 
 /* Immutable */
-const void *list_get( ConstList ls, size_t idx )
+const void *list_see( const struct dynamic_array *ls, size_t idx )
 {
-    return ( const byte * ) ls->items + idx * ls->el_size;
+    if ( idx >= ls->size )
+        return ( void * ) fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
+
+    return list_at_non_safe( ls, idx );
 }
 
-const void *list_peek( ConstList ls )
+const void *list_peek( const struct dynamic_array *ls )
 {
     if ( ls->size == 0 )
-        return fwarnx_ret_p( NULL, "list contains no elements" );
+        return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
 
-    return list_get( ls, list_size( ls ) - 1 );
+    return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
 
 
 /* Mutable */
-void *list_at( List ls, size_t idx )
+void *list_at( struct dynamic_array *ls, size_t idx )
 {
-    return ( byte * ) ls->items + idx * ls->el_size;
+    if ( idx >= ls->size )
+        return ( void * ) fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
+
+    return list_at_non_safe( ls, idx );
 }
 
-void *list_at_last( List ls )
+void *list_at_last( struct dynamic_array *ls )
 {
-    return list_at( ls, list_size( ls ) - 1 );
+    if ( ls->size == 0 )
+        return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
+
+    return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
 
 
@@ -113,12 +140,12 @@ void *list_at_last( List ls )
  * to hold all of its items + min_cap_add
  * @return -1 if realloc fails, else 0
  */
-static int list_upsize( List ls, size_t min_cap_add )
+Private int list_upsize( struct dynamic_array *ls, size_t min_cap_add )
 {
     size_t new_capacity = ls->capacity * 2;
 
     if ( ( ls->capacity + min_cap_add ) * ls->el_size > new_capacity )
-        new_capacity = ( ls->capacity + min_cap_add ) * ls->el_size;
+        new_capacity = ( ls->capacity + min_cap_add * ls->el_size ) * 2u;
 
     void *tmp = realloc( ls->items, new_capacity * ls->el_size );
     if ( tmp == NULL )
@@ -133,7 +160,7 @@ static int list_upsize( List ls, size_t min_cap_add )
  * Changes (realloc) the lists capacity to be half as large\n
  * @return -1 if realloc fails, else 0
  */
-static int list_downsize( List ls )
+Private int list_downsize( struct dynamic_array *ls )
 {
     size_t new_cap = ls->capacity / 2;
 
@@ -147,13 +174,13 @@ static int list_downsize( List ls )
 }
 
 
-int list_set_at( List ls, size_t index, const void *data )
+int list_set_at( struct dynamic_array *ls, size_t index, const void *data )
 {
     if ( index >= ls->size )
-        return fwarnx_ret( RV_EXCEPTION,
-                           "index %zu is out of bounds for list of length %zu",
-                           index,
-                           ls->size );
+        return fwarnx_ret( RV_EXCEPTION, ListIndexOOBExceptionString( ls, index ) );
+
+    if ( data == NULL )
+        return fwarnx_ret( RV_EXCEPTION, ListNullPointerExceptionString( data ) );
 
     memcpy( ( ( byte * ) ls->items ) + ( index * ls->el_size ), data, ls->el_size );
 
@@ -161,7 +188,7 @@ int list_set_at( List ls, size_t index, const void *data )
 }
 
 
-int list_append( List ls, const void *data )
+int list_append( struct dynamic_array *ls, const void *data )
 {
     if ( ls->size + 1 > ls->capacity )
     {
@@ -176,7 +203,7 @@ int list_append( List ls, const void *data )
     return RV_SUCCESS;
 }
 
-int list_extend( List ls, const void *array, size_t len )
+int list_extend( struct dynamic_array *ls, const void *array, size_t len )
 {
     if ( ls->capacity < ls->size + len )
     {
@@ -187,14 +214,14 @@ int list_extend( List ls, const void *array, size_t len )
         }
     }
 
-    memcpy( list_at( ls, ls->size ), array, len * ls->el_size );
+    memcpy( list_at_non_safe( ls, ls->size ), array, len * ls->el_size );
 
     ls->size += len;
 
     return RV_SUCCESS;
 }
 
-int list_extend_list( List ls, ConstList app )
+int list_extend_list( struct dynamic_array *ls, const struct dynamic_array *app )
 {
     if ( ls->size + app->size >= ls->capacity )
     {
@@ -205,27 +232,32 @@ int list_extend_list( List ls, ConstList app )
         }
     }
 
-    memcpy( list_at( ls, ls->size ), app->items, app->size * app->el_size );
+    memcpy( list_at_non_safe( ls, ls->size ), app->items, app->size * app->el_size );
 
     ls->size += app->size;
 
     return RV_SUCCESS;
 }
 
-int list_insert( List ls, size_t at, const void *data )
+int list_insert( struct dynamic_array *ls, size_t at, const void *data )
 {
+    if ( at > ls->size )
+        return fwarnx_ret( RV_EXCEPTION, ListIndexOOBExceptionString( ls, at ) );
+
     if ( ls->size + 1 >= ls->capacity )
     {
-        if ( list_upsize( ls, 1 ) )
+        on_fail( list_upsize( ls, 1 ) )
         {
             f_stack_trace();
             return RV_ERROR;
         }
     }
 
-    memmove( list_at( ls, at + 1 ), list_at( ls, at ), ( ls->size - at ) * ls->el_size );
+    memmove( list_at_non_safe( ls, at + 1 ),
+             list_at_non_safe( ls, at ),
+             ( ls->size - at ) * ls->el_size );
 
-    memcpy( list_at( ls, at ), data, ls->el_size );
+    memcpy( list_at_non_safe( ls, at ), data, ls->el_size );
 
     ++ls->size;
 
@@ -233,14 +265,20 @@ int list_insert( List ls, size_t at, const void *data )
 }
 
 
-int list_pop( List ls, void *container )
+Private inline void list_remove_last_nonsafe( struct dynamic_array *ls )
 {
-    if ( ls->size <= 0 )
-        return fwarnx_ret( RV_EXCEPTION, "%s", "popping from an empty List" );
+    memset( list_at_last( ls ), 0, ls->el_size );
+    --ls->size;
+}
+
+int list_pop( struct dynamic_array *ls, void *container )
+{
+    if ( ls->size == 0 )
+        return fwarnx_ret( RV_EXCEPTION, ListEmptyExceptionString );
 
     if ( ls->capacity / LIST_CAP_SIZE_RATIO > ls->size )
     {
-        if ( list_downsize( ls ) )
+        if ( list_downsize( ls ) != RV_SUCCESS )
         {
             f_stack_trace();
             return RV_ERROR;
@@ -248,69 +286,70 @@ int list_pop( List ls, void *container )
     }
 
     if ( container != NULL )
-        memcpy( container, list_at( ls, ls->size - 1 ), ls->el_size );
+        // copy popped element to container
+        memcpy( container, list_at_last( ls ), ls->el_size );
 
-    memset( ( byte * ) ls->items + ( ls->size - 1 ) * ls->el_size, 0, ls->el_size );
+    list_remove_last_nonsafe( ls );
+
+    return RV_SUCCESS;
+}
+
+int list_remove( struct dynamic_array *ls, size_t index, void *container )
+{
+    if ( index > ls->size )
+        return fwarnx_ret( RV_EXCEPTION, ListIndexOOBExceptionString( ls, index ) );
+
+    if ( index == ls->size - 1 )
+        return list_pop( ls, container );
+
+    if ( ls->capacity / LIST_CAP_SIZE_RATIO > ls->size )
+        if ( list_downsize( ls ) )
+            return RV_ERROR;
+
+    if ( container != NULL )
+        memcpy( container, list_at( ls, index ), ls->el_size );
+
+    memmove( list_at( ls, index ),
+             list_at( ls, index - 1 ),
+             ( ls->size - index ) * ls->el_size );
 
     --ls->size;
 
     return RV_SUCCESS;
 }
 
-int list_remove( List ls, size_t index, void *container )
-{
-    if ( index > ls->size )
-    {
-        warnx( "list_remove: index is out of bounds" );
-        return RV_EXCEPTION;
-    }
-
-    if ( ls->capacity / LIST_CAP_SIZE_RATIO > ls->size )
-        if ( list_downsize( ls ) )
-            return RV_ERROR;
-
-    memcpy( container, ( ( byte * ) ls->items ) + ( index ) *ls->el_size, ls->el_size );
-
-    memmove( ( ( byte * ) ls->items ) + index,
-             ( ( byte * ) ls->items ) + ( index + 1 ) * ls->el_size,
-             ( ls->size - index ) * ls->el_size );
-
-    ls->size--;
-
-    return RV_SUCCESS;
-}
-
-int list_remove_fast( List ls, size_t index, void *container )
+int list_remove_fast( struct dynamic_array *ls, size_t index, void *container )
 {
     if ( index >= ls->size )
-    {
-        warnx( "list_remove_fast: index is out of bounds" );
-        return RV_EXCEPTION;
-    }
+        return fwarnx_ret( RV_EXCEPTION, ListIndexOOBExceptionString( ls, index ) );
+
     if ( ls->capacity / LIST_CAP_SIZE_RATIO > ls->size )
         if ( list_downsize( ls ) )
             return RV_ERROR;
 
-    memmove( container, ( ( byte * ) ls->items ) + index * ls->el_size, ls->el_size );
+    if ( container != NULL )
+        // put element at index into the container
+        memmove( container, list_at( ls, index ), ls->el_size );
 
-    memmove( ( ( byte * ) ls->items ) + index * ls->el_size,
-             ( ( byte * ) ls->items ) + ( ls->size - 1 ) * ls->el_size,
-             ls->el_size );
+    // put last element at ‹index›
+    memmove( list_at( ls, index ), list_at_last( ls ), ls->el_size );
 
-    list_pop( ls, NULL );
+    // pop last element
+    memset( list_at_last( ls ), 0, ls->el_size );
+    --ls->size;
 
     return RV_SUCCESS;
 }
 
 
-const void *list_bsearch_p( ConstList ls,
+const void *list_bsearch_p( const struct dynamic_array *ls,
                             const void *needle,
                             int ( *cmp )( const void *, const void * ) )
 {
     return bsearch( needle, ls->items, ls->size, ls->el_size, cmp );
 }
 
-int64_t list_bsearch_i( ConstList ls,
+int64_t list_bsearch_i( const struct dynamic_array *ls,
                         const void *needle,
                         int ( *cmp )( const void *, const void * ) )
 {
@@ -320,16 +359,16 @@ int64_t list_bsearch_i( ConstList ls,
     return res - ( char * ) ls->items;
 }
 
-const void *list_lsearch_p( ConstList ls, const void *needle )
+const void *list_lsearch_p( const struct dynamic_array *ls, const void *needle )
 {
     for ( size_t i = 0; i < ls->size; ++i )
-        if ( memcmp( list_get( ls, i ), needle, ls->el_size ) == 0 )
-            return list_get( ls, i );
+        if ( memcmp( list_see( ls, i ), needle, ls->el_size ) == 0 )
+            return list_see( ls, i );
 
     return NULL;
 }
 
-int64_t list_lsearch_i( ConstList ls, const void *needle )
+int64_t list_lsearch_i( const struct dynamic_array *ls, const void *needle )
 {
     const byte *res = list_lsearch_p( ls, needle );
     if ( res == NULL )
@@ -337,20 +376,23 @@ int64_t list_lsearch_i( ConstList ls, const void *needle )
     return res - ( byte * ) ls->items;
 }
 
-inline void list_sort( List ls, int ( *cmp )( const void *, const void * ) )
+void list_sort( struct dynamic_array *ls, int ( *cmp )( const void *, const void * ) )
 {
     qsort( ls->items, ls->size, ls->el_size, cmp );
 }
 
 
-int list_reverse( List ls )
+int list_reverse( struct dynamic_array *ls )
 {
+    if ( ls->size == 0 )
+        return RV_SUCCESS;
+
     byte *buffer = malloc( ls->el_size );
     if ( buffer == NULL )
-        return fwarn_ret( RV_ERROR, "%s", "buffer allocation" );
+        return fwarn_ret( RV_ERROR, "buffer allocation" );
 
     void *l = ls->items;
-    void *r = list_at( ls, ls->size - 1 );
+    void *r = list_at_non_safe( ls, ls->size - 1 );
 
     for ( size_t i = 0; i < ls->size / 2; ++i )
     {
@@ -372,9 +414,9 @@ int list_reverse( List ls )
     return RV_SUCCESS;
 }
 
-List list_reversed( ConstList ls )
+struct dynamic_array *list_reversed( const struct dynamic_array *ls )
 {
-    List rev;
+    struct dynamic_array *rev;
     if ( list_copy( ls, &rev ) )
         return NULL;
     list_reverse( rev );
@@ -382,9 +424,9 @@ List list_reversed( ConstList ls )
 }
 
 
-int list_copy( ConstList ls, List *new_ls_cont )
+int list_copy( const struct dynamic_array *ls, struct dynamic_array **new_ls_cont )
 {
-    List new_ls = list_init_size( ls->el_size );
+    struct dynamic_array *new_ls = list_init_size( ls->el_size );
     if ( new_ls == NULL )
         return RV_ERROR;
 
@@ -396,9 +438,9 @@ int list_copy( ConstList ls, List *new_ls_cont )
     return RV_SUCCESS;
 }
 
-List list_copy_p( ConstList ls )
+struct dynamic_array *list_copy_p( const struct dynamic_array *ls )
 {
-    List new;
+    struct dynamic_array *new;
     if ( list_copy( ls, &new ) )
         return NULL;
     return new;
@@ -407,8 +449,8 @@ List list_copy_p( ConstList ls )
 
 int list_cmp_size( const void *l1, const void *l2 )
 {
-    ConstList ls_1 = ( List ) l1;
-    ConstList ls_2 = ( List ) l2;
+    const struct dynamic_array *ls_1 = ( struct dynamic_array * ) l1;
+    const struct dynamic_array *ls_2 = ( struct dynamic_array * ) l2;
 
     if ( ls_1->size > ls_2->size )
         return 1;
@@ -419,8 +461,8 @@ int list_cmp_size( const void *l1, const void *l2 )
 
 int list_cmp_elsize( const void *l1, const void *l2 )
 {
-    ConstList ls_1 = ( List ) l1;
-    ConstList ls_2 = ( List ) l2;
+    const struct dynamic_array *ls_1 = ( struct dynamic_array * ) l1;
+    const struct dynamic_array *ls_2 = ( struct dynamic_array * ) l2;
 
     if ( ls_1->el_size > ls_2->el_size )
         return 1;
@@ -430,14 +472,14 @@ int list_cmp_elsize( const void *l1, const void *l2 )
 }
 
 
-void list_destroy( List ls )
+void list_destroy( struct dynamic_array *ls )
 {
     free( ls->items );
     ls->items = NULL;
     free( ls );
 }
 
-void list_destroy_p( List *lsp )
+void list_destroy_p( struct dynamic_array **lsp )
 {
     list_destroy( *lsp );
     *lsp = NULL;
@@ -446,11 +488,13 @@ void list_destroy_p( List *lsp )
 
 /* ––––––––––––––––––––––––––––––– PRINTERS ––––––––––––––––––––––––––––––– */
 
-static void list_print_static( ConstList ls, int print_mode, bool print_size );
+Private void list_print_static( const struct dynamic_array *ls,
+                                int print_mode,
+                                bool print_size );
 
-static void list_print_mode( ConstList ls, // NOLINT(misc-no-recursion)
-                             int print_mode,
-                             bool print_size )
+Private void list_print_mode( const struct dynamic_array *ls, // NOLINT(misc-no-recursion)
+                              int print_mode,
+                              bool print_size )
 {
     switch ( print_mode )
     {
@@ -470,7 +514,8 @@ static void list_print_mode( ConstList ls, // NOLINT(misc-no-recursion)
             list_printf( ls, void *, "@%p" );
             break;
         case LS_PRINT_STR:
-            list_printf( ls, const char *, "\"" ARRAY_PRINT_STRING_FMTSTR "\"\n" );
+            printf( "\"%s\"\n", ( char * ) ls->items );
+            //list_printf( ls, const char *, "\"" ARRAY_PRINT_STRING_FMTSTR "\"\n" );
             break;
         case LS_PRINT_NOFORMAT:
             list_print_mode( ls, ls->def_print_mode, print_size );
@@ -480,17 +525,19 @@ static void list_print_mode( ConstList ls, // NOLINT(misc-no-recursion)
             for ( size_t i = 0; i < ls->size; ++i )
             {
                 printf( "\t" );
-                list_print_static(
-                        list_access( ls, i, List ), LS_PRINT_NOFORMAT, print_size );
+                list_print_static( list_access( ls, i, struct dynamic_array * ),
+                                   LS_PRINT_NOFORMAT,
+                                   print_size );
             }
             printf( "]\n" );
             break;
     }
 }
 
-static void list_print_static( ConstList ls, // NOLINT(misc-no-recursion)
-                               int print_mode,
-                               bool print_size )
+Private void list_print_static( // NOLINT(misc-no-recursion)
+        const struct dynamic_array *ls,
+        int print_mode,
+        bool print_size )
 {
     if ( ls == NULL )
     {
@@ -509,17 +556,17 @@ static void list_print_static( ConstList ls, // NOLINT(misc-no-recursion)
     list_print_mode( ls, print_mode, print_size );
 }
 
-void list_prints( ConstList ls, int print_mode )
+void list_prints( const struct dynamic_array *ls, int print_mode )
 {
     list_print_static( ls, print_mode, true );
 }
 
-void list_printm( ConstList ls, int print_mode )
+void list_printm( const struct dynamic_array *ls, int print_mode )
 {
     list_print_static( ls, print_mode, false );
 }
 
-void list_print( ConstList ls )
+void list_print( const struct dynamic_array *ls )
 {
     list_print_static( ls, LS_PRINT_NOFORMAT, false );
 }
@@ -530,33 +577,33 @@ void list_print( ConstList ls )
 /**
  * @return Number of elements in the list
  */
-size_t list_size( ConstList ls )
+size_t list_size( const struct dynamic_array *ls )
 {
     return ls->size;
 }
 
-size_t list_el_size( ConstList ls )
+size_t list_el_size( const struct dynamic_array *ls )
 {
     return ls->el_size;
 }
 
-const void *list_items( ConstList ls )
+const void *list_items( const struct dynamic_array *ls )
 {
     return ls->items;
 }
 
-void *list_items_copy( ConstList ls )
+void *list_items_copy( const struct dynamic_array *ls )
 {
     void *copy = calloc( ls->size, ls->el_size );
     if ( copy == NULL )
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
 
     memcpy( copy, ls->items, ls->size * ls->el_size );
     return copy;
 }
 
 
-void list_set_print_mode( List ls, int fmt )
+void list_set_print_mode( struct dynamic_array *ls, int fmt )
 {
     ls->def_print_mode = fmt;
 }

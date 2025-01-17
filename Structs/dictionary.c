@@ -1,8 +1,8 @@
 #include "dictionary.h"
 
-#include "errors.h"
-#include "misc.h"
-#include "pointer_utils.h"
+#include "../Dev/errors.h"    /* includes misc.h */
+#include "../misc.h"          /* hash_func(), cmp_size_t(), cmpeq() */
+#include "../pointer_utils.h" /* free_n() */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,13 +49,13 @@ Dict dict_init( void )
 {
     struct key_value_pair_set *dict = calloc( 1, sizeof( struct key_value_pair_set ) );
     if ( dict == NULL )
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
 
     dict->items = calloc( DICT_DEF_SIZE, sizeof( struct key_value_pair ) );
     if ( dict->items == NULL )
     {
         free( dict );
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
     }
 
     dict->capacity = DICT_DEF_SIZE;

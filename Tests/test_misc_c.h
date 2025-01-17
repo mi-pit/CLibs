@@ -5,8 +5,8 @@
 #ifndef CLIBS_TEST_MISC_C_H
 #define CLIBS_TEST_MISC_C_H
 
-#include "../misc.h"
-#include "../unit_tests.h"
+#include "../Dev/unit_tests.h" /* ... */
+#include "../misc.h"           /* ... */
 
 Tester test_one_reverse_int( int64_t n, unsigned base, int64_t res )
 {
@@ -48,7 +48,7 @@ static TEST( misc_c )
     }
     {
         int arr[ 10 ];
-        UNIT_TEST( sizeof_arr( arr ) == 10 );
+        UNIT_TEST( countof( arr ) == 10 );
     }
 
     UNIT_TEST( digitsof( 1, 10 ) == 1 );

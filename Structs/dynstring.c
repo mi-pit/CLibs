@@ -3,8 +3,8 @@
 //
 #include "dynstring.h"
 
-#include "../errors.h"       /* RV, warn */
-#include "../misc.h"         /* min_m */
+#include "../Dev/errors.h"   /* RV, warn */
+#include "../misc.h"         /* min_64() */
 #include "../string_utils.h" /* str_t, string_t */
 
 #include <assert.h>
@@ -25,7 +25,7 @@ DynamicString dynstr_init_cap( size_t capacity )
 {
     DynamicString new = calloc( 1, sizeof( struct dynamic_string ) );
     if ( new == NULL )
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
 
     new->cap  = capacity;
     new->len  = 0;
@@ -33,7 +33,7 @@ DynamicString dynstr_init_cap( size_t capacity )
     if ( new->data == NULL )
     {
         free( new );
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
     }
 
     return new;
@@ -47,7 +47,7 @@ DynamicString dynstr_init( void )
 DynamicString dynstr_init_as( string_t s )
 {
     if ( s == NULL )
-        return fwarnx_ret_p( NULL, "initial string may not be NULL" );
+        return ( void * ) fwarnx_ret( NULL, "initial string may not be NULL" );
 
     size_t len        = strlen( s );
     DynamicString new = dynstr_init_cap( len + 1 );

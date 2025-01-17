@@ -13,19 +13,15 @@
 #include <string.h>  /* memcpy() */
 
 
-/* TODO
- *  check swex functions return values
- */
-
-extern List switch_expr_values_stack;
-extern List switch_expr_variables_stack;
-extern List switch_expr_sizes_stack;
-extern List switch_expr_assigned_stack;
+struct dynamic_array extern *switch_expr_values_stack;
+struct dynamic_array extern *switch_expr_variables_stack;
+struct dynamic_array extern *switch_expr_sizes_stack;
+struct dynamic_array extern *switch_expr_assigned_stack;
 
 void *swex_aux_variable_;
 
 int switch_expression_push( size_t nbytes, const void *data );
-bool switch_expression_is_assigned();
+bool switch_expression_is_assigned( void );
 int switch_expression_assign( void );
 int switch_expression_pop( void );
 
@@ -74,8 +70,13 @@ int switch_expression_pop( void );
 /**
  * Assigns the 'result' into the swexpr variable
  */
-#define resolve( result_type, result ) \
-    *deref_as( result_type *, list_at_last( switch_expr_variables_stack ) ) = result
+#define resolve( result_type, result )                                            \
+    do                                                                            \
+    {                                                                             \
+        *deref_as( result_type *, list_at_last( switch_expr_variables_stack ) ) = \
+                result;                                                           \
+    }                                                                             \
+    while ( 0 )
 
 /**
  * Next statement/block is executed if the currently "switched"

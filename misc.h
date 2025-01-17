@@ -1,7 +1,7 @@
 #ifndef CLIBS_MISC_H
 #define CLIBS_MISC_H
 
-#include "attributes.h" /* LibraryDefined */
+#include "Dev/attributes.h" /* LibraryDefined */
 
 #include <stdbool.h> /* bool (is_within) */
 #include <stddef.h>  /* size_t */
@@ -69,7 +69,7 @@ uint64_t hash_func( const void *, size_t len );
  * Size of stack allocated array<br>
  * Apparently might be officially added to C
  */
-#define sizeof_arr( array ) ( sizeof( array ) / sizeof *( array ) )
+#define countof( array ) ( sizeof( array ) / sizeof *( array ) )
 
 /**
  * Tests if ‹num› is within the specified bounds\n

@@ -4,8 +4,7 @@
 
 #include "string_utils.h"
 
-#include "attributes.h"
-#include "errors.h"         /* *warn* */
+#include "Dev/errors.h"     /* *warn* */
 #include "Structs/dynarr.h" /* List */
 #include "Structs/dynstring.h"
 
@@ -53,7 +52,7 @@ str_t string_stripped( string_t s )
     str_len   = end_idx - start_idx + 1;
     str_t new = malloc( str_len + 1 );
     if ( new == NULL )
-        return fflwarn_ret_p( NULL, "malloc" );
+        return ( void * ) fflwarn_ret( NULL, "malloc" );
 
     for ( size_t i = 0; i < str_len; ++i )
     {
@@ -111,13 +110,13 @@ void string_strip( str_t s )
 str_t string_escaped( string_t old )
 {
     if ( old == NULL )
-        return fwarnx_ret_p( NULL, "string must not be null" );
+        return ( void * ) fwarnx_ret( NULL, "string must not be null" );
 
     size_t len = strlen( old );
 
     str_t new = calloc( len * 2 + 1, 1 );
     if ( new == NULL )
-        return fwarn_ret_p( NULL, "calloc" );
+        return ( void * ) fwarn_ret( NULL, "calloc" );
 
     size_t new_idx = 0;
     for ( size_t i = 0; i < len; ++i, ++new_idx )
@@ -157,7 +156,7 @@ str_t string_reversed( string_t s )
 {
     str_t new = strdup( s );
     if ( new == NULL )
-        return warn_ret_p( NULL, "strdup" );
+        return ( void * ) warn_ret( NULL, "strdup" );
 
     string_reverse( new );
     return new;
@@ -195,7 +194,7 @@ str_t string_as_upper( string_t old )
 
     str_t new = malloc( len + 1 );
     if ( new == NULL )
-        return fwarn_ret_p( NULL, "malloc" );
+        return ( void * ) fwarn_ret( NULL, "malloc" );
 
     new[ len ] = '\0';
 
@@ -227,7 +226,7 @@ str_t string_as_lower( string_t old )
 
     str_t new = malloc( len + 1 );
     if ( new == NULL )
-        return fwarn_ret_p( NULL, "malloc" );
+        return ( void * ) fwarn_ret( NULL, "malloc" );
 
     new[ len ] = '\0';
 
@@ -245,7 +244,7 @@ str_t string_as_lower( string_t old )
 str_t string_replaced( string_t const str, string_t old, string_t new )
 {
     if ( *old == '\0' )
-        return fwarnx_ret_p( NULL, "cannot replace \"%s\"", old );
+        return ( void * ) fwarnx_ret( NULL, "cannot replace \"%s\"", old );
 
     const char *curr     = str;
     DynamicString result = dynstr_init();
@@ -322,11 +321,12 @@ ssize_t string_split( str_t **str_arr_cont,
     if ( strcmp( split_tok, "" ) == 0 )
     {
         ssize_t rv = string_split_empty( str_arr_cont, string );
-        on_fail( ( int ) rv ) f_stack_trace();
+        if ( rv == RV_ERROR )
+            f_stack_trace();
         return rv;
     }
 
-    List ls = list_init_type( str_t );
+    struct dynamic_array *ls = list_init_type( str_t );
     if ( ls == NULL )
     {
         f_stack_trace();
@@ -364,11 +364,12 @@ ssize_t string_split( str_t **str_arr_cont,
         if ( dup == NULL )
         {
             list_destroy( ls );
-            return fflwarn_ret( RV_ERROR, "strdup" );
+            return fwarn_ret( RV_ERROR, "strdup" );
         }
 
-        if ( list_append( ls, &dup ) != RV_SUCCESS )
+        on_fail( list_append( ls, &dup ) )
         {
+            f_stack_trace();
             list_destroy( ls );
             return RV_ERROR;
         }
@@ -386,7 +387,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                             const regex_t *const __restrict regexp,
                             strsplit_mode_t mode )
 {
-    List ls = list_init_type( str_t );
+    struct dynamic_array *ls = list_init_type( str_t );
     if ( ls == NULL )
     {
         f_stack_trace();
