@@ -4,64 +4,32 @@
 
 #include "bigint.h"
 
+#include "../Dev/assert_that.h"
 #include "../Dev/errors.h"
 #include "../foreach.h"
-#include "../misc.h"
 #include "../pointer_utils.h"
 #include "../string_utils.h"
-#include "./dynstring.h"
+#include "dynstring.h"
 
 #include <assert.h>
 #include <inttypes.h>
 
 
-Private inline sign_t sign_flip( sign_t s )
+sign_t bigint_sign( const struct bigint *bi )
 {
-    return s == SIGN_NEG ? SIGN_POS : SIGN_NEG;
+    return bi->sign;
 }
 
-
-int bigint_init_p( struct bigint *bi )
+void bigint_flip_sign( struct bigint *bi )
 {
-    bi->numbers = list_init_type( uint64_t );
-    if ( bi->numbers == NULL )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
-    bi->sign = SIGN_POS;
-
-    const uint64_t ZERO = 0;
-    assert( list_append( bi->numbers, &ZERO ) == RV_SUCCESS );
-    // Cap must be at least one so no realloc -- therefore this shouldn't be able to fail
-
-    return RV_SUCCESS;
+    bi->sign = sgn_flip( bi->sign );
 }
 
-struct bigint *bigint_init( void )
+size_t bigint_sizeof( const struct bigint *bi )
 {
-    struct bigint *new = new ( struct bigint );
-    if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
-
-    bigint_init_p( new );
-
-    return new;
+    return list_size( bi->numbers );
 }
 
-struct bigint *bigint_init_as( const int64_t n )
-{
-    struct bigint *new = bigint_init();
-    uint64_t u_n       = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
-    assert( list_set_at( new->numbers, 0, &u_n ) == RV_SUCCESS );
-
-    sign_t new_sign = sgn_64( n );
-    if ( new_sign == 0 )
-        new_sign = SIGN_POS;
-    new->sign = new_sign;
-
-    return new;
-}
 
 str_t mul_uint_strings( string_t str_1, string_t str_2 )
 {
@@ -164,6 +132,49 @@ CLEANUP:
 }
 
 
+int bigint_init_p( struct bigint *bi )
+{
+    bi->numbers = list_init_type( uint64_t );
+    if ( bi->numbers == NULL )
+    {
+        f_stack_trace();
+        return RV_ERROR;
+    }
+    bi->sign = SIGN_POS;
+
+    const uint64_t ZERO = 0;
+    assert( list_append( bi->numbers, &ZERO ) == RV_SUCCESS );
+    // Cap must be at least one so no realloc -- therefore this shouldn't be able to fail
+
+    return RV_SUCCESS;
+}
+
+struct bigint *bigint_init( void )
+{
+    struct bigint *new = new ( struct bigint );
+    if ( new == NULL )
+        return ( void * ) fwarn_ret( NULL, "calloc" );
+
+    bigint_init_p( new );
+
+    return new;
+}
+
+struct bigint *bigint_init_as( const int64_t n )
+{
+    struct bigint *new = bigint_init();
+    uint64_t u_n       = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
+    assert( list_set_at( new->numbers, 0, &u_n ) == RV_SUCCESS );
+
+    sign_t new_sign = sgn_64( n );
+    if ( new_sign == 0 )
+        new_sign = SIGN_POS;
+    new->sign = new_sign;
+
+    return new;
+}
+
+
 #define STRING_2_TO_64 "18446744073709551616"
 
 #define N_POWER64_STRINGS 8
@@ -183,7 +194,7 @@ Private string_t const POWER64_STRINGS[ N_POWER64_STRINGS ] = {
     "191050713763565560762521606266177933534601628614656"
 };
 
-static str_t get_listelem_power_str( uint64_t n, size_t power )
+Private UseResult str_t get_listelem_power_str( uint64_t n, size_t power )
 {
     str_t buffer;
     if ( power < N_POWER64_STRINGS )
@@ -292,48 +303,51 @@ void bigint_destroy( struct bigint *bp )
 }
 
 
-Private int bigint_add_level( struct bigint *const bi,
-                              const int64_t n,
-                              const size_t level )
+Private int handle_overflow( struct bigint *, size_t level );
+
+int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
 {
     if ( n == 0 )
         return RV_SUCCESS;
 
-    uint64_t low = list_access( bi->numbers, 0, uint64_t );
+    uint64_t low = list_access( bi->numbers, level, uint64_t );
 
-    sign_t n_sign = sgn_64( n );
-    assert( n_sign == 1 || n_sign == -1 );
+    int64_t norm_n = n * bi->sign;
 
-    int64_t norm_n = bi->sign * n;
-    bool overflow  = INT64_MAX < low || ( int64_t ) low > norm_n;
-    //TODO:
-    // bool underflow = norm_n < 0 && low < -norm_n;
+    bool overflow  = norm_n > 0 && low > UINT64_MAX - ( uint64_t ) norm_n;
+    bool underflow = norm_n < 0 && low < ( uint64_t ) -norm_n;
+    assert_that( !overflow || !underflow, "cannot both be set at once" );
+
+    bool flip_bi_sign = underflow && list_size( bi->numbers ) == 1;
+
+    uint64_t final = flip_bi_sign ? low - norm_n : low + norm_n;
     if ( overflow )
-    {
-        if ( list_size( bi->numbers ) == level + 1 )
-        {
-            uint64_t high = 1;
-            if ( list_append( bi->numbers, &high ) != RV_SUCCESS )
-            {
-                f_stack_trace();
-                return RV_ERROR;
-            }
-        }
-        else
-        {
-            uint64_t old = list_access( bi->numbers, level + 1, uint64_t );
-            list_access( bi->numbers, level + 1, uint64_t ) += 1;
+        return_on_fail( handle_overflow( bi, level ) );
+    else if ( flip_bi_sign )
+        bigint_flip_sign( bi );
+    else if ( underflow )
+        return_on_fail( bigint_add_power( bi, sgn_flip( bi->sign ), level + 1 ) );
 
-            if ( old == UINT64_MAX )
-                return_on_fail( bigint_add_level( bi, 1, level + 1 ) );
-        }
-    }
-    low += norm_n;
-    assert( list_set_at( bi->numbers, 0, &low ) == RV_SUCCESS );
+    assert_that( list_set_at( bi->numbers, level, &final ) == RV_SUCCESS,
+                 "couldn't set number list element @ index %" PRIu64,
+                 level );
+
     return RV_SUCCESS;
 }
 
+Private inline int handle_overflow( struct bigint *const bi, size_t level )
+{
+    if ( list_size( bi->numbers ) == level + 1 ) // higher digit not available
+    {
+        uint64_t high = 1;
+        return list_append( bi->numbers, &high );
+    }
+
+    return bigint_add_power( bi, 1, level + 1 );
+}
+
+
 int bigint_add_i( struct bigint *bi, int64_t n )
 {
-    return bigint_add_level( bi, n, 0 );
+    return bigint_add_power( bi, n, 0 );
 }

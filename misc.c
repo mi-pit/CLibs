@@ -51,6 +51,8 @@ int64_t power( int64_t base, uint64_t exp )
 
 int64_t reverse_integer( int64_t n, unsigned base )
 {
+    sign_t sign = sgn_64( n );
+    n *= sgn_flip( sign );
     int64_t digits = digitsof( n, base );
 
     int64_t lp, hp;
@@ -67,5 +69,5 @@ int64_t reverse_integer( int64_t n, unsigned base )
         n = n - ( hd * hp ) + ( ld * hp );
     }
 
-    return n;
+    return n * sgn_flip( sign );
 }
