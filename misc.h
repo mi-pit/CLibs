@@ -23,10 +23,7 @@ typedef enum {
  * @return 1 if sign was -1 and vice versa
  * @see @code sign_t @endcode
  */
-LibraryDefined Mathematical inline sign_t sgn_flip( sign_t sign )
-{
-    return -sign;
-}
+#define sign_flipped( SIGN ) ( -SIGN )
 
 /**
  * Sign ( -1, 0, 1 ) of the number
@@ -133,7 +130,7 @@ LibraryDefined inline bool is_within( int64_t low, int64_t num, int64_t high )
  * @return      Number of digits. For (num = 0) the function returns 0; if base &lt 0,
  * the function returns -1
  */
-int64_t digitsof( uint64_t num, unsigned base );
+Mathematical int64_t digitsof( uint64_t num, unsigned base );
 
 /**
  * base ^ (to the power of) exp
@@ -141,7 +138,7 @@ int64_t digitsof( uint64_t num, unsigned base );
  * @param exp
  * @return `base` ^ `exp`
  */
-int64_t power( int64_t base, uint64_t exp );
+Mathematical int64_t power( int64_t base, uint64_t exp );
 
 /**
  * Reverses the digits of the number `n`.
@@ -158,6 +155,6 @@ int64_t power( int64_t base, uint64_t exp );
  * @param base  numeric base of the number
  * @return digit-wise reverse of the original
  */
-int64_t reverse_integer( int64_t n, unsigned base );
+uint64_t reverse_integer( uint64_t n, unsigned base );
 
 #endif //CLIBS_MISC_H

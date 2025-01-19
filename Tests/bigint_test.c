@@ -418,14 +418,16 @@ TEST( sub )
                  bi->sign == SIGN_POS ? "+" : "-",
                  list_size( bi->numbers ) );
     bigint_add_power( bi, -1, 1 );
-    UNIT_TEST( test_metadata( bi, SIGN_POS, 2, ( uint64_t[ 2 ] ){ 0, UINT64_MAX } ) );
+    UNIT_TEST( test_metadata( bi, SIGN_NEG, 2, ( uint64_t[ 2 ] ){ 0, 1 } ) );
 
-    bigint_add_power( bi, UINT64_MAX, 0 );
+    bigint_add_power( bi, INT64_MIN, 0 );
+    list_printf( bi->numbers, uint64_t, "%" PRIu64 );
     UNIT_TEST( test_metadata(
-            bi, SIGN_POS, 2, ( uint64_t[ 2 ] ){ UINT64_MAX, UINT64_MAX } ) );
+            bi, SIGN_NEG, 2, ( uint64_t[ 2 ] ){ 9223372036854775807uLL - 1, 1 } ) );
 
     bigint_add_power( bi, 1, 0 );
-    UNIT_TEST( test_metadata( bi, SIGN_POS, 3, ( uint64_t[ 3 ] ){ 0, 0, 1 } ) );
+    UNIT_TEST( test_metadata(
+            bi, SIGN_NEG, 2, ( uint64_t[ 3 ] ){ 9223372036854775807uLL - 2, 1 } ) );
 
     bigint_destroy( bi );
 }

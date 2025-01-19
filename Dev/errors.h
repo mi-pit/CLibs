@@ -108,11 +108,11 @@
  * @param format        format string
  * @param ...           printf-like arguments for ‹format›
  * @return @code return_value @endcode
- * @bug %p for some reason sometimes throws compiler errors for non `void *` pointers
+ * @bugs %p for some reason sometimes throws compiler errors for non `void *` pointers
  */
 LibraryDefined UseResult PrintfLike( 6, 7 ) Cold ptrdiff_t
-        WarnUniversal( const char *restrict FileName,
-                       const char *restrict FunctionName,
+        WarnUniversal( const char *__restrict FileName,
+                       const char *__restrict FunctionName,
                        int LineNumber,
                        int err_no,
                        ptrdiff_t return_value,
@@ -192,17 +192,13 @@ LibraryDefined UseResult PrintfLike( 6, 7 ) Cold ptrdiff_t
                   __LINE__ )
 
 
-/**
- * Warns like warn(3) and returns RETVAL
- */
+/** Warns like warn(3) and returns RETVAL */
 #define warn_ret( RETVAL, ... ) \
     WarnUniversal( NULL, NULL, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 #define warnx_ret( RETVAL, ... ) \
     WarnUniversal( NULL, NULL, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
-/**
- * warn(3) with function name at the start
- */
+/** warn(3) with function name at the start */
 #define fwarn( ... )  ( void ) WarnUniversal( NULL, __func__, -1, errno, -1, __VA_ARGS__ )
 #define fwarnx( ... ) ( void ) WarnUniversal( NULL, __func__, -1, -1, -1, __VA_ARGS__ )
 #define fwarn_ret( RETVAL, ... ) \

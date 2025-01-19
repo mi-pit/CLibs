@@ -22,7 +22,7 @@ sign_t bigint_sign( const struct bigint *bi )
 
 void bigint_flip_sign( struct bigint *bi )
 {
-    bi->sign = sgn_flip( bi->sign );
+    bi->sign = sign_flipped( bi->sign );
 }
 
 size_t bigint_sizeof( const struct bigint *bi )
@@ -310,23 +310,36 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
     if ( n == 0 )
         return RV_SUCCESS;
 
+    while ( list_size( bi->numbers ) <= level )
+    {
+        static const uint64_t ZERO = 0;
+        return_on_fail( list_append( bi->numbers, &ZERO ) );
+    }
+
     uint64_t low = list_access( bi->numbers, level, uint64_t );
 
-    int64_t norm_n = n * bi->sign;
+    // int64_t norm_n isn't able to hold this value
+    // => subtract it after converting to uint64_t
+    bool sub_one_more = sgn_64( n ) == bi->sign && n == INT64_MIN;
+
+    int64_t norm_n = sub_one_more ? INT64_MAX : n * bi->sign;
 
     bool overflow  = norm_n > 0 && low > UINT64_MAX - ( uint64_t ) norm_n;
-    bool underflow = norm_n < 0 && low < ( uint64_t ) -norm_n;
+    bool underflow = norm_n < 0 && low < ( uint64_t ) llabs( norm_n );
     assert_that( !overflow || !underflow, "cannot both be set at once" );
 
-    bool flip_bi_sign = underflow && list_size( bi->numbers ) == 1;
+    bool flip_bi_sign = underflow && list_size( bi->numbers ) == level + 1;
 
-    uint64_t final = flip_bi_sign ? low - norm_n : low + norm_n;
+    uint64_t final =
+            ( flip_bi_sign ? low - norm_n : low + norm_n ) - ( int ) sub_one_more;
+
     if ( overflow )
         return_on_fail( handle_overflow( bi, level ) );
     else if ( flip_bi_sign )
         bigint_flip_sign( bi );
     else if ( underflow )
-        return_on_fail( bigint_add_power( bi, sgn_flip( bi->sign ), level + 1 ) );
+        // subtract from higher level
+        return_on_fail( bigint_add_power( bi, sign_flipped( bi->sign ), level + 1 ) );
 
     assert_that( list_set_at( bi->numbers, level, &final ) == RV_SUCCESS,
                  "couldn't set number list element @ index %" PRIu64,

@@ -8,7 +8,7 @@
 #include "../Dev/unit_tests.h" /* ... */
 #include "../misc.h"           /* ... */
 
-Tester test_one_reverse_int( int64_t n, unsigned base, int64_t res )
+Tester test_one_reverse_int( int64_t n, unsigned base, uint64_t res )
 {
     return reverse_integer( n, base ) == res;
 }

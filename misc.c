@@ -9,9 +9,9 @@ uint64_t hash_func( const void *data, size_t nbytes )
 {
     uint64_t hash = 5381 * nbytes;
 
-    const byte *gen_data = ( byte * ) data;
+    const byte *data_byte = ( byte * ) data;
     for ( size_t i = 0; i < nbytes; ++i )
-        hash = ( ( hash << 5 ) + hash ) + gen_data[ i ];
+        hash = ( ( hash << 5 ) + hash ) + data_byte[ i ];
 
     return hash;
 }
@@ -49,10 +49,8 @@ int64_t power( int64_t base, uint64_t exp )
     return res;
 }
 
-int64_t reverse_integer( int64_t n, unsigned base )
+uint64_t reverse_integer( uint64_t n, unsigned base )
 {
-    sign_t sign = sgn_64( n );
-    n *= sgn_flip( sign );
     int64_t digits = digitsof( n, base );
 
     int64_t lp, hp;
@@ -69,5 +67,5 @@ int64_t reverse_integer( int64_t n, unsigned base )
         n = n - ( hd * hp ) + ( ld * hp );
     }
 
-    return n * sgn_flip( sign );
+    return n;
 }
