@@ -18,7 +18,7 @@ typedef char *str_t;
 
 #if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
 #include <stdlib.h> /* malloc */
-UseResult str_t strndup( string_t s, size_t l )
+LibraryDefined UseResult str_t strndup( string_t s, size_t l )
 {
     str_t n = malloc( l + 1 );
     if ( n == NULL )
@@ -28,7 +28,7 @@ UseResult str_t strndup( string_t s, size_t l )
     n[ l ] = '\0';
     return n;
 }
-UseResult str_t strdup( string_t s )
+LibraryDefined UseResult str_t strdup( string_t s )
 {
     size_t l = strlen( s );
     str_t n  = malloc( l + 1 );
