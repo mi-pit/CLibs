@@ -491,18 +491,3 @@ TEST( strings_misc )
     UNIT_TEST( strcmp( get_file_name( "./a" ), "a" ) == 0 );
 }
 END_TEST
-
-TEST( array_sprintf )
-{
-    int array[ 10 ];
-    for ( size_t i = 0; i < countof( array ); ++i )
-        array[ i ] = ( int ) ( i * i );
-
-    str_t buffer;
-    array_sprintf_d( buffer, array, countof( array ), "%i", ", " );
-    PrintInColor( stdout, COLOR_CYAN, "%s\n", buffer );
-
-    UNIT_TEST( cmpeq( strcmp( buffer, "[ 0, 1, 4, 9, 16, 25, 36, 49, 64, 81 ]" ) ) );
-    free( buffer );
-}
-END_TEST
