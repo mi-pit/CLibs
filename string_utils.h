@@ -16,6 +16,30 @@
 typedef const char *string_t;
 typedef char *str_t;
 
+#if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
+UseResult str_t strndup( string_t s, size_t l )
+{
+    str_t n = malloc( l + 1 );
+    if ( n == NULL )
+        return NULL;
+
+    strncpy( n, s, l );
+    n[ l ] = '\0';
+    return n;
+}
+UseResult str_t strdup( string_t s )
+{
+    size_t l = strlen( s );
+    str_t n  = malloc( l + 1 );
+    if ( n == NULL )
+        return NULL;
+
+    n[ l ] = '\0';
+    strcpy( n, s );
+    return n;
+}
+#endif // ndef strdup
+
 
 /**
  * Heap-allocates a new string with all whitespace (as defined in isspace(3)) from either end stripped.

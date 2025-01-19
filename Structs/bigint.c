@@ -123,8 +123,7 @@ CLEANUP:
 
 int bigint_init_p( struct bigint *bi )
 {
-    bi->numbers = list_init_type( uint64_t );
-    if ( bi->numbers == NULL )
+    if ( ( bi->numbers = list_init_type( uint64_t ) ) == NULL )
     {
         f_stack_trace();
         return RV_ERROR;
@@ -153,7 +152,8 @@ struct bigint *bigint_init( void )
 struct bigint *bigint_init_as( const int64_t n )
 {
     struct bigint *new = bigint_init();
-    uint64_t u_n       = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
+
+    const uint64_t u_n = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
     assert_that( list_set_at( new->numbers, 0, &u_n ) == RV_SUCCESS,
                  "bigint.numbers.capacity should always be at least one" );
 
@@ -291,7 +291,16 @@ void bigint_destroy( struct bigint *bp )
 }
 
 
-Private int handle_overflow( struct bigint *, size_t level );
+Private inline int handle_overflow( struct bigint *const bi, size_t level )
+{
+    if ( list_size( bi->numbers ) == level + 1 ) // higher digit not available
+    {
+        uint64_t high = 1;
+        return list_append( bi->numbers, &high );
+    }
+
+    return bigint_add_power( bi, 1, level + 1 );
+}
 
 int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
 {
@@ -338,18 +347,6 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
 
     return RV_SUCCESS;
 }
-
-Private inline int handle_overflow( struct bigint *const bi, size_t level )
-{
-    if ( list_size( bi->numbers ) == level + 1 ) // higher digit not available
-    {
-        uint64_t high = 1;
-        return list_append( bi->numbers, &high );
-    }
-
-    return bigint_add_power( bi, 1, level + 1 );
-}
-
 
 int bigint_add_i( struct bigint *bi, int64_t n )
 {

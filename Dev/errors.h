@@ -110,7 +110,7 @@
  * @return @code return_value @endcode
  * @bugs %p for some reason sometimes throws compiler errors for non `void *` pointers
  */
-LibraryDefined UseResult PrintfLike( 6, 7 ) Cold ptrdiff_t
+LibraryDefined PrintfLike( 6, 7 ) Cold ptrdiff_t
         WarnUniversal( const char *__restrict FileName,
                        const char *__restrict FunctionName,
                        int LineNumber,

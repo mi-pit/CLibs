@@ -46,15 +46,13 @@ LibraryDefined PrintfLike( 3, 4 ) inline void PrintInColor( FILE *file,
     fprintf( file, COLOR_DEFAULT );
 }
 
-LibraryDefined void inline VPrintInColor( FILE *file,
+LibraryDefined inline void VPrintInColor( FILE *file,
                                           const char *Color,
                                           const char *__restrict format,
                                           va_list vaList )
 {
     fprintf( file, PRINT_COLOR, Color );
-
     vfprintf( file, format, vaList );
-
     fprintf( file, COLOR_DEFAULT );
 }
 

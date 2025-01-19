@@ -14,9 +14,8 @@
 
 
 typedef enum {
-    SIGN_NEG  = -1,
-    SIGN_ZERO = 0,
-    SIGN_POS  = 1,
+    SIGN_NEG = -1,
+    SIGN_POS = 1,
 } sign_t;
 
 
@@ -29,7 +28,7 @@ typedef enum {
 /**
  * Sign ( -1, 0, 1 ) of the number
  */
-LibraryDefined Mathematical inline sign_t sgn_64( int64_t n )
+LibraryDefined Mathematical inline signed int sgn_64( int64_t n )
 {
     return n == 0 ? 0 : n < 0 ? -1 : 1;
 }
