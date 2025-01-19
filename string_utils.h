@@ -17,6 +17,7 @@ typedef const char *string_t;
 typedef char *str_t;
 
 #if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
+#include <stdlib.h> /* malloc */
 UseResult str_t strndup( string_t s, size_t l )
 {
     str_t n = malloc( l + 1 );

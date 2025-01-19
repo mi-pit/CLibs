@@ -13,10 +13,10 @@
 #include <string.h>  /* memcpy() */
 
 
-struct dynamic_array extern *switch_expr_values_stack;
-struct dynamic_array extern *switch_expr_variables_stack;
-struct dynamic_array extern *switch_expr_sizes_stack;
-struct dynamic_array extern *switch_expr_assigned_stack;
+extern struct dynamic_array *switch_expr_values_stack;
+extern struct dynamic_array *switch_expr_variables_stack;
+extern struct dynamic_array *switch_expr_sizes_stack;
+extern struct dynamic_array *switch_expr_assigned_stack;
 
 void *swex_aux_variable_;
 
