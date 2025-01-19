@@ -71,7 +71,7 @@
 #if defined( __APPLE__ ) || defined( __FreeBSD__ )
 #include <stdlib.h>
 #define get_prog_name() getprogname()
-#elif defined( __FILE_NAME__ )
+#elif defined( __FILE_NAME__ ) // this kinda sucks, but hey, what are you gonna do?
 #define get_prog_name() __FILE_NAME__
 #else
 #define get_prog_name() "current-program"

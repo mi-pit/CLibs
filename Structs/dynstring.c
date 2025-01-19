@@ -5,7 +5,8 @@
 
 #include "../Dev/errors.h"   /* RV, warn */
 #include "../misc.h"         /* min_64() */
-#include "../string_utils.h" /* str_t, string_t */
+#include "../string_utils.h" /* vasprintf(in case it's not defined in <stdio.h>),
+                              * str_t, string_t */
 
 #include <assert.h>
 #include <stdio.h>  /* fprintf() */
@@ -128,33 +129,6 @@ int dynstr_appendn( DynamicString dynstr, const char *app, size_t len )
 
     return RV_SUCCESS;
 }
-
-#if !defined( _GNU_SOURCE ) && !defined( __APPLE__ )
-/**
- * Like `vsprintf`, except it heap-allocates memory for the resulting string.
- * (*strp) may be passed to free(3)
- */
-int vasprintf( char **strp, const char *fmt, va_list args )
-{
-    va_list vaList;
-    va_copy( vaList, args );
-
-    int size = vsnprintf( NULL, 0, fmt, args );
-
-    if ( size < 0 )
-        return size;
-
-    *strp = malloc( size + 1 );
-    if ( !*strp )
-        return -1;
-
-
-    int result = vsnprintf( *strp, size + 1, fmt, vaList );
-    va_end( args );
-
-    return result;
-}
-#endif
 
 int dynstr_appendf( DynamicString dynstr, const char *fmt, ... )
 {

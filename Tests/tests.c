@@ -64,5 +64,7 @@ int main( void )
     run_dynstr();
     run_list();
 
+    RUN_TEST( array_sprintf );
+
     FINISH_TESTING();
 }

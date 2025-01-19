@@ -13,7 +13,7 @@ Tester test_one_reverse_int( int64_t n, unsigned base, uint64_t res )
     return reverse_integer( n, base ) == res;
 }
 
-static TEST( misc_c )
+LibraryDefined TEST( misc_c )
 {
     UNIT_TEST( max_i64( 1, 2 ) == 2 );
     UNIT_TEST( max_i64( 3, 2 ) == 3 );
@@ -35,7 +35,7 @@ static TEST( misc_c )
     }
     {
         double a = 1;
-        double b = 1;
+        double b;
         PrintInColor( stdout, COLOR_CYAN, "%f\n", min_m( a, b = .9 ) );
     }
     UNIT_TEST( min_i64( 1, 2 ) == 1 );
@@ -79,6 +79,7 @@ static TEST( misc_c )
     UNIT_TEST( test_one_reverse_int( 7, 2, 7 ) );
     UNIT_TEST( test_one_reverse_int( 8, 2, 1 ) );
     UNIT_TEST( test_one_reverse_int( 1, 2, 1 ) );
+    UNIT_TEST( test_one_reverse_int( 0x1AB, 16, 0xBA1 ) );
 }
 END_TEST
 

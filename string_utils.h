@@ -46,6 +46,42 @@ LibraryDefined UseResult str_t string_duplicate( string_t s )
 }
 #endif // ndef strdup
 
+#if !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) // non-standard
+/**
+ * Like `vsprintf`, except it heap-allocates memory for the resulting string.
+ * (*strp) may be passed to free(3)
+ */
+int vasprintf( str_t *strp, string_t fmt, va_list args )
+{
+    va_list vaList;
+    va_copy( vaList, args );
+
+    int size = vsnprintf( NULL, 0, fmt, args );
+
+    if ( size < 0 )
+        return size;
+
+    *strp = malloc( size + 1 );
+    if ( !*strp )
+        return -1;
+
+
+    int result = vsnprintf( *strp, size + 1, fmt, vaList );
+    va_end( args );
+
+    return result;
+}
+
+int asprintf( str_t *strp, string_t fmt, ... )
+{
+    va_list va;
+    va_start( va, fmt );
+    int rv = vasprintf( strp, fmt, va );
+    va_end( va );
+    return rv;
+}
+#endif
+
 
 /**
  * Heap-allocates a new string with all whitespace (as defined in isspace(3)) from either end stripped.
