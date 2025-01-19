@@ -2,11 +2,10 @@
 // Created by MacBook on 09.01.2025.
 //
 
-#include "../Structs/bigint.h" /* also includes dynarr.h */
+#include "../Structs/bigint.h" /* also includes dynarr.h, misc.h */
 
 #include "../Dev/assert_that.h" /* assert_that(), #include "../errors.h" */
 #include "../Dev/unit_tests.h"  /* TEST, UNIT_TEST, RUN_TEST, FINISH_TESTING */
-#include "../misc.h"            /* cmpeq */
 #include "../string_utils.h"    /* str types */
 
 #include <assert.h>
@@ -15,7 +14,7 @@
 /**
  * Sets the bi->numbers list to be
  * @code
- * size := count;
+ * size     := count;
  * contents := numbers;
  * @endcode
  */
@@ -428,6 +427,17 @@ TEST( sub )
     bigint_add_power( bi, 1, 0 );
     UNIT_TEST( test_metadata(
             bi, SIGN_NEG, 2, ( uint64_t[ 3 ] ){ 9223372036854775807uLL - 2, 1 } ) );
+
+    reset_number_array( bi );
+    assert( bi->sign == SIGN_POS );
+    bigint_add_power( bi, 1, 0x1000 );
+    UNIT_TEST( bigint_sizeof( bi ) == 0x1000 + 1 ); // list.size == max power + 1
+    list_printf( bi->numbers, uint64_t, "%" PRIu64 );
+#if 0
+    str_t s = bigint_to_string( bi );
+    PrintInColor( stdout, COLOR_MAGENTA, "%s\n", s );
+    free( s );
+#endif
 
     bigint_destroy( bi );
 }

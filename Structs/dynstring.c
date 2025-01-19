@@ -80,7 +80,8 @@ Private int dynstr_resize( DynamicString dynstr, size_t new_size )
 
     dynstr->data = temp;
     dynstr->cap  = new_size;
-    dynstr->len  = min_64( ( int64_t ) dynstr->cap, ( int64_t ) dynstr->len );
+    dynstr->len  = min_u64( dynstr->cap, dynstr->len );
+
     dynstr->data[ dynstr->len ] = '\0';
 
     return RV_SUCCESS;

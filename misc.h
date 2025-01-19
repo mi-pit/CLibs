@@ -10,12 +10,13 @@
 /**
  * Stops those pesky `unused variable` compiler errors
  */
-#define UNUSED( ... ) ( ( void ) ( ( void ) __VA_ARGS__ ) ) /* Why does this work? */
+#define UNUSED( ... ) ( ( void ) ( ( void ) __VA_ARGS__ ) )
 
 
 typedef enum {
-    SIGN_NEG = -1,
-    SIGN_POS = 1,
+    SIGN_NEG  = -1,
+    SIGN_ZERO = 0,
+    SIGN_POS  = 1,
 } sign_t;
 
 
@@ -28,25 +29,67 @@ typedef enum {
 /**
  * Sign ( -1, 0, 1 ) of the number
  */
-LibraryDefined Mathematical inline int64_t sgn_64( int64_t n )
+LibraryDefined Mathematical inline sign_t sgn_64( int64_t n )
 {
     return n == 0 ? 0 : n < 0 ? -1 : 1;
 }
 
 /**
+ * Evaluates to the smaller of the two numbers.
+ * Works with both integral and floating-point types with some caveats (see below).
+ * @attention constructs with the ++ or -- operators like
+ * @code
+ * int a = 10, b = 10;
+ * int c = min_m( a++, b );
+ * @endcode
+ * are undefined for this macro.
+ * <p>
+ * This isn't the case for the (min|max)_[ui]64 functions
+ */
+#define min_m( NUM_A, NUM_B ) ( ( NUM_A ) < ( NUM_B ) ? ( NUM_A ) : ( NUM_B ) )
+
+/**
+ * Evaluates to the bigger of the two numbers.
+ * Works with both integral and floating-point types with some caveats (see below).
+ * @attention constructs with the ++ or -- operators like
+ * @code
+ * int a = 10, b = 10;
+ * int c = max_m( a++, b );
+ * @endcode
+ * are undefined for this macro.
+ * <p>
+ * This isn't the case for the (min|max)_[ui]64 functions
+ */
+#define max_m( NUM_A, NUM_B ) ( ( NUM_A ) > ( NUM_B ) ? ( NUM_A ) : ( NUM_B ) )
+
+/**
  * Smaller of the two numbers
  */
-LibraryDefined Mathematical inline int64_t min_64( int64_t a, int64_t b )
+LibraryDefined Mathematical inline int64_t min_i64( int64_t a, int64_t b )
 {
-    return ( ( a ) < ( b ) ? ( a ) : ( b ) );
+    return min_m( a, b );
+}
+/**
+ * Smaller of the two numbers
+ */
+LibraryDefined Mathematical inline uint64_t min_u64( uint64_t a, uint64_t b )
+{
+    return min_m( a, b );
 }
 
 /**
  * Bigger of the two numbers
  */
-LibraryDefined Mathematical inline int64_t max_64( int64_t a, int64_t b )
+LibraryDefined Mathematical inline int64_t max_i64( int64_t a, int64_t b )
 {
-    return ( ( a ) > ( b ) ? ( a ) : ( b ) );
+    return max_m( a, b );
+}
+/**
+ * Bigger of the two numbers
+ */
+LibraryDefined Mathematical inline uint64_t max_u64( uint64_t a, uint64_t b )
+{
+    return max_m( a, b );
 }
 
 
@@ -89,8 +132,7 @@ DECLARE_CMP_FUNCTION( int64_t );
         if ( val_1 < val_2 )                         \
             return -1;                               \
         return 0;                                    \
-    }                                                \
-    REQUIRE_SEMICOLON
+    }
 
 
 /**
@@ -130,7 +172,7 @@ LibraryDefined inline bool is_within( int64_t low, int64_t num, int64_t high )
  * @return      Number of digits. For (num = 0) the function returns 0; if base &lt 0,
  * the function returns -1
  */
-Mathematical int64_t digitsof( uint64_t num, unsigned base );
+Mathematical uint64_t digitsof( uint64_t num, unsigned base );
 
 /**
  * base ^ (to the power of) exp

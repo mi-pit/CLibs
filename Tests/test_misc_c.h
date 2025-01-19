@@ -15,22 +15,32 @@ Tester test_one_reverse_int( int64_t n, unsigned base, uint64_t res )
 
 static TEST( misc_c )
 {
-    UNIT_TEST( max_64( 1, 2 ) == 2 );
-    UNIT_TEST( max_64( 3, 2 ) == 3 );
-    UNIT_TEST( max_64( 3, -2 ) == 3 );
+    UNIT_TEST( max_i64( 1, 2 ) == 2 );
+    UNIT_TEST( max_i64( 3, 2 ) == 3 );
+    UNIT_TEST( max_i64( 3, -2 ) == 3 );
     {
         int a = 1;
         int b = 1;
-        UNIT_TEST( max_64( a, ++b ) == 2 );
+        UNIT_TEST( max_i64( a, ++b ) == 2 );
     }
     {
         int a = 1;
         int b = 1;
-        UNIT_TEST( max_64( a, b++ ) == 1 );
+        UNIT_TEST( max_i64( a, b++ ) == 1 );
     }
-    UNIT_TEST( min_64( 1, 2 ) == 1 );
-    UNIT_TEST( min_64( 10, 2 ) == 2 );
-    UNIT_TEST( min_64( -10, 2 ) == -10 );
+    {
+        int a = 1;
+        int b = 1;
+        PrintInColor( stdout, COLOR_CYAN, "%i\n", min_m( a, b++ ) );
+    }
+    {
+        double a = 1;
+        double b = 1;
+        PrintInColor( stdout, COLOR_CYAN, "%f\n", min_m( a, b = .9 ) );
+    }
+    UNIT_TEST( min_i64( 1, 2 ) == 1 );
+    UNIT_TEST( min_i64( 10, 2 ) == 2 );
+    UNIT_TEST( min_i64( -10, 2 ) == -10 );
 
     UNIT_TEST( sgn_64( 1204 ) > 0 );
     UNIT_TEST( sgn_64( -11 ) < 0 );
@@ -49,6 +59,10 @@ static TEST( misc_c )
     {
         int arr[ 10 ];
         UNIT_TEST( countof( arr ) == 10 );
+    }
+    {
+        str_t *arr[ 1 ];
+        UNIT_TEST( countof( arr ) == 1 );
     }
 
     UNIT_TEST( digitsof( 1, 10 ) == 1 );

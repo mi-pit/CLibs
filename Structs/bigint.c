@@ -4,15 +4,13 @@
 
 #include "bigint.h"
 
-#include "../Dev/assert_that.h"
-#include "../Dev/errors.h"
-#include "../foreach.h"
-#include "../pointer_utils.h"
-#include "../string_utils.h"
-#include "dynstring.h"
+#include "../Dev/assert_that.h" /* includes errors.h */
+#include "../foreach.h"         /* foreach_ls */
+#include "../pointer_utils.h"   /* new */
+#include "../string_utils.h"    /* str_t, string_reversed() */
+#include "dynstring.h"          /* dynstr */
 
-#include <assert.h>
-#include <inttypes.h>
+#include <inttypes.h> /* PRI macros */
 
 
 sign_t bigint_sign( const struct bigint *bi )
@@ -33,17 +31,17 @@ size_t bigint_sizeof( const struct bigint *bi )
 
 str_t mul_uint_strings( string_t str_1, string_t str_2 )
 {
-    typedef unsigned char digit_t;
+    typedef uint8_t digit_t;
 
     size_t len_1      = strlen( str_1 );
     size_t len_2      = strlen( str_2 );
     size_t result_len = len_1 + len_2;
 
-    // Allocate memory for the result (zero-initialized)
-    char *result = calloc( result_len + 1, 1 );
-    if ( !result )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+    char *result = malloc( result_len + 1 );
+    if ( result == NULL )
+        return ( void * ) fwarn_ret( NULL, "malloc" );
     memset( result, '0', result_len );
+    result[ result_len ] = '\0';
 
     // Perform multiplication using the "long multiplication" algorithm
     for ( ssize_t i = ( ssize_t ) len_1 - 1; i >= 0; --i )
@@ -53,10 +51,10 @@ str_t mul_uint_strings( string_t str_1, string_t str_2 )
         {
             digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry
                            + ( result[ i + j + 1 ] - '0' );
-            result[ i + j + 1 ] = ( char ) ( ( prod % 10 ) + '0' ); // Store the digit
-            carry               = prod / 10;                        // Carry over
+            result[ i + j + 1 ] = ( char ) ( ( prod % 10 ) + '0' );
+            carry               = prod / 10;
         }
-        result[ i ] = ( char ) ( result[ i ] + carry ); // Add any remaining carry
+        result[ i ] = ( char ) ( result[ i ] + carry );
     }
 
     // Remove leading zeros
@@ -64,15 +62,8 @@ str_t mul_uint_strings( string_t str_1, string_t str_2 )
     while ( start < result_len && result[ start ] == '0' )
         ++start;
 
-    // If the result is all zeros (e.g., "0 * 0"), return "0"
-    if ( start == result_len )
-    {
-        free( result );
-        return strdup( "0" );
-    }
-
-    // Shift the result to remove leading zeros
-    char *final_result = strdup( result + start );
+    char *final_result =
+            ( start == result_len ) ? strdup( "0" ) : strdup( result + start );
     free( result );
 
     return final_result;
@@ -95,9 +86,7 @@ str_t add_uint_strings( string_t str_1, string_t str_2 )
     str_t ret = NULL;
 
     digit_t carry = 0;
-    for ( size_t idx = 0;
-          idx < ( size_t ) max_64( ( int64_t ) str_1_len, ( int64_t ) str_2_len );
-          ++idx )
+    for ( size_t idx = 0; idx < max_u64( str_1_len, str_2_len ); ++idx )
     {
         digit_t str_1_digit = idx < str_1_len ? str_1[ str_1_len - idx - 1 ] - '0' : 0;
         digit_t str_2_digit = idx < str_2_len ? str_2[ str_2_len - idx - 1 ] - '0' : 0;
@@ -140,11 +129,12 @@ int bigint_init_p( struct bigint *bi )
         f_stack_trace();
         return RV_ERROR;
     }
-    bi->sign = SIGN_POS;
+    bi->sign = SIGN_POS; // fixme? maybe this should be SIGN_ZERO
 
-    const uint64_t ZERO = 0;
-    assert( list_append( bi->numbers, &ZERO ) == RV_SUCCESS );
-    // Cap must be at least one so no realloc -- therefore this shouldn't be able to fail
+    static const uint64_t ZERO = 0;
+    assert_that( list_append( bi->numbers, &ZERO ) == RV_SUCCESS,
+                 "Cap must be at least one so no realloc,"
+                 "therefore this shouldn't be able to fail" );
 
     return RV_SUCCESS;
 }
@@ -164,12 +154,10 @@ struct bigint *bigint_init_as( const int64_t n )
 {
     struct bigint *new = bigint_init();
     uint64_t u_n       = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
-    assert( list_set_at( new->numbers, 0, &u_n ) == RV_SUCCESS );
+    assert_that( list_set_at( new->numbers, 0, &u_n ) == RV_SUCCESS,
+                 "bigint.numbers.capacity should always be at least one" );
 
-    sign_t new_sign = sgn_64( n );
-    if ( new_sign == 0 )
-        new_sign = SIGN_POS;
-    new->sign = new_sign;
+    new->sign = n == 0 ? SIGN_POS : sgn_64( n );
 
     return new;
 }
@@ -310,10 +298,12 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
     if ( n == 0 )
         return RV_SUCCESS;
 
-    while ( list_size( bi->numbers ) <= level )
+    if ( list_size( bi->numbers ) <= level )
     {
-        static const uint64_t ZERO = 0;
-        return_on_fail( list_append( bi->numbers, &ZERO ) );
+        const size_t len = level - list_size( bi->numbers ) + 1;
+        uint64_t *ZEROES = calloc( len, sizeof( uint64_t ) );
+        return_on_fail( list_extend( bi->numbers, ZEROES, len ) );
+        free( ZEROES );
     }
 
     uint64_t low = list_access( bi->numbers, level, uint64_t );
@@ -342,8 +332,9 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
         return_on_fail( bigint_add_power( bi, sign_flipped( bi->sign ), level + 1 ) );
 
     assert_that( list_set_at( bi->numbers, level, &final ) == RV_SUCCESS,
-                 "couldn't set number list element @ index %" PRIu64,
-                 level );
+                 "couldn't set number list element; index=%" PRIu64 ", size=%zu",
+                 level,
+                 list_size( bi->numbers ) );
 
     return RV_SUCCESS;
 }

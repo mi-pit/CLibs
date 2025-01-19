@@ -45,18 +45,19 @@ void bigint_flip_sign( struct bigint * );
 UseResult char *bigint_to_string( const struct bigint * );
 UseResult List *bigint_get_number_array( const struct bigint * );
 
+/// All of these functions return RV_SUCCESS / RV_ERROR
 
 int bigint_add_i( struct bigint *, int64_t );
 /**
  * Adds
  * @code
- * (UINT64_MAX ^ power) * n // UINT64_MAX == 2^64 - 1
+ * (UINT64_MAX ^ power) * n
  * @endcode
  * to the bigint
  * @param bi    valid bi struct
  * @param n     any number -- may be negative
- * @param power
- * @return
+ * @param power positive integer; might act strange when nearing SIZE_MAX
+ * @return RV_ERROR in case list_append() fails, else RV_SUCCESS
  */
 int bigint_add_power( struct bigint *bi, int64_t n, uint64_t power );
 int bigint_add_b( struct bigint *, const struct bigint * );
