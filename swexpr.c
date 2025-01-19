@@ -100,6 +100,7 @@ size_t switch_expression_size_peek( void )
 {
     return *( size_t * ) list_peek( switch_expr_sizes_stack );
 }
+
 void *switch_expression_value_peek( void )
 {
     return *( void ** ) list_peek( switch_expr_values_stack );

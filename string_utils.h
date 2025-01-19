@@ -18,7 +18,11 @@ typedef char *str_t;
 
 #if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
 #include <stdlib.h> /* malloc */
-LibraryDefined UseResult str_t strndup( string_t s, size_t l )
+
+#define strndup string_nduplicate
+#define strdup  string_duplicate
+
+LibraryDefined UseResult str_t string_nduplicate( string_t s, size_t l )
 {
     str_t n = malloc( l + 1 );
     if ( n == NULL )
@@ -28,7 +32,8 @@ LibraryDefined UseResult str_t strndup( string_t s, size_t l )
     n[ l ] = '\0';
     return n;
 }
-LibraryDefined UseResult str_t strdup( string_t s )
+
+LibraryDefined UseResult str_t string_duplicate( string_t s )
 {
     size_t l = strlen( s );
     str_t n  = malloc( l + 1 );

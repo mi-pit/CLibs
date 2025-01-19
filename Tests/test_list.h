@@ -52,6 +52,8 @@ Private TEST( list_init )
     }
     bool InitOverall = true;
     UNIT_TEST( InitOverall );
+
+    list_destroy( ls );
 }
 END_TEST
 

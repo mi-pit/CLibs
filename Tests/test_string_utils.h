@@ -75,6 +75,7 @@ static void free_spl( const size_t count, str_t strings[ count ] )
     {
         free( strings[ i ] );
     }
+    free( strings );
 }
 Tester test_one_strspl_str( string_t haystack,
                             string_t split_tok,

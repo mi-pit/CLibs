@@ -13,7 +13,7 @@
 #include <string.h>  /* memcpy() */
 
 
-void *swex_aux_variable_;
+LibraryDefined void *swex_aux_variable_;
 
 int switch_expression_push( size_t nbytes, const void *data );
 bool switch_expression_is_assigned( void );
