@@ -13,17 +13,17 @@
 #include <string.h>  /* memcpy() */
 
 
-extern struct dynamic_array *switch_expr_values_stack;
-extern struct dynamic_array *switch_expr_variables_stack;
-extern struct dynamic_array *switch_expr_sizes_stack;
-extern struct dynamic_array *switch_expr_assigned_stack;
-
 void *swex_aux_variable_;
 
 int switch_expression_push( size_t nbytes, const void *data );
 bool switch_expression_is_assigned( void );
 int switch_expression_assign( void );
 int switch_expression_pop( void );
+int switch_expression_init_var( void *var_addr );
+void *switch_expression_get_varaddr( void );
+
+size_t switch_expression_size_peek( void );
+void *switch_expression_value_peek( void );
 
 /**
  * Initializes the swexpr to, in each ‹ case ›,
@@ -51,12 +51,10 @@ int switch_expression_pop( void );
 /**
  * Uses an existing variable to store the result from ‹ resolve ›
  */
-#define as( VAR_NAME )                                             \
-    {                                                              \
-        void *swex_as_var_addr = &( VAR_NAME );                    \
-        list_set_at( switch_expr_variables_stack,                  \
-                     list_size( switch_expr_variables_stack ) - 1, \
-                     &( swex_as_var_addr ) );                      \
+#define as( VAR_NAME )                                   \
+    {                                                    \
+        void *swex_as_var_addr = &( VAR_NAME );          \
+        switch_expression_init_var( &swex_as_var_addr ); \
     }
 
 /**
@@ -70,12 +68,11 @@ int switch_expression_pop( void );
 /**
  * Assigns the 'result' into the swexpr variable
  */
-#define resolve( result_type, result )                                            \
-    do                                                                            \
-    {                                                                             \
-        *deref_as( result_type *, list_at_last( switch_expr_variables_stack ) ) = \
-                result;                                                           \
-    }                                                                             \
+#define resolve( result_type, result )                                        \
+    do                                                                        \
+    {                                                                         \
+        *deref_as( result_type *, switch_expression_get_varaddr() ) = result; \
+    }                                                                         \
     while ( 0 )
 
 /**
@@ -85,41 +82,34 @@ int switch_expression_pop( void );
  * Each case (including default) is only executed if no other
  * case branch has been executed in this swexpr so far
  */
-#define swex_case_imm( type, expr_case )                                             \
-    {                                                                                \
-        if ( swex_aux_variable_ != NULL )                                            \
-        {                                                                            \
-            free( swex_aux_variable_ );                                              \
-            swex_aux_variable_ = NULL;                                               \
-        }                                                                            \
-        swex_aux_variable_ = malloc( sizeof( type ) );                               \
-        if ( swex_aux_variable_ == NULL )                                            \
-            err( ENOMEM, "swex_case_imm" ); /* todo: <- here */                      \
-        type swex_case_imm_aux_var_ = expr_case;                                     \
-        memcpy( swex_aux_variable_, &swex_case_imm_aux_var_, sizeof( type ) );       \
-    }                                                                                \
-    if ( !switch_expression_is_assigned()                                            \
-         && ( *( size_t * ) list_peek( switch_expr_sizes_stack ) ) == sizeof( type ) \
-         && memcmp( *( void ** ) list_peek( switch_expr_values_stack ),              \
-                    swex_aux_variable_,                                              \
-                    sizeof( type ) )                                                 \
-                    == 0 )                                                           \
+#define swex_case_imm( type, expr_case )                                                 \
+    {                                                                                    \
+        if ( swex_aux_variable_ != NULL )                                                \
+        {                                                                                \
+            free( swex_aux_variable_ );                                                  \
+            swex_aux_variable_ = NULL;                                                   \
+        }                                                                                \
+        swex_aux_variable_ = malloc( sizeof( type ) );                                   \
+        if ( swex_aux_variable_ == NULL )                                                \
+            err( ENOMEM, "swex_case_imm" ); /* todo: <- here */                          \
+        type swex_case_imm_aux_var_ = expr_case;                                         \
+        memcpy( swex_aux_variable_, &swex_case_imm_aux_var_, sizeof( type ) );           \
+    }                                                                                    \
+    if ( !switch_expression_is_assigned()                                                \
+         && ( switch_expression_size_peek() ) == sizeof( type )                          \
+         && memcmp( switch_expression_value_peek(), swex_aux_variable_, sizeof( type ) ) \
+                    == 0 )                                                               \
         if ( switch_expression_assign() != 1 )
 
-#define swex_case_ptr( expr_case, nbytes )                                             \
-    if ( !switch_expression_is_assigned()                                              \
-         && ( *( size_t * ) list_peek( switch_expr_sizes_stack ) ) == sizeof( void * ) \
-         && memcmp( *( void ** ) list_peek( switch_expr_values_stack ),                \
-                    expr_case,                                                         \
-                    nbytes )                                                           \
-                    == 0 )                                                             \
+#define swex_case_ptr( expr_case, nbytes )                                     \
+    if ( !switch_expression_is_assigned()                                      \
+         && ( switch_expression_size_peek() ) == sizeof( void * )              \
+         && memcmp( switch_expression_value_peek(), expr_case, nbytes ) == 0 ) \
         if ( switch_expression_assign() != 1 )
 
-#define swex_case_str( expr_case )                                            \
-    if ( !switch_expression_is_assigned()                                     \
-         && strcmp( *( const char ** ) list_peek( switch_expr_values_stack ), \
-                    expr_case )                                               \
-                    == 0 )                                                    \
+#define swex_case_str( expr_case )                                     \
+    if ( !switch_expression_is_assigned()                              \
+         && strcmp( switch_expression_value_peek(), expr_case ) == 0 ) \
         if ( switch_expression_assign() != 1 )
 
 /**

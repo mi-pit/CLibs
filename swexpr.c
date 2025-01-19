@@ -7,10 +7,10 @@
 #include "Dev/errors.h" /* RV, f_stack_trace() */
 
 
-List *switch_expr_values_stack    = NULL;
-List *switch_expr_variables_stack = NULL;
-List *switch_expr_sizes_stack     = NULL;
-List *switch_expr_assigned_stack  = NULL;
+Private List *switch_expr_values_stack    = NULL;
+Private List *switch_expr_variables_stack = NULL;
+Private List *switch_expr_sizes_stack     = NULL;
+Private List *switch_expr_assigned_stack  = NULL;
 
 
 static const bool TRUE  = true;
@@ -82,4 +82,25 @@ int switch_expression_pop( void )
     try_pop( switch_expr_variables_stack );
 
     return RV_SUCCESS;
+}
+
+int switch_expression_init_var( void *var_addr )
+{
+    return list_set_at( switch_expr_variables_stack,
+                        list_size( switch_expr_variables_stack ) - 1,
+                        var_addr );
+}
+
+void *switch_expression_get_varaddr( void )
+{
+    return list_at_last( switch_expr_variables_stack );
+}
+
+size_t switch_expression_size_peek( void )
+{
+    return *( size_t * ) list_peek( switch_expr_sizes_stack );
+}
+void *switch_expression_value_peek( void )
+{
+    return *( void ** ) list_peek( switch_expr_values_stack );
 }
