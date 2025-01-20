@@ -46,17 +46,23 @@ LibraryDefined UseResult str_t string_duplicate( string_t s )
 }
 #endif // ndef strdup
 
-#if !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) // non-standard
+#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) \
+        || defined( _POSIX_C_SOURCE ) // non-standard
+#include <stdarg.h>
+#include <stdlib.h>
+
+int vsnprintf( char *str, size_t size, const char *restrict format, va_list ap );
+
 /**
  * Like `vsprintf`, except it heap-allocates memory for the resulting string.
  * (*strp) may be passed to free(3)
  */
-int vasprintf( str_t *strp, string_t fmt, va_list args )
+LibraryDefined int vasprintf( str_t *strp, string_t fmt, va_list args )
 {
     va_list vaList;
     va_copy( vaList, args );
 
-    int size = vsnprintf( NULL, 0, fmt, args );
+    int size = vsnprintf( NULL, ( size_t ) 0, fmt, args );
 
     if ( size < 0 )
         return size;
@@ -65,14 +71,13 @@ int vasprintf( str_t *strp, string_t fmt, va_list args )
     if ( !*strp )
         return -1;
 
-
-    int result = vsnprintf( *strp, size + 1, fmt, vaList );
+    int result = vsnprintf( *strp, ( size_t ) size + 1, fmt, vaList );
     va_end( args );
 
     return result;
 }
 
-int asprintf( str_t *strp, string_t fmt, ... )
+LibraryDefined int asprintf( str_t *strp, string_t fmt, ... )
 {
     va_list va;
     va_start( va, fmt );

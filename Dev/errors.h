@@ -68,10 +68,11 @@
 #define on_error( func_call ) if ( ( func_call ) == RV_ERROR )
 
 
-#if defined( __APPLE__ ) || defined( __FreeBSD__ )
+#if ( defined( __APPLE__ ) || defined( __FreeBSD__ ) ) && !defined( _POSIX_C_SOURCE )
 #include <stdlib.h>
 #define get_prog_name() getprogname()
-#elif defined( __FILE_NAME__ ) // this kinda sucks, but hey, what are you gonna do?
+#elif defined( __FILE_NAME__ ) // this kinda sucks, but hey, what are you gonna do? \
+                               // TODO: constructor
 #define get_prog_name() __FILE_NAME__
 #else
 #define get_prog_name() "current-program"
@@ -139,7 +140,11 @@ LibraryDefined PrintfLike( 6, 7 ) Cold ptrdiff_t
 
     PrintInColor( stderr, COLOR_WARNING, "\n" );
 #else
-    ( ( void ) ( ( void ) FileName, FunctionName, LineNumber, err_no, format ) );
+    UNUSED( FileName );
+    UNUSED( FunctionName );
+    UNUSED( LineNumber );
+    UNUSED( err_no );
+    UNUSED( format );
 #endif //SUPPRESS_WARNINGS
 
     return return_value;
