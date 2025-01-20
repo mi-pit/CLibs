@@ -9,10 +9,27 @@
 #include "attributes.h"      /* PrintfLike, LibraryDefined */
 #include "terminal_colors.h" /* COLORs, PrintInColor */
 
-#include <errno.h>         /* for WarnUniversal + include */
-#include <stddef.h>        /* ptrdiff_t */
-#include <string.h>        /* strerror() */
-#include <sys/syslimits.h> /* PATH_MAX */
+#include <errno.h>  /* for WarnUniversal + include */
+#include <stddef.h> /* ptrdiff_t */
+#include <string.h> /* strerror() */
+
+// Get PATH_MAX
+#if defined( __APPLE__ )
+#include <sys/syslimits.h>
+#elif defined( __linux__ )
+#include <linux/limits.h>
+#else
+#ifndef PATH_MAX
+#define PATH_MAX 1024
+#endif //ndef PATH_MAX
+#endif // Get PATH_MAX
+
+#ifndef __FILE_NAME__
+#include <string.h>
+
+#define __FILE_NAME__ \
+    ( strrchr( __FILE__, '/' ) ? strrchr( __FILE__, '/' ) + 1 : __FILE__ )
+#endif //__FILE_NAME__
 
 /* for user */
 #include <err.h> /* include */
@@ -94,6 +111,10 @@ BeforeMain LibraryDefined int set_prog_name( void )
 #define get_prog_name() getprogname()
 
 #elif defined( __linux__ )
+
+#include "../string_utils.h" /* get_file_name() */
+
+#include <unistd.h> /* readlink */
 
 BeforeMain LibraryDefined int set_prog_name( void )
 {
