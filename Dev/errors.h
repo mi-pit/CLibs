@@ -31,6 +31,24 @@
     ( strrchr( __FILE__, '/' ) ? strrchr( __FILE__, '/' ) + 1 : __FILE__ )
 #endif //__FILE_NAME__
 
+// Get PATH_MAX
+#if defined( __APPLE__ )
+#include <sys/syslimits.h>
+#elif defined( __linux__ )
+#include <linux/limits.h>
+#else
+#ifndef PATH_MAX
+#define PATH_MAX 1024
+#endif //ndef PATH_MAX
+#endif // Get PATH_MAX
+
+#ifndef __FILE_NAME__
+#include <string.h>
+
+#define __FILE_NAME__ \
+    ( strrchr( __FILE__, '/' ) ? strrchr( __FILE__, '/' ) + 1 : __FILE__ )
+#endif //__FILE_NAME__
+
 /* for user */
 #include <err.h> /* include */
 
