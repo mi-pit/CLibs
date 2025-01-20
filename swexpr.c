@@ -13,8 +13,8 @@ Private List *switch_expr_sizes_stack     = NULL;
 Private List *switch_expr_assigned_stack  = NULL;
 
 
-static const bool TRUE  = true;
-static const bool FALSE = false;
+static const bool SWEX_TRUE  = true;
+static const bool SWEX_FALSE = false;
 
 
 #define try_push( LIST, EXPRESSION, NBYTES )                               \
@@ -37,7 +37,7 @@ int switch_expression_push( size_t nbytes, const void *data )
 {
     try_push( switch_expr_sizes_stack, &nbytes, sizeof( size_t ) );
     try_push( switch_expr_values_stack, data, sizeof( void * ) );
-    try_push( switch_expr_assigned_stack, &FALSE, sizeof( bool ) );
+    try_push( switch_expr_assigned_stack, &SWEX_FALSE, sizeof( bool ) );
 
     const void *null = NULL;
     try_push( switch_expr_variables_stack, &null, sizeof( void * ) );
@@ -54,7 +54,7 @@ int switch_expression_assign( void )
 {
     return list_set_at( switch_expr_assigned_stack,
                         list_size( switch_expr_assigned_stack ) - 1,
-                        &TRUE );
+                        &SWEX_TRUE );
 }
 
 

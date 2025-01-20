@@ -50,6 +50,11 @@
 #define Const
 #endif // const
 
+#if HAS_ATTRIBUTE( constructor )
+#define BeforeMain __attribute__( ( constructor ) )
+#else
+#define BeforeMain UsageOptional
+#endif // constructor
 
 /**
  * Function allocates memory for an object.

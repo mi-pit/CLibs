@@ -9,9 +9,10 @@
 #include "attributes.h"      /* PrintfLike, LibraryDefined */
 #include "terminal_colors.h" /* COLORs, PrintInColor */
 
-#include <errno.h>  /* for WarnUniversal + include */
-#include <stddef.h> /* ptrdiff_t */
-#include <string.h> /* strerror() */
+#include <errno.h>         /* for WarnUniversal + include */
+#include <stddef.h>        /* ptrdiff_t */
+#include <string.h>        /* strerror() */
+#include <sys/syslimits.h> /* PATH_MAX */
 
 /* for user */
 #include <err.h> /* include */
@@ -19,15 +20,6 @@
 
 /* errno value */
 #define E_OK 0 /* No error */
-
-
-#ifndef __FILE_NAME__
-#ifndef __FILE__
-#define __FILE__ "current-program"
-#endif //__FILE__
-
-#define __FILE_NAME__ __FILE__
-#endif //__FILE_NAME__
 
 
 #define RV_EXCEPTION ( -2 ) /* Non-fatal, recoverable error e.g. OOB index */
@@ -68,15 +60,61 @@
 #define on_error( func_call ) if ( ( func_call ) == RV_ERROR )
 
 
-#if ( defined( __APPLE__ ) || defined( __FreeBSD__ ) ) && !defined( _POSIX_C_SOURCE )
+LibraryDefined char prog_name[ PATH_MAX + 1 ] = { 0 };
+
+LibraryDefined const char *get_prog_name( void )
+{
+    return prog_name;
+}
+
+
+#if defined( __APPLE__ ) /* not sure if it actually works on iPhones :D */
+
+#include "../string_utils.h" /* get_file_name() */
+
+#include <mach-o/dyld.h> /* _NSGetExecutablePath() */
+
+BeforeMain LibraryDefined int set_prog_name( void )
+{
+    char path[ PATH_MAX ];
+    uint32_t size = PATH_MAX;
+    if ( _NSGetExecutablePath( path, &size ) == 0 )
+    {
+        string_t name = get_file_name( path );
+        strncpy( prog_name, name, PATH_MAX );
+        return RV_SUCCESS;
+    }
+
+    return RV_ERROR;
+}
+
+#elif ( defined( __APPLE__ ) || defined( __FreeBSD__ ) ) && !defined( _POSIX_C_SOURCE )
+
 #include <stdlib.h>
 #define get_prog_name() getprogname()
-#elif defined( __FILE_NAME__ ) // this kinda sucks, but hey, what are you gonna do? \
-                               // TODO: constructor
+
+#elif defined( __linux__ )
+
+BeforeMain LibraryDefined int set_prog_name( void )
+{
+    char path[ PATH_MAX ] = { 0 };
+
+    if ( readlink( "/proc/self/exe", path, PATH_MAX ) == RV_ERROR )
+    {
+        warn( "%s: readlink", __func__ );
+        return RV_ERROR;
+    }
+
+    strncpy( prog_name, get_file_name( path ), PATH_MAX );
+    return RV_SUCCESS;
+}
+
+#elif defined( __FILE_NAME__ ) /* this kinda sucks, but hey, what are you gonna do? */
 #define get_prog_name() __FILE_NAME__
-#else
+
+#else /* just give up at this point */
 #define get_prog_name() "current-program"
-#endif
+#endif // get_prog_name()
 
 
 #ifndef COLOR_WARNING
