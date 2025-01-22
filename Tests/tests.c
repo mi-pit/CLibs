@@ -37,6 +37,7 @@ void run_string_utils( void )
     RUN_TEST( string_as_UL );
     RUN_TEST( reverse_str );
     RUN_TEST( strip );
+
     RUN_TEST( strings_misc );
 }
 

@@ -224,10 +224,4 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                             strsplit_mode_t mode );
 
 
-/**
- * @param full_path Full path to file
- * @return pointer to the last part of ‹full_path›
- */
-string_t get_file_name( string_t full_path );
-
 #endif //CLIBS_STRING_UTILS_H

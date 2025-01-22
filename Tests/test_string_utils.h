@@ -489,5 +489,6 @@ TEST( strings_misc )
     UNIT_TEST( strcmp( get_file_name( "Hovno" ), "Hovno" ) == 0 );
     UNIT_TEST( strcmp( get_file_name( "/a" ), "a" ) == 0 );
     UNIT_TEST( strcmp( get_file_name( "./a" ), "a" ) == 0 );
+    UNIT_TEST( strcmp( get_file_name( "Directory/Subdir/" ), "Subdir/" ) == 0 );
 }
 END_TEST

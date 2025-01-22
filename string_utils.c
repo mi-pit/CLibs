@@ -460,18 +460,3 @@ ssize_t string_split_regex( str_t **str_arr_cont,
 
 
 //
-
-string_t get_file_name( string_t const full_path )
-{
-    const char *program_name = strrchr( full_path, '/' );
-    if ( program_name == NULL )
-        return full_path;
-    if ( program_name[ 1 ] != '\0' )
-        return program_name + 1;
-
-    for ( const char *ptr = program_name - 1; ptr >= full_path; --ptr )
-        if ( *ptr == '/' )
-            return ptr + 1;
-
-    return full_path;
-}
