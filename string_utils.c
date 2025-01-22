@@ -4,6 +4,7 @@
 
 #include "string_utils.h"
 
+#include "Dev/assert_that.h"
 #include "Dev/errors.h"     /* *warn* */
 #include "Structs/dynarr.h" /* List */
 #include "Structs/dynstring.h"
@@ -459,4 +460,95 @@ ssize_t string_split_regex( str_t **str_arr_cont,
 }
 
 
-//
+void string_strip_lead_zeroes( str_t s )
+{
+    size_t fst_non0_idx = 0;
+    while ( s[ fst_non0_idx ] == '0' )
+        fst_non0_idx++;
+
+    if ( s[ fst_non0_idx ] == '\0' )
+    {
+        s[ 0 ] = '0';
+        s[ 1 ] = '\0';
+    }
+    else
+    {
+        size_t new_len = strlen( s + fst_non0_idx );
+        memmove( s, s + fst_non0_idx, new_len );
+        s[ new_len ] = '\0';
+    }
+}
+
+
+Private int hex_char_to_int( char hex )
+{
+    if ( hex >= '0' && hex <= '9' )
+        return hex - '0';
+    else if ( hex >= 'a' && hex <= 'f' )
+        return hex - 'a' + 10;
+    else if ( hex >= 'A' && hex <= 'F' )
+        return hex - 'A' + 10;
+
+    return -1; // Invalid hex character
+}
+
+Private bool issign( char c )
+{
+    return c == '-' || c == '+';
+}
+
+
+// Convert a hexadecimal string to a decimal string
+char *hex_to_decimal( const char *hex )
+{
+    const size_t len = strlen( hex );
+
+    DynamicString dynstr = dynstr_init_as( "0" );
+    if ( dynstr == NULL )
+        goto ERROR;
+
+    // Process each hex digit
+    for ( size_t i = 0; i < len; ++i )
+    {
+        if ( i == 0 && issign( hex[ i ] ) )
+            continue;
+
+        int digit = hex_char_to_int( hex[ i ] );
+        assert_that( digit >= 0,
+                     "invalid input string: '%s' (offending digit: '%c')",
+                     hex,
+                     hex[ i ] );
+
+        // Multiply current decimal value by 16 and add the hex digit
+        unsigned long carry = digit;
+        for ( ssize_t j = ( ssize_t ) dynstr_len( dynstr ) - 1; j >= 0; --j )
+        {
+            const unsigned long temp = ( dynstr_data( dynstr )[ j ] - '0' ) * 16 + carry;
+            dynstr_data( dynstr )[ j ] = ( char ) ( '0' + ( temp % 10 ) );
+            carry                      = temp / 10;
+        }
+
+        // Handle any carry left
+        while ( carry > 0 )
+        {
+            char p = ( char ) ( '0' + ( carry % 10 ) );
+            if ( dynstr_prependn( dynstr, &p, 1 ) != RV_SUCCESS )
+                goto ERROR;
+            carry /= 10;
+        }
+    }
+
+    if ( issign( hex[ 0 ] ) )
+        if ( dynstr_prependn( dynstr, hex + 0, 1 ) != RV_SUCCESS )
+            goto ERROR;
+
+    str_t decimal = dynstr_data_copy( dynstr );
+    dynstr_destroy( dynstr );
+    return decimal;
+
+ERROR:
+    f_stack_trace();
+    if ( dynstr != NULL )
+        dynstr_destroy( dynstr );
+    return NULL;
+}

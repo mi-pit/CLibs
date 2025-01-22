@@ -5,6 +5,7 @@
 #include "bigint.h"
 
 #include "../Dev/assert_that.h" /* includes errors.h */
+#include "../extra_types.h"     /* byte */
 #include "../foreach.h"         /* foreach_ls */
 #include "../pointer_utils.h"   /* new */
 #include "../string_utils.h"    /* str_t, string_reversed() */
@@ -163,108 +164,42 @@ struct bigint *bigint_init_as( const int64_t n )
 }
 
 
-#define STRING_2_TO_64 "18446744073709551616"
-
-#define N_POWER64_STRINGS 8
-
-/// Lookup table for `get_listelem_power_str()`
-Private string_t const POWER64_STRINGS[ N_POWER64_STRINGS ] = {
-    "1",
-    STRING_2_TO_64,
-    "340282366920938463463374607431768211456",
-    "6277101735386680763835789423207666416102355444464034512896",
-    "115792089237316195423570985008687907853269984665640564039457584007913129639936",
-    "213598703592091008239502170616955211460270452235665276994704160782221972578064055002"
-    "2962086936576",
-    "394020061963944792122790401001436138050797392704654466679482934042457217714972106114"
-    "14266254884915640806627990306816",
-    "726838724295606890549323807888004534353641360687318060281490199180639288113397923326"
-    "191050713763565560762521606266177933534601628614656"
-};
-
-Private UseResult str_t get_listelem_power_str( uint64_t n, size_t power )
-{
-    str_t buffer;
-    if ( power < N_POWER64_STRINGS )
-    {
-        buffer = strdup( POWER64_STRINGS[ power ] );
-        if ( buffer == NULL )
-            return ( void * ) fwarn_ret( NULL, "strdup" );
-    }
-    else
-    {
-        buffer = strdup( POWER64_STRINGS[ N_POWER64_STRINGS - 1 ] );
-        if ( buffer == NULL )
-            return ( void * ) fwarn_ret( NULL, "strdup" );
-
-        for ( size_t i = N_POWER64_STRINGS - 1; i < power; ++i )
-        {
-            str_t tmp = mul_uint_strings( buffer, STRING_2_TO_64 );
-            free( buffer );
-            if ( tmp == NULL )
-            {
-                f_stack_trace();
-                return NULL;
-            }
-            buffer = tmp;
-        }
-    }
-
-    str_t n_str;
-    if ( asprintf( &n_str, "%" PRIu64, n ) == -1 )
-        return ( void * ) fwarn_ret( NULL, "asprintf" );
-
-    str_t result = mul_uint_strings( buffer, n_str );
-    free( buffer );
-    free( n_str );
-
-    return result;
-}
-
 str_t bigint_to_string( const struct bigint *const bi )
 {
-    str_t sum;
-    foreach_ls( uint64_t, n, bi->numbers )
+    DynamicString dynstr =
+            dynstr_init_cap( list_size( bi->numbers ) * sizeof( uint64_t ) * 2 );
+    if ( dynstr == NULL )
     {
-        if ( foreach_index_n == 0 )
-        {
-            // init
-            if ( asprintf( &sum, "%" PRIu64, n ) == -1 )
-                return ( void * ) fwarn_ret( NULL, "asprintf" );
-
-            continue;
-        }
-
-        str_t buffer = get_listelem_power_str( n, foreach_index_n );
-        if ( buffer == NULL )
-        {
-            f_stack_trace();
-            free( sum );
-            return NULL;
-        }
-
-        str_t tmp = add_uint_strings( sum, buffer );
-        free( buffer );
-        free( sum );
-        if ( tmp == NULL )
-        {
-            f_stack_trace();
-            return NULL;
-        }
-        sum = tmp;
+        f_stack_trace();
+        return NULL;
     }
 
+    foreach_ls( uint64_t, num, bi->numbers )
+    {
+        for ( size_t i = 0; i < sizeof( uint64_t ); ++i )
+        {
+            if ( dynstr_prependf( dynstr, "%02x", ( int ) ( num % 0x100 ) )
+                 != RV_SUCCESS )
+                goto ERROR;
+
+            num /= 0x100;
+        }
+    }
+
+    string_strip_lead_zeroes( dynstr_data( dynstr ) );
     if ( bi->sign == SIGN_NEG )
-    {
-        str_t tmp;
-        asprintf( &tmp, "-%s", sum );
-        free( sum );
+        dynstr_prependn( dynstr, "-", 1 );
 
-        return tmp;
-    }
+    str_t ret = hex_to_decimal( dynstr_data( dynstr ) );
+    dynstr_destroy( dynstr );
+    return ret;
 
-    return sum;
+ERROR:
+    f_stack_trace();
+    dynstr_destroy( dynstr );
+    return NULL;
 }
+
 
 List *bigint_get_number_array( const struct bigint *bi )
 {

@@ -63,7 +63,7 @@
 #define Constructor UseResult
 
 /** Function is not visible outside of the current file */
-#define Private static UsageOptional
+#define Private static
 
 /** Function is defined in a header file */
 #define LibraryDefined static UsageOptional

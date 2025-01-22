@@ -82,7 +82,9 @@ int dynstr_vappendf( DynamicString, const char *fmt, va_list vargs );
  * @return 0 on success, -1 on allocation error
  */
 int dynstr_prepend( DynamicString, const char * );
-
+int dynstr_prependn( DynamicString dynstr, const char *s, size_t len );
+PrintfLike( 2, 3 ) int dynstr_prependf( DynamicString dynstr, const char *fmt, ... );
+int dynstr_vprependf( DynamicString dynstr, const char *fmt, va_list vargs );
 
 /**
  * Sets the string to be a slice of itself, from ‹start_idx› to ‹end_idx›.

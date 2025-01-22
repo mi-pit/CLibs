@@ -224,4 +224,9 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                             strsplit_mode_t mode );
 
 
+void string_strip_lead_zeroes( str_t );
+
+str_t hex_to_decimal( string_t );
+
+
 #endif //CLIBS_STRING_UTILS_H

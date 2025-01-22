@@ -89,25 +89,32 @@ Private int dynstr_resize( DynamicString dynstr, size_t new_size )
 }
 
 
-int dynstr_append( DynamicString dynstr, const char *app )
+Private int dynstr_VPendF( DynamicString dynstr,
+                           int( pender )( DynamicString, const char * ),
+                           const char *fmt,
+                           va_list vaList )
 {
-    size_t app_len  = strlen( app );
-    size_t new_size = dynstr->len + app_len;
-    if ( new_size + 1 >= dynstr->cap )
+    str_t buffer;
+    if ( vasprintf( &buffer, fmt, vaList ) == RV_ERROR )
     {
-        size_t new_cap = dynstr->cap;
-        /* get next smallest power of 2 */
-        while ( new_cap <= new_size + 1 )
-            new_cap *= 2;
-
-        return_on_fail( dynstr_resize( dynstr, new_cap ) );
+        f_stack_trace();
+        return RV_ERROR;
     }
 
-    strcpy( dynstr->data + dynstr->len, app );
-    dynstr->data[ new_size ] = '\0';
-    dynstr->len              = new_size;
+    if ( pender( dynstr, buffer ) != RV_SUCCESS )
+    {
+        f_stack_trace();
+        return RV_ERROR;
+    }
 
+    free( buffer );
     return RV_SUCCESS;
+}
+
+
+int dynstr_append( DynamicString dynstr, const char *app )
+{
+    return dynstr_appendn( dynstr, app, strlen( app ) );
 }
 
 int dynstr_appendn( DynamicString dynstr, const char *app, size_t len )
@@ -132,49 +139,27 @@ int dynstr_appendn( DynamicString dynstr, const char *app, size_t len )
 
 int dynstr_appendf( DynamicString dynstr, const char *fmt, ... )
 {
-    str_t buffer;
-
-    va_list vaList;
-    va_start( vaList, fmt );
-    if ( vasprintf( &buffer, fmt, vaList ) == RV_ERROR )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
-    va_end( vaList );
-
-    if ( dynstr_append( dynstr, buffer ) == RV_ERROR )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
-
-    free( buffer );
-    return RV_SUCCESS;
+    va_list va;
+    va_start( va, fmt );
+    int rv = dynstr_VPendF( dynstr, dynstr_append, fmt, va );
+    va_end( va );
+    return rv;
 }
 
 int dynstr_vappendf( DynamicString dynstr, const char *fmt, va_list vargs )
 {
-    str_t buffer;
-    if ( vasprintf( &buffer, fmt, vargs ) == RV_ERROR )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
-
-    int rv = dynstr_append( dynstr, buffer );
-    if ( rv != RV_SUCCESS )
-        f_stack_trace();
-
-    free( buffer );
-    return rv;
+    return dynstr_VPendF( dynstr, dynstr_append, fmt, vargs );
 }
 
 
 int dynstr_prepend( DynamicString dynstr, string_t s )
 {
-    size_t added_len = strlen( s );
-    size_t new_size  = dynstr->len + added_len;
+    return dynstr_prependn( dynstr, s, strlen( s ) );
+}
+
+int dynstr_prependn( DynamicString dynstr, const char *s, size_t len )
+{
+    size_t new_size = dynstr->len + len;
     if ( new_size >= dynstr->cap )
     {
         size_t new_cap = dynstr->cap;
@@ -189,12 +174,26 @@ int dynstr_prepend( DynamicString dynstr, string_t s )
         }
     }
 
-    memmove( dynstr->data + added_len, dynstr->data, dynstr->len );
-    memcpy( dynstr->data, s, added_len );
+    memmove( dynstr->data + len, dynstr->data, dynstr->len );
+    memcpy( dynstr->data, s, len );
     dynstr->data[ new_size ] = '\0';
     dynstr->len              = new_size;
 
     return RV_SUCCESS;
+}
+
+int dynstr_prependf( DynamicString dynstr, const char *fmt, ... )
+{
+    va_list va;
+    va_start( va, fmt );
+    int rv = dynstr_VPendF( dynstr, dynstr_prepend, fmt, va );
+    va_end( va );
+    return rv;
+}
+
+int dynstr_vprependf( DynamicString dynstr, const char *fmt, va_list vargs )
+{
+    return dynstr_VPendF( dynstr, dynstr_prepend, fmt, vargs );
 }
 
 
@@ -251,6 +250,7 @@ int dynstr_reset( DynamicString dynstr )
         return fwarn_ret( RV_ERROR, "malloc" );
     dynstr->data[ 0 ] = '\0';
     dynstr->len       = 0;
+    dynstr->cap       = DEFAULT_DYNSTRING_CAP;
     return RV_SUCCESS;
 }
 
