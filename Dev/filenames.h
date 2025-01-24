@@ -15,18 +15,17 @@
 #endif //__FILE_NAME__
 
 
-// Get PATH_MAX
-#if defined( __APPLE__ )
+#ifndef PATH_MAX
+#if defined( __APPLE__ ) // Get PATH_MAX
 #include <sys/syslimits.h>
 #elif defined( __linux__ )
 #include <linux/limits.h>
 #else
-#ifndef PATH_MAX
 #define PATH_MAX 1024
-#endif //ndef PATH_MAX
 #endif // Get PATH_MAX
+#endif //ndef PATH_MAX
 
-LibraryDefined char ProgName[ PATH_MAX + 1 ] = { 0 };
+LibraryDefined char ProgName[ PATH_MAX + 1 ] = "current-program";
 
 /**
  * This function doesn't allocate any memory on the heap.
@@ -83,9 +82,7 @@ BeforeMain LibraryDefined bool set_prog_name( void )
 #elif ( defined( __APPLE__ ) || defined( __FreeBSD__ ) ) && !defined( _POSIX_C_SOURCE )
 #include <stdlib.h>
 #define get_prog_name() getprogname()
-
 #elif defined( __linux__ )
-
 #include <unistd.h> /* readlink */
 
 BeforeMain LibraryDefined bool set_prog_name( void )
@@ -104,9 +101,6 @@ BeforeMain LibraryDefined bool set_prog_name( void )
 
 #elif defined( __FILE_NAME__ ) /* this kinda sucks, but hey, what are you gonna do? */
 #define get_prog_name() __FILE_NAME__
-
-#else /* just give up at this point */
-#define get_prog_name() "current-program"
 #endif // get_prog_name()
 
 
