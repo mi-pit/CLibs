@@ -5,12 +5,12 @@
 #ifndef CLIBS_BIGINT_H
 #define CLIBS_BIGINT_H
 
-#include "../Dev/attributes.h" /* Constructor */
-#include "../misc.h"           /* sign */
+#include "../Dev/attributes.h" /* Constructor, UseResult */
+#include "../misc.h"           /* sign_t */
 #include "dynarr.h"            /* List */
 
 #include <stdbool.h> /* ... */
-#include <stdint.h>  /* uint64_t */
+#include <stdint.h>  /* (u)int64_t */
 
 
 struct bigint {
@@ -19,8 +19,12 @@ struct bigint {
 };
 
 
-UseResult char *add_uint_strings( const char *str_1, const char *str_2 );
-UseResult char *mul_uint_strings( const char *str_1, const char *str_2 );
+#define BIGINT_LIST_MEMBER_MAX        ( UINT64_C( 10000000000000000000 ) - 1 )
+#define BIGINT_LIST_MEMBER_MAX_DIGITS 19
+
+
+UseResult char *add_uint_strings( const char *, const char * );
+UseResult char *mul_uint_strings( const char *, const char * );
 
 
 int bigint_init_p( struct bigint * );
@@ -45,7 +49,7 @@ void bigint_flip_sign( struct bigint * );
 UseResult char *bigint_to_string( const struct bigint * );
 UseResult List *bigint_get_number_array( const struct bigint * );
 
-/// All of these functions return RV_SUCCESS / RV_ERROR
+///// All of these functions return RV_SUCCESS / RV_ERROR
 
 int bigint_add_i( struct bigint *, int64_t );
 /**

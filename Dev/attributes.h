@@ -14,6 +14,7 @@
 #define HAS_ATTRIBUTE( TOK ) 0
 #endif // __has_attribute
 
+
 #if HAS_ATTRIBUTE( unused )
 /// Stops compiler warnings when the function/variable is unused
 #define UsageOptional __attribute__( ( __unused__ ) )

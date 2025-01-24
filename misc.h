@@ -61,31 +61,19 @@ LibraryDefined Mathematical inline signed int sgn_64( int64_t n )
  */
 #define max_m( NUM_A, NUM_B ) ( ( NUM_A ) > ( NUM_B ) ? ( NUM_A ) : ( NUM_B ) )
 
-/**
- * Smaller of the two numbers
- */
 LibraryDefined Mathematical inline int64_t min_i64( int64_t a, int64_t b )
 {
     return min_m( a, b );
 }
-/**
- * Smaller of the two numbers
- */
 LibraryDefined Mathematical inline uint64_t min_u64( uint64_t a, uint64_t b )
 {
     return min_m( a, b );
 }
 
-/**
- * Bigger of the two numbers
- */
 LibraryDefined Mathematical inline int64_t max_i64( int64_t a, int64_t b )
 {
     return max_m( a, b );
 }
-/**
- * Bigger of the two numbers
- */
 LibraryDefined Mathematical inline uint64_t max_u64( uint64_t a, uint64_t b )
 {
     return max_m( a, b );
@@ -142,10 +130,6 @@ DECLARE_CMP_FUNCTION( int64_t );
 uint64_t hash_func( const void *, size_t len );
 
 
-/**
- * Size of stack allocated array<br>
- * Apparently might be officially added to C
- */
 #define countof( array ) ( sizeof( array ) / sizeof *( array ) )
 
 /**
@@ -164,7 +148,7 @@ LibraryDefined inline bool is_within( int64_t low, int64_t num, int64_t high )
 
 
 /**
- * Returns how many digits ‹num› has in base ‹base›
+ * Returns how many digits ‹num› has in a specified base
  *
  * @param num   Any natural number
  * @param base  Whole number bigger than 0
@@ -177,7 +161,7 @@ Mathematical uint64_t digitsof( uint64_t num, unsigned base );
  * base ^ (to the power of) exp
  * @param base
  * @param exp
- * @return `base` ^ `exp`
+ * @return base ^ exp
  */
 Mathematical int64_t power( int64_t base, uint64_t exp );
 

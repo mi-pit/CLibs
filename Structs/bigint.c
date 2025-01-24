@@ -174,23 +174,24 @@ str_t bigint_to_string( const struct bigint *const bi )
         return NULL;
     }
 
-    foreach_ls( uint64_t, num, bi->numbers )
+    ssize_t idx_last = ( ssize_t ) list_size( bi->numbers ) - 1;
+    for ( ssize_t idx = idx_last; idx >= 0; --idx )
     {
-        for ( size_t i = 0; i < sizeof( uint64_t ); ++i )
-        {
-            if ( dynstr_prependf( dynstr, "%02x", ( int ) ( num % 0x100 ) )
-                 != RV_SUCCESS )
-                goto ERROR;
+        char fmt_buf[ 1 + 1 + 20 + 3 + 1 ];
+        /*            %   0   i   llu \0 */
+        snprintf(
+                fmt_buf, sizeof fmt_buf, "%%0%i" PRIu64, BIGINT_LIST_MEMBER_MAX_DIGITS );
 
-            num /= 0x100;
-        }
+        uint64_t num = list_access( bi->numbers, idx, uint64_t );
+        if ( dynstr_appendf( dynstr, ( idx == idx_last ? "%" PRIu64 : fmt_buf ), num )
+             != RV_SUCCESS )
+            goto ERROR;
     }
 
-    string_strip_lead_zeroes( dynstr_data( dynstr ) );
     if ( bi->sign == SIGN_NEG )
         dynstr_prependn( dynstr, "-", 1 );
 
-    str_t ret = hex_to_decimal( dynstr_data( dynstr ) );
+    str_t ret = dynstr_data_copy( dynstr );
     dynstr_destroy( dynstr );
     return ret;
 
@@ -234,7 +235,18 @@ Private inline int handle_overflow( struct bigint *const bi, size_t level )
         return list_append( bi->numbers, &high );
     }
 
-    return bigint_add_power( bi, 1, level + 1 );
+    return bigint_add_power( bi, bi->sign, level + 1 );
+}
+
+Private inline int handle_underflow( struct bigint *const bi, size_t level )
+{
+    if ( list_size( bi->numbers ) == level + 1 ) // higher digit not available
+    {
+        uint64_t high = 1;
+        return list_append( bi->numbers, &high );
+    }
+
+    return bigint_add_power( bi, sign_flipped( bi->sign ), level + 1 );
 }
 
 int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
@@ -258,27 +270,31 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
 
     int64_t norm_n = sub_one_more ? INT64_MAX : n * bi->sign;
 
-    bool overflow  = norm_n > 0 && low > UINT64_MAX - ( uint64_t ) norm_n;
+    bool overflow  = norm_n > 0 && low > BIGINT_LIST_MEMBER_MAX - ( uint64_t ) norm_n;
     bool underflow = norm_n < 0 && low < ( uint64_t ) llabs( norm_n );
     assert_that( !overflow || !underflow, "cannot both be set at once" );
 
     bool flip_bi_sign = underflow && list_size( bi->numbers ) == level + 1;
 
-    uint64_t final =
-            ( flip_bi_sign ? low - norm_n : low + norm_n ) - ( int ) sub_one_more;
-
-    if ( overflow )
-        return_on_fail( handle_overflow( bi, level ) );
-    else if ( flip_bi_sign )
-        bigint_flip_sign( bi );
-    else if ( underflow )
-        // subtract from higher level
-        return_on_fail( bigint_add_power( bi, sign_flipped( bi->sign ), level + 1 ) );
-
+    const uint64_t final =
+            ( flip_bi_sign ? low - norm_n
+              : underflow  ? BIGINT_LIST_MEMBER_MAX + 1 + ( ( int64_t ) low + norm_n )
+                           : ( low + norm_n ) % ( BIGINT_LIST_MEMBER_MAX + 1 ) )
+            - ( int ) sub_one_more;
     assert_that( list_set_at( bi->numbers, level, &final ) == RV_SUCCESS,
                  "couldn't set number list element; index=%" PRIu64 ", size=%zu",
                  level,
                  list_size( bi->numbers ) );
+
+    if ( flip_bi_sign )
+        bigint_flip_sign( bi );
+    else if ( underflow )
+        return_on_fail( handle_underflow( bi, level ) );
+    else if ( overflow )
+        return_on_fail( handle_overflow( bi, level ) );
+
+    if ( final == 0 && level == list_size( bi->numbers ) - 1 )
+        return list_pop( bi->numbers, NULL );
 
     return RV_SUCCESS;
 }
