@@ -425,22 +425,6 @@ TEST( to_string_bigger )
 }
 END_TEST
 
-TEST( get_array )
-{
-    struct bigint *bi = bigint_init();
-    assert_that( bi != NULL, "bi init" );
-    uint64_t arr[ 10 ];
-    for ( size_t i = 0; i < countof( arr ); ++i )
-        arr[ i ] = ( i + 1 ) * 2;
-    set_number_array( bi, SIGN_POS, countof( arr ), arr );
-
-    List *ls = bigint_get_number_array( bi );
-    list_destroy( bi->numbers );
-    bi->numbers = ls;
-    UNIT_TEST( test_number_array( bi, countof( arr ), arr ) );
-}
-END_TEST
-
 
 Tester test_metadata( const struct bigint *bi,
                       sign_t sign,
@@ -719,8 +703,6 @@ int main( void )
     RUN_TEST( init );
     RUN_TEST( init_and_string );
     RUN_TEST( to_string_bigger );
-
-    RUN_TEST( get_array );
 
     RUN_TEST( add );
     RUN_TEST( sub );

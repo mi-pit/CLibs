@@ -224,9 +224,15 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                             strsplit_mode_t mode );
 
 
+/* ==== Mathematical stuff ==== */
+
+UseResult char *add_uint_strings( const char *, const char * );
+UseResult char *mul_uint_strings( const char *, const char * );
+
+
 void string_strip_lead_zeroes( str_t );
 
-str_t hex_to_decimal( string_t );
+UseResult str_t hex_to_decimal( string_t );
 
 
 #endif //CLIBS_STRING_UTILS_H

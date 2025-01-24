@@ -16,16 +16,6 @@ uint64_t hash_func( const void *data, size_t nbytes )
 }
 
 
-DEFINE_CMP_FUNCTION( byte )
-
-DEFINE_CMP_FUNCTION( char )
-
-DEFINE_CMP_FUNCTION( int )
-
-DEFINE_CMP_FUNCTION( size_t )
-
-DEFINE_CMP_FUNCTION( int64_t )
-
 
 uint64_t digitsof( uint64_t num, unsigned base )
 {

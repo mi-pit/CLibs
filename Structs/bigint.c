@@ -30,98 +30,6 @@ size_t bigint_sizeof( const struct bigint *bi )
 }
 
 
-str_t mul_uint_strings( string_t str_1, string_t str_2 )
-{
-    typedef uint8_t digit_t;
-
-    size_t len_1      = strlen( str_1 );
-    size_t len_2      = strlen( str_2 );
-    size_t result_len = len_1 + len_2;
-
-    char *result = malloc( result_len + 1 );
-    if ( result == NULL )
-        return ( void * ) fwarn_ret( NULL, "malloc" );
-    memset( result, '0', result_len );
-    result[ result_len ] = '\0';
-
-    // Perform multiplication using the "long multiplication" algorithm
-    for ( ssize_t i = ( ssize_t ) len_1 - 1; i >= 0; --i )
-    {
-        digit_t carry = 0;
-        for ( ssize_t j = ( ssize_t ) len_2 - 1; j >= 0; --j )
-        {
-            digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry
-                           + ( result[ i + j + 1 ] - '0' );
-            result[ i + j + 1 ] = ( char ) ( ( prod % 10 ) + '0' );
-            carry               = prod / 10;
-        }
-        result[ i ] = ( char ) ( result[ i ] + carry );
-    }
-
-    // Remove leading zeros
-    size_t start = 0;
-    while ( start < result_len && result[ start ] == '0' )
-        ++start;
-
-    char *final_result =
-            ( start == result_len ) ? strdup( "0" ) : strdup( result + start );
-    free( result );
-
-    return final_result;
-}
-
-str_t add_uint_strings( string_t str_1, string_t str_2 )
-{
-    typedef uint8_t digit_t;
-
-    DynamicString result = dynstr_init();
-    if ( result == NULL )
-    {
-        f_stack_trace();
-        return NULL;
-    }
-
-    size_t str_1_len = strlen( str_1 );
-    size_t str_2_len = strlen( str_2 );
-
-    str_t ret = NULL;
-
-    digit_t carry = 0;
-    for ( size_t idx = 0; idx < max_u64( str_1_len, str_2_len ); ++idx )
-    {
-        digit_t str_1_digit = idx < str_1_len ? str_1[ str_1_len - idx - 1 ] - '0' : 0;
-        digit_t str_2_digit = idx < str_2_len ? str_2[ str_2_len - idx - 1 ] - '0' : 0;
-
-        digit_t val = ( str_1_digit + str_2_digit + carry );
-
-        carry       = val >= 10;
-        digit_t dig = val % 10;
-
-        char app = ( char ) ( dig + '0' );
-        if ( dynstr_appendn( result, &app, 1 ) != RV_SUCCESS )
-        {
-            f_stack_trace();
-            goto CLEANUP;
-        }
-    }
-    if ( carry )
-    {
-        char app = '1';
-        if ( dynstr_appendn( result, &app, 1 ) != RV_SUCCESS )
-        {
-            f_stack_trace();
-            goto CLEANUP;
-        }
-    }
-
-    ret = string_reversed( dynstr_data( result ) );
-
-CLEANUP:
-    dynstr_destroy( result );
-    return ret;
-}
-
-
 int bigint_init_p( struct bigint *bi )
 {
     if ( ( bi->numbers = list_init_type( uint64_t ) ) == NULL )
@@ -199,19 +107,6 @@ ERROR:
     f_stack_trace();
     dynstr_destroy( dynstr );
     return NULL;
-}
-
-
-List *bigint_get_number_array( const struct bigint *bi )
-{
-    List *ls;
-    int rv = list_copy( bi->numbers, &ls );
-    on_fail( rv )
-    {
-        f_stack_trace();
-        return NULL;
-    }
-    return ls;
 }
 
 
@@ -325,4 +220,21 @@ int bigint_add_b( struct bigint *bi, const struct bigint *add )
     }
 
     return RV_SUCCESS;
+}
+
+
+int bigint_cmp_i( const struct bigint *bi, int64_t n )
+{
+    if ( bigint_sizeof( bi ) > 1 )
+        return BIGINT_GT;
+
+    const uint64_t bi_low = list_access( bi->numbers, 0, uint64_t );
+    if ( bi->sign != sgn_64( n ) )
+        return bi->sign;
+
+    if ( bi_low > INT64_MAX )
+        return BIGINT_GT;
+
+    const uint64_t norm_n = ( uint64_t ) n;
+    return cmp_uint64_t( &bi_low, &norm_n );
 }

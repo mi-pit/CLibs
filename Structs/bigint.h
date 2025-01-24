@@ -20,11 +20,7 @@ struct bigint {
 
 
 #define BIGINT_LIST_MEMBER_MAX        ( UINT64_C( 10000000000000000000 ) - 1 )
-#define BIGINT_LIST_MEMBER_MAX_DIGITS 19
-
-
-UseResult char *add_uint_strings( const char *, const char * );
-UseResult char *mul_uint_strings( const char *, const char * );
+#define BIGINT_LIST_MEMBER_MAX_DIGITS ( 19 )
 
 
 int bigint_init_p( struct bigint * );
@@ -47,7 +43,7 @@ void bigint_flip_sign( struct bigint * );
 
 
 UseResult char *bigint_to_string( const struct bigint * );
-UseResult List *bigint_get_number_array( const struct bigint * );
+
 
 ///// All of these functions return RV_SUCCESS / RV_ERROR
 
@@ -55,7 +51,7 @@ int bigint_add_i( struct bigint *, int64_t );
 /**
  * Adds
  * @code
- * (UINT64_MAX ^ power) * n
+ * (10000000000000000000 ^ power) * n
  * @endcode
  * to the bigint
  * @param bi    valid bi struct
@@ -66,17 +62,15 @@ int bigint_add_i( struct bigint *, int64_t );
 int bigint_add_power( struct bigint *bi, int64_t n, uint64_t power );
 int bigint_add_b( struct bigint *, const struct bigint * );
 
-int bigint_sub_b( struct bigint *, const struct bigint * );
-
 int bigint_mul_i( struct bigint *, long double );
 int bigint_mul_b( struct bigint *, const struct bigint * );
 
 int bigint_div_b( struct bigint *, const struct bigint * );
 
 
-#define BIGINT_LT 0x01
-#define BIGINT_EQ 0x02
-#define BIGINT_GT 0x04
+#define BIGINT_LT ( -1 )
+#define BIGINT_EQ ( 0 )
+#define BIGINT_GT ( +1 )
 
 int bigint_cmp_i( const struct bigint *, int64_t );
 int bigint_cmp_b( const struct bigint *, const struct bigint * );

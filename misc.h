@@ -2,10 +2,10 @@
 #define CLIBS_MISC_H
 
 #include "Dev/attributes.h" /* LibraryDefined */
+#include "extra_types.h"    /* byte, (u)int64_t */
 
 #include <stdbool.h> /* bool (is_within) */
 #include <stddef.h>  /* size_t */
-#include <stdint.h>  /* [u]?int64_t */
 
 /**
  * Stops those pesky `unused variable` compiler errors
@@ -91,35 +91,34 @@ LibraryDefined Mathematical inline uint64_t max_u64( uint64_t a, uint64_t b )
  */
 #define DECLARE_CMP_FUNCTION( TYPE ) int cmp_##TYPE( const void *p1, const void *p2 )
 
-DECLARE_CMP_FUNCTION( char );
-DECLARE_CMP_FUNCTION( int );
-DECLARE_CMP_FUNCTION( size_t );
-DECLARE_CMP_FUNCTION( int64_t );
-
-#ifndef REQUIRE_SEMICOLON
-/**
- * Declares an unused (and undefined) struct for the sake of requiring semicolons
- * at the ends of macros
- */
-#define REQUIRE_SEMICOLON struct DECLARATION_MACRO_UNUSED_STRUCT
-#endif //REQUIRE_SEMICOLON
-
 /**
  * Creates a new comparator function for already comparable numeric types.
  * `TYPE` has to be a single token since it's used to define the name of the function.
  */
-#define DEFINE_CMP_FUNCTION( TYPE )                  \
-    int cmp_##TYPE( const void *p1, const void *p2 ) \
-    {                                                \
-        TYPE val_1 = *( TYPE * ) p1;                 \
-        TYPE val_2 = *( TYPE * ) p2;                 \
-                                                     \
-        if ( val_1 > val_2 )                         \
-            return 1;                                \
-        if ( val_1 < val_2 )                         \
-            return -1;                               \
-        return 0;                                    \
+#define DEFINE_CMP_FUNCTION( TYPE )                                 \
+    LibraryDefined int cmp_##TYPE( const void *p1, const void *p2 ) \
+    {                                                               \
+        TYPE val_1 = *( TYPE * ) p1;                                \
+        TYPE val_2 = *( TYPE * ) p2;                                \
+                                                                    \
+        if ( val_1 > val_2 )                                        \
+            return 1;                                               \
+        if ( val_1 < val_2 )                                        \
+            return -1;                                              \
+        return 0;                                                   \
     }
+
+DEFINE_CMP_FUNCTION( byte )
+
+DEFINE_CMP_FUNCTION( char )
+
+DEFINE_CMP_FUNCTION( int )
+
+DEFINE_CMP_FUNCTION( size_t )
+
+DEFINE_CMP_FUNCTION( int64_t )
+
+DEFINE_CMP_FUNCTION( uint64_t )
 
 
 /**
