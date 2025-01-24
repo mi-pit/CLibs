@@ -9,7 +9,7 @@
 #include "../string_utils.h"    /* str types */
 
 #include <assert.h>
-#include <inttypes.h>
+#include <inttypes.h> /* PRIi64 */
 
 /**
  * Sets the bi->numbers list to be
@@ -656,6 +656,60 @@ TEST( sub )
 }
 END_TEST
 
+TEST( bigint_add_b )
+{
+    struct bigint *bi1 = bigint_init_as( INT64_MAX );
+    struct bigint *bi2 = bigint_init();
+    bigint_add_power( bi2, 123, 3 );
+    UNIT_TEST( test_metadata( bi1, SIGN_POS, 1, ( uint64_t[ 1 ] ){ INT64_MAX } ) );
+    UNIT_TEST( test_metadata( bi2, SIGN_POS, 4, ( uint64_t[ 4 ] ){ 0, 0, 0, 123 } ) );
+
+    assert( bigint_add_b( bi1, bi2 ) == RV_SUCCESS );
+    UNIT_TEST( test_metadata(
+            bi1, SIGN_POS, 4, ( uint64_t[ 4 ] ){ INT64_MAX, 0, 0, 123 } ) );
+
+    set_number_array( bi1,
+                      SIGN_POS,
+                      3,
+                      ( const uint64_t[ 3 ] ){ 5163779307421638327, 59287839, 1509730 } );
+    set_number_array( bi2, SIGN_POS, 1, ( const uint64_t[ 1 ] ){ 23096907901937 } );
+    bigint_add_b( bi1, bi2 );
+    UNIT_TEST( test_metadata(
+            bi1,
+            SIGN_POS,
+            3,
+            ( const uint64_t[ 3 ] ){ 5163802404329540264, 59287839, 1509730 } ) );
+
+    set_number_array( bi1,
+                      SIGN_POS,
+                      3,
+                      ( const uint64_t[ 3 ] ){ 5163779307421638327, 59287839, 1509730 } );
+    set_number_array( bi2, SIGN_NEG, 1, ( const uint64_t[ 1 ] ){ 5163779307421638327 } );
+    bigint_add_b( bi1, bi2 );
+    UNIT_TEST( test_metadata(
+            bi1, SIGN_POS, 3, ( const uint64_t[ 3 ] ){ 0, 59287839, 1509730 } ) );
+
+    set_number_array( bi1,
+                      SIGN_POS,
+                      3,
+                      ( const uint64_t[ 3 ] ){
+                              BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX, 1509730 } );
+    set_number_array( bi2, SIGN_POS, 1, ( const uint64_t[ 1 ] ){ 1 } );
+    bigint_add_b( bi1, bi2 );
+    UNIT_TEST(
+            test_metadata( bi1, SIGN_POS, 3, ( const uint64_t[ 3 ] ){ 0, 0, 1509731 } ) );
+
+    set_number_array(
+            bi1,
+            SIGN_POS,
+            2,
+            ( const uint64_t[ 2 ] ){ BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX } );
+    set_number_array( bi2, SIGN_POS, 3, ( const uint64_t[ 3 ] ){ 1, 1, 1 } );
+    bigint_add_b( bi1, bi2 );
+    UNIT_TEST( test_metadata( bi1, SIGN_POS, 3, ( const uint64_t[ 3 ] ){ 0, 1, 2 } ) );
+}
+END_TEST
+
 
 int main( void )
 {
@@ -670,6 +724,8 @@ int main( void )
 
     RUN_TEST( add );
     RUN_TEST( sub );
+
+    RUN_TEST( bigint_add_b );
 
     FINISH_TESTING();
 }

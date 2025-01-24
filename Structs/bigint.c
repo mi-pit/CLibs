@@ -227,6 +227,11 @@ void bigint_destroy( struct bigint *bp )
 }
 
 
+int bigint_add_i( struct bigint *bi, int64_t n )
+{
+    return bigint_add_power( bi, n, 0 );
+}
+
 Private inline int handle_overflow( struct bigint *const bi, size_t level )
 {
     if ( list_size( bi->numbers ) == level + 1 ) // higher digit not available
@@ -249,7 +254,7 @@ Private inline int handle_underflow( struct bigint *const bi, size_t level )
     return bigint_add_power( bi, sign_flipped( bi->sign ), level + 1 );
 }
 
-int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
+int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t level )
 {
     if ( n == 0 )
         return RV_SUCCESS;
@@ -299,7 +304,25 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, uint64_t level )
     return RV_SUCCESS;
 }
 
-int bigint_add_i( struct bigint *bi, int64_t n )
+
+int bigint_add_b( struct bigint *bi, const struct bigint *add )
 {
-    return bigint_add_power( bi, n, 0 );
+    foreach_ls( const uint64_t, num, add->numbers )
+    {
+        assert_that( num <= BIGINT_LIST_MEMBER_MAX,
+                     "bigint list member value out of bounds: %" PRIu64,
+                     num );
+
+        if ( num >= INT64_MAX )
+        {
+            const int64_t main = ( int64_t ) ( num - INT64_MAX ) * add->sign;
+            const int64_t rem  = ( int64_t ) ( num - main ) * add->sign;
+            return_on_fail( bigint_add_power( bi, main, foreach_index_num ) );
+            return_on_fail( bigint_add_power( bi, rem, foreach_index_num ) );
+        }
+        else
+            return_on_fail( bigint_add_power( bi, num * add->sign, foreach_index_num ) );
+    }
+
+    return RV_SUCCESS;
 }
