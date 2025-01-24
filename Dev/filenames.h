@@ -83,19 +83,17 @@ BeforeMain LibraryDefined bool set_prog_name( void )
 #include <stdlib.h>
 #define get_prog_name() getprogname()
 #elif defined( __linux__ )
+#include <stdbool.h>
 #include <unistd.h> /* readlink */
 
 BeforeMain LibraryDefined bool set_prog_name( void )
 {
     char path[ PATH_MAX ] = { 0 };
 
-    if ( readlink( "/proc/self/exe", path, PATH_MAX ) == RV_ERROR )
-    {
-        warn( "%s: readlink", __func__ );
+    if ( readlink( "/proc/self/exe", path, PATH_MAX ) == -1 )
         return 1;
-    }
 
-    strncpy( prog_name, get_file_name( path ), PATH_MAX );
+    strncpy( ProgName, get_file_name( path ), PATH_MAX );
     return 0;
 }
 

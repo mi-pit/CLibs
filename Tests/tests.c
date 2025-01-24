@@ -16,6 +16,7 @@ void run_list( void )
 {
     RUN_TEST( list_init );
     RUN_TEST( list_basic );
+    RUN_TEST( list_advanced );
 }
 
 void run_dynstr( void )
