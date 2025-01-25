@@ -29,6 +29,7 @@ add_executable(TestNumbers
         Structs/dynstring.c
         Structs/dynarr.c
         string_utils.c
+        misc.c
         )
 
 add_executable(TestHashFunc

@@ -43,6 +43,7 @@ void bigint_flip_sign( struct bigint * );
 
 
 UseResult char *bigint_to_string( const struct bigint * );
+int bigint_from_string( const char *, struct bigint **cont );
 
 
 ///// All of these functions return RV_SUCCESS / RV_ERROR

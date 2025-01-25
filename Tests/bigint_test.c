@@ -650,7 +650,7 @@ TEST( bigint_add_b )
 
     assert( bigint_add_b( bi1, bi2 ) == RV_SUCCESS );
     UNIT_TEST( test_metadata(
-            bi1, SIGN_POS, 4, ( uint64_t[ 4 ] ){ INT64_MAX, 0, 0, 123 } ) );
+            bi1, SIGN_POS, 4, ( const uint64_t[ 4 ] ){ INT64_MAX, 0, 0, 123 } ) );
 
     set_number_array( bi1,
                       SIGN_POS,
@@ -691,6 +691,109 @@ TEST( bigint_add_b )
     set_number_array( bi2, SIGN_POS, 3, ( const uint64_t[ 3 ] ){ 1, 1, 1 } );
     bigint_add_b( bi1, bi2 );
     UNIT_TEST( test_metadata( bi1, SIGN_POS, 3, ( const uint64_t[ 3 ] ){ 0, 1, 2 } ) );
+
+    set_number_array(
+            bi1,
+            SIGN_NEG,
+            2,
+            ( const uint64_t[ 2 ] ){ BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX } );
+    set_number_array(
+            bi2,
+            SIGN_POS,
+            2,
+            ( const uint64_t[ 2 ] ){ BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX } );
+    bigint_add_b( bi1, bi2 );
+    UNIT_TEST( test_number_array( bi1, 1, ( const uint64_t[ 3 ] ){ 0 } ) );
+
+    bigint_destroy( bi1 );
+    bigint_destroy( bi2 );
+}
+END_TEST
+
+TEST( bigint_cmp )
+{
+    struct bigint *bi_low  = bigint_init_as( 12345 );
+    struct bigint *bi_high = bigint_init_as( 1234567890 );
+    UNIT_TEST( bigint_cmp_i( bi_low, 12345 ) == BIGINT_EQ );
+    UNIT_TEST( bigint_cmp_i( bi_low, 1234 ) == BIGINT_GT );
+    UNIT_TEST( bigint_cmp_i( bi_low, 123456 ) == BIGINT_LT );
+
+    set_number_array( bi_low, SIGN_NEG, 1, ( uint64_t[ 1 ] ){ 12345 } );
+    UNIT_TEST( bigint_cmp_i( bi_low, 12345 ) == BIGINT_LT );
+    set_number_array( bi_low, SIGN_NEG, 1, ( uint64_t[ 1 ] ){ 1234567 } );
+    UNIT_TEST( bigint_cmp_i( bi_low, 12345 ) == BIGINT_LT );
+    set_number_array( bi_low, SIGN_NEG, 1, ( uint64_t[ 1 ] ){ 0 } );
+    UNIT_TEST( bigint_cmp_i( bi_low, 12345 ) == BIGINT_LT );
+
+    UNIT_TEST( bigint_cmp_b( bi_low, bi_high ) == BIGINT_LT );
+    UNIT_TEST( bigint_cmp_b( bi_high, bi_low ) == BIGINT_GT );
+    UNIT_TEST( bigint_cmp_b( bi_high, bi_high ) == BIGINT_EQ );
+
+    bigint_destroy( bi_low );
+    bigint_destroy( bi_high );
+}
+END_TEST
+
+Tester test_one_from_string( string_t str,
+                             sign_t sign,
+                             size_t count,
+                             uint64_t array[ count ] )
+{
+    struct bigint *bi;
+    int rv = bigint_from_string( str, &bi );
+    assert_that( rv == RV_SUCCESS, "bigint from string: %s", rv_to_string( rv ) );
+    if ( bigint_sizeof( bi ) != count )
+        return false;
+    if ( !test_metadata( bi, sign, count, array ) )
+        return false;
+
+    bigint_destroy( bi );
+    return true;
+}
+
+TEST( from_string )
+{
+    UNIT_TEST(
+            test_one_from_string( "234098", SIGN_POS, 1, ( uint64_t[ 1 ] ){ 234098 } ) );
+    UNIT_TEST( test_one_from_string( "0", SIGN_POS, 1, ( uint64_t[ 1 ] ){ 0 } ) );
+    UNIT_TEST( test_one_from_string(
+            "10000000000000000000", SIGN_POS, 2, ( uint64_t[ 2 ] ){ 0, 1 } ) );
+    UNIT_TEST( test_one_from_string( "+123", SIGN_POS, 1, ( uint64_t[ 1 ] ){ 123 } ) );
+    UNIT_TEST( test_one_from_string( "-123", SIGN_NEG, 1, ( uint64_t[ 1 ] ){ 123 } ) );
+    UNIT_TEST( test_one_from_string(
+            "-10000000000000000000", SIGN_NEG, 2, ( uint64_t[ 2 ] ){ 0, 1 } ) );
+    UNIT_TEST( test_one_from_string(
+            "9350000000000000123123000000000012312312399999999999999999999999999999999999"
+            "999",
+            SIGN_POS,
+            5,
+            ( uint64_t[ 5 ] ){ BIGINT_LIST_MEMBER_MAX,
+                               BIGINT_LIST_MEMBER_MAX,
+                               123123123,
+                               123123,
+                               935 } ) );
+    UNIT_TEST( test_one_from_string(
+            "-100000000000000000000000000000000000000000000000000000093500000000000001231"
+            "23000000000012312312300000000000010905800000000157539609843",
+            SIGN_NEG,
+            8,
+            ( uint64_t[ 8 ] ){
+                    157539609843, 1090580, 123123123, 123123, 935, 0, 0, 1 } ) );
+    UNIT_TEST( test_one_from_string(
+            "+100000000000000000100000000000000000000000000000000000093500000000000001231"
+            "23000000000012312312300000000000010905800000000157539609843",
+            SIGN_POS,
+            8,
+            ( uint64_t[ 8 ] ){
+                    157539609843, 1090580, 123123123, 123123, 935, 0, 10, 1 } ) );
+
+    struct bigint *bi;
+    UNIT_TEST( bigint_from_string( "Hovenko", &bi ) == RV_EXCEPTION );
+    UNIT_TEST( bigint_from_string( "", &bi ) == RV_EXCEPTION );
+    UNIT_TEST( bigint_from_string( "+1h", &bi ) == RV_EXCEPTION );
+    UNIT_TEST( bigint_from_string( "1+", &bi ) == RV_EXCEPTION );
+    UNIT_TEST( bigint_from_string( "+", &bi ) == RV_EXCEPTION );
+    UNIT_TEST( bigint_from_string( "+-123", &bi ) == RV_EXCEPTION );
 }
 END_TEST
 
@@ -708,6 +811,10 @@ int main( void )
     RUN_TEST( sub );
 
     RUN_TEST( bigint_add_b );
+
+    RUN_TEST( bigint_cmp );
+
+    RUN_TEST( from_string );
 
     FINISH_TESTING();
 }

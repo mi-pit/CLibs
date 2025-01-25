@@ -11,6 +11,7 @@
 #include "../string_utils.h"    /* str_t, string_reversed() */
 #include "dynstring.h"          /* dynstr */
 
+#include <ctype.h>    /* isdigit() */
 #include <inttypes.h> /* PRI macros */
 
 
@@ -110,6 +111,83 @@ ERROR:
 }
 
 
+Private bool validate_input_string( string_t str, size_t len )
+{
+    bool has_digits = false;
+
+    for ( size_t i = 0; i < len; ++i )
+    {
+        if ( i == 0 && !( isdigit( str[ i ] ) || str[ i ] == '+' || str[ i ] == '-' ) )
+            return false;
+
+        if ( i != 0 && !isdigit( str[ i ] ) )
+            return false;
+
+        has_digits = isdigit( str[ i ] );
+    }
+
+    return has_digits;
+}
+
+int bigint_from_string( string_t str, struct bigint **cont )
+{
+    size_t len = strlen( str );
+    if ( !validate_input_string( str, len ) )
+        return RV_EXCEPTION;
+
+    struct bigint *bi = bigint_init();
+    if ( bi == NULL )
+    {
+        f_stack_trace();
+        return RV_ERROR;
+    }
+    assert_that( list_size( bi->numbers ) == 1, "bigint numbers list is incorrect" );
+
+    if ( str[ 0 ] == '+' || str[ 0 ] == '-' )
+    {
+        bi->sign = str[ 0 ] == '+' ? SIGN_POS : SIGN_NEG;
+        str++;
+        len--;
+    }
+
+    const size_t chunk_size = BIGINT_LIST_MEMBER_MAX_DIGITS;
+    const size_t n_chunks   = ( len / chunk_size ) + 1;
+
+    for ( size_t i = 0; i < len; i += chunk_size )
+    {
+        unsigned n_lead_zeroes   = 0;
+        const uint64_t chunk_idx = n_chunks - i - 1;
+        uint64_t app             = 0;
+        for ( size_t j = 0; j < chunk_size; ++j )
+        {
+            const size_t char_index = len - ( i + j ) - 1;
+            if ( char_index >= len )
+                break;
+
+            app *= 10;
+            app += str[ char_index ] - '0';
+
+            if ( str[ char_index ] == '0' && app == 0 )
+                ++n_lead_zeroes;
+        }
+        app = reverse_integer( app, 10 ) * power( 10, n_lead_zeroes );
+
+        if ( chunk_idx == n_chunks - 1 )
+            goto_on_fail( ERROR, list_set_at( bi->numbers, 0, &app ) );
+        else
+            goto_on_fail( ERROR, list_append( bi->numbers, &app ) );
+    }
+
+    *cont = bi;
+    return RV_SUCCESS;
+
+ERROR:
+    f_stack_trace();
+    bigint_destroy( bi );
+    return RV_ERROR;
+}
+
+
 void bigint_destroy_l( struct bigint bi )
 {
     list_destroy( bi.numbers );
@@ -193,7 +271,7 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
     else if ( overflow )
         return_on_fail( handle_overflow( bi, level ) );
 
-    if ( final == 0 && level == list_size( bi->numbers ) - 1 )
+    if ( final == 0 && level != 0 && level == list_size( bi->numbers ) - 1 )
         return list_pop( bi->numbers, NULL );
 
     return RV_SUCCESS;
@@ -237,4 +315,24 @@ int bigint_cmp_i( const struct bigint *bi, int64_t n )
 
     const uint64_t norm_n = ( uint64_t ) n;
     return cmp_uint64_t( &bi_low, &norm_n );
+}
+
+int bigint_cmp_b( const struct bigint *bi1, const struct bigint *bi2 )
+{
+    const size_t s1 = list_size( bi1->numbers );
+    const size_t s2 = list_size( bi2->numbers );
+
+    if ( s1 != s2 )
+        return cmp_size_t( &s1, &s2 );
+
+    assert( s1 == s2 );
+    for ( size_t idx = 0; idx < s1; ++idx )
+    {
+        const uint64_t n1 = list_access( bi1->numbers, idx, uint64_t );
+        const uint64_t n2 = list_access( bi2->numbers, idx, uint64_t );
+        if ( n1 != n2 )
+            return cmp_uint64_t( &n1, &n2 );
+    }
+
+    return BIGINT_EQ;
 }

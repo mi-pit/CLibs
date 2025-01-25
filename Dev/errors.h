@@ -26,6 +26,26 @@
 #define RV_ERROR     ( -1 ) /* Fatal, un-recoverable error */
 #define RV_SUCCESS   0      /* Success */
 
+LibraryDefined const char *rv_to_string( int rv )
+{
+    switch ( rv )
+    {
+        case RV_SUCCESS:
+            return "Success";
+        case RV_EXCEPTION:
+            return "Exception";
+        case RV_ERROR:
+            return "Error";
+
+        default:
+            return "Unknown error";
+    }
+}
+
+
+#define on_fail( func_call )  if ( ( func_call ) != RV_SUCCESS )
+#define on_error( func_call ) if ( ( func_call ) == RV_ERROR )
+
 /**
  * Returns the value (of type ‹int›) of the function call or variable
  * if it doesn't equal RV_SUCCESS
@@ -36,8 +56,10 @@
     do                                        \
     {                                         \
         int func_call_retval = ( func_call ); \
-        if ( func_call_retval < RV_SUCCESS )  \
+        on_fail( func_call_retval )           \
+        {                                     \
             return func_call_retval;          \
+        }                                     \
     }                                         \
     while ( 0 )
 
@@ -51,13 +73,26 @@
     do                                        \
     {                                         \
         int func_call_retval = ( func_call ); \
-        if ( func_call_retval == RV_ERROR )   \
+        on_error( func_call_retval )          \
+        {                                     \
             return func_call_retval;          \
+        }                                     \
     }                                         \
     while ( 0 )
 
-#define on_fail( func_call )  if ( ( func_call ) != RV_SUCCESS )
-#define on_error( func_call ) if ( ( func_call ) == RV_ERROR )
+#define goto_on_fail( GOTO_LABEL, func_call ) \
+    do                                        \
+    {                                         \
+        on_fail( func_call ) goto GOTO_LABEL; \
+    }                                         \
+    while ( 0 )
+
+#define goto_on_error( GOTO_LABEL, func_call ) \
+    do                                         \
+    {                                          \
+        on_error( func_call ) goto GOTO_LABEL; \
+    }                                          \
+    while ( 0 )
 
 
 #ifndef COLOR_WARNING

@@ -49,9 +49,12 @@ LibraryDefined UseResult str_t string_duplicate( string_t s )
 #if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) \
         || defined( _POSIX_C_SOURCE ) // non-standard
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 
+#ifndef vsnprintf
 int vsnprintf( char *str, size_t size, const char *restrict format, va_list ap );
+#endif
 
 /**
  * Like `vsprintf`, except it heap-allocates memory for the resulting string.

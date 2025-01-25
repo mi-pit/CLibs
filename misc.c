@@ -16,7 +16,6 @@ uint64_t hash_func( const void *data, size_t nbytes )
 }
 
 
-
 uint64_t digitsof( uint64_t num, unsigned base )
 {
     uint64_t ndigs = 0;
@@ -45,18 +44,18 @@ uint64_t reverse_integer( uint64_t n, unsigned base )
 {
     uint64_t digits = digitsof( n, base );
 
-    int64_t lp, hp;
+    int64_t lp = 1, hp = power( base, digits - 1 );
     uint8_t ld, hd;
     for ( uint64_t i = 0; i < digits / 2; ++i )
     {
-        lp = power( base, i );
-        hp = power( base, digits - i - 1 );
-
-        ld = n % ( lp * base ) / lp;
-        hd = n / hp % ( hp / base );
+        ld = n / lp % base;
+        hd = n / hp % base;
 
         n = n - ( ld * lp ) + ( hd * lp );
         n = n - ( hd * hp ) + ( ld * hp );
+
+        lp *= base;
+        hp /= base;
     }
 
     return n;

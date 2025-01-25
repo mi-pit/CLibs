@@ -214,6 +214,13 @@ void list_destroy_p( struct dynamic_array **lsp );
 #define list_printf( ls, type, format ) list_printf_d( ls, type, format, ", " )
 
 
+#define list_sprintf_d( STRING, LIST, TYPE, FMTSTR, DELIM ) \
+    array_sprintf_d( STRING, list_items( LIST ), list_size( LIST ), TYPE, FMTSTR, DELIM )
+
+#define list_sprintf( STRING, LIST, TYPE, FMTSTR ) \
+    array_sprintf( STRING, list_items( LIST ), list_size( LIST ), TYPE, FMTSTR )
+
+
 /* ––––– Pre–Formatted ––––– */
 
 /**
