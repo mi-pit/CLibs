@@ -798,6 +798,73 @@ TEST( from_string )
 END_TEST
 
 
+Tester test_one_multi_cmp( string_t s1, string_t s2, int cmp_rv )
+{
+    struct bigint *bi1, *bi2;
+    assert( bigint_from_string( s1, &bi1 ) == RV_SUCCESS );
+    assert( bigint_from_string( s2, &bi2 ) == RV_SUCCESS );
+
+    bool rv = bigint_cmp_b( bi1, bi2 ) == cmp_rv;
+
+    bigint_destroy( bi1 );
+    bigint_destroy( bi2 );
+
+    return rv;
+}
+
+Tester test_one_multi_add( string_t s1, string_t s2, string_t result )
+{
+    struct bigint *bi1, *bi2, *res;
+    assert( bigint_from_string( s1, &bi1 ) == RV_SUCCESS );
+    assert( bigint_from_string( s2, &bi2 ) == RV_SUCCESS );
+
+    assert( bigint_from_string( result, &res ) == RV_SUCCESS );
+
+    assert( bigint_add_b( bi1, bi2 ) == RV_SUCCESS );
+
+    SetTerminalColor( FOREGROUND_BLUE );
+    list_printf_sde( bi1->numbers, uint64_t, "%llu", "\nbi1: [\n\t", "\n\t", "\n]\n" );
+    list_printf_sde( res->numbers, uint64_t, "%llu", "\nres: [\n\t", "\n\t", "\n]\n" );
+    SetTerminalColor( COLOR_DEFAULT );
+
+    bool rv = cmpeq( bigint_cmp_b( bi1, res ) );
+
+    bigint_destroy( bi1 );
+    bigint_destroy( bi2 );
+    bigint_destroy( res );
+
+    return rv;
+}
+
+TEST( multi )
+{
+    UNIT_TEST( test_one_multi_cmp(
+            "29370597230597209723059809895032098350297076902390976097539040",
+            "29370597230597209723059809895032098350297076902390976097539041",
+            BIGINT_LT ) );
+    UNIT_TEST( test_one_multi_cmp(
+            "29370597230597209723059809895032098350297076902390976097539041",
+            "29370597230597209723059809895032098350297076902390976097539041",
+            BIGINT_EQ ) );
+    UNIT_TEST( test_one_multi_cmp(
+            "29370597230597209723059809895032098350297016902390976097539042",
+            "29370597230597209723059809895032098350297076902390976097539041",
+            BIGINT_LT ) );
+    UNIT_TEST( test_one_multi_cmp(
+            "29370597230597209723059809895032098350297006902390976097539042",
+            "29370597230597209723059809895032098350297001902390976097539042",
+            BIGINT_GT ) );
+
+    UNIT_TEST( test_one_multi_add( "+395203950928293509809835029",
+                                   "2739428037492848670349687096872653812",
+                                   "2739428037888052621277980606682488841" ) );
+    UNIT_TEST( test_one_multi_add( "+395203950928293509809835029",
+                                   "-2739428037492848670349687096872653812",
+                                   "-2739428037097644719421393587062818783" ) );
+}
+END_TEST
+
+
 int main( void )
 {
     RUN_TEST( add_uint_strings );
@@ -809,12 +876,13 @@ int main( void )
 
     RUN_TEST( add );
     RUN_TEST( sub );
-
     RUN_TEST( bigint_add_b );
 
     RUN_TEST( bigint_cmp );
 
     RUN_TEST( from_string );
+
+    RUN_TEST( multi );
 
     FINISH_TESTING();
 }

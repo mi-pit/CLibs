@@ -60,7 +60,7 @@ int bigint_add_i( struct bigint *, int64_t );
  * @param power positive integer; might act strange when nearing SIZE_MAX
  * @return RV_ERROR in case list_append() fails, else RV_SUCCESS
  */
-int bigint_add_power( struct bigint *bi, int64_t n, uint64_t power );
+int bigint_add_power( struct bigint *, int64_t n, uint64_t power );
 int bigint_add_b( struct bigint *, const struct bigint * );
 
 int bigint_mul_i( struct bigint *, long double );

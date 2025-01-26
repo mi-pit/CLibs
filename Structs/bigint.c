@@ -4,8 +4,7 @@
 
 #include "bigint.h"
 
-#include "../Dev/assert_that.h" /* includes errors.h */
-#include "../extra_types.h"     /* byte */
+#include "../Dev/assert_that.h" /* includes "errors.h", <assert.h> */
 #include "../foreach.h"         /* foreach_ls */
 #include "../pointer_utils.h"   /* new */
 #include "../string_utils.h"    /* str_t, string_reversed() */
@@ -88,6 +87,7 @@ str_t bigint_to_string( const struct bigint *const bi )
     {
         char fmt_buf[ 1 + 1 + 20 + 3 + 1 ];
         /*            %   0   i   llu \0 */
+        /* i is number of digits. Maximum is 20, but the actual value is usually lower */
         snprintf(
                 fmt_buf, sizeof fmt_buf, "%%0%i" PRIu64, BIGINT_LIST_MEMBER_MAX_DIGITS );
 
@@ -141,7 +141,6 @@ int bigint_from_string( string_t str, struct bigint **cont )
         f_stack_trace();
         return RV_ERROR;
     }
-    assert_that( list_size( bi->numbers ) == 1, "bigint numbers list is incorrect" );
 
     if ( str[ 0 ] == '+' || str[ 0 ] == '-' )
     {
@@ -158,6 +157,7 @@ int bigint_from_string( string_t str, struct bigint **cont )
         unsigned n_lead_zeroes   = 0;
         const uint64_t chunk_idx = n_chunks - i - 1;
         uint64_t app             = 0;
+        // TODO? one loop
         for ( size_t j = 0; j < chunk_size; ++j )
         {
             const size_t char_index = len - ( i + j ) - 1;
@@ -280,8 +280,12 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
 
 int bigint_add_b( struct bigint *bi, const struct bigint *add )
 {
-    foreach_ls( const uint64_t, num, add->numbers )
+    // FIXME: subtraction "underflow"
+    for ( size_t i = 0; i < list_size( add->numbers ); ++i )
     {
+        const size_t index = list_size( add->numbers ) - i - 1;
+        const uint64_t num = list_access( add->numbers, index, uint64_t );
+
         assert_that( num <= BIGINT_LIST_MEMBER_MAX,
                      "bigint list member value out of bounds: %" PRIu64,
                      num );
@@ -290,11 +294,11 @@ int bigint_add_b( struct bigint *bi, const struct bigint *add )
         {
             const int64_t main = ( int64_t ) ( num - INT64_MAX ) * add->sign;
             const int64_t rem  = ( int64_t ) ( num - main ) * add->sign;
-            return_on_fail( bigint_add_power( bi, main, foreach_index_num ) );
-            return_on_fail( bigint_add_power( bi, rem, foreach_index_num ) );
+            return_on_fail( bigint_add_power( bi, main, index ) );
+            return_on_fail( bigint_add_power( bi, rem, index ) );
         }
         else
-            return_on_fail( bigint_add_power( bi, num * add->sign, foreach_index_num ) );
+            return_on_fail( bigint_add_power( bi, num * add->sign, index ) );
     }
 
     return RV_SUCCESS;
@@ -325,9 +329,9 @@ int bigint_cmp_b( const struct bigint *bi1, const struct bigint *bi2 )
     if ( s1 != s2 )
         return cmp_size_t( &s1, &s2 );
 
-    assert( s1 == s2 );
-    for ( size_t idx = 0; idx < s1; ++idx )
+    for ( size_t i = 0; i < s1; ++i )
     {
+        const size_t idx  = s1 - i - 1;
         const uint64_t n1 = list_access( bi1->numbers, idx, uint64_t );
         const uint64_t n2 = list_access( bi2->numbers, idx, uint64_t );
         if ( n1 != n2 )
