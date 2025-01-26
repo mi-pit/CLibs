@@ -14,6 +14,22 @@
 /* ––––– Array Print ––––– */
 #define ARRAY_PRINT_STRING_FMTSTR "\\s"
 
+#define array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, START_STR, DELIM, END_STR ) \
+    do                                                                                 \
+    {                                                                                  \
+        printf( START_STR );                                                           \
+        for ( size_t print_array_idx__ = 0; print_array_idx__ < ( ARRLEN );            \
+              ++print_array_idx__ )                                                    \
+        {                                                                              \
+            printf( FORMAT_STR, ( ( TYPE * ) ARRAY )[ print_array_idx__ ] );           \
+            if ( print_array_idx__ != ( ARRLEN ) -1 )                                  \
+                printf( "%s", DELIM );                                                 \
+        }                                                                              \
+        printf( END_STR );                                                             \
+    }                                                                                  \
+    while ( 0 )
+
+
 /**
  * Prints the array of a set length and type to stdout.\n
  * <p>
@@ -27,20 +43,8 @@
  *     array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ", " )
  * @endcode
  */
-#define array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, DELIM )             \
-    do                                                                       \
-    {                                                                        \
-        printf( "[ " );                                                      \
-        for ( size_t print_array_idx__ = 0; print_array_idx__ < ( ARRLEN );  \
-              ++print_array_idx__ )                                          \
-        {                                                                    \
-            printf( FORMAT_STR, ( ( TYPE * ) ARRAY )[ print_array_idx__ ] ); \
-            if ( print_array_idx__ != ( ARRLEN ) -1 )                        \
-                printf( "%s", DELIM );                                       \
-        }                                                                    \
-        printf( " ]\n" );                                                    \
-    }                                                                        \
-    while ( 0 )
+#define array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, DELIM ) \
+    array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, "[ ", DELIM, " ]\n" )
 
 /**
  * Prints the array of a set length and type.\n

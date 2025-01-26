@@ -207,11 +207,22 @@ void list_destroy_p( struct dynamic_array **lsp );
 /* ––––––––––––––––––––––––––––––– PRINTERS ––––––––––––––––––––––––––––––– */
 
 ///@see \code array_printf_d
-#define list_printf_d( ls, type, format, delim ) \
-    array_printf_d( list_items( ls ), list_size( ls ), type, format, delim )
+#define list_printf_sde( LIST, ITEM_TYPE, FORMAT, START_STR, DELIM, END_STR ) \
+    array_printf_sde( list_items( LIST ),                                     \
+                      list_size( LIST ),                                      \
+                      ITEM_TYPE,                                              \
+                      FORMAT,                                                 \
+                      START_STR,                                              \
+                      DELIM,                                                  \
+                      END_STR )
 
 ///@see \code array_printf_d
-#define list_printf( ls, type, format ) list_printf_d( ls, type, format, ", " )
+#define list_printf_d( LIST, ITEM_TYPE, FORMAT, DELIM ) \
+    array_printf_d( list_items( LIST ), list_size( LIST ), ITEM_TYPE, FORMAT, DELIM )
+
+///@see \code array_printf_d
+#define list_printf( LIST, ITEM_TYPE, FORMAT ) \
+    array_printf( list_items( LIST ), list_size( LIST ), ITEM_TYPE, FORMAT )
 
 
 #define list_sprintf_d( STRING, LIST, TYPE, FMTSTR, DELIM ) \
