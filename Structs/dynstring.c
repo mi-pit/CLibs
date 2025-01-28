@@ -53,10 +53,7 @@ DynamicString dynstr_init_as( string_t s )
     size_t len        = strlen( s );
     DynamicString new = dynstr_init_cap( len + 1 );
     if ( new == NULL )
-    {
-        f_stack_trace();
-        return NULL;
-    }
+        return ( void * ) f_stack_trace( NULL );
 
     strncpy( new->data, s, len + 1 );
     new->len = len;
@@ -96,16 +93,10 @@ Private int dynstr_VPendF( DynamicString dynstr,
 {
     str_t buffer;
     if ( vasprintf( &buffer, fmt, vaList ) == RV_ERROR )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
+        return f_stack_trace( RV_ERROR );
 
     if ( pender( dynstr, buffer ) != RV_SUCCESS )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
+        return f_stack_trace( RV_ERROR );
 
     free( buffer );
     return RV_SUCCESS;
@@ -168,10 +159,7 @@ int dynstr_prependn( DynamicString dynstr, const char *s, size_t len )
 
         int rv = dynstr_resize( dynstr, new_cap );
         if ( rv != RV_SUCCESS )
-        {
-            f_stack_trace();
-            return rv;
-        }
+            return f_stack_trace( rv );
     }
 
     memmove( dynstr->data + len, dynstr->data, dynstr->len );

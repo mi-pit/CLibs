@@ -2,6 +2,7 @@
 // Created by MacBook on 03.01.2025.
 //
 
+#include "../Dev/errors.h"
 #include "../Dev/unit_tests.h"
 #include "../misc.h"
 
@@ -28,6 +29,8 @@ END_TEST
 TEST( this_one_actually_passes )
 {
     UNIT_TEST( true );
+
+    f_stack_trace( 0 );
 }
 END_TEST
 
@@ -40,6 +43,8 @@ int main( void )
     RUN_TEST( all_fail );
     RUN_TEST( test_example );
     RUN_TEST( this_one_actually_passes );
+
+    f_stack_trace( 0 );
 
     FINISH_TESTING();
 }

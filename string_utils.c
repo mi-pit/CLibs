@@ -158,7 +158,7 @@ str_t string_reversed( string_t s )
 {
     str_t new = strdup( s );
     if ( new == NULL )
-        return ( void * ) warn_ret( NULL, "strdup" );
+        return ( void * ) fwarn_ret( NULL, "strdup" );
 
     string_reverse( new );
     return new;
@@ -255,17 +255,14 @@ str_t string_replaced( string_t const str, string_t old, string_t new )
         const char *next = strstr( curr, old );
         if ( next == NULL )
         {
-            if ( dynstr_append( result, curr ) != RV_SUCCESS )
-                goto ERROR;
+            goto_on_error( ERROR, dynstr_append( result, curr ) );
             break;
         }
         size_t app_len = next - curr;
         if ( app_len > 0 )
-            if ( dynstr_appendn( result, curr, app_len ) != RV_SUCCESS )
-                goto ERROR;
+            goto_on_error( ERROR, dynstr_appendn( result, curr, app_len ) );
 
-        if ( dynstr_append( result, new ) != RV_SUCCESS )
-            goto ERROR;
+        goto_on_error( ERROR, dynstr_append( result, new ) );
 
         if ( next == NULL )
             break;
@@ -274,17 +271,16 @@ str_t string_replaced( string_t const str, string_t old, string_t new )
     while ( *curr != '\0' );
 
     str_t ret = dynstr_data_copy( result );
-    if ( ret == NULL )
-        f_stack_trace();
-
     dynstr_destroy( result );
+
+    if ( ret == NULL )
+        return ( void * ) f_stack_trace( NULL );
 
     return ret;
 
 ERROR:
-    f_stack_trace();
     dynstr_destroy( result );
-    return NULL;
+    return ( void * ) f_stack_trace( NULL );
 }
 
 
@@ -324,16 +320,13 @@ ssize_t string_split( str_t **str_arr_cont,
     {
         ssize_t rv = string_split_empty( str_arr_cont, string );
         if ( rv == RV_ERROR )
-            f_stack_trace();
+            return f_stack_trace( RV_ERROR );
         return rv;
     }
 
     struct dynamic_array *ls = list_init_type( str_t );
     if ( ls == NULL )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
+        return f_stack_trace( RV_ERROR );
 
     size_t split_tok_len = strlen( split_tok );
 
@@ -371,9 +364,8 @@ ssize_t string_split( str_t **str_arr_cont,
 
         on_fail( list_append( ls, &dup ) )
         {
-            f_stack_trace();
             list_destroy( ls );
-            return RV_ERROR;
+            return f_stack_trace( RV_ERROR );
         }
     }
 
@@ -391,10 +383,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
 {
     struct dynamic_array *ls = list_init_type( str_t );
     if ( ls == NULL )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
+        return f_stack_trace( RV_ERROR );
 
     const char *searched = string;
 
@@ -440,9 +429,8 @@ ssize_t string_split_regex( str_t **str_arr_cont,
             str_t duped = strndup( actual_start, actual_len );
             if ( list_append( ls, &duped ) != RV_SUCCESS )
             {
-                f_stack_trace();
                 list_destroy( ls );
-                return RV_ERROR;
+                return f_stack_trace( RV_ERROR );
             }
         }
         next_start = ( mode & STRSPLIT_KEEP_DELIM_AFTER )
@@ -507,15 +495,10 @@ str_t add_uint_strings( string_t str_1, string_t str_2 )
 
     DynamicString result = dynstr_init();
     if ( result == NULL )
-    {
-        f_stack_trace();
-        return NULL;
-    }
+        return ( void * ) f_stack_trace( NULL );
 
     size_t str_1_len = strlen( str_1 );
     size_t str_2_len = strlen( str_2 );
-
-    str_t ret = NULL;
 
     digit_t carry = 0;
     for ( size_t idx = 0; idx < max_u64( str_1_len, str_2_len ); ++idx )
@@ -529,27 +512,21 @@ str_t add_uint_strings( string_t str_1, string_t str_2 )
         digit_t dig = val % 10;
 
         char app = ( char ) ( dig + '0' );
-        if ( dynstr_appendn( result, &app, 1 ) != RV_SUCCESS )
-        {
-            f_stack_trace();
-            goto CLEANUP;
-        }
+        goto_on_fail( ERROR, dynstr_appendn( result, &app, 1 ) );
     }
     if ( carry )
     {
         char app = '1';
-        if ( dynstr_appendn( result, &app, 1 ) != RV_SUCCESS )
-        {
-            f_stack_trace();
-            goto CLEANUP;
-        }
+        goto_on_fail( ERROR, dynstr_appendn( result, &app, 1 ) );
     }
 
-    ret = string_reversed( dynstr_data( result ) );
-
-CLEANUP:
+    str_t ret = string_reversed( dynstr_data( result ) );
     dynstr_destroy( result );
     return ret;
+
+ERROR:
+    dynstr_destroy( result );
+    return ( void * ) f_stack_trace( NULL );
 }
 
 
@@ -591,7 +568,6 @@ Private bool issign( char c )
 }
 
 
-// Convert a hexadecimal string to a decimal string
 char *hex_to_decimal( const char *hex )
 {
     const size_t len = strlen( hex );
@@ -600,7 +576,6 @@ char *hex_to_decimal( const char *hex )
     if ( dynstr == NULL )
         goto ERROR;
 
-    // Process each hex digit
     for ( size_t i = 0; i < len; ++i )
     {
         if ( i == 0 && issign( hex[ i ] ) )
@@ -612,7 +587,6 @@ char *hex_to_decimal( const char *hex )
                      hex,
                      hex[ i ] );
 
-        // Multiply current decimal value by 16 and add the hex digit
         unsigned long carry = digit;
         for ( ssize_t j = ( ssize_t ) dynstr_len( dynstr ) - 1; j >= 0; --j )
         {
@@ -621,27 +595,23 @@ char *hex_to_decimal( const char *hex )
             carry                      = temp / 10;
         }
 
-        // Handle any carry left
         while ( carry > 0 )
         {
             char p = ( char ) ( '0' + ( carry % 10 ) );
-            if ( dynstr_prependn( dynstr, &p, 1 ) != RV_SUCCESS )
-                goto ERROR;
+            goto_on_error( ERROR, dynstr_prependn( dynstr, &p, 1 ) );
             carry /= 10;
         }
     }
 
     if ( issign( hex[ 0 ] ) )
-        if ( dynstr_prependn( dynstr, hex + 0, 1 ) != RV_SUCCESS )
-            goto ERROR;
+        goto_on_fail( ERROR, dynstr_prependn( dynstr, hex + 0, 1 ) );
 
     str_t decimal = dynstr_data_copy( dynstr );
     dynstr_destroy( dynstr );
     return decimal;
 
 ERROR:
-    f_stack_trace();
     if ( dynstr != NULL )
         dynstr_destroy( dynstr );
-    return NULL;
+    return ( void * ) f_stack_trace( NULL );
 }

@@ -13,20 +13,21 @@ struct dynamic_array; // defined in dynarr.c
 typedef struct dynamic_array List;
 
 
-#define LIST_DEF_SIZE 256
+#define LIST_DEF_SIZE 64
 
-#define LIST_CAP_SIZE_RATIO 4
+#define LIST_CAP_SIZE_RATIO 2
 
 
 enum ListPrinters {
     LS_PRINT_NOFORMAT = ( -1 ), /* Lets each list to choose its own print method */
     LS_PRINT_BYTE     = 0,      /* default;
                                  * prints any data as pairs of hexadecimal digits */
-    LS_PRINT_STR      = 1,      /* List contents are strings */
-    LS_PRINT_INT      = 2,      /* List contents are whole numbers */
-    LS_PRINT_DEC      = 3,      /* List contents are rational numbers */
-    LS_PRINT_PTR      = 4,      /* List contents are pointers */
-    LS_PRINT_LIST     = 5,      /* List contents are other lists */
+    LS_PRINT_STR,               /* List contents are strings */
+    LS_PRINT_SIGNED,            /* List contents are signed whole numbers */
+    LS_PRINT_UNSIGNED,          /* List contents are unsigned whole numbers */
+    LS_PRINT_DEC,               /* List contents are rational numbers */
+    LS_PRINT_PTR,               /* List contents are pointers */
+    LS_PRINT_LIST,              /* List contents are other lists */
 };
 
 /**

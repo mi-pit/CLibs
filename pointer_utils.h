@@ -11,10 +11,6 @@
 #include <stdlib.h> /* free(), NULL */
 
 
-#ifndef __cplusplus
-#define new( TYPE ) ( calloc( 1, sizeof( TYPE ) ) )
-#endif
-
 #define free_n( ptr ) free_and_null( ( void ** ) &( ptr ) )
 
 

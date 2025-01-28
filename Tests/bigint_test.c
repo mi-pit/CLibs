@@ -822,10 +822,10 @@ Tester test_one_multi_add( string_t s1, string_t s2, string_t result )
 
     assert( bigint_add_b( bi1, bi2 ) == RV_SUCCESS );
 
-    SetTerminalColor( FOREGROUND_BLUE );
+    SetTerminalColor( stdout, FOREGROUND_BLUE );
     list_printf_sde( bi1->numbers, uint64_t, "%llu", "\nbi1: [\n\t", "\n\t", "\n]\n" );
     list_printf_sde( res->numbers, uint64_t, "%llu", "\nres: [\n\t", "\n\t", "\n]\n" );
-    SetTerminalColor( COLOR_DEFAULT );
+    SetTerminalColor( stdout, COLOR_DEFAULT );
 
     bool rv = cmpeq( bigint_cmp_b( bi1, res ) );
 

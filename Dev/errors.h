@@ -6,6 +6,7 @@
 #define CLIBS_ERRORS_H
 
 /* for this header */
+#include "../misc.h"         /* UNUSED() */
 #include "attributes.h"      /* PrintfLike, LibraryDefined */
 #include "filenames.h"       /* get_prog_name() */
 #include "terminal_colors.h" /* COLORs, PrintInColor */
@@ -113,9 +114,9 @@ LibraryDefined const char *rv_to_string( int rv )
  * </p>
  *
  * @example actual function-like macro defined in errors.h:
- * \code
+ * @code
  * #define fwarn( ... )  ( void ) WarnUniversal( NULL, __func__, -1, errno, -1, __VA_ARGS__ )
- * \endcode
+ * @endcode
  *
  * @param FileName      name of the current file (__FILE_NAME__)
  * @param FunctionName  name of the function (__func__)
@@ -127,8 +128,9 @@ LibraryDefined const char *rv_to_string( int rv )
  * @return @code return_value @endcode
  * @bugs %p for some reason sometimes throws compiler errors for non `void *` pointers
  */
-LibraryDefined PrintfLike( 6, 7 ) Cold ptrdiff_t
-        WarnUniversal( const char *__restrict FileName,
+LibraryDefined PrintfLike( 7, 8 ) Cold ptrdiff_t
+        WarnUniversal( bool PrintProgName,
+                       const char *__restrict FileName,
                        const char *__restrict FunctionName,
                        int LineNumber,
                        int err_no,
@@ -137,25 +139,33 @@ LibraryDefined PrintfLike( 6, 7 ) Cold ptrdiff_t
                        ... )
 {
 #ifndef SUPPRESS_WARNINGS
-    PrintInColor( stderr, COLOR_WARNING, "%s", get_prog_name() );
+    SetTerminalColor( stderr, COLOR_WARNING );
+
+    if ( PrintProgName )
+        fprintf( stderr, "%s", get_prog_name() );
     if ( FileName != NULL )
-        PrintInColor( stderr, COLOR_WARNING, ": %s", FileName );
+        fprintf( stderr, ": %s", FileName );
     if ( FunctionName != NULL )
-        PrintInColor( stderr, COLOR_WARNING, ": %s", FunctionName );
+        fprintf( stderr, ": %s", FunctionName );
     if ( LineNumber > 0 )
-        PrintInColor( stderr, COLOR_WARNING, " @ %i", LineNumber );
-    PrintInColor( stderr, COLOR_WARNING, ": " );
+        fprintf( stderr, " @ %i", LineNumber );
+
+    if ( PrintProgName || FileName != NULL || FunctionName != NULL || LineNumber > 0 )
+        fprintf( stderr, ": " );
 
     va_list vaList;
     va_start( vaList, format );
-    VPrintInColor( stderr, COLOR_WARNING, format, vaList );
+    vfprintf( stderr, format, vaList );
     va_end( vaList );
 
     if ( err_no >= 0 )
-        PrintInColor( stderr, COLOR_WARNING, ": %s", strerror( err_no ) );
+        fprintf( stderr, ": %s", strerror( err_no ) );
 
-    PrintInColor( stderr, COLOR_WARNING, "\n" );
+    fprintf( stderr, "\n" );
+
+    SetTerminalColor( stderr, COLOR_DEFAULT );
 #else
+    UNUSED( PrintProgName );
     UNUSED( FileName );
     UNUSED( FunctionName );
     UNUSED( LineNumber );
@@ -198,49 +208,65 @@ LibraryDefined PrintfLike( 6, 7 ) Cold ptrdiff_t
  *     in main
  * \endcode
  */
-#define f_stack_trace() PrintInColor( stderr, COLOR_WARNING, "\tin %s\n", __func__ )
+#define f_stack_trace( RETVAL ) \
+    WarnUniversal( false, NULL, NULL, -1, -1, ( ptrdiff_t ) RETVAL, "\tin %s", __func__ )
 
 /**
  * Like f_stack_trace, just with __FILE_NAME__ and __LINE__
- * @see \code f_stack_trace()
+ * @see @code
+ * f_stack_trace()
+ * @endcode
  */
-#define ffl_stack_trace()               \
-    PrintInColor( stderr,               \
-                  COLOR_WARNING,        \
-                  "\tin %s: %s @ %d\n", \
-                  __FILE_NAME__,        \
-                  __func__,             \
-                  __LINE__ )
+#define ffl_stack_trace( RETVAL )        \
+    WarnUniversal( false,                \
+                   NULL,                 \
+                   NULL,                 \
+                   -1,                   \
+                   -1,                   \
+                   ( ptrdiff_t ) RETVAL, \
+                   "\tin %s: %s @ %d",   \
+                   __FILE_NAME__,        \
+                   __func__,             \
+                   __LINE__ )
 
 
 /** Warns like warn(3) and returns RETVAL */
 #define warn_ret( RETVAL, ... ) \
-    WarnUniversal( NULL, NULL, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+    WarnUniversal( true, NULL, NULL, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 #define warnx_ret( RETVAL, ... ) \
-    WarnUniversal( NULL, NULL, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+    WarnUniversal( true, NULL, NULL, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
 /** warn(3) with function name at the start */
-#define fwarn( ... )  ( void ) WarnUniversal( NULL, __func__, -1, errno, -1, __VA_ARGS__ )
-#define fwarnx( ... ) ( void ) WarnUniversal( NULL, __func__, -1, -1, -1, __VA_ARGS__ )
+#define fwarn( ... ) \
+    ( void ) WarnUniversal( true, NULL, __func__, -1, errno, -1, __VA_ARGS__ )
+#define fwarnx( ... ) \
+    ( void ) WarnUniversal( true, NULL, __func__, -1, -1, -1, __VA_ARGS__ )
 #define fwarn_ret( RETVAL, ... ) \
-    WarnUniversal( NULL, __func__, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+    WarnUniversal( true, NULL, __func__, -1, errno, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 #define fwarnx_ret( RETVAL, ... ) \
-    WarnUniversal( NULL, __func__, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+    WarnUniversal( true, NULL, __func__, -1, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
 
-#define fflwarn( ... ) \
-    ( void ) WarnUniversal( __FILE_NAME__, __func__, __LINE__, errno, -1, __VA_ARGS__ )
+#define fflwarn( ... )      \
+    ( void ) WarnUniversal( \
+            true, __FILE_NAME__, __func__, __LINE__, errno, -1, __VA_ARGS__ )
 #define fflwarnx( ... ) \
-    ( void ) WarnUniversal( __FILE_NAME__, __func__, __LINE__, -1, -1, __VA_ARGS__ )
+    ( void ) WarnUniversal( true, __FILE_NAME__, __func__, __LINE__, -1, -1, __VA_ARGS__ )
 #define fflwarn_ret( RETVAL, ... )       \
-    WarnUniversal( __FILE_NAME__,        \
+    WarnUniversal( true,                 \
+                   __FILE_NAME__,        \
                    __func__,             \
                    __LINE__,             \
                    errno,                \
                    ( ptrdiff_t ) RETVAL, \
                    __VA_ARGS__ )
-#define fflwarnx_ret( RETVAL, ... ) \
-    WarnUniversal(                  \
-            __FILE_NAME__, __func__, __LINE__, -1, ( ptrdiff_t ) RETVAL, __VA_ARGS__ )
+#define fflwarnx_ret( RETVAL, ... )      \
+    WarnUniversal( true,                 \
+                   __FILE_NAME__,        \
+                   __func__,             \
+                   __LINE__,             \
+                   -1,                   \
+                   ( ptrdiff_t ) RETVAL, \
+                   __VA_ARGS__ )
 
 
 #endif //CLIBS_ERRORS_H

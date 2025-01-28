@@ -32,12 +32,10 @@ size_t bigint_sizeof( const struct bigint *bi )
 
 int bigint_init_p( struct bigint *bi )
 {
-    if ( ( bi->numbers = list_init_type( uint64_t ) ) == NULL )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
-    bi->sign = SIGN_POS; // fixme? maybe this should be SIGN_ZERO
+    if ( ( bi->numbers = list_init_type_p( uint64_t, LS_PRINT_UNSIGNED ) ) == NULL )
+        return f_stack_trace( RV_ERROR );
+
+    bi->sign = SIGN_POS;
 
     static const uint64_t ZERO = 0;
     assert_that( list_append( bi->numbers, &ZERO ) == RV_SUCCESS,
@@ -49,7 +47,7 @@ int bigint_init_p( struct bigint *bi )
 
 struct bigint *bigint_init( void )
 {
-    struct bigint *new = new ( struct bigint );
+    struct bigint *new = calloc( 1, sizeof( struct bigint ) );
     if ( new == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
@@ -77,10 +75,7 @@ str_t bigint_to_string( const struct bigint *const bi )
     DynamicString dynstr =
             dynstr_init_cap( list_size( bi->numbers ) * sizeof( uint64_t ) * 2 );
     if ( dynstr == NULL )
-    {
-        f_stack_trace();
-        return NULL;
-    }
+        return ( void * ) f_stack_trace( NULL );
 
     ssize_t idx_last = ( ssize_t ) list_size( bi->numbers ) - 1;
     for ( ssize_t idx = idx_last; idx >= 0; --idx )
@@ -105,9 +100,8 @@ str_t bigint_to_string( const struct bigint *const bi )
     return ret;
 
 ERROR:
-    f_stack_trace();
     dynstr_destroy( dynstr );
-    return NULL;
+    return ( void * ) f_stack_trace( NULL );
 }
 
 
@@ -137,10 +131,7 @@ int bigint_from_string( string_t str, struct bigint **cont )
 
     struct bigint *bi = bigint_init();
     if ( bi == NULL )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
+        return f_stack_trace( RV_ERROR );
 
     if ( str[ 0 ] == '+' || str[ 0 ] == '-' )
     {
@@ -182,9 +173,8 @@ int bigint_from_string( string_t str, struct bigint **cont )
     return RV_SUCCESS;
 
 ERROR:
-    f_stack_trace();
     bigint_destroy( bi );
-    return RV_ERROR;
+    return f_stack_trace( RV_ERROR );
 }
 
 

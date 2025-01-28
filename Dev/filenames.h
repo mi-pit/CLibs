@@ -58,7 +58,7 @@ LibraryDefined const char *get_file_name( const char *const full_path )
     return full_path;
 }
 
-LibraryDefined const char *get_prog_name( void )
+LibraryDefined inline const char *get_prog_name( void )
 {
     return ProgName;
 }

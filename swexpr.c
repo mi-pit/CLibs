@@ -21,15 +21,9 @@ static const bool SWEX_FALSE = false;
     do                                                                     \
     {                                                                      \
         if ( LIST == NULL && ( LIST = list_init_size( NBYTES ) ) == NULL ) \
-        {                                                                  \
-            f_stack_trace();                                               \
-            return RV_ERROR;                                               \
-        }                                                                  \
+            return f_stack_trace( RV_ERROR );                              \
         if ( list_append( LIST, EXPRESSION ) == RV_ERROR )                 \
-        {                                                                  \
-            f_stack_trace();                                               \
-            return RV_ERROR;                                               \
-        }                                                                  \
+            return f_stack_trace( RV_ERROR );                              \
     }                                                                      \
     while ( 0 )
 
@@ -62,10 +56,7 @@ int switch_expression_assign( void )
     do                                              \
     {                                               \
         if ( list_pop( LIST, NULL ) != RV_SUCCESS ) \
-        {                                           \
-            f_stack_trace();                        \
-            return RV_ERROR;                        \
-        }                                           \
+            return f_stack_trace( RV_ERROR );       \
         if ( list_size( LIST ) == 0 )               \
         {                                           \
             list_destroy( LIST );                   \

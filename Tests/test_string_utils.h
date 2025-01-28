@@ -87,7 +87,7 @@ Tester test_one_strspl_str( string_t haystack,
     ssize_t strspl_rv = string_split( &spl, haystack, split_tok, mode );
     if ( strspl_rv < 0 )
     {
-        ffl_stack_trace();
+        ffl_stack_trace( 0 );
         exit( 1 );
     }
 
@@ -132,7 +132,7 @@ Tester test_one_strspl_regex( string_t haystack,
     ssize_t strspl_rv = string_split_regex( &spl, haystack, &reg, mode );
     if ( strspl_rv < 0 )
     {
-        ffl_stack_trace();
+        ffl_stack_trace( 0 );
         exit( -1 );
     }
 

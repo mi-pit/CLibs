@@ -57,9 +57,9 @@
 #define BACKGROUND_WHITE   COLOR_CREATOR( GROUND_BACK COLOR_WHITE )
 
 
-LibraryDefined inline void SetTerminalColor( const char *Color )
+LibraryDefined inline void SetTerminalColor( FILE *stream, const char *Color )
 {
-    printf( "%s", Color );
+    fprintf( stream, "%s", Color );
 }
 
 LibraryDefined PrintfLike( 3, 4 ) inline void PrintInColor( FILE *file,
