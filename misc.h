@@ -162,7 +162,8 @@ Mathematical uint64_t digitsof( uint64_t num, unsigned base );
  * @param exp
  * @return base ^ exp
  */
-Mathematical int64_t power( int64_t base, uint64_t exp );
+Mathematical int64_t power( int64_t base, unsigned exp );
+Mathematical uint64_t upower( uint64_t base, unsigned exp );
 
 /**
  * Reverses the digits of the number `n`.

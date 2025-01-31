@@ -4,7 +4,7 @@
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
 
-#include "pointer_utils.h"  /* deref_as() */
+#include "Dev/pointer_utils.h" /* deref_as() */
 #include "Structs/dynarr.h" /* List (stack) */
 
 #include <err.h>     /* err() */

@@ -6,7 +6,6 @@
 
 #include "../Dev/assert_that.h" /* includes "errors.h", <assert.h> */
 #include "../foreach.h"         /* foreach_ls */
-#include "../pointer_utils.h"   /* new */
 #include "../string_utils.h"    /* str_t, string_reversed() */
 #include "dynstring.h"          /* dynstr */
 
@@ -161,7 +160,7 @@ int bigint_from_string( string_t str, struct bigint **cont )
             if ( str[ char_index ] == '0' && app == 0 )
                 ++n_lead_zeroes;
         }
-        app = reverse_integer( app, 10 ) * power( 10, n_lead_zeroes );
+        app = reverse_integer( app, 10 ) * upower( 10, n_lead_zeroes );
 
         if ( chunk_idx == n_chunks - 1 )
             goto_on_fail( ERROR, list_set_at( bi->numbers, 0, &app ) );

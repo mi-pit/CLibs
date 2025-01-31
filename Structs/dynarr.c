@@ -1,10 +1,10 @@
 
 #include "dynarr.h"
 
-#include "../Dev/errors.h"  /* RVs, fwarn* */
+#include "../Dev/errors.h" /* RVs, fwarn* */
+#include "../Dev/pointer_utils.h"
 #include "../extra_types.h" /* byte */
 #include "../misc.h"        /* cmpeq() */
-#include "../pointer_utils.h"
 
 #include <stdbool.h> /* ... */
 #include <stdio.h>   /* *print* */
