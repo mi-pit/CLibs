@@ -23,7 +23,7 @@ typedef enum {
  * @return 1 if sign was -1 and vice versa
  * @see @code sign_t @endcode
  */
-#define sign_flipped( SIGN ) ( -SIGN )
+#define sign_flipped( SIGN ) ( -( SIGN ) )
 
 /**
  * Sign ( -1, 0, 1 ) of the number

@@ -194,7 +194,9 @@ int bigint_add_i( struct bigint *bi, int64_t n )
     return bigint_add_power( bi, n, 0 );
 }
 
-Private inline int handle_overflow( struct bigint *const bi, size_t level )
+Private inline int handle_overunderflow( struct bigint *const bi,
+                                         size_t level,
+                                         sign_t sign )
 {
     if ( list_size( bi->numbers ) == level + 1 ) // higher digit not available
     {
@@ -202,19 +204,14 @@ Private inline int handle_overflow( struct bigint *const bi, size_t level )
         return list_append( bi->numbers, &high );
     }
 
-    return bigint_add_power( bi, bi->sign, level + 1 );
+    return bigint_add_power( bi, sign, level + 1 );
 }
 
-Private inline int handle_underflow( struct bigint *const bi, size_t level )
-{
-    if ( list_size( bi->numbers ) == level + 1 ) // higher digit not available
-    {
-        uint64_t high = 1;
-        return list_append( bi->numbers, &high );
-    }
+#define handle_overflow( BIGINT, LEVEL ) \
+    handle_overunderflow( ( BIGINT ), ( LEVEL ), ( BIGINT )->sign )
 
-    return bigint_add_power( bi, sign_flipped( bi->sign ), level + 1 );
-}
+#define handle_underflow( BIGINT, LEVEL ) \
+    handle_overunderflow( ( BIGINT ), ( LEVEL ), sign_flipped( ( BIGINT )->sign ) )
 
 int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t level )
 {
@@ -248,6 +245,7 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
               : underflow  ? BIGINT_LIST_MEMBER_MAX + 1 + ( ( int64_t ) low + norm_n )
                            : ( low + norm_n ) % ( BIGINT_LIST_MEMBER_MAX + 1 ) )
             - ( int ) sub_one_more;
+
     assert_that( list_set_at( bi->numbers, level, &final ) == RV_SUCCESS,
                  "couldn't set number list element; index=%" PRIu64 ", size=%zu",
                  level,
