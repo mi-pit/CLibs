@@ -26,18 +26,18 @@ void bigint_flip_sign( struct bigint *bi )
 
 size_t bigint_sizeof( const struct bigint *bi )
 {
-    return bi->numbers->len;
+    return bi->num_ls->len;
 }
 
 
 int bigint_init_p( struct bigint *bi )
 {
-    if ( ( bi->numbers = numls_init() ) == NULL )
+    if ( ( bi->num_ls = numls_init() ) == NULL )
         return f_stack_trace( RV_ERROR );
 
     bi->sign = SIGN_POS;
 
-    assert_that( numls_append( bi->numbers, 0 ) == RV_SUCCESS,
+    assert_that( numls_append( bi->num_ls, 0 ) == RV_SUCCESS,
                  "Cap must be at least one so no realloc,"
                  "therefore this shouldn't be able to fail" );
 
@@ -60,7 +60,7 @@ struct bigint *bigint_init_as( const int64_t n )
     struct bigint *new = bigint_init();
 
     const uint64_t u_n         = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
-    new->numbers->numbers[ 0 ] = u_n;
+    new->num_ls->numbers[ 0 ] = u_n;
     new->sign                  = n == 0 ? SIGN_POS : sgn_64( n );
 
     return new;
@@ -69,11 +69,11 @@ struct bigint *bigint_init_as( const int64_t n )
 
 str_t bigint_to_string( const struct bigint *const bi )
 {
-    DynamicString dynstr = dynstr_init_cap( bi->numbers->len * sizeof( uint64_t ) * 2 );
+    DynamicString dynstr = dynstr_init_cap( bi->num_ls->len * sizeof( uint64_t ) * 2 );
     if ( dynstr == NULL )
         return ( void * ) f_stack_trace( NULL );
 
-    ssize_t idx_last = ( ssize_t ) bi->numbers->len - 1;
+    ssize_t idx_last = ( ssize_t ) bi->num_ls->len - 1;
     for ( ssize_t idx = idx_last; idx >= 0; --idx )
     {
         char fmt_buf[ 1 + 1 + 20 + 3 + 1 ];
@@ -82,7 +82,7 @@ str_t bigint_to_string( const struct bigint *const bi )
         snprintf(
                 fmt_buf, sizeof fmt_buf, "%%0%i" PRIu64, BIGINT_LIST_MEMBER_MAX_DIGITS );
 
-        uint64_t num = bi->numbers->numbers[ idx ];
+        uint64_t num = bi->num_ls->numbers[ idx ];
         if ( dynstr_appendf( dynstr, ( idx == idx_last ? "%" PRIu64 : fmt_buf ), num )
              != RV_SUCCESS )
             goto ERROR;
@@ -160,9 +160,9 @@ int bigint_from_string( string_t str, struct bigint **cont )
         app = reverse_integer( app, 10 ) * upower( 10, n_lead_zeroes );
 
         if ( chunk_idx == n_chunks - 1 )
-            bi->numbers->numbers[ 0 ] = app;
+            bi->num_ls->numbers[ 0 ] = app;
         else
-            goto_on_fail( ERROR, numls_append( bi->numbers, app ) );
+            goto_on_fail( ERROR, numls_append( bi->num_ls, app ) );
     }
 
     *cont = bi;
@@ -176,12 +176,12 @@ ERROR:
 
 void bigint_destroy_l( struct bigint bi )
 {
-    numls_destroy( bi.numbers );
+    numls_destroy( bi.num_ls );
 }
 
 void bigint_destroy( struct bigint *bp )
 {
-    numls_destroy( bp->numbers );
+    numls_destroy( bp->num_ls );
     free( bp );
 }
 
@@ -195,8 +195,8 @@ Private inline int handle_overunderflow( struct bigint *const bi,
                                          size_t level,
                                          sign_t sign )
 {
-    if ( bi->numbers->len == level + 1 ) // higher digit not available
-        return numls_append( bi->numbers, 1 );
+    if ( bi->num_ls->len == level + 1 ) // higher digit not available
+        return numls_append( bi->num_ls, 1 );
 
     return bigint_add_power( bi, sign, level + 1 );
 }
@@ -212,11 +212,11 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
     if ( n == 0 )
         return RV_SUCCESS;
 
-    if ( bi->numbers->len <= level )
+    if ( bi->num_ls->len <= level )
         return_on_fail(
-                numls_extend_zeroes( bi->numbers, level - bi->numbers->len + 1 ) );
+                numls_extend_zeroes( bi->num_ls, level - bi->num_ls->len + 1 ) );
 
-    uint64_t low = bi->numbers->numbers[ level ];
+    uint64_t low = bi->num_ls->numbers[ level ];
 
     // int64_t norm_n isn't able to hold this value
     // => subtract it after converting to uint64_t
@@ -228,7 +228,7 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
     bool underflow = norm_n < 0 && low < ( uint64_t ) llabs( norm_n );
     assert_that( !overflow || !underflow, "cannot both be set at once" );
 
-    bool flip_bi_sign = underflow && bi->numbers->len == level + 1;
+    bool flip_bi_sign = underflow && bi->num_ls->len == level + 1;
 
     const uint64_t final =
             ( flip_bi_sign ? low - norm_n
@@ -236,7 +236,7 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
                            : ( low + norm_n ) % ( BIGINT_LIST_MEMBER_MAX + 1 ) )
             - ( int ) sub_one_more;
 
-    bi->numbers->numbers[ level ] = final;
+    bi->num_ls->numbers[ level ] = final;
 
     if ( flip_bi_sign )
         bigint_flip_sign( bi );
@@ -245,8 +245,8 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
     else if ( overflow )
         return_on_fail( handle_overflow( bi, level ) );
 
-    if ( final == 0 && level != 0 && level == bi->numbers->len - 1 )
-        return numls_pop( bi->numbers );
+    if ( final == 0 && level != 0 && level == bi->num_ls->len - 1 )
+        return numls_pop( bi->num_ls );
 
     return RV_SUCCESS;
 }
@@ -255,10 +255,10 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
 int bigint_add_b( struct bigint *bi, const struct bigint *add )
 {
     // FIXME: subtraction "underflow"
-    for ( size_t i = 0; i < add->numbers->len; ++i )
+    for ( size_t i = 0; i < add->num_ls->len; ++i )
     {
-        const size_t index = add->numbers->len - i - 1;
-        const uint64_t num = add->numbers->numbers[ index ];
+        const size_t index = add->num_ls->len - i - 1;
+        const uint64_t num = add->num_ls->numbers[ index ];
 
         assert_that( num <= BIGINT_LIST_MEMBER_MAX,
                      "bigint list member value out of bounds: %" PRIu64,
@@ -284,7 +284,7 @@ int bigint_cmp_i( const struct bigint *bi, int64_t n )
     if ( bigint_sizeof( bi ) > 1 )
         return BIGINT_GT;
 
-    const uint64_t bi_low = bi->numbers->numbers[ 0 ];
+    const uint64_t bi_low = bi->num_ls->numbers[ 0 ];
     if ( bi->sign != sgn_64( n ) )
         return bi->sign;
 
@@ -297,8 +297,8 @@ int bigint_cmp_i( const struct bigint *bi, int64_t n )
 
 int bigint_cmp_b( const struct bigint *bi1, const struct bigint *bi2 )
 {
-    const size_t s1 = bi1->numbers->len;
-    const size_t s2 = bi2->numbers->len;
+    const size_t s1 = bi1->num_ls->len;
+    const size_t s2 = bi2->num_ls->len;
 
     if ( s1 != s2 )
         return cmp_size_t( &s1, &s2 );
@@ -306,8 +306,8 @@ int bigint_cmp_b( const struct bigint *bi1, const struct bigint *bi2 )
     for ( size_t i = 0; i < s1; ++i )
     {
         const size_t idx  = s1 - i - 1;
-        const uint64_t n1 = bi1->numbers->numbers[ idx ];
-        const uint64_t n2 = bi2->numbers->numbers[ idx ];
+        const uint64_t n1 = bi1->num_ls->numbers[ idx ];
+        const uint64_t n2 = bi2->num_ls->numbers[ idx ];
         if ( n1 != n2 )
             return cmp_uint64_t( &n1, &n2 );
     }

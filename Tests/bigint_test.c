@@ -26,17 +26,17 @@ Private void set_number_array( struct bigint *bi,
 {
     bi->sign = sign;
 
-    while ( bi->numbers->len > count )
-        assert_that( numls_pop( bi->numbers ) == RV_SUCCESS,
+    while ( bi->num_ls->len > count )
+        assert_that( numls_pop( bi->num_ls ) == RV_SUCCESS,
                      "list_pop at size %zu",
-                     bi->numbers->len );
+                     bi->num_ls->len );
 
-    for ( size_t i = 0; i < bi->numbers->len; ++i )
-        bi->numbers->numbers[ i ] = numbers[ i ];
+    for ( size_t i = 0; i < bi->num_ls->len; ++i )
+        bi->num_ls->numbers[ i ] = numbers[ i ];
 
-    for ( size_t i = bi->numbers->len; i < count; ++i )
+    for ( size_t i = bi->num_ls->len; i < count; ++i )
     {
-        assert_that( numls_append( bi->numbers, numbers[ i ] ) == RV_SUCCESS,
+        assert_that( numls_append( bi->num_ls, numbers[ i ] ) == RV_SUCCESS,
                      "numls_append @%zu",
                      i );
     }
@@ -112,12 +112,12 @@ Tester test_number_array( const struct bigint *bi,
                           size_t count,
                           const uint64_t arr[ count ] )
 {
-    if ( bi->numbers->len != count )
+    if ( bi->num_ls->len != count )
         return false;
 
     for ( size_t i = 0; i < count; ++i )
     {
-        uint64_t in_num = bi->numbers->numbers[ i ];
+        uint64_t in_num = bi->num_ls->numbers[ i ];
         uint64_t arg    = arr[ i ];
         if ( arg != in_num )
             return false;
@@ -171,7 +171,7 @@ TEST( init_and_string )
     UNIT_TEST( try_to_init_as_to_string( INT64_MIN ) );
 
     struct bigint *bi = bigint_init();
-    assert( bi->numbers->len > 0 );
+    assert( bi->num_ls->len > 0 );
     UNIT_TEST( test_number_array( bi, 1, ( uint64_t[] ){ 0ULL } ) );
 
     bigint_add_i( bi, INT64_MAX );
@@ -458,11 +458,11 @@ TEST( add )
     {
         bigint_add_i( bi, UINT64_C( 5000000000000000000 ) );
         bigint_add_i( bi, UINT64_C( 5000000000000000000 ) );
-        bool is_correct = bi->numbers->len == 2 && bi->sign == SIGN_POS;
+        bool is_correct = bi->num_ls->len == 2 && bi->sign == SIGN_POS;
 
         is_correct = is_correct
-                     && bi->numbers->numbers[ 0 ] == UINT64_C( 8446744073709551618 );
-        is_correct = is_correct && bi->numbers->numbers[ 1 ] == i + 2u;
+                     && bi->num_ls->numbers[ 0 ] == UINT64_C( 8446744073709551618 );
+        is_correct = is_correct && bi->num_ls->numbers[ 1 ] == i + 2u;
 
         UNIT_TEST( is_correct );
     }
@@ -579,12 +579,12 @@ TEST( sub )
     assert_that( test_metadata( bi, SIGN_POS, 1, ( uint64_t[ 1 ] ){ 0 } ),
                  "sign=%s, size=%zu",
                  bi->sign == SIGN_POS ? "+" : "-",
-                 bi->numbers->len );
+                 bi->num_ls->len );
     bigint_add_power( bi, -1, 1 );
     UNIT_TEST( test_metadata( bi, SIGN_NEG, 2, ( uint64_t[ 2 ] ){ 0, 1 } ) );
 
     bigint_add_power( bi, INT64_MIN, 0 );
-    array_printf( bi->numbers->numbers, bi->numbers->len, uint64_t, "%" PRIu64 );
+    array_printf( bi->num_ls->numbers, bi->num_ls->len, uint64_t, "%" PRIu64 );
     UNIT_TEST( test_metadata(
             bi, SIGN_NEG, 2, ( uint64_t[ 2 ] ){ 9223372036854775807uLL - 1, 1 } ) );
 
@@ -819,15 +819,15 @@ Tester test_one_multi_add( string_t s1, string_t s2, string_t result )
     assert( bigint_add_b( bi1, bi2 ) == RV_SUCCESS );
 
     SetTerminalColor( stdout, FOREGROUND_BLUE );
-    array_printf_sde( bi1->numbers,
-                      bi1->numbers->len,
+    array_printf_sde( bi1->num_ls,
+                      bi1->num_ls->len,
                       uint64_t,
                       "%llu",
                       "\nbi1: [\n\t",
                       "\n\t",
                       "\n]\n" );
-    array_printf_sde( res->numbers,
-                      res->numbers->len,
+    array_printf_sde( res->num_ls,
+                      res->num_ls->len,
                       uint64_t,
                       "%llu",
                       "\nres: [\n\t",

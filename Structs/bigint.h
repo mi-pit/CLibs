@@ -11,7 +11,7 @@
 
 
 struct bigint {
-    struct numbers_list *numbers;
+    struct numbers_list *num_ls;
     sign_t sign;
 };
 

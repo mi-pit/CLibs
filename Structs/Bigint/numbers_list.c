@@ -74,7 +74,7 @@ int numls_extend_zeroes( struct numbers_list *ls, size_t new_len )
     if ( ls->cap <= ls->len + new_len )
         return_on_fail( numls_resize( ls, get_next_power_of_two( ls->len + new_len ) ) );
 
-    memset( ls->numbers + ls->len, 0, new_len );
+    memset( ls->numbers + ls->len, 0, new_len * sizeof( uint64_t ) );
     ls->len += new_len;
 
     return RV_SUCCESS;
