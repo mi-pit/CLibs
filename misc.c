@@ -71,3 +71,21 @@ uint64_t reverse_integer( uint64_t n, unsigned base )
 
     return n;
 }
+
+uint64_t get_next_power_of_two( uint64_t n )
+{
+    uint64_t pwr = 1;
+    while ( pwr <= n )
+        pwr *= 2;
+
+    return pwr;
+}
+
+uint64_t get_prev_power_of_two( uint64_t n )
+{
+    uint64_t pwr = INT64_MAX + UINT64_C( 1 );
+    while ( pwr >= n )
+        pwr /= 2;
+
+    return pwr;
+}

@@ -182,4 +182,7 @@ Mathematical uint64_t upower( uint64_t base, unsigned exp );
  */
 uint64_t reverse_integer( uint64_t n, unsigned base );
 
+Mathematical uint64_t get_next_power_of_two( uint64_t );
+Mathematical uint64_t get_prev_power_of_two( uint64_t );
+
 #endif //CLIBS_MISC_H

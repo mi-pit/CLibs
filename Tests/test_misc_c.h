@@ -80,6 +80,20 @@ LibraryDefined TEST( misc_c )
     UNIT_TEST( test_one_reverse_int( 8, 2, 1 ) );
     UNIT_TEST( test_one_reverse_int( 1, 2, 1 ) );
     UNIT_TEST( test_one_reverse_int( 0x1AB, 16, 0xBA1 ) );
+
+    UNIT_TEST( get_next_power_of_two( 1 ) == 2 );
+    UNIT_TEST( get_next_power_of_two( 2 ) == 4 );
+    UNIT_TEST( get_next_power_of_two( 3 ) == 4 );
+    UNIT_TEST( get_next_power_of_two( 4 ) == 8 );
+    UNIT_TEST( get_next_power_of_two( 1 << 24 ) == ( 1 << 25 ) );
+    UNIT_TEST( get_next_power_of_two( ( 1 << 24 ) - 1 ) == ( 1 << 24 ) );
+
+    UNIT_TEST( get_prev_power_of_two( 2 ) == 1 );
+    UNIT_TEST( get_prev_power_of_two( 3 ) == 2 );
+    UNIT_TEST( get_prev_power_of_two( 4 ) == 2 );
+    UNIT_TEST( get_prev_power_of_two( 5 ) == 4 );
+    UNIT_TEST( get_prev_power_of_two( 1 << 24 ) == ( 1 << 23 ) );
+    UNIT_TEST( get_prev_power_of_two( ( 1 << 24 ) + 1 ) == ( 1 << 24 ) );
 }
 END_TEST
 

@@ -5,16 +5,13 @@
 #ifndef CLIBS_BIGINT_H
 #define CLIBS_BIGINT_H
 
-#include "../Dev/attributes.h" /* Constructor, UseResult */
-#include "../misc.h"           /* sign_t */
-#include "dynarr.h"            /* List */
-
-#include <stdbool.h> /* ... */
-#include <stdint.h>  /* (u)int64_t */
+#include "../Dev/attributes.h"   /* Constructor, UseResult */
+#include "../misc.h"             /* sign_t */
+#include "Bigint/numbers_list.h" /* numls */
 
 
 struct bigint {
-    struct dynamic_array *numbers;
+    struct numbers_list *numbers;
     sign_t sign;
 };
 

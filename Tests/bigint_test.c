@@ -4,6 +4,7 @@
 
 #include "../Structs/bigint.h" /* also includes dynarr.h, misc.h */
 
+#include "../array_printf.h"
 #include "../Dev/assert_that.h" /* assert_that(), #include "../errors.h" */
 #include "../Dev/unit_tests.h"  /* TEST, UNIT_TEST, RUN_TEST, FINISH_TESTING */
 #include "../string_utils.h"    /* str types */
@@ -25,23 +26,19 @@ Private void set_number_array( struct bigint *bi,
 {
     bi->sign = sign;
 
-    while ( list_size( bi->numbers ) > count )
-        assert_that( list_pop( bi->numbers, NULL ) == RV_SUCCESS,
+    while ( bi->numbers->len > count )
+        assert_that( numls_pop( bi->numbers ) == RV_SUCCESS,
                      "list_pop at size %zu",
-                     list_size( bi->numbers ) );
+                     bi->numbers->len );
 
-    for ( size_t i = 0; i < list_size( bi->numbers ); ++i )
-    {
-        uint64_t num = numbers[ i ];
-        assert_that(
-                list_set_at( bi->numbers, i, &num ) == RV_SUCCESS, "list_set_at %zu", i );
-    }
+    for ( size_t i = 0; i < bi->numbers->len; ++i )
+        bi->numbers->numbers[ i ] = numbers[ i ];
 
-    for ( size_t i = list_size( bi->numbers ); i < count; ++i )
+    for ( size_t i = bi->numbers->len; i < count; ++i )
     {
-        uint64_t num = numbers[ i ];
-        assert_that(
-                list_append( bi->numbers, &num ) == RV_SUCCESS, "list_append @%zu", i );
+        assert_that( numls_append( bi->numbers, numbers[ i ] ) == RV_SUCCESS,
+                     "numls_append @%zu",
+                     i );
     }
 }
 
@@ -115,12 +112,12 @@ Tester test_number_array( const struct bigint *bi,
                           size_t count,
                           const uint64_t arr[ count ] )
 {
-    if ( list_size( bi->numbers ) != count )
+    if ( bi->numbers->len != count )
         return false;
 
     for ( size_t i = 0; i < count; ++i )
     {
-        uint64_t in_num = list_access( bi->numbers, i, uint64_t );
+        uint64_t in_num = bi->numbers->numbers[ i ];
         uint64_t arg    = arr[ i ];
         if ( arg != in_num )
             return false;
@@ -174,7 +171,7 @@ TEST( init_and_string )
     UNIT_TEST( try_to_init_as_to_string( INT64_MIN ) );
 
     struct bigint *bi = bigint_init();
-    assert( list_size( bi->numbers ) > 0 );
+    assert( bi->numbers->len > 0 );
     UNIT_TEST( test_number_array( bi, 1, ( uint64_t[] ){ 0ULL } ) );
 
     bigint_add_i( bi, INT64_MAX );
@@ -461,12 +458,11 @@ TEST( add )
     {
         bigint_add_i( bi, UINT64_C( 5000000000000000000 ) );
         bigint_add_i( bi, UINT64_C( 5000000000000000000 ) );
-        bool is_correct = list_size( bi->numbers ) == 2 && bi->sign == SIGN_POS;
+        bool is_correct = bi->numbers->len == 2 && bi->sign == SIGN_POS;
 
         is_correct = is_correct
-                     && list_access( bi->numbers, 0, uint64_t )
-                                == UINT64_C( 8446744073709551618 );
-        is_correct = is_correct && list_access( bi->numbers, 1, uint64_t ) == i + 2u;
+                     && bi->numbers->numbers[ 0 ] == UINT64_C( 8446744073709551618 );
+        is_correct = is_correct && bi->numbers->numbers[ 1 ] == i + 2u;
 
         UNIT_TEST( is_correct );
     }
@@ -583,12 +579,12 @@ TEST( sub )
     assert_that( test_metadata( bi, SIGN_POS, 1, ( uint64_t[ 1 ] ){ 0 } ),
                  "sign=%s, size=%zu",
                  bi->sign == SIGN_POS ? "+" : "-",
-                 list_size( bi->numbers ) );
+                 bi->numbers->len );
     bigint_add_power( bi, -1, 1 );
     UNIT_TEST( test_metadata( bi, SIGN_NEG, 2, ( uint64_t[ 2 ] ){ 0, 1 } ) );
 
     bigint_add_power( bi, INT64_MIN, 0 );
-    list_printf( bi->numbers, uint64_t, "%" PRIu64 );
+    array_printf( bi->numbers->numbers, bi->numbers->len, uint64_t, "%" PRIu64 );
     UNIT_TEST( test_metadata(
             bi, SIGN_NEG, 2, ( uint64_t[ 2 ] ){ 9223372036854775807uLL - 1, 1 } ) );
 
@@ -823,8 +819,20 @@ Tester test_one_multi_add( string_t s1, string_t s2, string_t result )
     assert( bigint_add_b( bi1, bi2 ) == RV_SUCCESS );
 
     SetTerminalColor( stdout, FOREGROUND_BLUE );
-    list_printf_sde( bi1->numbers, uint64_t, "%llu", "\nbi1: [\n\t", "\n\t", "\n]\n" );
-    list_printf_sde( res->numbers, uint64_t, "%llu", "\nres: [\n\t", "\n\t", "\n]\n" );
+    array_printf_sde( bi1->numbers,
+                      bi1->numbers->len,
+                      uint64_t,
+                      "%llu",
+                      "\nbi1: [\n\t",
+                      "\n\t",
+                      "\n]\n" );
+    array_printf_sde( res->numbers,
+                      res->numbers->len,
+                      uint64_t,
+                      "%llu",
+                      "\nres: [\n\t",
+                      "\n\t",
+                      "\n]\n" );
     SetTerminalColor( stdout, COLOR_DEFAULT );
 
     bool rv = cmpeq( bigint_cmp_b( bi1, res ) );

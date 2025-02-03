@@ -30,6 +30,7 @@ add_executable(TestNumbers
         Structs/dynarr.c
         string_utils.c
         misc.c
+        Structs/Bigint/numbers_list.c
         )
 
 add_executable(TestHashFunc
