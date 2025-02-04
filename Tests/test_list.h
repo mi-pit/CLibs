@@ -172,6 +172,8 @@ Private TEST( list_advanced )
     assert( ls != NULL );
 
     assert( list_extend( ls, array, countof( array ) ) == RV_SUCCESS );
+
+    list_destroy( ls );
 }
 END_TEST
 

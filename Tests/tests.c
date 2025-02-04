@@ -57,13 +57,11 @@ void run_misc_c( void )
     RUN_TEST( misc_c );
 }
 
-LibraryDefined TEST( array_sprintf )
+Private TEST( array_sprintf )
 {
     int array[ 10 ];
     for ( size_t i = 0; i < countof( array ); ++i )
         array[ i ] = ( int ) ( i * i ) * ( i % 2 == 0 ? -1 : 1 );
-
-    void *items_gen = array;
 
     str_t str, snd;
     array_sprintf_d( str, array, countof( array ), int, "%i", ", " );
@@ -75,6 +73,7 @@ LibraryDefined TEST( array_sprintf )
     free( str );
     free( snd );
 
+    void *items_gen = array;
     array_sprintf_d( str, items_gen, countof( array ), int, "%+02i", " | " );
     PrintInColor( stdout, BACKGROUND_YELLOW, "%s\n", str );
 
