@@ -109,20 +109,15 @@ LibraryDefined Mathematical inline uint64_t max_u64( uint64_t a, uint64_t b )
     }
 
 DEFINE_CMP_FUNCTION( byte )
-
 DEFINE_CMP_FUNCTION( char )
-
 DEFINE_CMP_FUNCTION( int )
-
 DEFINE_CMP_FUNCTION( size_t )
-
 DEFINE_CMP_FUNCTION( int64_t )
-
 DEFINE_CMP_FUNCTION( uint64_t )
 
 
 /**
- * Creates an arbitrary hash of any data of the specified length length
+ * Creates an arbitrary hash of any data of the specified length
  * @param len number of bytes (chars) under the pointer
  * @return unsigned 64-bit int hash
  */

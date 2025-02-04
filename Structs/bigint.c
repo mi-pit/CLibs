@@ -46,7 +46,7 @@ int bigint_init_p( struct bigint *bi )
 
 struct bigint *bigint_init( void )
 {
-    struct bigint *new = new ( struct bigint );
+    struct bigint *const new = new ( struct bigint );
     if ( new == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
@@ -57,11 +57,11 @@ struct bigint *bigint_init( void )
 
 struct bigint *bigint_init_as( const int64_t n )
 {
-    struct bigint *new = bigint_init();
+    struct bigint *const new = bigint_init();
 
-    const uint64_t u_n         = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
+    const uint64_t u_n        = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
     new->num_ls->numbers[ 0 ] = u_n;
-    new->sign                  = n == 0 ? SIGN_POS : sgn_64( n );
+    new->sign                 = n == 0 ? SIGN_POS : sgn_64( n );
 
     return new;
 }
@@ -82,7 +82,7 @@ str_t bigint_to_string( const struct bigint *const bi )
         snprintf(
                 fmt_buf, sizeof fmt_buf, "%%0%i" PRIu64, BIGINT_LIST_MEMBER_MAX_DIGITS );
 
-        uint64_t num = bi->num_ls->numbers[ idx ];
+        const uint64_t num = bi->num_ls->numbers[ idx ];
         if ( dynstr_appendf( dynstr, ( idx == idx_last ? "%" PRIu64 : fmt_buf ), num )
              != RV_SUCCESS )
             goto ERROR;
@@ -113,7 +113,7 @@ Private bool validate_input_string( string_t str, size_t len )
         if ( i != 0 && !isdigit( str[ i ] ) )
             return false;
 
-        has_digits = isdigit( str[ i ] );
+        has_digits = has_digits || isdigit( str[ i ] );
     }
 
     return has_digits;
@@ -141,9 +141,10 @@ int bigint_from_string( string_t str, struct bigint **cont )
 
     for ( size_t i = 0; i < len; i += chunk_size )
     {
-        unsigned n_lead_zeroes   = 0;
         const uint64_t chunk_idx = n_chunks - i - 1;
-        uint64_t app             = 0;
+
+        unsigned n_lead_zeroes = 0;
+        uint64_t app           = 0;
         // TODO? one loop
         for ( size_t j = 0; j < chunk_size; ++j )
         {
@@ -195,7 +196,7 @@ Private inline int handle_overunderflow( struct bigint *const bi,
                                          size_t level,
                                          sign_t sign )
 {
-    if ( bi->num_ls->len == level + 1 ) // higher digit not available
+    if ( numls_is_last( bi->num_ls, level ) ) // higher digit not available
         return numls_append( bi->num_ls, 1 );
 
     return bigint_add_power( bi, sign, level + 1 );
@@ -212,23 +213,28 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
     if ( n == 0 )
         return RV_SUCCESS;
 
-    if ( bi->num_ls->len <= level )
-        return_on_fail(
-                numls_extend_zeroes( bi->num_ls, level - bi->num_ls->len + 1 ) );
+    assert( sgn_64( n ) != 0 );
+    assert_that( bi->sign == 1 || bi->sign == -1,
+                 "bigint sign must be ›1‹ or ›-1‹ (is %d)",
+                 bi->sign );
 
-    uint64_t low = bi->num_ls->numbers[ level ];
+    if ( bi->num_ls->len <= level )
+        return_on_fail( numls_extend_zeroes( bi->num_ls, level - bi->num_ls->len + 1 ) );
+
+    const uint64_t low = bi->num_ls->numbers[ level ];
 
     // int64_t norm_n isn't able to hold this value
     // => subtract it after converting to uint64_t
-    bool sub_one_more = sgn_64( n ) == bi->sign && n == INT64_MIN;
+    const bool sub_one_more = sgn_64( n ) == bi->sign && n == INT64_MIN;
 
     int64_t norm_n = sub_one_more ? INT64_MAX : n * bi->sign;
 
-    bool overflow  = norm_n > 0 && low > BIGINT_LIST_MEMBER_MAX - ( uint64_t ) norm_n;
-    bool underflow = norm_n < 0 && low < ( uint64_t ) llabs( norm_n );
+    const bool overflow =
+            norm_n > 0 && low > BIGINT_LIST_MEMBER_MAX - ( uint64_t ) norm_n;
+    const bool underflow = norm_n < 0 && low < ( uint64_t ) llabs( norm_n );
     assert_that( !overflow || !underflow, "cannot both be set at once" );
 
-    bool flip_bi_sign = underflow && bi->num_ls->len == level + 1;
+    const bool flip_bi_sign = underflow && numls_is_last( bi->num_ls, level );
 
     const uint64_t final =
             ( flip_bi_sign ? low - norm_n
@@ -245,7 +251,7 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
     else if ( overflow )
         return_on_fail( handle_overflow( bi, level ) );
 
-    if ( final == 0 && level != 0 && level == bi->num_ls->len - 1 )
+    if ( final == 0 && level != 0 && numls_is_last( bi->num_ls, level ) )
         return numls_pop( bi->num_ls );
 
     return RV_SUCCESS;
@@ -257,8 +263,7 @@ int bigint_add_b( struct bigint *bi, const struct bigint *add )
     // FIXME: subtraction "underflow"
     for ( size_t i = 0; i < add->num_ls->len; ++i )
     {
-        const size_t index = add->num_ls->len - i - 1;
-        const uint64_t num = add->num_ls->numbers[ index ];
+        const uint64_t num = add->num_ls->numbers[ i ];
 
         assert_that( num <= BIGINT_LIST_MEMBER_MAX,
                      "bigint list member value out of bounds: %" PRIu64,
@@ -266,13 +271,13 @@ int bigint_add_b( struct bigint *bi, const struct bigint *add )
 
         if ( num >= INT64_MAX )
         {
-            const int64_t main = ( int64_t ) ( num - INT64_MAX ) * add->sign;
-            const int64_t rem  = ( int64_t ) ( num - main ) * add->sign;
-            return_on_fail( bigint_add_power( bi, main, index ) );
-            return_on_fail( bigint_add_power( bi, rem, index ) );
+            const int64_t main = INT64_MAX;
+            const int64_t rem  = ( int64_t ) ( num - main );
+            return_on_fail( bigint_add_power( bi, main * add->sign, i ) );
+            return_on_fail( bigint_add_power( bi, rem * add->sign, i ) );
         }
         else
-            return_on_fail( bigint_add_power( bi, num * add->sign, index ) );
+            return_on_fail( bigint_add_power( bi, num * add->sign, i ) );
     }
 
     return RV_SUCCESS;

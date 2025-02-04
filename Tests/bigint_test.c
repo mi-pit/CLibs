@@ -460,8 +460,8 @@ TEST( add )
         bigint_add_i( bi, UINT64_C( 5000000000000000000 ) );
         bool is_correct = bi->num_ls->len == 2 && bi->sign == SIGN_POS;
 
-        is_correct = is_correct
-                     && bi->num_ls->numbers[ 0 ] == UINT64_C( 8446744073709551618 );
+        is_correct =
+                is_correct && bi->num_ls->numbers[ 0 ] == UINT64_C( 8446744073709551618 );
         is_correct = is_correct && bi->num_ls->numbers[ 1 ] == i + 2u;
 
         UNIT_TEST( is_correct );
@@ -632,9 +632,24 @@ TEST( sub )
 #endif
     free( s );
 
+    set_number_array(
+            bi, SIGN_POS, 2, ( const uint64_t[] ){ 928293509809835029, 39520395 } );
+    struct bigint *sub = bigint_init();
+    set_number_array( sub,
+                      SIGN_NEG,
+                      2,
+                      ( const uint64_t[ 2 ] ){ 349687096872653812, 273942803749284867 } );
+    bigint_add_b( bi, sub );
+    UNIT_TEST( test_metadata(
+            bi,
+            SIGN_NEG,
+            2,
+            ( const uint64_t[ 2 ] ){ 9421393587062818783u, 273942803709764471u } ) );
+    bigint_destroy( sub );
+
     bigint_destroy( bi );
 }
-END_TEST
+END_TEST // sub
 
 TEST( bigint_add_b )
 {
@@ -813,24 +828,40 @@ Tester test_one_multi_add( string_t s1, string_t s2, string_t result )
     struct bigint *bi1, *bi2, *res;
     assert( bigint_from_string( s1, &bi1 ) == RV_SUCCESS );
     assert( bigint_from_string( s2, &bi2 ) == RV_SUCCESS );
+    printf( "\n" );
+    SetTerminalColor( stdout, FOREGROUND_GREEN );
+    array_printf_sde( bi1->num_ls->numbers,
+                      bi1->num_ls->len,
+                      uint64_t,
+                      "%llu",
+                      "bi1: [\n\t",
+                      "\n\t",
+                      "\n]\n" );
+    array_printf_sde( bi2->num_ls->numbers,
+                      bi2->num_ls->len,
+                      uint64_t,
+                      "%llu",
+                      "bi2: [\n\t",
+                      "\n\t",
+                      "\n]\n" );
 
     assert( bigint_from_string( result, &res ) == RV_SUCCESS );
 
     assert( bigint_add_b( bi1, bi2 ) == RV_SUCCESS );
 
     SetTerminalColor( stdout, FOREGROUND_BLUE );
-    array_printf_sde( bi1->num_ls,
+    array_printf_sde( bi1->num_ls->numbers,
                       bi1->num_ls->len,
                       uint64_t,
                       "%llu",
-                      "\nbi1: [\n\t",
+                      "bi1: [\n\t",
                       "\n\t",
                       "\n]\n" );
-    array_printf_sde( res->num_ls,
+    array_printf_sde( res->num_ls->numbers,
                       res->num_ls->len,
                       uint64_t,
                       "%llu",
-                      "\nres: [\n\t",
+                      "res: [\n\t",
                       "\n\t",
                       "\n]\n" );
     SetTerminalColor( stdout, COLOR_DEFAULT );
