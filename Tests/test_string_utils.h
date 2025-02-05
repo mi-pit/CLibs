@@ -438,7 +438,7 @@ Tester test_one_reverse_str( string_t orig, string_t result )
     return rv;
 }
 
-Private TEST( reverse_str )
+TEST( reverse_str )
 {
     UNIT_TEST( test_one_reverse_str( "Hovno", "onvoH" ) );
     UNIT_TEST( test_one_reverse_str( "", "" ) );

@@ -34,9 +34,9 @@
  * @param item  name of the new variable
  * @param array array of type 'type[]'
  */
-#define foreach_arr( TYPE, ITEM_NAME, ARRAY, COUNT )               \
+#define foreach_arr( ITEM_TYPE, ITEM_NAME, ARRAY, COUNT )          \
     foreach_helper_init( COUNT, ITEM_NAME ) foreach_helper_assign( \
-            TYPE, ITEM_NAME, ( ARRAY )[ foreach_index_##ITEM_NAME ] )
+            ITEM_TYPE, ITEM_NAME, ( ARRAY )[ foreach_index_##ITEM_NAME ] )
 
 /**
  * Iterates over the string ‹strn›<br>

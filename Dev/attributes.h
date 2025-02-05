@@ -57,6 +57,12 @@
 #define BeforeMain UsageOptional
 #endif // constructor
 
+#if HAS_ATTRIBUTE( noreturn )
+#define NoReturn __attribute__( ( noreturn ) )
+#else
+#define NoReturn
+#endif // constructor
+
 /**
  * Function allocates memory for an object.
  * Not using function's return value results in a memory leak (or worse).

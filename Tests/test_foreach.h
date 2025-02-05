@@ -89,7 +89,7 @@ Tester test_one_foreach_dynstr( string_t str )
     return true;
 }
 
-static TEST( foreach )
+TEST( foreach )
 {
     struct dynamic_array *numbers_ls = list_init_type( int64_t );
     assert_that( numbers_ls != NULL, "list init" );

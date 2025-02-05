@@ -20,7 +20,7 @@ Tester test_list_array_uint64( struct dynamic_array *ls,
     return true;
 }
 
-Private TEST( list_init )
+TEST( list_init )
 {
     struct dynamic_array *ls = list_init_type( uint64_t );
     UNIT_TEST( list_el_size( ls ) == sizeof( uint64_t ) );
@@ -72,7 +72,7 @@ Tester test_list_items( List *ls, size_t count, const int array[ count ] )
 #define test_list_items_m( LIST, COUNT, ... ) \
     test_list_items( LIST, COUNT, ( int[ COUNT ] ){ __VA_ARGS__ } )
 
-Private TEST( list_basic )
+TEST( list_basic )
 {
     int array[ 100 ];
     for ( size_t i = 0; i < countof( array ); ++i )
@@ -162,7 +162,7 @@ Private TEST( list_basic )
 }
 END_TEST
 
-Private TEST( list_advanced )
+TEST( list_advanced )
 {
     int array[ 100 ];
     for ( size_t i = 0; i < countof( array ); ++i )

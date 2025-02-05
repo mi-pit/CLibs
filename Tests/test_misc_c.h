@@ -13,7 +13,7 @@ Tester test_one_reverse_int( int64_t n, unsigned base, uint64_t res )
     return reverse_integer( n, base ) == res;
 }
 
-LibraryDefined TEST( misc_c )
+TEST( misc_c )
 {
     UNIT_TEST( max_i64( 1, 2 ) == 2 );
     UNIT_TEST( max_i64( 3, 2 ) == 3 );
