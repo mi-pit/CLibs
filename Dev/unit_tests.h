@@ -135,6 +135,7 @@ LibraryDefined NoReturn void FINISH_TESTING( void )
             TEST_NAME_CREATOR( TOTAL_RAN ),
             TEST_NAME_CREATOR( TOTAL_FAILED ) == 0 ? COLOR_SUCC : COLOR_FAIL,
             TEST_NAME_CREATOR( TOTAL_FAILED ) );
+
     exit( TEST_NAME_CREATOR( TOTAL_FAILED ) == 0 ? EXIT_SUCCESS : EXIT_FAILURE );
 }
 
@@ -142,16 +143,21 @@ LibraryDefined NoReturn void FINISH_TESTING( void )
 LibraryDefined bool UNIT_TEST_( const char *cond_str, bool passed )
 {
     printf( "    " COLOR_TEST_TAG "[UNIT TEST]" COLOR_DEFAULT " %s ", cond_str );
-    const size_t TEST_NAME_LEN = strlen( cond_str );
-    ssize_t NDOTS = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + TEST_NAME_LEN );
-    if ( NDOTS < 0 )
+
+    ssize_t ln = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + strlen( cond_str ) );
+
+    const size_t ndots = ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_CONST_PART_LEN;
+
+    if ( ln < 0 )
     {
-        printf( "\n                 " );
-        NDOTS = TESTS_LINE_WIDTH - MSG_CONST_PART_LEN;
+        printf( "\n" );
+        for ( int i = 0; i < 16; ++i )
+            printf( " " );
     }
 
-    for ( size_t index = 0; index < ( size_t ) NDOTS; ++index )
+    for ( size_t i = 0; i < ndots; ++i )
         printf( "." );
+
     printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",
             passed ? COLOR_SUCC : COLOR_FAIL,
             passed ? "SUCCESS" : "FAILURE" );
