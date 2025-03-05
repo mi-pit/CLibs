@@ -2,8 +2,6 @@
 // Created by MacBook on 14.01.2025.
 //
 
-// TODO: Support more colors
-
 #ifndef CLIBS_TERMINAL_COLORS_H
 #define CLIBS_TERMINAL_COLORS_H
 

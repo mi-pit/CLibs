@@ -140,9 +140,15 @@ LibraryDefined NoReturn void FINISH_TESTING( void )
 }
 
 
-LibraryDefined bool UNIT_TEST_( const char *cond_str, bool passed )
+LibraryDefined bool UNIT_TEST_( const char *cond_str,
+                                bool passed,
+                                const char *filename,
+                                int lineno )
 {
-    printf( "    " COLOR_TEST_TAG "[UNIT TEST]" COLOR_DEFAULT " %s ", cond_str );
+    printf( "    " COLOR_TEST_TAG "[UNIT TEST" );
+    if ( !passed )
+        printf( " //%s @ %d", filename, lineno );
+    printf( "]" COLOR_DEFAULT " %s ", cond_str );
 
     ssize_t ln = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + strlen( cond_str ) );
 
@@ -172,13 +178,13 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str, bool passed )
  * If condition evaluates to false, "FAILURE" is printed
  * in the color defined in COLOR_FAIL (red by default)
  */
-#define UNIT_TEST( CONDITION )                      \
-    do                                              \
-    {                                               \
-        if ( !UNIT_TEST_( #CONDITION, CONDITION ) ) \
-            ++TEST_NAME_CREATOR( failed_total );    \
-        ++TEST_NAME_CREATOR( ran_total );           \
-    }                                               \
+#define UNIT_TEST( CONDITION )                                               \
+    do                                                                       \
+    {                                                                        \
+        if ( !UNIT_TEST_( #CONDITION, CONDITION, __FILE_NAME__, __LINE__ ) ) \
+            ++TEST_NAME_CREATOR( failed_total );                             \
+        ++TEST_NAME_CREATOR( ran_total );                                    \
+    }                                                                        \
     while ( 0 )
 
 #endif //CLIBS_UNIT_TESTS_H

@@ -8,7 +8,7 @@
 /* for this header */
 #include "../misc.h"         /* UNUSED() */
 #include "attributes.h"      /* PrintfLike, LibraryDefined */
-#include "filenames.h"       /* get_prog_name() */
+#include "filenames.h"       /* get_prog_name(), __FILE_NAME__ */
 #include "terminal_colors.h" /* COLORs, PrintInColor */
 
 #include <errno.h>  /* for WarnUniversal + include */
@@ -161,9 +161,9 @@ LibraryDefined PrintfLike( 7, 8 ) Cold ptrdiff_t
     if ( err_no >= 0 )
         fprintf( stderr, ": %s", strerror( err_no ) );
 
-    fprintf( stderr, "\n" );
+    fprintf( stderr, "\n" );                   //
+    SetTerminalColor( stderr, COLOR_DEFAULT ); // maybe swap these two lines?
 
-    SetTerminalColor( stderr, COLOR_DEFAULT );
 #else
     UNUSED( PrintProgName );
     UNUSED( FileName );
