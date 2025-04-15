@@ -14,6 +14,7 @@
 #define HAS_ATTRIBUTE( TOK ) 0
 #endif // __has_attribute
 
+
 #if HAS_ATTRIBUTE( unused )
 /// Stops compiler warnings when the function/variable is unused
 #define UsageOptional __attribute__( ( __unused__ ) )
@@ -44,6 +45,23 @@
 #define Cold
 #endif // cold
 
+#if HAS_ATTRIBUTE( const )
+#define Const __attribute__( ( __const__ ) )
+#else // const
+#define Const
+#endif // const
+
+#if HAS_ATTRIBUTE( constructor )
+#define BeforeMain __attribute__( ( constructor ) )
+#else
+#define BeforeMain UsageOptional
+#endif // constructor
+
+#if HAS_ATTRIBUTE( noreturn )
+#define NoReturn __attribute__( ( noreturn ) )
+#else
+#define NoReturn
+#endif // constructor
 
 /**
  * Function allocates memory for an object.
@@ -51,11 +69,16 @@
  */
 #define Constructor UseResult
 
-/// Function is not visible outside of the current file
-#define Private static UsageOptional
+/** Function is not visible outside of the current file */
+#define Private static
 
-/// Function is defined in a header file
+/** Function is defined in a header file */
 #define LibraryDefined static UsageOptional
 
+/**
+ * Function has no effect except for the return value.
+ * Function's return value only depends on its parameters.
+ */
+#define Mathematical Const
 
 #endif //CLIBS_ATTRIBUTES_H

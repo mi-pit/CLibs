@@ -26,7 +26,7 @@ Tester test_one_pend( string_t init, string_t app, string_t expected, PendFuncti
     return rv;
 }
 
-static TEST( append )
+TEST( append )
 {
     UNIT_TEST( test_one_pend( "Hops", "pop", "Hopspop", dynstr_append ) );
     UNIT_TEST( test_one_pend( "", *( &"Hopspop" ) + 1, "opspop", dynstr_append ) );
@@ -53,7 +53,7 @@ Tester test_one_appendn( string_t init, string_t app, size_t len, string_t expec
     return rv;
 }
 
-static TEST( appendn )
+TEST( appendn )
 {
     UNIT_TEST( test_one_appendn( "Hops", "pop", 3, "Hopspop" ) );
     UNIT_TEST( test_one_appendn( "Hops", "pop", 1, "Hopsp" ) );
@@ -73,7 +73,7 @@ Tester test_one_init_as( string_t init )
     return rv;
 }
 
-static TEST( init_as )
+TEST( init_as )
 {
     UNIT_TEST( test_one_init_as( "Hops" ) );
     UNIT_TEST( test_one_init_as( "pop" ) );
@@ -152,7 +152,7 @@ Tester test_one_slice_s( string_t str, size_t start, int rv_want, string_t res )
     return rv;
 }
 
-static TEST( slices )
+TEST( slices )
 {
     UNIT_TEST( test_one_slice( "Hopspop", 0, -1, RV_SUCCESS, "Hopspop" ) );
     UNIT_TEST( test_one_slice( "Hopspop", 2, -1, RV_SUCCESS, "pspop" ) );
@@ -187,7 +187,7 @@ static TEST( slices )
 }
 END_TEST
 
-__printflike( 2, 3 ) Tester test_one_vappendf( string_t init, string_t fmt, ... )
+PrintfLike( 2, 3 ) Tester test_one_vappendf( string_t init, string_t fmt, ... )
 {
     va_list vaList, vaCopy;
     va_start( vaList, fmt );
@@ -229,7 +229,7 @@ __printflike( 2, 3 ) Tester test_one_vappendf( string_t init, string_t fmt, ... 
     while ( 0 )
 
 
-static TEST( appendf )
+TEST( appendf )
 {
     TEST_ONE_APPENDF( "Hopspop", "Hopspop hovno", " %s", "hovno" );
     TEST_ONE_APPENDF( "", "Hopspop hovno", "%s %s", "Hopspop", "hovno" );

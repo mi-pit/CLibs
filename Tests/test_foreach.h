@@ -75,18 +75,21 @@ Tester test_one_foreach_dynstr( string_t str )
         if ( foreach_cap_c != strlen( str ) )
         {
             fflwarnx( "foreach_cap" );
+            dynstr_destroy( dynstr );
             return false;
         }
         if ( c != str[ foreach_index_c ] )
         {
             fflwarnx( "c != str[ foreach_idx ]" );
+            dynstr_destroy( dynstr );
             return false;
         }
     }
+    dynstr_destroy( dynstr );
     return true;
 }
 
-static TEST( foreach )
+TEST( foreach )
 {
     struct dynamic_array *numbers_ls = list_init_type( int64_t );
     assert_that( numbers_ls != NULL, "list init" );
@@ -99,6 +102,7 @@ static TEST( foreach )
 
     UNIT_TEST( test_one_foreach_arr( numbers_arr, countof( numbers_arr ) ) );
     UNIT_TEST( test_one_foreach_ls( numbers_ls, numbers_arr, countof( numbers_arr ) ) );
+    list_destroy( numbers_ls );
     UNIT_TEST( test_one_foreach_uni( numbers_arr, countof( numbers_arr ) ) );
 
     UNIT_TEST( test_one_foreach_str( "" ) );

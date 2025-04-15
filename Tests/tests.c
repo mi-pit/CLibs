@@ -16,6 +16,7 @@ void run_list( void )
 {
     RUN_TEST( list_init );
     RUN_TEST( list_basic );
+    RUN_TEST( list_advanced );
 }
 
 void run_dynstr( void )
@@ -37,6 +38,7 @@ void run_string_utils( void )
     RUN_TEST( string_as_UL );
     RUN_TEST( reverse_str );
     RUN_TEST( strip );
+
     RUN_TEST( strings_misc );
 }
 
@@ -55,14 +57,42 @@ void run_misc_c( void )
     RUN_TEST( misc_c );
 }
 
+Private TEST( array_sprintf )
+{
+    int array[ 10 ];
+    for ( size_t i = 0; i < countof( array ); ++i )
+        array[ i ] = ( int ) ( i * i ) * ( i % 2 == 0 ? -1 : 1 );
+
+    str_t str, snd;
+    array_sprintf_d( str, array, countof( array ), int, "%i", ", " );
+    array_sprintf( snd, array, countof( array ), int, "%i" );
+    PrintInColor( stdout, BACKGROUND_YELLOW, "%s\n", str );
+
+    UNIT_TEST( cmpeq( strcmp( str, "[ 0, 1, -4, 9, -16, 25, -36, 49, -64, 81 ]" ) ) );
+    UNIT_TEST( cmpeq( strcmp( str, snd ) ) );
+    free( str );
+    free( snd );
+
+    void *items_gen = array;
+    array_sprintf_d( str, items_gen, countof( array ), int, "%+02i", " | " );
+    PrintInColor( stdout, BACKGROUND_YELLOW, "%s\n", str );
+
+    UNIT_TEST( cmpeq( strcmp(
+            str, "[ +0 | +1 | -4 | +9 | -16 | +25 | -36 | +49 | -64 | +81 ]" ) ) );
+    free( str );
+}
+END_TEST
+
 int main( void )
 {
-    /** run_misc_c();       ***/
-    /** run_foreach();      ***/
-    /** run_swex();         ***/
-    /** run_string_utils(); ***/
-    /** run_dynstr();       ***/
-    /**/ run_list(); /***/
+    run_misc_c();
+    run_foreach();
+    run_swex();
+    run_string_utils();
+    run_dynstr();
+    run_list();
+
+    RUN_TEST( array_sprintf );
 
     FINISH_TESTING();
 }

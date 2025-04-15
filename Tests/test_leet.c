@@ -2,7 +2,7 @@
 // Created by MacBook on 03.01.2025.
 //
 #include "../Dev/assert_that.h"
-#include "../pointer_utils.h"
+#include "../Dev/pointer_utils.h"
 #include "../Structs/dictionary.h"
 #include "../Structs/dynarr.h"
 

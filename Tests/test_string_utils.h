@@ -75,6 +75,7 @@ static void free_spl( const size_t count, str_t strings[ count ] )
     {
         free( strings[ i ] );
     }
+    free( strings );
 }
 Tester test_one_strspl_str( string_t haystack,
                             string_t split_tok,
@@ -86,7 +87,7 @@ Tester test_one_strspl_str( string_t haystack,
     ssize_t strspl_rv = string_split( &spl, haystack, split_tok, mode );
     if ( strspl_rv < 0 )
     {
-        ffl_stack_trace();
+        ffl_stack_trace( 0 );
         exit( 1 );
     }
 
@@ -131,7 +132,7 @@ Tester test_one_strspl_regex( string_t haystack,
     ssize_t strspl_rv = string_split_regex( &spl, haystack, &reg, mode );
     if ( strspl_rv < 0 )
     {
-        ffl_stack_trace();
+        ffl_stack_trace( 0 );
         exit( -1 );
     }
 
@@ -437,7 +438,7 @@ Tester test_one_reverse_str( string_t orig, string_t result )
     return rv;
 }
 
-Private TEST( reverse_str )
+TEST( reverse_str )
 {
     UNIT_TEST( test_one_reverse_str( "Hovno", "onvoH" ) );
     UNIT_TEST( test_one_reverse_str( "", "" ) );
@@ -488,5 +489,6 @@ TEST( strings_misc )
     UNIT_TEST( strcmp( get_file_name( "Hovno" ), "Hovno" ) == 0 );
     UNIT_TEST( strcmp( get_file_name( "/a" ), "a" ) == 0 );
     UNIT_TEST( strcmp( get_file_name( "./a" ), "a" ) == 0 );
+    UNIT_TEST( strcmp( get_file_name( "Directory/Subdir/" ), "Subdir/" ) == 0 );
 }
 END_TEST

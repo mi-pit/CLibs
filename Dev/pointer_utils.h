@@ -5,15 +5,13 @@
 #ifndef CLIBS_POINTER_UTILS_H
 #define CLIBS_POINTER_UTILS_H
 
-#include "Dev/attributes.h" /* LibraryDefined */
+#include "attributes.h" /* LibraryDefined */
 
 #include <stdarg.h> /* va_* */
 #include <stdlib.h> /* free(), NULL */
 
 
-#ifndef __cplusplus
-#define new( TYPE ) ( calloc( 1, sizeof( TYPE ) ) )
-#endif
+#define new( TYPE ) calloc( 1, sizeof( TYPE ) )
 
 #define free_n( ptr ) free_and_null( ( void ** ) &( ptr ) )
 

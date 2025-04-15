@@ -5,6 +5,8 @@ set(CMAKE_C_STANDARD 99)
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
+add_compile_options(-D_POSIX_C_SOURCE=200809L)
+
 add_compile_options(-fsanitize=address)
 add_link_options(-fsanitize=address)
 
@@ -27,6 +29,8 @@ add_executable(TestNumbers
         Structs/dynstring.c
         Structs/dynarr.c
         string_utils.c
+        misc.c
+        Structs/Bigint/numbers_list.c
         )
 
 add_executable(TestHashFunc

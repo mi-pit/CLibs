@@ -16,6 +16,80 @@
 typedef const char *string_t;
 typedef char *str_t;
 
+#if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
+#include <stdlib.h> /* malloc */
+
+#define strndup string_nduplicate
+#define strdup  string_duplicate
+
+LibraryDefined UseResult str_t string_nduplicate( string_t s, size_t l )
+{
+    str_t n = malloc( l + 1 );
+    if ( n == NULL )
+        return NULL;
+
+    strncpy( n, s, l );
+    n[ l ] = '\0';
+    return n;
+}
+
+LibraryDefined UseResult str_t string_duplicate( string_t s )
+{
+    size_t l = strlen( s );
+    str_t n  = malloc( l + 1 );
+    if ( n == NULL )
+        return NULL;
+
+    n[ l ] = '\0';
+    strcpy( n, s );
+    return n;
+}
+#endif // ndef strdup
+
+#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) \
+        || defined( _POSIX_C_SOURCE ) // non-standard
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifndef vsnprintf
+int vsnprintf( char *str, size_t size, const char *restrict format, va_list ap );
+#endif
+
+/**
+ * Like `vsprintf`, except it heap-allocates memory for the resulting string.
+ * (*strp) may be passed to free(3)
+ */
+LibraryDefined int vasprintf( str_t *strp, string_t fmt, va_list args )
+{
+    va_list vaList;
+    va_copy( vaList, args );
+
+    int size = vsnprintf( NULL, ( size_t ) 0, fmt, args );
+
+    if ( size < 0 )
+        return size;
+
+    *strp = malloc( size + 1 );
+    if ( !*strp )
+        return -1;
+
+    int result = vsnprintf( *strp, ( size_t ) size + 1, fmt, vaList );
+    va_end( args );
+
+    return result;
+}
+
+LibraryDefined int asprintf( str_t *strp, string_t fmt, ... )
+{
+    va_list va;
+    va_start( va, fmt );
+    int rv = vasprintf( strp, fmt, va );
+    va_end( va );
+    return rv;
+}
+#endif
+
 
 /**
  * Heap-allocates a new string with all whitespace (as defined in isspace(3)) from either end stripped.
@@ -153,10 +227,15 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                             strsplit_mode_t mode );
 
 
-/**
- * @param full_path Full path to file
- * @return pointer to the last part of ‹full_path›
- */
-string_t get_file_name( string_t full_path );
+/* ==== Mathematical stuff ==== */
+
+UseResult char *add_uint_strings( const char *, const char * );
+UseResult char *mul_uint_strings( const char *, const char * );
+
+
+void string_strip_lead_zeroes( str_t );
+
+UseResult str_t hex_to_decimal( string_t );
+
 
 #endif //CLIBS_STRING_UTILS_H

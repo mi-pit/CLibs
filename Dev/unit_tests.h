@@ -45,25 +45,33 @@
 // todo?: #define TESTER( NAME ) static bool test_one_##NAME
 
 
-#ifndef LINE_PREF_WIDTH
+#define MSG_CONST_PART_LEN 25
+
+#if !defined( LINE_PREF_WIDTH )
 #define LINE_PREF_WIDTH 158
+#endif
+
+#if LINE_PREF_WIDTH < MSG_CONST_PART_LEN
+#define TESTS_LINE_WIDTH ( MSG_CONST_PART_LEN + 1 )
+#else
+#define TESTS_LINE_WIDTH LINE_PREF_WIDTH
 #endif
 
 
 #ifndef COLOR_FAIL
-#define COLOR_FAIL COLOR_RED
+#define COLOR_FAIL FOREGROUND_RED
 #endif //COLOR_FAIL
 
 #ifndef COLOR_SUCC
-#define COLOR_SUCC COLOR_GREEN
+#define COLOR_SUCC FOREGROUND_GREEN
 #endif //COLOR_SUCC
 
 #ifndef COLOR_NOTE
-#define COLOR_NOTE COLOR_CYAN
+#define COLOR_NOTE FOREGROUND_CYAN
 #endif //COLOR_NOTE
 
 #ifndef COLOR_TEST_TAG
-#define COLOR_TEST_TAG COLOR_YELLOW
+#define COLOR_TEST_TAG FOREGROUND_YELLOW
 #endif //COLOR_TEST_TAG
 
 
@@ -83,12 +91,12 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
         int TEST_NAME_CREATOR( failed_total )        = 0;       \
         int TEST_NAME_CREATOR( ran_total )           = 0;       \
         const char *TEST_NAME_CREATOR( test_handle ) = #HANDLE; \
-        printf( COLOR_TEST_TAG "[TEST] " COLOR_DEFAULT #HANDLE "\n" );
+        printf( COLOR_TEST_TAG "[TEST]" COLOR_DEFAULT " " #HANDLE "\n" );
 
 #define END_TEST                                                                    \
-    printf( COLOR_TEST_TAG "[TEST] " COLOR_DEFAULT "%s: ran %i tests, " PRINT_COLOR \
+    printf( COLOR_TEST_TAG "[TEST]" COLOR_DEFAULT " %s: ran %i tests, " PRINT_COLOR \
                            "%i successful" COLOR_DEFAULT ", " PRINT_COLOR           \
-                           "%i failed\n" COLOR_DEFAULT,                             \
+                           "%i failed" COLOR_DEFAULT "\n",                          \
             TEST_NAME_CREATOR( test_handle ),                                       \
             TEST_NAME_CREATOR( ran_total ),                                         \
             TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ) == 0 \
@@ -112,27 +120,56 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
     while ( 0 )
 
 
-#define FINISH_TESTING()                                                                \
-    do                                                                                  \
-    {                                                                                   \
-        puts( "" );                                                                     \
-        printf( COLOR_NOTE "[SUMMARY]" COLOR_DEFAULT                                    \
-                           " total unit tests ran: " COLOR_NOTE "%i" COLOR_DEFAULT      \
-                           ", total unit tests failed: " PRINT_COLOR "%i" COLOR_DEFAULT \
-                           "\n",                                                        \
-                TEST_NAME_CREATOR( TOTAL_RAN_UNIT ),                                    \
-                TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) == 0 ? COLOR_SUCC : COLOR_FAIL,  \
-                TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) );                               \
-                                                                                        \
-        printf( COLOR_NOTE "[SUMMARY]" COLOR_DEFAULT " total tests ran: " COLOR_NOTE    \
-                           "%i" COLOR_DEFAULT ", total tests failed: " PRINT_COLOR      \
-                           "%i" COLOR_DEFAULT "\n",                                     \
-                TEST_NAME_CREATOR( TOTAL_RAN ),                                         \
-                TEST_NAME_CREATOR( TOTAL_FAILED ) == 0 ? COLOR_SUCC : COLOR_FAIL,       \
-                TEST_NAME_CREATOR( TOTAL_FAILED ) );                                    \
-        exit( TEST_NAME_CREATOR( TOTAL_FAILED ) == 0 ? EXIT_SUCCESS : EXIT_FAILURE );   \
-    }                                                                                   \
-    while ( 0 )
+LibraryDefined NoReturn void FINISH_TESTING( void )
+{
+    printf( COLOR_NOTE "\n[SUMMARY]" COLOR_DEFAULT " total unit tests ran: " COLOR_NOTE
+                       "%i" COLOR_DEFAULT ", total unit tests failed: " PRINT_COLOR
+                       "%i" COLOR_DEFAULT "\n",
+            TEST_NAME_CREATOR( TOTAL_RAN_UNIT ),
+            TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) == 0 ? COLOR_SUCC : COLOR_FAIL,
+            TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) );
+
+    printf( COLOR_NOTE "[SUMMARY]" COLOR_DEFAULT " total tests ran: " COLOR_NOTE
+                       "%i" COLOR_DEFAULT ", total tests failed: " PRINT_COLOR
+                       "%i" COLOR_DEFAULT "\n",
+            TEST_NAME_CREATOR( TOTAL_RAN ),
+            TEST_NAME_CREATOR( TOTAL_FAILED ) == 0 ? COLOR_SUCC : COLOR_FAIL,
+            TEST_NAME_CREATOR( TOTAL_FAILED ) );
+
+    exit( TEST_NAME_CREATOR( TOTAL_FAILED ) == 0 ? EXIT_SUCCESS : EXIT_FAILURE );
+}
+
+
+LibraryDefined bool UNIT_TEST_( const char *cond_str,
+                                bool passed,
+                                const char *filename,
+                                int lineno )
+{
+    printf( "    " COLOR_TEST_TAG "[UNIT TEST" );
+    if ( !passed )
+        printf( " //%s @ %d", filename, lineno );
+    printf( "]" COLOR_DEFAULT " %s ", cond_str );
+
+    ssize_t ln = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + strlen( cond_str ) );
+
+    const size_t ndots = ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_CONST_PART_LEN;
+
+    if ( ln < 0 )
+    {
+        printf( "\n" );
+        for ( int i = 0; i < 16; ++i )
+            printf( " " );
+    }
+
+    for ( size_t i = 0; i < ndots; ++i )
+        printf( "." );
+
+    printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",
+            passed ? COLOR_SUCC : COLOR_FAIL,
+            passed ? "SUCCESS" : "FAILURE" );
+
+    return passed;
+}
 
 /**
  * If condition evaluates to true, "SUCCESS" is printed
@@ -141,33 +178,13 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
  * If condition evaluates to false, "FAILURE" is printed
  * in the color defined in COLOR_FAIL (red by default)
  */
-#define UNIT_TEST( CONDITION )                                                           \
-    do                                                                                   \
-    {                                                                                    \
-        printf( COLOR_TEST_TAG "    [UNIT TEST] " COLOR_DEFAULT "%s ", #CONDITION );     \
-        const size_t TEST_NAME_CREATOR( MSG_CONST_PART_LEN ) = 25;                       \
-        const size_t TEST_NAME_CREATOR( TEST_NAME_LEN ) = ( sizeof( #CONDITION ) ) - 1;  \
-        ssize_t TEST_NAME_CREATOR( NDOTS )              = LINE_PREF_WIDTH                \
-                                             - ( TEST_NAME_CREATOR( MSG_CONST_PART_LEN ) \
-                                                 + TEST_NAME_CREATOR( TEST_NAME_LEN ) ); \
-        if ( TEST_NAME_CREATOR( NDOTS ) < 0 )                                            \
-        {                                                                                \
-            printf( "\n                 " );                                             \
-            TEST_NAME_CREATOR( NDOTS ) =                                                 \
-                    LINE_PREF_WIDTH - TEST_NAME_CREATOR( MSG_CONST_PART_LEN );           \
-        }                                                                                \
-        bool TEST_NAME_CREATOR( success ) = CONDITION;                                   \
-        for ( size_t TEST_NAME_CREATOR( index ) = 0;                                     \
-              TEST_NAME_CREATOR( index ) < ( size_t ) TEST_NAME_CREATOR( NDOTS );        \
-              ++TEST_NAME_CREATOR( index ) )                                             \
-            printf( "." );                                                               \
-        printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",                                 \
-                TEST_NAME_CREATOR( success ) ? COLOR_SUCC : COLOR_FAIL,                  \
-                TEST_NAME_CREATOR( success ) ? "SUCCESS" : "FAILURE" );                  \
-        if ( !TEST_NAME_CREATOR( success ) )                                             \
-            ++TEST_NAME_CREATOR( failed_total );                                         \
-        ++TEST_NAME_CREATOR( ran_total );                                                \
-    }                                                                                    \
+#define UNIT_TEST( CONDITION )                                               \
+    do                                                                       \
+    {                                                                        \
+        if ( !UNIT_TEST_( #CONDITION, CONDITION, __FILE_NAME__, __LINE__ ) ) \
+            ++TEST_NAME_CREATOR( failed_total );                             \
+        ++TEST_NAME_CREATOR( ran_total );                                    \
+    }                                                                        \
     while ( 0 )
 
 #endif //CLIBS_UNIT_TESTS_H

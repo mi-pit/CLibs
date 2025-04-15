@@ -4,43 +4,49 @@
 
 #include "bigint.h"
 
-#include "../Dev/errors.h"
-#include "../foreach.h"
-#include "../misc.h"
-#include "../pointer_utils.h"
-#include "../string_utils.h"
-#include "./dynstring.h"
+#include "../Dev/assert_that.h"   /* includes "errors.h", <assert.h> */
+#include "../Dev/pointer_utils.h" /* new */
+#include "../foreach.h"           /* foreach_ls */
+#include "../string_utils.h"      /* str_t, string_reversed() */
+#include "./dynstring.h"          /* dynstr */
 
-#include <assert.h>
-#include <inttypes.h>
+#include <ctype.h>    /* isdigit() */
+#include <inttypes.h> /* PRI macros */
 
 
-Private inline sign_t sign_flip( sign_t s )
+sign_t bigint_sign( const struct bigint *bi )
 {
-    return s == SIGN_NEG ? SIGN_POS : SIGN_NEG;
+    return bi->sign;
+}
+
+void bigint_flip_sign( struct bigint *bi )
+{
+    bi->sign = sign_flipped( bi->sign );
+}
+
+size_t bigint_sizeof( const struct bigint *bi )
+{
+    return bi->num_ls->len;
 }
 
 
 int bigint_init_p( struct bigint *bi )
 {
-    bi->numbers = list_init_type( uint64_t );
-    if ( bi->numbers == NULL )
-    {
-        f_stack_trace();
-        return RV_ERROR;
-    }
+    if ( ( bi->num_ls = numls_init() ) == NULL )
+        return f_stack_trace( RV_ERROR );
+
     bi->sign = SIGN_POS;
 
-    const uint64_t ZERO = 0;
-    assert( list_append( bi->numbers, &ZERO ) == RV_SUCCESS );
-    // Cap must be at least one so no realloc -- therefore this shouldn't be able to fail
+    assert_that( numls_append( bi->num_ls, 0 ) == RV_SUCCESS,
+                 "Cap must be at least one so no realloc,"
+                 "therefore this shouldn't be able to fail" );
 
     return RV_SUCCESS;
 }
 
 struct bigint *bigint_init( void )
 {
-    struct bigint *new = new ( struct bigint );
+    struct bigint *const new = new ( struct bigint );
     if ( new == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
@@ -51,289 +57,265 @@ struct bigint *bigint_init( void )
 
 struct bigint *bigint_init_as( const int64_t n )
 {
-    struct bigint *new = bigint_init();
-    uint64_t u_n       = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
-    assert( list_set_at( new->numbers, 0, &u_n ) == RV_SUCCESS );
+    struct bigint *const new = bigint_init();
 
-    sign_t new_sign = sgn_64( n );
-    if ( new_sign == 0 )
-        new_sign = SIGN_POS;
-    new->sign = new_sign;
+    const uint64_t u_n        = n > 0 ? n : ( uint64_t ) llabs( ( long long ) n );
+    new->num_ls->numbers[ 0 ] = u_n;
+    new->sign                 = n == 0 ? SIGN_POS : sgn_64( n );
 
     return new;
 }
 
-str_t mul_uint_strings( string_t str_1, string_t str_2 )
-{
-    typedef unsigned char digit_t;
-
-    size_t len_1      = strlen( str_1 );
-    size_t len_2      = strlen( str_2 );
-    size_t result_len = len_1 + len_2;
-
-    // Allocate memory for the result (zero-initialized)
-    char *result = calloc( result_len + 1, 1 );
-    if ( !result )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
-    memset( result, '0', result_len );
-
-    // Perform multiplication using the "long multiplication" algorithm
-    for ( ssize_t i = ( ssize_t ) len_1 - 1; i >= 0; --i )
-    {
-        digit_t carry = 0;
-        for ( ssize_t j = ( ssize_t ) len_2 - 1; j >= 0; --j )
-        {
-            digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry
-                           + ( result[ i + j + 1 ] - '0' );
-            result[ i + j + 1 ] = ( char ) ( ( prod % 10 ) + '0' ); // Store the digit
-            carry               = prod / 10;                        // Carry over
-        }
-        result[ i ] = ( char ) ( result[ i ] + carry ); // Add any remaining carry
-    }
-
-    // Remove leading zeros
-    size_t start = 0;
-    while ( start < result_len && result[ start ] == '0' )
-        ++start;
-
-    // If the result is all zeros (e.g., "0 * 0"), return "0"
-    if ( start == result_len )
-    {
-        free( result );
-        return strdup( "0" );
-    }
-
-    // Shift the result to remove leading zeros
-    char *final_result = strdup( result + start );
-    free( result );
-
-    return final_result;
-}
-
-str_t add_uint_strings( string_t str_1, string_t str_2 )
-{
-    typedef uint8_t digit_t;
-
-    DynamicString result = dynstr_init();
-    if ( result == NULL )
-    {
-        f_stack_trace();
-        return NULL;
-    }
-
-    size_t str_1_len = strlen( str_1 );
-    size_t str_2_len = strlen( str_2 );
-
-    str_t ret = NULL;
-
-    digit_t carry = 0;
-    for ( size_t idx = 0;
-          idx < ( size_t ) max_64( ( int64_t ) str_1_len, ( int64_t ) str_2_len );
-          ++idx )
-    {
-        digit_t str_1_digit = idx < str_1_len ? str_1[ str_1_len - idx - 1 ] - '0' : 0;
-        digit_t str_2_digit = idx < str_2_len ? str_2[ str_2_len - idx - 1 ] - '0' : 0;
-
-        digit_t val = ( str_1_digit + str_2_digit + carry );
-
-        carry       = val >= 10;
-        digit_t dig = val % 10;
-
-        char app = ( char ) ( dig + '0' );
-        if ( dynstr_appendn( result, &app, 1 ) != RV_SUCCESS )
-        {
-            f_stack_trace();
-            goto CLEANUP;
-        }
-    }
-    if ( carry )
-    {
-        char app = '1';
-        if ( dynstr_appendn( result, &app, 1 ) != RV_SUCCESS )
-        {
-            f_stack_trace();
-            goto CLEANUP;
-        }
-    }
-
-    ret = string_reversed( dynstr_data( result ) );
-
-CLEANUP:
-    dynstr_destroy( result );
-    return ret;
-}
-
-
-#define STRING_2_TO_64 "18446744073709551616"
-
-#define N_POWER64_STRINGS 8
-
-/// Lookup table for `get_listelem_power_str()`
-Private string_t const POWER64_STRINGS[ N_POWER64_STRINGS ] = {
-    "1",
-    STRING_2_TO_64,
-    "340282366920938463463374607431768211456",
-    "6277101735386680763835789423207666416102355444464034512896",
-    "115792089237316195423570985008687907853269984665640564039457584007913129639936",
-    "213598703592091008239502170616955211460270452235665276994704160782221972578064055002"
-    "2962086936576",
-    "394020061963944792122790401001436138050797392704654466679482934042457217714972106114"
-    "14266254884915640806627990306816",
-    "726838724295606890549323807888004534353641360687318060281490199180639288113397923326"
-    "191050713763565560762521606266177933534601628614656"
-};
-
-static str_t get_listelem_power_str( uint64_t n, size_t power )
-{
-    str_t buffer;
-    if ( power < N_POWER64_STRINGS )
-    {
-        buffer = strdup( POWER64_STRINGS[ power ] );
-        if ( buffer == NULL )
-            return ( void * ) fwarn_ret( NULL, "strdup" );
-    }
-    else
-    {
-        buffer = strdup( POWER64_STRINGS[ N_POWER64_STRINGS - 1 ] );
-        if ( buffer == NULL )
-            return ( void * ) fwarn_ret( NULL, "strdup" );
-
-        for ( size_t i = N_POWER64_STRINGS - 1; i < power; ++i )
-        {
-            str_t tmp = mul_uint_strings( buffer, STRING_2_TO_64 );
-            free( buffer );
-            if ( tmp == NULL )
-            {
-                f_stack_trace();
-                return NULL;
-            }
-            buffer = tmp;
-        }
-    }
-
-    str_t n_str;
-    if ( asprintf( &n_str, "%" PRIu64, n ) == -1 )
-        return ( void * ) fwarn_ret( NULL, "asprintf" );
-
-    str_t result = mul_uint_strings( buffer, n_str );
-    free( buffer );
-    free( n_str );
-
-    return result;
-}
 
 str_t bigint_to_string( const struct bigint *const bi )
 {
-    str_t sum;
-    foreach_ls( uint64_t, n, bi->numbers )
+    DynamicString dynstr = dynstr_init_cap( bi->num_ls->len * sizeof( uint64_t ) * 2 );
+    if ( dynstr == NULL )
+        return ( void * ) f_stack_trace( NULL );
+
+    ssize_t idx_last = ( ssize_t ) bi->num_ls->len - 1;
+    for ( ssize_t idx = idx_last; idx >= 0; --idx )
     {
-        if ( foreach_index_n == 0 )
-        {
-            // init
-            if ( asprintf( &sum, "%" PRIu64, n ) == -1 )
-                return ( void * ) fwarn_ret( NULL, "asprintf" );
+        char fmt_buf[ 1 + 1 + 20 + 3 + 1 ];
+        /*            %   0   i   llu \0 */
+        /* i is number of digits. Maximum is 20, but the actual value is usually lower */
+        snprintf(
+                fmt_buf, sizeof fmt_buf, "%%0%i" PRIu64, BIGINT_LIST_MEMBER_MAX_DIGITS );
 
-            continue;
-        }
-
-        str_t buffer = get_listelem_power_str( n, foreach_index_n );
-        if ( buffer == NULL )
-        {
-            f_stack_trace();
-            free( sum );
-            return NULL;
-        }
-
-        str_t tmp = add_uint_strings( sum, buffer );
-        free( buffer );
-        free( sum );
-        if ( tmp == NULL )
-        {
-            f_stack_trace();
-            return NULL;
-        }
-        sum = tmp;
+        const uint64_t num = bi->num_ls->numbers[ idx ];
+        if ( dynstr_appendf( dynstr, ( idx == idx_last ? "%" PRIu64 : fmt_buf ), num )
+             != RV_SUCCESS )
+            goto ERROR;
     }
 
     if ( bi->sign == SIGN_NEG )
-    {
-        str_t tmp;
-        asprintf( &tmp, "-%s", sum );
-        free( sum );
+        dynstr_prependn( dynstr, "-", 1 );
 
-        return tmp;
-    }
+    str_t ret = dynstr_data_copy( dynstr );
+    dynstr_destroy( dynstr );
+    return ret;
 
-    return sum;
+ERROR:
+    dynstr_destroy( dynstr );
+    return ( void * ) f_stack_trace( NULL );
 }
 
-List *bigint_get_number_array( const struct bigint *bi )
+
+Private bool validate_input_string( string_t str, size_t len )
 {
-    List *ls;
-    int rv = list_copy( bi->numbers, &ls );
-    on_fail( rv )
+    bool has_digits = false;
+
+    for ( size_t i = 0; i < len; ++i )
     {
-        f_stack_trace();
-        return NULL;
+        if ( i == 0 && !( isdigit( str[ i ] ) || str[ i ] == '+' || str[ i ] == '-' ) )
+            return false;
+
+        if ( i != 0 && !isdigit( str[ i ] ) )
+            return false;
+
+        has_digits = has_digits || isdigit( str[ i ] );
     }
-    return ls;
+
+    return has_digits;
+}
+
+int bigint_from_string( string_t str, struct bigint **cont )
+{
+    size_t len = strlen( str );
+    if ( !validate_input_string( str, len ) )
+        return RV_EXCEPTION;
+
+    struct bigint *bi = bigint_init();
+    if ( bi == NULL )
+        return f_stack_trace( RV_ERROR );
+
+    if ( str[ 0 ] == '+' || str[ 0 ] == '-' )
+    {
+        bi->sign = str[ 0 ] == '+' ? SIGN_POS : SIGN_NEG;
+        str++;
+        len--;
+    }
+
+    const size_t chunk_size = BIGINT_LIST_MEMBER_MAX_DIGITS;
+    const size_t n_chunks   = ( len / chunk_size ) + 1;
+
+    for ( size_t i = 0; i < len; i += chunk_size )
+    {
+        const uint64_t chunk_idx = n_chunks - i - 1;
+
+        unsigned n_lead_zeroes = 0;
+        uint64_t app           = 0;
+        // TODO? one loop
+        for ( size_t j = 0; j < chunk_size; ++j )
+        {
+            const size_t char_index = len - ( i + j ) - 1;
+            if ( char_index >= len )
+                break;
+
+            app *= 10;
+            app += str[ char_index ] - '0';
+
+            if ( str[ char_index ] == '0' && app == 0 )
+                ++n_lead_zeroes;
+        }
+        app = reverse_integer( app, 10 ) * upower( 10, n_lead_zeroes );
+
+        if ( chunk_idx == n_chunks - 1 )
+            bi->num_ls->numbers[ 0 ] = app;
+        else
+            goto_on_fail( ERROR, numls_append( bi->num_ls, app ) );
+    }
+
+    *cont = bi;
+    return RV_SUCCESS;
+
+ERROR:
+    bigint_destroy( bi );
+    return f_stack_trace( RV_ERROR );
 }
 
 
 void bigint_destroy_l( struct bigint bi )
 {
-    list_destroy( bi.numbers );
+    numls_destroy( bi.num_ls );
 }
 
 void bigint_destroy( struct bigint *bp )
 {
-    list_destroy( bp->numbers );
+    numls_destroy( bp->num_ls );
     free( bp );
 }
 
 
-Private int bigint_add_level( struct bigint *const bi,
-                              const int64_t n,
-                              const size_t level )
+int bigint_add_i( struct bigint *bi, int64_t n )
+{
+    return bigint_add_power( bi, n, 0 );
+}
+
+Private inline int handle_overunderflow( struct bigint *const bi,
+                                         size_t level,
+                                         sign_t sign )
+{
+    if ( numls_is_last( bi->num_ls, level ) ) // higher digit not available
+        return numls_append( bi->num_ls, 1 );
+
+    return bigint_add_power( bi, sign, level + 1 );
+}
+
+#define handle_overflow( BIGINT, LEVEL ) \
+    handle_overunderflow( ( BIGINT ), ( LEVEL ), ( BIGINT )->sign )
+
+#define handle_underflow( BIGINT, LEVEL ) \
+    handle_overunderflow( ( BIGINT ), ( LEVEL ), sign_flipped( ( BIGINT )->sign ) )
+
+int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t level )
 {
     if ( n == 0 )
         return RV_SUCCESS;
 
-    uint64_t low = list_access( bi->numbers, 0, uint64_t );
+    assert( sgn_64( n ) != 0 );
+    assert_that( bi->sign == 1 || bi->sign == -1,
+                 "bigint sign must be ›1‹ or ›-1‹ (is %d)",
+                 bi->sign );
 
-    sign_t n_sign = sgn_64( n );
-    assert( n_sign == 1 || n_sign == -1 );
+    if ( bi->num_ls->len <= level )
+        return_on_fail( numls_extend_zeroes( bi->num_ls, level - bi->num_ls->len + 1 ) );
 
-    int64_t norm_n = bi->sign * n;
-    bool overflow  = INT64_MAX < low || ( int64_t ) low > norm_n;
-    //TODO:
-    // bool underflow = norm_n < 0 && low < -norm_n;
-    if ( overflow )
-    {
-        if ( list_size( bi->numbers ) == level + 1 )
-        {
-            uint64_t high = 1;
-            if ( list_append( bi->numbers, &high ) != RV_SUCCESS )
-            {
-                f_stack_trace();
-                return RV_ERROR;
-            }
-        }
-        else
-        {
-            uint64_t old = list_access( bi->numbers, level + 1, uint64_t );
-            list_access( bi->numbers, level + 1, uint64_t ) += 1;
+    const uint64_t low = bi->num_ls->numbers[ level ];
 
-            if ( old == UINT64_MAX )
-                return_on_fail( bigint_add_level( bi, 1, level + 1 ) );
-        }
-    }
-    low += norm_n;
-    assert( list_set_at( bi->numbers, 0, &low ) == RV_SUCCESS );
+    // int64_t norm_n isn't able to hold this value
+    // => subtract it after converting to uint64_t
+    const bool sub_one_more = sgn_64( n ) == bi->sign && n == INT64_MIN;
+
+    int64_t norm_n = sub_one_more ? INT64_MAX : n * bi->sign;
+
+    const bool overflow =
+            norm_n > 0 && low > BIGINT_LIST_MEMBER_MAX - ( uint64_t ) norm_n;
+    const bool underflow = norm_n < 0 && low < ( uint64_t ) llabs( norm_n );
+    assert_that( !overflow || !underflow, "cannot both be set at once" );
+
+    const bool flip_bi_sign = underflow && numls_is_last( bi->num_ls, level );
+
+    const uint64_t final =
+            ( flip_bi_sign ? low - norm_n
+              : underflow  ? BIGINT_LIST_MEMBER_MAX + 1 + ( ( int64_t ) low + norm_n )
+                           : ( low + norm_n ) % ( BIGINT_LIST_MEMBER_MAX + 1 ) )
+            - ( int ) sub_one_more;
+
+    bi->num_ls->numbers[ level ] = final;
+
+    if ( flip_bi_sign )
+        bigint_flip_sign( bi );
+    else if ( underflow )
+        return_on_fail( handle_underflow( bi, level ) );
+    else if ( overflow )
+        return_on_fail( handle_overflow( bi, level ) );
+
+    if ( final == 0 && level != 0 && numls_is_last( bi->num_ls, level ) )
+        return numls_pop( bi->num_ls );
+
     return RV_SUCCESS;
 }
 
-int bigint_add_i( struct bigint *bi, int64_t n )
+
+int bigint_add_b( struct bigint *bi, const struct bigint *add )
 {
-    return bigint_add_level( bi, n, 0 );
+    // FIXME: subtraction "underflow"
+    for ( size_t i = 0; i < add->num_ls->len; ++i )
+    {
+        const uint64_t num = add->num_ls->numbers[ i ];
+
+        assert_that( num <= BIGINT_LIST_MEMBER_MAX,
+                     "bigint list member value out of bounds: %" PRIu64,
+                     num );
+
+        if ( num >= INT64_MAX )
+        {
+            const int64_t main = INT64_MAX;
+            const int64_t rem  = ( int64_t ) ( num - main );
+            return_on_fail( bigint_add_power( bi, main * add->sign, i ) );
+            return_on_fail( bigint_add_power( bi, rem * add->sign, i ) );
+        }
+        else
+            return_on_fail( bigint_add_power( bi, num * add->sign, i ) );
+    }
+
+    return RV_SUCCESS;
+}
+
+
+int bigint_cmp_i( const struct bigint *bi, int64_t n )
+{
+    if ( bigint_sizeof( bi ) > 1 )
+        return BIGINT_GT;
+
+    const uint64_t bi_low = bi->num_ls->numbers[ 0 ];
+    if ( bi->sign != sgn_64( n ) )
+        return bi->sign;
+
+    if ( bi_low > INT64_MAX )
+        return BIGINT_GT;
+
+    const uint64_t norm_n = ( uint64_t ) n;
+    return cmp_uint64_t( &bi_low, &norm_n );
+}
+
+int bigint_cmp_b( const struct bigint *bi1, const struct bigint *bi2 )
+{
+    const size_t s1 = bi1->num_ls->len;
+    const size_t s2 = bi2->num_ls->len;
+
+    if ( s1 != s2 )
+        return cmp_size_t( &s1, &s2 );
+
+    for ( size_t i = 0; i < s1; ++i )
+    {
+        const size_t idx  = s1 - i - 1;
+        const uint64_t n1 = bi1->num_ls->numbers[ idx ];
+        const uint64_t n2 = bi2->num_ls->numbers[ idx ];
+        if ( n1 != n2 )
+            return cmp_uint64_t( &n1, &n2 );
+    }
+
+    return BIGINT_EQ;
 }
