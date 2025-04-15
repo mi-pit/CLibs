@@ -2,81 +2,90 @@
 
 #include "extra_types.h"
 
-#include <ctype.h>
-#include <string.h>
 
-
-int64_t hash_func( const void *data, size_t nbytes )
+uint64_t hash_func( const void *data, size_t nbytes )
 {
-    union {
-        int64_t number;
-        byte byte_array[ sizeof( int64_t ) ];
-    } hash;
-    hash.number = ( int64_t ) nbytes;
+    uint64_t hash = 5381 * nbytes;
 
-    const byte *gen_data = ( byte * ) data;
+    const byte *data_byte = ( byte * ) data;
     for ( size_t i = 0; i < nbytes; ++i )
-    {
-        hash.byte_array[ i % sizeof( int64_t ) ] =
-                ( byte ) ( hash.byte_array[ i % sizeof( int64_t ) ] ^ gen_data[ i ] );
-    }
+        hash = ( ( hash << 5 ) + hash ) + data_byte[ i ];
 
-    return hash.number;
+    return hash;
 }
 
 
-define_cmp_function( char );
-
-define_cmp_function( int );
-
-define_cmp_function( size_t );
-
-define_cmp_function( int64_t );
-
-
-int64_t digitsof( uint64_t num, int base )
+uint64_t digitsof( uint64_t num, unsigned base )
 {
-    if ( base <= 0 )
-        return -1;
-
-    int ndigs;
-    for ( ndigs = 0; num > 0; num /= base, ++ndigs )
+    uint64_t ndigs = 0;
+    for ( ; num > 0; num /= base, ++ndigs )
         ;
 
-    return ( int ) ndigs;
+    return ndigs;
 }
 
-int64_t power( int64_t base, int64_t exp )
+int64_t power( int64_t base, unsigned exp )
 {
     int64_t res = 1;
-    for ( ; exp > 0; ++exp, res *= base )
-        ;
+    while ( exp > 0 )
+    {
+        if ( exp % 2 == 1 )
+            res *= base;
+        base *= base;
+        exp /= 2;
+    }
 
     return res;
 }
 
-inline bool is_within( int64_t low, int64_t num, int64_t high )
+uint64_t upower( uint64_t base, unsigned exp )
 {
-    return ( ( num ) >= ( low ) && ( num ) <= ( high ) );
+    uint64_t res = 1;
+    while ( exp > 0 )
+    {
+        if ( exp % 2 == 1 )
+            res *= base;
+        base *= base;
+        exp /= 2;
+    }
+
+    return res;
 }
 
-int64_t reverse_integer( int64_t n, int base )
+uint64_t reverse_integer( uint64_t n, unsigned base )
 {
-    int64_t digits = digitsof( n, base );
-
-    int64_t lp, hp;
-    uint8_t ld, hd;
-    for ( int i = 0; i < digits / 2; ++i )
+    uint64_t digits = n == 0 ? 0 : digitsof( n, base );
+    uint64_t lp = 1, hp = upower( base, digits - 1 ); // powers
+    uint8_t ld, hd;                                   // digits
+    for ( uint64_t i = 0; i < digits / 2; ++i )
     {
-        lp = power( base, i );
-        hp = power( base, digits - i - 1 );
+        ld = n / lp % base;
+        hd = n / hp % base;
 
-        ld = n % ( lp * 10 ) / lp;
-        hd = n / hp % ( hp / 10 );
+        n = n - ( ld * lp ) + ( hd * lp );
+        n = n - ( hd * hp ) + ( ld * hp );
 
-        n += -( ld * lp ) + ( hd * lp );
-        n += -( hd * hp ) + ( ld * hp );
+        lp *= base;
+        hp /= base;
     }
 
     return n;
+}
+
+uint64_t get_next_power_of_two( uint64_t n )
+{
+    uint64_t pwr = 1;
+    while ( pwr <= n )
+        pwr *= 2;
+
+    return pwr;
+}
+
+uint64_t get_prev_power_of_two( uint64_t n )
+{
+    uint64_t pwr = INT64_MAX + UINT64_C( 1 );
+    while ( pwr >= n )
+        pwr /= 2;
+
+    return pwr;
 }

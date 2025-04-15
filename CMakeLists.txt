@@ -3,28 +3,52 @@ project(CLibs C)
 
 set(CMAKE_C_STANDARD 99)
 
-include_directories(.)
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
-add_executable(CLibs
-        dictionary.c
-        dictionary.h
-        dynarr.c
-        dynarr.h
-        dynstring.c
-        dynstring.h
-        errors.c
-        errors.h
-        extra_types.h
-        foreach.h
-        main.c
-        misc.c
-        misc.h
-        pointer_utils.c
-        pointer_utils.h
-        print_functions.c
-        print_functions.h
-        sets.c
-        sets.h
+add_compile_options(-D_POSIX_C_SOURCE=200809L)
+
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
+
+add_compile_options(-fsanitize=undefined)
+add_link_options(-fsanitize=undefined)
+
+
+add_executable(Tests
+        Tests/tests.c
         string_utils.c
-        string_utils.h
-        swexpr.h swexpr.c)
+        Structs/dynarr.c
+        Structs/dynstring.c
+        swexpr.c
+        misc.c
+        )
+
+add_executable(TestNumbers
+        Tests/bigint_test.c
+        Structs/bigint.c
+        Structs/dynstring.c
+        Structs/dynarr.c
+        string_utils.c
+        misc.c
+        Structs/Bigint/numbers_list.c
+        )
+
+add_executable(TestHashFunc
+        Tests/test_hash_func.c
+        misc.c
+        Structs/sets.c
+        item_print_functions.c
+        )
+
+add_executable(TestLeet
+        Tests/test_leet.c
+        Structs/dictionary.c
+        Structs/dynarr.c
+        item_print_functions.c
+        misc.c
+        )
+
+add_executable(TestTests
+        Tests/test_unit_tests.c
+        misc.c
+        )

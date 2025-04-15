@@ -4,3 +4,11 @@
 !CMakeLists.txt
 !*.c
 !*.h
+
+!*.sh
+!*.hs
+
+!/Tests/
+!/Dev/
+!/Structs/
+!/Structs/Bigint/

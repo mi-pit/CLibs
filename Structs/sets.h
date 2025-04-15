@@ -1,9 +1,7 @@
 #ifndef CLIBS_SETS_H
 #define CLIBS_SETS_H
 
-
-#include "extra_types.h"     /* GenericData */
-#include "print_functions.h" /* PrintFunction */
+#include "../item_print_functions.h" /* PrintFunction */
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -16,7 +14,7 @@ typedef const struct hash_set *ConstSet;
 #define SET_DEFAULT_CAP 64
 
 /**
- * func is hash_set to print_byte by default
+ * func is set to print_byte by default
  */
 struct set_item {
     void *data;
@@ -59,8 +57,8 @@ bool set_search_item( ConstSet set, const struct set_item *item );
  * @param set_1
  * @param set_2
  * @param result    if the val at result is NULL, the function creates a new
- * hash_set with the proper values. If the val isn't NULL, the function
- * adds the intersecting values to the hash_set in result
+ * hash set with the proper values. If the val isn't NULL, the function
+ * adds the intersecting values to the hash set in result
  * @return -1 on error, else 0
  */
 int set_intersection( ConstSet set_1, ConstSet set_2, Set *result );
@@ -74,30 +72,6 @@ int set_subtract( Set, ConstSet sub );
 
 
 int set_cmp( ConstSet set_1, ConstSet set_2 );
-
-static int clib_set_insert_retval = 0;
-static int clib_set_remove_retval = 0;
-
-#define set_insert_val( set, value, type )                                    \
-    do                                                                        \
-    {                                                                         \
-        type __set_insert_lit_var__ = value;                                  \
-                                                                              \
-        clib_set_insert_retval = set_insert_f( set,                           \
-                                               &__set_insert_lit_var__,       \
-                                               sizeof( __typeof__( value ) ), \
-                                               print( type ) );               \
-    }                                                                         \
-    while ( 0 )
-
-#define set_remove_val( set, value, type )                                  \
-    do                                                                      \
-    {                                                                       \
-        type __set_remove_lit_var__ = value;                                \
-        clib_set_remove_retval =                                            \
-                set_remove( set, &__set_remove_lit_var__, sizeof( type ) ); \
-    }                                                                       \
-    while ( 0 )
 
 
 void set_destroy( Set );

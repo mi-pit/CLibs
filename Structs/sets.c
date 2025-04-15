@@ -1,10 +1,9 @@
 #include "sets.h"
 
-#include "errors.h"
-#include "misc.h"
+#include "../Dev/errors.h" /* RVs, warns, ... */
+#include "../misc.h"       /* cmp_size_t */
 
 #include <assert.h> /* assert */
-#include <err.h>    /* warn */
 #include <stdarg.h> /* va_list, ... */
 #include <stdio.h>  /* print */
 #include <stdlib.h> /* malloc */
@@ -40,6 +39,8 @@ static int set_item_cmp( const void *s1, const void *s2 )
 }
 
 
+/*  resize -> insert_item -> insert_f -> resize -\
+ *   <-------------------------------------------/  */
 static int set_resize( Set set, size_t new_size )
 {
     Set new_set = set_init_cap( new_size );
@@ -76,16 +77,12 @@ Set set_init_cap( size_t capacity )
 {
     Set new_set = calloc( 1, sizeof( struct hash_set ) );
     if ( new_set == NULL )
-    {
-        ffwarn( "%s", "calloc" );
-        return NULL;
-    }
+        return ( void * ) fflwarn_ret( NULL, "calloc" );
 
     if ( ( new_set->items = calloc( capacity, sizeof( struct set_item ) ) ) == NULL )
     {
         free( new_set );
-        ffwarn( "%s", "calloc" );
-        return NULL;
+        return ( void * ) fflwarn_ret( NULL, "calloc" );
     }
 
     new_set->capacity = capacity;
@@ -137,7 +134,7 @@ int set_insert_f( Set set, const void *data, size_t len, PrintFunction func )
         // elements rightful place is empty => insert
         curr->data = malloc( len );
         if ( curr->data == NULL )
-            return ffwarn_ret( RV_ERROR, "%s", "malloc" );
+            return fwarn_ret( RV_ERROR, "malloc" );
 
         memcpy( curr->data, data, len );
         curr->size    = len;
@@ -241,7 +238,7 @@ bool set_search( ConstSet set, const void *data, size_t len )
 
     const struct set_item new = {
         .size = len, .data = ( void * ) data,
-        /* data should still be const */
+        /* data is still const */
     };
 
     struct set_item *curr;

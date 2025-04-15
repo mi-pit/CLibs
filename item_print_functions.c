@@ -1,16 +1,11 @@
-#include "print_functions.h"
+#include "item_print_functions.h"
 
-#include "dictionary.h"
-#include "dynarr.h"
-#include "errors.h"
+#include "Dev/errors.h"
+#include "Dev/pointer_utils.h"
 #include "extra_types.h"
-#include "pointer_utils.h"
-#include "sets.h"
-#include "string_utils.h"
 
 #include <err.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 
@@ -46,21 +41,11 @@ void print_pointer( const void *data, size_t nbytes )
 {
     if ( nbytes != sizeof( void * ) )
     {
-        ffwarn( "%s", "invalid data size" );
+        fflwarn( "invalid data size" );
         return;
     }
 
-    printf( "'"
-            "pointer"
-            ": "
-            "\"%p\""
-            "'",
-            *( ( const void ** ) data ) );
-}
-
-void print_ptr( const void *data, size_t nbytes )
-{
-    print_pointer( data, nbytes );
+    printf( "'pointer: \"%p\"'", *( ( void ** ) data ) );
 }
 
 void print_string( const void *data, size_t nbytes )
@@ -70,9 +55,7 @@ void print_string( const void *data, size_t nbytes )
         warnx( "%s: strlen != nbytes", __func__ );
         return;
     }
-    char *s = string_escaped( data );
-    printf( "\"%s\"", s );
-    free( s );
+    printf( "\"%s\"", ( char * ) data );
 }
 
 void print_str( const void *data, size_t nbytes )
@@ -81,6 +64,7 @@ void print_str( const void *data, size_t nbytes )
 }
 
 
+#ifdef CLIBS_DYNAMIC_ARRAY_H
 void print_List( const void *data, size_t nbytes )
 {
     if ( nbytes != sizeof( List ) )
@@ -91,7 +75,9 @@ void print_List( const void *data, size_t nbytes )
     ConstList ls = *( List * ) data;
     list_print( ls );
 }
+#endif //CLIBS_DYNAMIC_ARRAY_H
 
+#ifdef CLIBS_SETS_H
 void print_Set( const void *data, size_t nbytes )
 {
     if ( nbytes != sizeof( Set ) )
@@ -102,7 +88,9 @@ void print_Set( const void *data, size_t nbytes )
     ConstSet s = *( Set * ) data;
     set_print( s );
 }
+#endif //CLIBS_SETS_H
 
+#ifdef CLIBS_DICTIONARY_H
 void print_Dict( const void *data, size_t nbytes )
 {
     if ( nbytes != sizeof( Dict ) )
@@ -113,3 +101,4 @@ void print_Dict( const void *data, size_t nbytes )
     ConstDict dict = *( Dict * ) data;
     dict_print( dict );
 }
+#endif //CLIBS_DICTIONARY_H
