@@ -35,11 +35,13 @@
 #ifndef CLIBS_UNIT_TESTS_H
 #define CLIBS_UNIT_TESTS_H
 
+#include "filenames.h"       /* PATH_MAX */
 #include "terminal_colors.h" /* colors */
 
 #include <stdbool.h> /* * */
 #include <stdio.h>   /* printf */
 #include <stdlib.h>  /* exit */
+#include <string.h>  /* strlen */
 
 #define Tester static bool
 // todo?: #define TESTER( NAME ) static bool test_one_##NAME
@@ -145,14 +147,18 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
                                 const char *filename,
                                 int lineno )
 {
-    printf( "    " COLOR_TEST_TAG "[UNIT TEST" );
-    if ( !passed )
-        printf( " //%s @ %d", filename, lineno );
-    printf( "]" COLOR_DEFAULT " %s ", cond_str );
-
     ssize_t ln = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + strlen( cond_str ) );
 
-    const size_t ndots = ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_CONST_PART_LEN;
+    printf( "    " COLOR_TEST_TAG "[UNIT TEST" );
+    if ( !passed )
+    {
+        char buffer[ PATH_MAX + 128 ];
+        ln -= snprintf( buffer, sizeof buffer, " //%s @ %d", filename, lineno );
+        printf( "%s", buffer );
+    }
+    printf( "]" COLOR_DEFAULT " %s ", cond_str );
+
+    const size_t ndots = ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_CONST_PART_LEN + 1;
 
     if ( ln < 0 )
     {

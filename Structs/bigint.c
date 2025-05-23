@@ -9,6 +9,7 @@
 #include "../foreach.h"           /* foreach_ls */
 #include "../string_utils.h"      /* str_t, string_reversed() */
 #include "./dynstring.h"          /* dynstr */
+#include "Bigint/numbers_list.h"  /* numls */
 
 #include <ctype.h>    /* isdigit() */
 #include <inttypes.h> /* PRI macros */
@@ -24,7 +25,7 @@ void bigint_flip_sign( struct bigint *bi )
     bi->sign = sign_flipped( bi->sign );
 }
 
-size_t bigint_sizeof( const struct bigint *bi )
+size_t bigint_ndigs_64( const struct bigint *bi )
 {
     return bi->num_ls->len;
 }
@@ -69,7 +70,8 @@ struct bigint *bigint_init_as( const int64_t n )
 
 str_t bigint_to_string( const struct bigint *const bi )
 {
-    DynamicString dynstr = dynstr_init_cap( bi->num_ls->len * sizeof( uint64_t ) * 2 );
+    struct dynamic_string *dynstr =
+            dynstr_init_cap( bi->num_ls->len * sizeof( uint64_t ) * 2 );
     if ( dynstr == NULL )
         return ( void * ) f_stack_trace( NULL );
 
@@ -83,8 +85,8 @@ str_t bigint_to_string( const struct bigint *const bi )
                 fmt_buf, sizeof fmt_buf, "%%0%i" PRIu64, BIGINT_LIST_MEMBER_MAX_DIGITS );
 
         const uint64_t num = bi->num_ls->numbers[ idx ];
-        if ( dynstr_appendf( dynstr, ( idx == idx_last ? "%" PRIu64 : fmt_buf ), num )
-             != RV_SUCCESS )
+        if ( dynstr_appendf( dynstr, ( idx == idx_last ? "%" PRIu64 : fmt_buf ), num ) !=
+             RV_SUCCESS )
             goto ERROR;
     }
 
@@ -192,6 +194,8 @@ int bigint_add_i( struct bigint *bi, int64_t n )
     return bigint_add_power( bi, n, 0 );
 }
 
+#if 1 // mine/ChatGPT impl
+
 Private inline int handle_overunderflow( struct bigint *const bi,
                                          size_t level,
                                          sign_t sign )
@@ -208,7 +212,7 @@ Private inline int handle_overunderflow( struct bigint *const bi,
 #define handle_underflow( BIGINT, LEVEL ) \
     handle_overunderflow( ( BIGINT ), ( LEVEL ), sign_flipped( ( BIGINT )->sign ) )
 
-int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t level )
+int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t power )
 {
     if ( n == 0 )
         return RV_SUCCESS;
@@ -218,10 +222,10 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
                  "bigint sign must be ›1‹ or ›-1‹ (is %d)",
                  bi->sign );
 
-    if ( bi->num_ls->len <= level )
-        return_on_fail( numls_extend_zeroes( bi->num_ls, level - bi->num_ls->len + 1 ) );
+    if ( bi->num_ls->len <= power )
+        return_on_fail( numls_extend_zeroes( bi->num_ls, power - bi->num_ls->len + 1 ) );
 
-    const uint64_t low = bi->num_ls->numbers[ level ];
+    const uint64_t low = bi->num_ls->numbers[ power ];
 
     // int64_t norm_n isn't able to hold this value
     // => subtract it after converting to uint64_t
@@ -234,28 +238,82 @@ int bigint_add_power( struct bigint *const bi, const int64_t n, const uint64_t l
     const bool underflow = norm_n < 0 && low < ( uint64_t ) llabs( norm_n );
     assert_that( !overflow || !underflow, "cannot both be set at once" );
 
-    const bool flip_bi_sign = underflow && numls_is_last( bi->num_ls, level );
+    const bool flip_bi_sign = underflow && numls_is_last( bi->num_ls, power );
 
     const uint64_t final =
             ( flip_bi_sign ? low - norm_n
               : underflow  ? BIGINT_LIST_MEMBER_MAX + 1 + ( ( int64_t ) low + norm_n )
-                           : ( low + norm_n ) % ( BIGINT_LIST_MEMBER_MAX + 1 ) )
-            - ( int ) sub_one_more;
+                           : ( low + norm_n ) % ( BIGINT_LIST_MEMBER_MAX + 1 ) ) -
+            ( int ) sub_one_more;
 
-    bi->num_ls->numbers[ level ] = final;
+    bi->num_ls->numbers[ power ] = final;
 
     if ( flip_bi_sign )
         bigint_flip_sign( bi );
     else if ( underflow )
-        return_on_fail( handle_underflow( bi, level ) );
+        return_on_fail( handle_underflow( bi, power ) );
     else if ( overflow )
-        return_on_fail( handle_overflow( bi, level ) );
+        return_on_fail( handle_overflow( bi, power ) );
 
-    if ( final == 0 && level != 0 && numls_is_last( bi->num_ls, level ) )
+    if ( final == 0 && power != 0 && numls_is_last( bi->num_ls, power ) )
         return numls_pop( bi->num_ls );
 
     return RV_SUCCESS;
 }
+#else
+#define BASE ( BIGINT_LIST_MEMBER_MAX + 1 )
+
+int bigint_add_power( struct bigint *bi, int64_t n, uint64_t power )
+{
+    if ( !bi || !bi->num_ls )
+        return -1;
+
+    struct numbers_list *num_ls = bi->num_ls;
+    if ( num_ls->len <= power )
+    {
+        if ( numls_extend_zeroes( num_ls, power + 1 ) != 0 )
+            return -1;
+    }
+
+    const int64_t norm_n = n * bi->sign;
+    const bool underflow = norm_n < 0 && num_ls->numbers[ power ] < ( uint64_t ) norm_n;
+    const bool flip_bi_sign = underflow && numls_is_last( bi->num_ls, power );
+
+    if ( flip_bi_sign )
+        bigint_flip_sign( bi );
+
+    int64_t carry = n * bi->sign;
+    for ( size_t i = power; carry != 0; i++ )
+    {
+        if ( i >= num_ls->len )
+        {
+            if ( numls_append( num_ls, 0 ) != 0 )
+                return -1;
+        }
+
+        if ( UINT64_MAX - num_ls->numbers[ i ] < ( uint64_t ) carry )
+        {
+            carry += ( int64_t ) ( num_ls->numbers[ i ] - BASE );
+            num_ls->numbers[ i ] = carry;
+            carry                = 1;
+            continue;
+        }
+
+        uint64_t sum = num_ls->numbers[ i ] + carry;
+        if ( sum >= BASE )
+        {
+            num_ls->numbers[ i ] = sum % BASE;
+            carry                = ( int64_t ) ( sum / BASE );
+        }
+        else
+        {
+            num_ls->numbers[ i ] = sum;
+            carry                = 0;
+        }
+    }
+    return 0;
+}
+#endif
 
 
 int bigint_add_b( struct bigint *bi, const struct bigint *add )
@@ -286,7 +344,7 @@ int bigint_add_b( struct bigint *bi, const struct bigint *add )
 
 int bigint_cmp_i( const struct bigint *bi, int64_t n )
 {
-    if ( bigint_sizeof( bi ) > 1 )
+    if ( bigint_ndigs_64( bi ) > 1 )
         return BIGINT_GT;
 
     const uint64_t bi_low = bi->num_ls->numbers[ 0 ];

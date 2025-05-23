@@ -6,6 +6,7 @@
 
 #include "../../Dev/errors.h"
 #include "../../Dev/pointer_utils.h"
+#include "../../misc.h"
 
 #define DEFAULT_NUMLS_CAP 8
 

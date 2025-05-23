@@ -46,8 +46,8 @@ LibraryDefined UseResult str_t string_duplicate( string_t s )
 }
 #endif // ndef strdup
 
-#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) \
-        || defined( _POSIX_C_SOURCE ) // non-standard
+#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) || \
+        defined( _POSIX_C_SOURCE ) // non-standard
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>

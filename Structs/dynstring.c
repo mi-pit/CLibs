@@ -5,10 +5,10 @@
 
 #include "../Dev/errors.h"   /* RV, warn */
 #include "../misc.h"         /* min_64() */
-#include "../string_utils.h" /* vasprintf(in case it's not defined in <stdio.h>),
+#include "../string_utils.h" /* vasprintf (in case it's not defined in <stdio.h>),
                               * str_t, string_t */
 
-#include <assert.h>
+#include <assert.h> //
 #include <stdio.h>  /* fprintf() */
 #include <stdlib.h> /* alloc */
 #include <string.h> /* this one should be obvious */
@@ -22,9 +22,9 @@ struct dynamic_string {
 };
 
 
-DynamicString dynstr_init_cap( size_t capacity )
+struct dynamic_string *dynstr_init_cap( size_t capacity )
 {
-    DynamicString new = calloc( 1, sizeof( struct dynamic_string ) );
+    struct dynamic_string *new = calloc( 1, sizeof( struct dynamic_string ) );
     if ( new == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
@@ -40,18 +40,18 @@ DynamicString dynstr_init_cap( size_t capacity )
     return new;
 }
 
-DynamicString dynstr_init( void )
+struct dynamic_string *dynstr_init( void )
 {
     return dynstr_init_cap( DEFAULT_DYNSTRING_CAP );
 }
 
-DynamicString dynstr_init_as( string_t s )
+struct dynamic_string *dynstr_init_as( string_t s )
 {
     if ( s == NULL )
         return ( void * ) fwarnx_ret( NULL, "initial string may not be NULL" );
 
-    size_t len        = strlen( s );
-    DynamicString new = dynstr_init_cap( len + 1 );
+    size_t len                 = strlen( s );
+    struct dynamic_string *new = dynstr_init_cap( len + 1 );
     if ( new == NULL )
         return ( void * ) f_stack_trace( NULL );
 
@@ -61,14 +61,14 @@ DynamicString dynstr_init_as( string_t s )
     return new;
 }
 
-void dynstr_destroy( DynamicString dynstr )
+void dynstr_destroy( struct dynamic_string *dynstr )
 {
     free( dynstr->data );
     free( dynstr );
 }
 
 
-Private int dynstr_resize( DynamicString dynstr, size_t new_size )
+Private int dynstr_resize( struct dynamic_string *dynstr, size_t new_size )
 {
     assert( new_size > dynstr->len );
 
@@ -86,8 +86,8 @@ Private int dynstr_resize( DynamicString dynstr, size_t new_size )
 }
 
 
-Private int dynstr_VPendF( DynamicString dynstr,
-                           int( pender )( DynamicString, const char * ),
+Private int dynstr_VPendF( struct dynamic_string *dynstr,
+                           int( pender )( struct dynamic_string *, const char * ),
                            const char *fmt,
                            va_list vaList )
 {
@@ -103,12 +103,12 @@ Private int dynstr_VPendF( DynamicString dynstr,
 }
 
 
-int dynstr_append( DynamicString dynstr, const char *app )
+int dynstr_append( struct dynamic_string *dynstr, const char *app )
 {
     return dynstr_appendn( dynstr, app, strlen( app ) );
 }
 
-int dynstr_appendn( DynamicString dynstr, const char *app, size_t len )
+int dynstr_appendn( struct dynamic_string *dynstr, const char *app, size_t len )
 {
     size_t new_size = dynstr->len + len;
     if ( new_size + 1 >= dynstr->cap )
@@ -128,7 +128,7 @@ int dynstr_appendn( DynamicString dynstr, const char *app, size_t len )
     return RV_SUCCESS;
 }
 
-int dynstr_appendf( DynamicString dynstr, const char *fmt, ... )
+int dynstr_appendf( struct dynamic_string *dynstr, const char *fmt, ... )
 {
     va_list va;
     va_start( va, fmt );
@@ -137,18 +137,18 @@ int dynstr_appendf( DynamicString dynstr, const char *fmt, ... )
     return rv;
 }
 
-int dynstr_vappendf( DynamicString dynstr, const char *fmt, va_list vargs )
+int dynstr_vappendf( struct dynamic_string *dynstr, const char *fmt, va_list vargs )
 {
     return dynstr_VPendF( dynstr, dynstr_append, fmt, vargs );
 }
 
 
-int dynstr_prepend( DynamicString dynstr, string_t s )
+int dynstr_prepend( struct dynamic_string *dynstr, string_t s )
 {
     return dynstr_prependn( dynstr, s, strlen( s ) );
 }
 
-int dynstr_prependn( DynamicString dynstr, const char *s, size_t len )
+int dynstr_prependn( struct dynamic_string *dynstr, const char *s, size_t len )
 {
     size_t new_size = dynstr->len + len;
     if ( new_size >= dynstr->cap )
@@ -170,7 +170,7 @@ int dynstr_prependn( DynamicString dynstr, const char *s, size_t len )
     return RV_SUCCESS;
 }
 
-int dynstr_prependf( DynamicString dynstr, const char *fmt, ... )
+int dynstr_prependf( struct dynamic_string *dynstr, const char *fmt, ... )
 {
     va_list va;
     va_start( va, fmt );
@@ -179,13 +179,13 @@ int dynstr_prependf( DynamicString dynstr, const char *fmt, ... )
     return rv;
 }
 
-int dynstr_vprependf( DynamicString dynstr, const char *fmt, va_list vargs )
+int dynstr_vprependf( struct dynamic_string *dynstr, const char *fmt, va_list vargs )
 {
     return dynstr_VPendF( dynstr, dynstr_prepend, fmt, vargs );
 }
 
 
-int dynstr_slice( DynamicString dynstr, size_t start_idx, ssize_t end_idx )
+int dynstr_slice( struct dynamic_string *dynstr, size_t start_idx, ssize_t end_idx )
 {
     const size_t end = end_idx < 0 ? dynstr->len + end_idx + 1 : ( size_t ) end_idx;
 
@@ -202,7 +202,7 @@ int dynstr_slice( DynamicString dynstr, size_t start_idx, ssize_t end_idx )
     return RV_SUCCESS;
 }
 
-int dynstr_slice_e( DynamicString dynstr, ssize_t end_idx )
+int dynstr_slice_e( struct dynamic_string *dynstr, ssize_t end_idx )
 {
     const size_t end = end_idx < 0 ? dynstr->len + end_idx + 1 : ( size_t ) end_idx;
     if ( end > dynstr->len )
@@ -216,7 +216,7 @@ int dynstr_slice_e( DynamicString dynstr, ssize_t end_idx )
     return RV_SUCCESS;
 }
 
-int dynstr_slice_s( DynamicString dynstr, size_t start_idx )
+int dynstr_slice_s( struct dynamic_string *dynstr, size_t start_idx )
 {
     if ( start_idx > dynstr->len )
         return fwarnx_ret( RV_EXCEPTION,
@@ -231,7 +231,7 @@ int dynstr_slice_s( DynamicString dynstr, size_t start_idx )
 }
 
 
-int dynstr_reset( DynamicString dynstr )
+int dynstr_reset( struct dynamic_string *dynstr )
 {
     free( dynstr->data );
     if ( ( dynstr->data = malloc( DEFAULT_DYNSTRING_CAP ) ) == NULL )
@@ -242,9 +242,22 @@ int dynstr_reset( DynamicString dynstr )
     return RV_SUCCESS;
 }
 
+
+int dynstr_set_at( struct dynamic_string *dynstr, size_t idx, char c )
+{
+    if ( idx >= dynstr->len )
+        return fwarnx_ret( RV_EXCEPTION,
+                           "index %zu out of bounds for string of length %zu",
+                           idx,
+                           dynstr->len );
+
+    dynstr->data[ idx ] = c;
+    return RV_SUCCESS;
+}
+
 /* ==== */ /* ==== */
 
-str_t dynstr_data_copy( ConstDynamicString dynstr )
+str_t dynstr_data_copy( const struct dynamic_string *dynstr )
 {
     str_t ret = strndup( dynstr->data, dynstr->len );
     if ( ret == NULL )
@@ -253,12 +266,12 @@ str_t dynstr_data_copy( ConstDynamicString dynstr )
 }
 
 
-str_t dynstr_data( DynamicString dynstr )
+string_t dynstr_data( const struct dynamic_string *dynstr )
 {
     return dynstr->data;
 }
 
-size_t dynstr_len( ConstDynamicString dynstr )
+size_t dynstr_len( const struct dynamic_string *dynstr )
 {
     return dynstr->len;
 }
