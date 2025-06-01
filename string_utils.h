@@ -8,9 +8,10 @@
 #include "Dev/attributes.h" /* UseResult */
 
 #include <regex.h>     /* regex_t */
-#include <stdbool.h>   /* bool */
-#include <string.h>    /* import */
 #include <sys/types.h> /* ssize_t */
+
+/* include for user */
+#include <string.h>
 
 
 typedef const char *string_t;
