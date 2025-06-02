@@ -57,7 +57,7 @@
  */
 #define foreach_ls( TYPE, ITEM_NAME, LIST )                                    \
     foreach_helper_init( list_size( LIST ), ITEM_NAME ) foreach_helper_assign( \
-            TYPE, ITEM_NAME, list_access( LIST, foreach_index_##ITEM_NAME, TYPE ) )
+            TYPE, ITEM_NAME, list_fetch( LIST, foreach_index_##ITEM_NAME, TYPE ) )
 #endif //CLIBS_DYNAMIC_ARRAY_H
 
 
