@@ -6,9 +6,9 @@
 #include "../extra_types.h" /* byte */
 #include "../misc.h"        /* cmpeq() */
 
-#include <stdio.h>   /* *print* */
-#include <stdlib.h>  /* malloc, free, bsearch, qsort */
-#include <string.h>  /* mem* */
+#include <stdio.h>  /* *print* */
+#include <stdlib.h> /* malloc, free, bsearch, qsort */
+#include <string.h> /* mem* */
 
 
 #define ListIndexOOBExceptionString( LIST, INDEX ) \
@@ -286,7 +286,7 @@ int list_remove( struct dynamic_array *ls, size_t index, void *container )
         memcpy( container, list_at( ls, index ), ls->el_size );
 
     memmove( list_at( ls, index ),
-             list_at( ls, index - 1 ),
+             list_at( ls, index + 1 ),
              ( ls->size - index ) * ls->el_size );
 
     --ls->size;
@@ -391,6 +391,7 @@ int list_reverse( struct dynamic_array *ls )
 
 struct dynamic_array *list_reversed( const struct dynamic_array *ls )
 {
+    // todo: re-implement this for efficiency
     struct dynamic_array *rev;
     if ( list_copy( ls, &rev ) != RV_SUCCESS )
         return ( void * ) f_stack_trace( NULL );

@@ -124,9 +124,9 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
 
 LibraryDefined NoReturn void FINISH_TESTING( void )
 {
-    printf( COLOR_NOTE "\n[SUMMARY]" COLOR_DEFAULT " total unit tests ran: " COLOR_NOTE
-                       "%i" COLOR_DEFAULT ", total unit tests failed: " PRINT_COLOR
-                       "%i" COLOR_DEFAULT "\n",
+    printf( "\n" COLOR_NOTE "[SUMMARY]" COLOR_DEFAULT " total unit tests ran: " COLOR_NOTE
+            "%i" COLOR_DEFAULT ", total unit tests failed: " PRINT_COLOR
+            "%i" COLOR_DEFAULT "\n",
             TEST_NAME_CREATOR( TOTAL_RAN_UNIT ),
             TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) == 0 ? COLOR_SUCC : COLOR_FAIL,
             TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) );
@@ -143,9 +143,9 @@ LibraryDefined NoReturn void FINISH_TESTING( void )
 
 
 LibraryDefined bool UNIT_TEST_( const char *cond_str,
-                                bool passed,
+                                const bool passed,
                                 const char *filename,
-                                int lineno )
+                                const int lineno )
 {
     ssize_t ln = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + strlen( cond_str ) );
 
@@ -153,7 +153,7 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
     if ( !passed )
     {
         char buffer[ PATH_MAX + 128 ];
-        ln -= snprintf( buffer, sizeof buffer, " //%s @ %d", filename, lineno );
+        ln -= snprintf( buffer, sizeof buffer, " // %s @ %d", filename, lineno );
         printf( "%s", buffer );
     }
     printf( "]" COLOR_DEFAULT " %s ", cond_str );
