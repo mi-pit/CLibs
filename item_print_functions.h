@@ -1,9 +1,8 @@
 #ifndef CLIBS_PRINT_FUNCTIONS_H
 #define CLIBS_PRINT_FUNCTIONS_H
 
-#include "extra_types.h" /* byte */
+#include "Dev/attributes.h"
 
-#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -15,7 +14,7 @@
 
 typedef void ( *PrintFunction )( const void *, size_t );
 
-static bool PrintType = false;
+LibraryDefined bool PrintType = false;
 
 #ifndef TYPE_SEPARATOR
 #define TYPE_SEPARATOR ": "

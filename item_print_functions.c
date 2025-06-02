@@ -26,7 +26,7 @@ define_print_func( int, "%-d" );
 
 define_print_func( size_t, "%-zu" );
 
-define_print_func( ssize_t, "%- zd" );
+define_print_func( ssize_t, "%-zd" );
 
 define_print_func( char, "'%c'" );
 
