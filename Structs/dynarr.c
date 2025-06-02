@@ -12,7 +12,7 @@
 
 
 #define ListIndexOOBExceptionString( LIST, INDEX ) \
-    "index %zu out of bounds for list of size %zu", INDEX, ( LIST )->size - 1
+    "index %zu out of bounds for list of size %zu", INDEX, ( LIST )->size
 
 #define ListEmptyExceptionString "list is empty"
 
@@ -272,7 +272,7 @@ int list_pop( struct dynamic_array *ls, void *container )
 
 int list_remove( struct dynamic_array *ls, size_t index, void *container )
 {
-    if ( index > ls->size )
+    if ( index >= ls->size )
         return fwarnx_ret( RV_EXCEPTION, ListIndexOOBExceptionString( ls, index ) );
 
     if ( index == ls->size - 1 )
