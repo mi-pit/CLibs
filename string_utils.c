@@ -21,8 +21,6 @@ str_t string_stripped( string_t s )
 {
     size_t str_len = strlen( s );
 
-    s = NULL;
-
     size_t start_idx = -1;
     size_t end_idx   = str_len;
 
