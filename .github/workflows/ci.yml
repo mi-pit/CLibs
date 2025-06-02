@@ -92,20 +92,3 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure
-
-      - name: Generate Coverage (Ubuntu/GCC only)
-        shell: bash
-        if: env.COLLECT_COVERAGE == 'true'
-        run: |
-          cd build
-          lcov --capture --directory . --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' --ignore-errors unused --output-file coverage.filtered.info
-          lcov --list coverage.filtered.info
-
-      - name: Upload Coverage to Codecov
-        if: env.COLLECT_COVERAGE == 'true'
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: build/coverage.filtered.info
-          fail_ci_if_error: true
