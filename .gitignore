@@ -2,6 +2,11 @@
 
 !.gitignore
 !CMakeLists.txt
+
+!/.github/
+!/.github/workflows/
+!*.yml
+
 !*.c
 !*.h
 

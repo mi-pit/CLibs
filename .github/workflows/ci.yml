@@ -1,0 +1,100 @@
+# File: .github/workflows/ci.yml
+#
+# GitHub Actions CI for the CLibs project.
+# • Builds on Ubuntu, macOS, and Windows.
+# • Tests with both GCC and Clang.
+# • Enables sanitizers on Debug builds.
+# • Runs CTest to execute all registered tests.
+# • (Optional) Captures coverage on Ubuntu/GCC.
+
+name: C/C++ CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build-and-test:
+    name: Build & Test on ${{ matrix.os }} / ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        compiler: [ gcc, clang ]
+      fail-fast: false
+
+    env:
+      # Enable sanitizers only on Debug builds. We'll force Debug on CI.
+      USE_SANITIZERS: true
+      # Only collect coverage on Ubuntu + GCC + push events:
+      COLLECT_COVERAGE: ${{ matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc' && github.event_name == 'push' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          if [ "${{ matrix.compiler }}" == "gcc" ]; then
+            sudo apt-get update
+            sudo apt-get install -y build-essential cmake lcov
+          else
+            sudo apt-get update
+            sudo apt-get install -y clang cmake lcov
+          fi
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          choco install cmake -y
+          if ($env:matrix_compiler -eq 'gcc') {
+            choco install mingw -y
+          } else {
+            choco install llvm -y
+          }
+
+      - name: Configure CMake
+        # Create an out-of-source build directory and configure.
+        run: |
+          mkdir -p build
+          cd build
+
+          # On Windows, use MSYS2 GCC or LLVM if available. CMake auto-detects.
+          # Force Debug so that sanitizers and symbols are on.
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug -DUSE_SANITIZERS=$USE_SANITIZERS
+          else
+            cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_SANITIZERS=$USE_SANITIZERS \
+              $([ "$COLLECT_COVERAGE" == "true" ] && echo "-DCMAKE_C_FLAGS=--coverage -DCMAKE_CXX_FLAGS=--coverage")
+          fi
+
+      - name: Build
+        run: cmake --build build -- -j$(nproc)
+
+      - name: Run unit tests
+        run: |
+          cd build
+          ctest --output-on-failure
+
+      - name: Generate Coverage (Ubuntu/GCC only)
+        if: env.COLLECT_COVERAGE == 'true'
+        run: |
+          cd build
+          lcov --capture --directory . --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' --output-file coverage.filtered.info
+          lcov --list coverage.filtered.info
+
+      - name: Upload Coverage to Codecov
+        if: env.COLLECT_COVERAGE == 'true'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/coverage.filtered.info
+          fail_ci_if_error: true
