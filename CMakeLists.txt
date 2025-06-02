@@ -23,16 +23,6 @@ add_executable(Tests
         misc.c
         )
 
-add_executable(TestNumbers
-        Tests/bigint_test.c
-        Structs/bigint.c
-        Structs/dynstring.c
-        Structs/dynarr.c
-        string_utils.c
-        misc.c
-        Structs/Bigint/numbers_list.c
-        )
-
 add_executable(TestHashFunc
         Tests/test_hash_func.c
         misc.c
