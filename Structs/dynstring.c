@@ -207,8 +207,8 @@ int dynstr_slice_e( struct dynamic_string *dynstr, ssize_t end_idx )
     const size_t end = end_idx < 0 ? dynstr->len + end_idx + 1 : ( size_t ) end_idx;
     if ( end > dynstr->len )
         return fwarnx_ret( RV_EXCEPTION,
-                           "index %zu out of bounds for string of length %zu",
-                           end,
+                           "index %zd out of bounds for string of length %zu",
+                           end_idx,
                            dynstr->len );
 
     dynstr->data[ end ] = '\0';

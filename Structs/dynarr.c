@@ -405,19 +405,19 @@ struct dynamic_array *list_reversed( const struct dynamic_array *ls )
 }
 
 
-int list_copy( const struct dynamic_array *ls, struct dynamic_array **new_ls_cont )
+int list_copy( const struct dynamic_array *old, struct dynamic_array **new_ls_container )
 {
-    struct dynamic_array *new_ls = list_init_size( ls->el_size );
+    struct dynamic_array *new_ls = list_init_size( old->el_size );
     if ( new_ls == NULL )
         return RV_ERROR;
 
-    if ( list_extend_list( new_ls, ls ) != RV_SUCCESS )
+    if ( list_extend_list( new_ls, old ) != RV_SUCCESS )
     {
         list_destroy( new_ls );
         return f_stack_trace( RV_ERROR );
     }
 
-    *new_ls_cont = new_ls;
+    *new_ls_container = new_ls;
 
     return RV_SUCCESS;
 }
