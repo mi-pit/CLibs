@@ -1,0 +1,71 @@
+# File: .github/workflows/ci.yml
+#
+# GitHub Actions CI for the CLibs project.
+# • Builds on Ubuntu & macOS
+# • Tests with both GCC and Clang.
+# • Enables sanitizers on Debug builds.
+# • Runs CTest to execute all registered tests.
+# • (Optional) Captures coverage on Ubuntu/GCC.
+
+name: C/C++ CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build-and-test:
+    name: Build & Test on ${{ matrix.os }} / ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+        compiler: [ gcc, clang ]
+      fail-fast: false
+
+    env:
+      USE_SANITIZERS: true
+      COLLECT_COVERAGE: ${{ matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc' && github.event_name == 'push' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          if [ "${{ matrix.compiler }}" == "gcc" ]; then
+            sudo apt-get update
+            sudo apt-get install -y build-essential cmake
+          else
+            sudo apt-get update
+            sudo apt-get install -y clang cmake
+          fi
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install cmake gcc
+
+      - name: Configure CMake
+        shell: bash
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_SANITIZERS=$USE_SANITIZERS
+
+      - name: Build
+        shell: bash
+        run: cmake --build build -- -j$(nproc)
+
+      - name: Run unit tests
+        shell: bash
+        run: |
+          cd build
+          ctest --output-on-failure
