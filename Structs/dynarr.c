@@ -6,7 +6,6 @@
 #include "../extra_types.h" /* byte */
 #include "../misc.h"        /* cmpeq() */
 
-#include <stdbool.h> /* ... */
 #include <stdio.h>   /* *print* */
 #include <stdlib.h>  /* malloc, free, bsearch, qsort */
 #include <string.h>  /* mem* */
@@ -454,10 +453,9 @@ void list_destroy( struct dynamic_array *ls )
     free( ls );
 }
 
-void list_destroy_p( struct dynamic_array **lsp )
+void list_destroy_p( struct dynamic_array ls )
 {
-    list_destroy( *lsp );
-    *lsp = NULL;
+    free_n( ls.items );
 }
 
 
