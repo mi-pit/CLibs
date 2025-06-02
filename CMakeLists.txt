@@ -21,14 +21,14 @@ add_executable(Tests
         Structs/dynstring.c
         swexpr.c
         misc.c
-        )
+)
 
 add_executable(TestHashFunc
         Tests/test_hash_func.c
         misc.c
         Structs/sets.c
         item_print_functions.c
-        )
+)
 
 add_executable(TestLeet
         Tests/test_leet.c
@@ -36,16 +36,16 @@ add_executable(TestLeet
         Structs/dynarr.c
         item_print_functions.c
         misc.c
-        )
+)
 
 add_executable(TestTests
         Tests/test_unit_tests.c
         misc.c
-        )
+)
 
 add_executable(TestSets
         Tests/test_sets.c
         Structs/sets.c
         item_print_functions.c
         misc.c
-        )
+)
