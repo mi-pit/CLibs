@@ -5,7 +5,7 @@
 #define CLIBS_SWEXPR_H
 
 #include "Dev/pointer_utils.h" /* deref_as() */
-#include "Structs/dynarr.h" /* List (stack) */
+#include "Structs/dynarr.h"    /* List (stack) */
 
 #include <err.h>     /* err() */
 #include <errno.h>   /* ENOMEM */
@@ -39,14 +39,14 @@ void *switch_expression_value_peek( void );
 /**
  * Initializes the swexpr to, in each ‹ case ›, compare it to this expression
  */
-#define swex_init_val( expr_type, expr )                                     \
-    expr_type swex_init_imm_tmp_var_##expr_type##_##expr##__ = ( expr );     \
-    expr_type *swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ =           \
-            &( swex_init_imm_tmp_var_##expr_type##_##expr##__ );             \
-    assert( switch_expression_push(                                          \
-                    sizeof( expr_type ),                                     \
-                    &( swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ ) ) \
-            == RV_SUCCESS );
+#define swex_init_val( expr_type, expr )                                        \
+    expr_type swex_init_imm_tmp_var_##expr_type##_##expr##__ = ( expr );        \
+    expr_type *swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ =              \
+            &( swex_init_imm_tmp_var_##expr_type##_##expr##__ );                \
+    assert( switch_expression_push(                                             \
+                    sizeof( expr_type ),                                        \
+                    &( swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ ) ) == \
+            RV_SUCCESS );
 
 /**
  * Uses an existing variable to store the result from ‹ resolve ›
@@ -95,21 +95,21 @@ void *switch_expression_value_peek( void );
         type swex_case_imm_aux_var_ = expr_case;                                         \
         memcpy( swex_aux_variable_, &swex_case_imm_aux_var_, sizeof( type ) );           \
     }                                                                                    \
-    if ( !switch_expression_is_assigned()                                                \
-         && ( switch_expression_size_peek() ) == sizeof( type )                          \
-         && memcmp( switch_expression_value_peek(), swex_aux_variable_, sizeof( type ) ) \
-                    == 0 )                                                               \
+    if ( !switch_expression_is_assigned() &&                                             \
+         ( switch_expression_size_peek() ) == sizeof( type ) &&                          \
+         memcmp( switch_expression_value_peek(), swex_aux_variable_, sizeof( type ) ) == \
+                 0 )                                                                     \
         if ( switch_expression_assign() != 1 )
 
-#define swex_case_ptr( expr_case, nbytes )                                     \
-    if ( !switch_expression_is_assigned()                                      \
-         && ( switch_expression_size_peek() ) == sizeof( void * )              \
-         && memcmp( switch_expression_value_peek(), expr_case, nbytes ) == 0 ) \
+#define swex_case_ptr( expr_case, nbytes )                                  \
+    if ( !switch_expression_is_assigned() &&                                \
+         ( switch_expression_size_peek() ) == sizeof( void * ) &&           \
+         memcmp( switch_expression_value_peek(), expr_case, nbytes ) == 0 ) \
         if ( switch_expression_assign() != 1 )
 
-#define swex_case_str( expr_case )                                     \
-    if ( !switch_expression_is_assigned()                              \
-         && strcmp( switch_expression_value_peek(), expr_case ) == 0 ) \
+#define swex_case_str( expr_case )                                  \
+    if ( !switch_expression_is_assigned() &&                        \
+         strcmp( switch_expression_value_peek(), expr_case ) == 0 ) \
         if ( switch_expression_assign() != 1 )
 
 /**

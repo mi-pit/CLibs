@@ -45,13 +45,14 @@
  * #define CLIBS_ASSERT_THAT_H_EXIT_VAL RV_EXCEPTION
  * @endcode
  */
-#define assert_that( EXPRESSION, ... )                                                \
-    do                                                                                \
-    {                                                                                 \
-        if ( !( EXPRESSION ) )                                                        \
-            exit( fflwarnx_ret( CLIBS_ASSERT_THAT_H_EXIT_VAL,                         \
-                                "Assertion error: " #EXPRESSION ": " __VA_ARGS__ ) ); \
-    }                                                                                 \
+#define assert_that( EXPRESSION, ... )                                  \
+    do                                                                  \
+    {                                                                   \
+        if ( !( EXPRESSION ) )                                          \
+            exit( ( int ) fflwarnx_ret( CLIBS_ASSERT_THAT_H_EXIT_VAL,   \
+                                        "Assertion error: " #EXPRESSION \
+                                        ": " __VA_ARGS__ ) );           \
+    }                                                                   \
     while ( 0 )
 #else
 #define assert_that( EXPRESSION, ... )

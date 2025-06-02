@@ -13,7 +13,7 @@
 typedef int64_t Number;
 typedef size_t count_t;
 
-#define TypeNumber 2
+#define TypeNumber 1
 
 #if TypeNumber == 1
 #define Type Number

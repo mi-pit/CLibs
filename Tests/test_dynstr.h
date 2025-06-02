@@ -11,11 +11,11 @@
 #include <assert.h>
 
 
-typedef int( PendFunction )( DynamicString, string_t );
+typedef int( PendFunction )( struct dynamic_string *, string_t );
 
 Tester test_one_pend( string_t init, string_t app, string_t expected, PendFunction func )
 {
-    DynamicString dynstr = dynstr_init_as( init );
+    struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr alloc" );
     assert_that( func( dynstr, app ) == RV_SUCCESS, "append rv" );
 
@@ -42,7 +42,7 @@ END_TEST
 
 Tester test_one_appendn( string_t init, string_t app, size_t len, string_t expected )
 {
-    DynamicString dynstr = dynstr_init_as( init );
+    struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr alloc" );
     assert_that( dynstr_appendn( dynstr, app, len ) == RV_SUCCESS, "append rv" );
 
@@ -64,11 +64,11 @@ END_TEST
 
 Tester test_one_init_as( string_t init )
 {
-    size_t str_len       = strlen( init );
-    DynamicString dynstr = dynstr_init_as( init );
+    size_t str_len                = strlen( init );
+    struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "init" );
-    bool rv = cmpeq( strcmp( dynstr_data( dynstr ), init ) )
-              && dynstr_len( dynstr ) == str_len;
+    bool rv = cmpeq( strcmp( dynstr_data( dynstr ), init ) ) &&
+              dynstr_len( dynstr ) == str_len;
     dynstr_destroy( dynstr );
     return rv;
 }
@@ -90,7 +90,7 @@ Tester test_one_slice( string_t str,
                        int rv_want,
                        string_t res )
 {
-    DynamicString s = dynstr_init_as( str );
+    struct dynamic_string *s = dynstr_init_as( str );
     assert_that( s != NULL, "strdup" );
     if ( strcmp( str, dynstr_data( s ) ) != 0 )
     {
@@ -111,7 +111,7 @@ Tester test_one_slice( string_t str,
 }
 Tester test_one_slice_e( string_t str, ssize_t end, int rv_want, string_t res )
 {
-    DynamicString s = dynstr_init_as( str );
+    struct dynamic_string *s = dynstr_init_as( str );
     assert_that( s != NULL, "strdup" );
     if ( strcmp( str, dynstr_data( s ) ) != 0 )
     {
@@ -132,7 +132,7 @@ Tester test_one_slice_e( string_t str, ssize_t end, int rv_want, string_t res )
 }
 Tester test_one_slice_s( string_t str, size_t start, int rv_want, string_t res )
 {
-    DynamicString s = dynstr_init_as( str );
+    struct dynamic_string *s = dynstr_init_as( str );
     assert_that( s != NULL, "strdup" );
     if ( strcmp( str, dynstr_data( s ) ) != 0 )
     {
@@ -203,7 +203,7 @@ PrintfLike( 2, 3 ) Tester test_one_vappendf( string_t init, string_t fmt, ... )
     assert_that( vsnprintf( formatted + strlen( init ), app_len + 1, fmt, vaCopy ) >= 0,
                  "vsnprintf" );
 
-    DynamicString dynstr = dynstr_init_as( init );
+    struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr init" );
 
     assert_that( dynstr_vappendf( dynstr, fmt, vaList ) == RV_SUCCESS,
@@ -220,7 +220,7 @@ PrintfLike( 2, 3 ) Tester test_one_vappendf( string_t init, string_t fmt, ... )
 #define TEST_ONE_APPENDF( INIT, DESIRED, FMT, ... )                         \
     do                                                                      \
     {                                                                       \
-        DynamicString dynstr = dynstr_init_as( INIT );                      \
+        struct dynamic_string *dynstr = dynstr_init_as( INIT );             \
         assert( dynstr != NULL );                                           \
         assert( dynstr_appendf( dynstr, FMT, __VA_ARGS__ ) == RV_SUCCESS ); \
         UNIT_TEST( strcmp( dynstr_data( dynstr ), ( DESIRED ) ) == 0 );     \

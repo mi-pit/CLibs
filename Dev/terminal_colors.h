@@ -55,15 +55,25 @@
 #define BACKGROUND_WHITE   COLOR_CREATOR( GROUND_BACK COLOR_WHITE )
 
 
+#define FOREGROUND_GRAY COLOR_CREATOR( GROUND_FORE "8;5;238" )
+#define BACKGROUND_GRAY COLOR_CREATOR( GROUND_BACK "8;5;238" )
+
+
+LibraryDefined PrintfLike( 3, 4 ) void PrintInColor( FILE *file,
+                                                     const char *Color,
+                                                     const char *__restrict format,
+                                                     ... );
+
 LibraryDefined inline void SetTerminalColor( FILE *stream, const char *Color )
 {
-    fprintf( stream, "%s", Color );
+    if ( fprintf( stream, "%s", Color ) < 0 )
+        PrintInColor( stderr, BACKGROUND_RED, "%s: fprintf", __func__ );
 }
 
-LibraryDefined PrintfLike( 3, 4 ) inline void PrintInColor( FILE *file,
-                                                            const char *Color,
-                                                            const char *__restrict format,
-                                                            ... )
+inline void PrintInColor( FILE *file,
+                          const char *Color,
+                          const char *__restrict format,
+                          ... )
 {
     fprintf( file, PRINT_COLOR, Color );
 

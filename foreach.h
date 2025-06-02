@@ -9,9 +9,8 @@
 #include <string.h>
 
 #define foreach_helper_init( SIZE, TOK )                                 \
-    for ( size_t foreach_keep_##TOK  = 1,                                \
-                 foreach_index_##TOK = 0,                                \
-                 foreach_cap_##TOK   = ( SIZE );                         \
+    for ( size_t foreach_keep_##TOK = 1, foreach_index_##TOK = 0,        \
+                 foreach_cap_##TOK = ( SIZE );                           \
           foreach_keep_##TOK && foreach_index_##TOK < foreach_cap_##TOK; \
                                                                          \
           foreach_keep_##TOK = !foreach_keep_##TOK, ++foreach_index_##TOK )
@@ -39,8 +38,8 @@
             ITEM_TYPE, ITEM_NAME, ( ARRAY )[ foreach_index_##ITEM_NAME ] )
 
 /**
- * Iterates over the string ‹strn›<br>
- * Stores each character of the string in a new variable named ‹item› of type char
+ * Iterates over a string<br>
+ * Stores each character of the string in a new variable of type char
  * @param item  name of the new variable
  * @param strn string
  */
@@ -58,7 +57,7 @@
  */
 #define foreach_ls( TYPE, ITEM_NAME, LIST )                                    \
     foreach_helper_init( list_size( LIST ), ITEM_NAME ) foreach_helper_assign( \
-            TYPE, ITEM_NAME, list_access( LIST, foreach_index_##ITEM_NAME, TYPE ) )
+            TYPE, ITEM_NAME, list_fetch( LIST, foreach_index_##ITEM_NAME, TYPE ) )
 #endif //CLIBS_DYNAMIC_ARRAY_H
 
 

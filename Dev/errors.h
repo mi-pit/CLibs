@@ -6,7 +6,6 @@
 #define CLIBS_ERRORS_H
 
 /* for this header */
-#include "../misc.h"         /* UNUSED() */
 #include "attributes.h"      /* PrintfLike, LibraryDefined */
 #include "filenames.h"       /* get_prog_name(), __FILE_NAME__ */
 #include "terminal_colors.h" /* COLORs, PrintInColor */
@@ -59,6 +58,7 @@ LibraryDefined const char *rv_to_string( int rv )
         int func_call_retval = ( func_call ); \
         on_fail( func_call_retval )           \
         {                                     \
+            ( void ) f_stack_trace( NULL );   \
             return func_call_retval;          \
         }                                     \
     }                                         \
@@ -76,6 +76,7 @@ LibraryDefined const char *rv_to_string( int rv )
         int func_call_retval = ( func_call ); \
         on_error( func_call_retval )          \
         {                                     \
+            ( void ) f_stack_trace( 0 );      \
             return func_call_retval;          \
         }                                     \
     }                                         \
@@ -165,12 +166,12 @@ LibraryDefined PrintfLike( 7, 8 ) Cold ptrdiff_t
     SetTerminalColor( stderr, COLOR_DEFAULT ); // maybe swap these two lines?
 
 #else
-    UNUSED( PrintProgName );
-    UNUSED( FileName );
-    UNUSED( FunctionName );
-    UNUSED( LineNumber );
-    UNUSED( err_no );
-    UNUSED( format );
+    ( void ) ( PrintProgName );
+    ( void ) ( FileName );
+    ( void ) ( FunctionName );
+    ( void ) ( LineNumber );
+    ( void ) ( err_no );
+    ( void ) ( format );
 #endif //SUPPRESS_WARNINGS
 
     return return_value;

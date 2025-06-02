@@ -7,10 +7,12 @@
 #include <stdbool.h> /* bool (is_within) */
 #include <stddef.h>  /* size_t */
 
-/**
- * Stops those pesky `unused variable` compiler errors
- */
-#define UNUSED( ... ) ( ( void ) ( ( void ) __VA_ARGS__ ) )
+/// Stops those pesky `unused variable` compiler warnings/errors
+#define UNUSED( UNUSEDARG ) ( ( void ) UNUSEDARG )
+
+
+/// For string literals
+#define STRLEN( STRING ) ( sizeof( STRING ) - 1 )
 
 
 typedef enum {

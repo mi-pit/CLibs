@@ -248,8 +248,8 @@ str_t string_replaced( string_t const str, string_t old, string_t new )
     if ( *old == '\0' )
         return ( void * ) fwarnx_ret( NULL, "cannot replace \"%s\"", old );
 
-    const char *curr     = str;
-    DynamicString result = dynstr_init();
+    const char *curr              = str;
+    struct dynamic_string *result = dynstr_init();
     do
     {
         const char *next = strstr( curr, old );
@@ -349,9 +349,9 @@ ssize_t string_split( str_t **str_arr_cont,
         const char *start = curr + start_offset;
         size_t end_offset = ( mode & STRSPLIT_KEEP_DELIM_BEFORE ) ? split_tok_len : 0;
 
-        if ( mode & STRSPLIT_EXCLUDE_EMPTY
-             && ( ( next == NULL && *start == '\0' )
-                  || ( next != NULL && ( ( next - start + end_offset ) == 0 ) ) ) )
+        if ( mode & STRSPLIT_EXCLUDE_EMPTY &&
+             ( ( next == NULL && *start == '\0' ) ||
+               ( next != NULL && ( ( next - start + end_offset ) == 0 ) ) ) )
             continue;
 
         str_t dup = next == NULL ? strdup( start )
@@ -469,8 +469,8 @@ str_t mul_uint_strings( string_t str_1, string_t str_2 )
         digit_t carry = 0;
         for ( ssize_t j = ( ssize_t ) len_2 - 1; j >= 0; --j )
         {
-            digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry
-                           + ( result[ i + j + 1 ] - '0' );
+            digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry +
+                           ( result[ i + j + 1 ] - '0' );
             result[ i + j + 1 ] = ( char ) ( ( prod % 10 ) + '0' );
             carry               = prod / 10;
         }
@@ -493,7 +493,7 @@ str_t add_uint_strings( string_t str_1, string_t str_2 )
 {
     typedef uint8_t digit_t;
 
-    DynamicString result = dynstr_init();
+    struct dynamic_string *result = dynstr_init();
     if ( result == NULL )
         return ( void * ) f_stack_trace( NULL );
 
@@ -572,7 +572,7 @@ char *hex_to_decimal( const char *hex )
 {
     const size_t len = strlen( hex );
 
-    DynamicString dynstr = dynstr_init_as( "0" );
+    struct dynamic_string *dynstr = dynstr_init_as( "0" );
     if ( dynstr == NULL )
         goto ERROR;
 
@@ -591,8 +591,8 @@ char *hex_to_decimal( const char *hex )
         for ( ssize_t j = ( ssize_t ) dynstr_len( dynstr ) - 1; j >= 0; --j )
         {
             const unsigned long temp = ( dynstr_data( dynstr )[ j ] - '0' ) * 16 + carry;
-            dynstr_data( dynstr )[ j ] = ( char ) ( '0' + ( temp % 10 ) );
-            carry                      = temp / 10;
+            dynstr_set_at( dynstr, j, ( char ) ( '0' + ( temp % 10 ) ) );
+            carry = temp / 10;
         }
 
         while ( carry > 0 )

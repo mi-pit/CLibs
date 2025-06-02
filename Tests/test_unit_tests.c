@@ -30,7 +30,8 @@ TEST( this_one_actually_passes )
 {
     UNIT_TEST( true );
 
-    f_stack_trace( 0 );
+    UNIT_TEST( fwarnx_ret( 123, "Testing warn & stack trace" ) == 123 );
+    UNIT_TEST( f_stack_trace( -1 ) == ( int ) -1 );
 }
 END_TEST
 
@@ -38,7 +39,10 @@ END_TEST
 int main( void )
 {
     int a, b, c, d;
-    UNUSED( a, b, c, d );
+    UNUSED( a );
+    UNUSED( b );
+    UNUSED( c );
+    UNUSED( d );
 
     RUN_TEST( all_fail );
     RUN_TEST( test_example );

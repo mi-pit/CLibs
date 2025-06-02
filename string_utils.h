@@ -8,9 +8,10 @@
 #include "Dev/attributes.h" /* UseResult */
 
 #include <regex.h>     /* regex_t */
-#include <stdbool.h>   /* bool */
-#include <string.h>    /* import */
 #include <sys/types.h> /* ssize_t */
+
+/* include for user */
+#include <string.h>
 
 
 typedef const char *string_t;
@@ -46,8 +47,8 @@ LibraryDefined UseResult str_t string_duplicate( string_t s )
 }
 #endif // ndef strdup
 
-#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) \
-        || defined( _POSIX_C_SOURCE ) // non-standard
+#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) || \
+        defined( _POSIX_C_SOURCE ) // non-standard
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
