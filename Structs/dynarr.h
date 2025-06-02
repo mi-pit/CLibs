@@ -116,18 +116,20 @@ int list_set_at( struct dynamic_array *, size_t index, const void *data );
 
 /**
  * Copies all elements from ‹array› of length ‹len› to the end of the List.
+ *
  * @param ls    a List to be extended
  * @param array array of ‹len› elements of size equal to ‹ls.el_size›
- * @param len   the number of elements in the array
+ * @param array_len   the number of elements in the array
  * @return -1 if realloc fails while creating space for the new elements,
  * otherwise returns 0
  */
-int list_extend( struct dynamic_array *, const void *array, size_t array_len );
+int list_extend( struct dynamic_array *ls, const void *array, size_t array_len );
 /**
+ * Copies all elements from `app` to `ls`
  *
  * @param ls    a List to be extended
  * @param app   a List to extend ‹ls›
- * @return -1 if realloc fails while creating space for the new elements,
+ * @return RV_ERROR if realloc fails while creating space for the new elements,
  * otherwise returns 0
  */
 int list_extend_list( struct dynamic_array *ls, const struct dynamic_array *app );
@@ -167,7 +169,7 @@ int list_insert( struct dynamic_array *, size_t index, const void *data );
  * of at least ‹ls.el_size› bytes
  * @return RV_EXCEPTION if List is empty, RV_ERROR if malloc fails; else RV_SUCCESS (0)
  */
-int list_pop( struct dynamic_array *, void *container );
+int list_pop( struct dynamic_array *ls, void *container );
 /**
  * Removes the element at ‹index› by swapping it with
  * the last element and popping
@@ -199,7 +201,7 @@ int64_t list_lsearch_i( const struct dynamic_array *, const void *needle );
  * @param ls    List to be sorted
  * @param cmp   compare function for the elements of the List
  */
-void list_sort( struct dynamic_array *, int ( *cmp )( const void *, const void * ) );
+void list_sort( struct dynamic_array *ls, int ( *cmp )( const void *, const void * ) );
 
 /**
  * Reverses the List – in place
@@ -247,11 +249,11 @@ void list_destroy_p( struct dynamic_array ls );
                       DELIM,                                                  \
                       END_STR )
 
-///@see \code array_printf_d
+///@see \code array_printf_d\endcode
 #define list_printf_d( LIST, ITEM_TYPE, FORMAT, DELIM ) \
     array_printf_d( list_items( LIST ), list_size( LIST ), ITEM_TYPE, FORMAT, DELIM )
 
-///@see \code array_printf_d
+///@see \code array_printf_d\endcode
 #define list_printf( LIST, ITEM_TYPE, FORMAT ) \
     array_printf( list_items( LIST ), list_size( LIST ), ITEM_TYPE, FORMAT )
 
