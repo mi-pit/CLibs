@@ -20,15 +20,15 @@ typedef struct dynamic_array List;
 
 
 enum ListPrinters {
-    LS_PRINT_NOFORMAT = ( -1 ), /* Lets each list to choose its own print method */
-    LS_PRINT_BYTE     = 0,      /* default;
-                                 * prints any data as pairs of hexadecimal digits */
-    LS_PRINT_STR,               /* List contents are strings */
-    LS_PRINT_SIGNED,            /* List contents are signed whole numbers */
-    LS_PRINT_UNSIGNED,          /* List contents are unsigned whole numbers */
-    LS_PRINT_DEC,               /* List contents are rational numbers */
-    LS_PRINT_PTR,               /* List contents are pointers */
-    LS_PRINT_LIST,              /* List contents are other lists */
+    LS_PRINT_NOFORMAT = -1, /* Lets each list to choose its own print method */
+    LS_PRINT_BYTE     = 0,  /* default;
+                             * prints any data as pairs of hexadecimal digits */
+    LS_PRINT_STR,           /* List contents are strings */
+    LS_PRINT_SIGNED,        /* List contents are signed whole numbers */
+    LS_PRINT_UNSIGNED,      /* List contents are unsigned whole numbers */
+    LS_PRINT_DEC,           /* List contents are rational numbers */
+    LS_PRINT_PTR,           /* List contents are pointers */
+    LS_PRINT_LIST,          /* List contents are other lists */
 };
 
 /**
@@ -76,18 +76,37 @@ Constructor struct dynamic_array *list_copy_p( const struct dynamic_array * );
  */
 const void *list_see( const struct dynamic_array *ls, size_t idx );
 /**
+ * Gets a non-mutable look of the last element
  *
- * @return Returns the address of the last element
+ * @return \code const void *\endcode to the last element
  */
 const void *list_peek( const struct dynamic_array *ls );
 
-#define list_access( list, idx, type ) ( *( ( type * ) list_see( list, idx ) ) )
+/**
+ * Fetches an item at the specified index;
+ * type must be the same as the list element type
+ */
+#define list_fetch( LIST, IDX, TYPE ) \
+    ( *( ( const TYPE * ) list_see( ( LIST ), ( IDX ) ) ) )
 
 /**
- * @return An address of ‹idx›'th element in the List
+ * Gets a mutable look of the element at the specified index
+ *
+ * @return pointer to the element
  */
 void *list_at( struct dynamic_array *, size_t idx );
+/**
+ * Gets a mutable look of the last element
+ *
+ * @return pointer to the last element
+ */
 void *list_at_last( struct dynamic_array * );
+
+/**
+ * Accesses the list as if it was an array (assignment is possible);
+ * OOB index dereferences a NULL pointer.
+ */
+#define list_access( LIST, IDX, TYPE ) ( *( ( TYPE * ) list_at( ( LIST ), ( IDX ) ) ) )
 
 /**
  * Changes element at ‹index› to ‹data›

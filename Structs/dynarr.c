@@ -502,7 +502,7 @@ Private void list_print_mode( const struct dynamic_array *ls, // NOLINT(misc-no-
             for ( size_t i = 0; i < ls->size; ++i )
             {
                 printf( "\t" );
-                list_print_static( list_access( ls, i, struct dynamic_array * ),
+                list_print_static( list_fetch( ls, i, struct dynamic_array * ),
                                    LS_PRINT_NOFORMAT,
                                    print_size );
             }
