@@ -4,6 +4,7 @@
 #include "../array_printf.h"   /* for list_printf */
 #include "../Dev/attributes.h" /* Private */
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/cdefs.h>
@@ -274,8 +275,11 @@ Deprecated void list_prints( const struct dynamic_array *, int print_mode );
 
 /* ––––– GETTERS ––––– */
 
+/// Returns true if list is empty
+bool list_is_empty( const struct dynamic_array * );
+/// Returns number of elements in the list
 size_t list_size( const struct dynamic_array * );
-
+/// Returns sizeof elements (e.g. if list element type is char, returns 1)
 size_t list_el_size( const struct dynamic_array * );
 
 const void *list_items( const struct dynamic_array *ls );

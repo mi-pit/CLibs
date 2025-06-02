@@ -551,9 +551,11 @@ void list_print( const struct dynamic_array *ls )
 
 /* ––––– GETTERS/SETTERS ––––– */
 
-/**
- * @return Number of elements in the list
- */
+bool list_is_empty( const struct dynamic_array *ls )
+{
+    return ls->size == 0;
+}
+
 size_t list_size( const struct dynamic_array *ls )
 {
     return ls->size;
