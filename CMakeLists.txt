@@ -52,3 +52,10 @@ add_executable(TestTests
         Tests/test_unit_tests.c
         misc.c
         )
+
+add_executable(TestSets
+        Tests/test_sets.c
+        Structs/sets.c
+        item_print_functions.c
+        misc.c
+        )

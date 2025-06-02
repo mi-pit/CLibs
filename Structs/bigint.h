@@ -5,10 +5,8 @@
 #ifndef CLIBS_BIGINT_H
 #define CLIBS_BIGINT_H
 
-#include "../Dev/attributes.h"   /* Constructor, UseResult */
-#include "../misc.h"             /* sign_t */
-#include "Bigint/numbers_list.h" /* numls */
-
+#include "../Dev/attributes.h" /* Constructor, UseResult */
+#include "../misc.h"           /* sign_t */
 
 struct bigint {
     struct numbers_list *num_ls;
@@ -33,7 +31,7 @@ void bigint_destroy( struct bigint * );
  * Returns the size of the number
  * @return Number of base-‹UINT64_MAX› digits
  */
-size_t bigint_sizeof( const struct bigint * );
+size_t bigint_ndigs_64( const struct bigint *bi );
 
 sign_t bigint_sign( const struct bigint * );
 void bigint_flip_sign( struct bigint * );

@@ -13,6 +13,10 @@
 #define UNUSED( ... ) ( ( void ) ( ( void ) __VA_ARGS__ ) )
 
 
+/// For string literals
+#define STRLEN( STRING ) ( sizeof( STRING ) - 1 )
+
+
 typedef enum {
     SIGN_NEG = -1,
     SIGN_POS = 1,

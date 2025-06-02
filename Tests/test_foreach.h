@@ -66,7 +66,7 @@ Tester test_one_foreach_str( string_t str )
 }
 Tester test_one_foreach_dynstr( string_t str )
 {
-    DynamicString dynstr = dynstr_init_as( str );
+    struct dynamic_string *dynstr = dynstr_init_as( str );
     assert_that( dynstr != NULL, "dynstr init" );
     assert_that( strlen( str ) == dynstr_len( dynstr ), "dynstr len" );
 
@@ -96,8 +96,8 @@ TEST( foreach )
     int64_t numbers_arr[] = {
         1, 2, 4, 6, 7, -1, 2323, 3195,
     };
-    assert_that( list_extend( numbers_ls, numbers_arr, countof( numbers_arr ) )
-                         == RV_SUCCESS,
+    assert_that( list_extend( numbers_ls, numbers_arr, countof( numbers_arr ) ) ==
+                         RV_SUCCESS,
                  "list extend" );
 
     UNIT_TEST( test_one_foreach_arr( numbers_arr, countof( numbers_arr ) ) );

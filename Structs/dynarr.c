@@ -6,7 +6,6 @@
 #include "../extra_types.h" /* byte */
 #include "../misc.h"        /* cmpeq() */
 
-#include <stdbool.h> /* ... */
 #include <stdio.h>   /* *print* */
 #include <stdlib.h>  /* malloc, free, bsearch, qsort */
 #include <string.h>  /* mem* */
@@ -405,19 +404,19 @@ struct dynamic_array *list_reversed( const struct dynamic_array *ls )
 }
 
 
-int list_copy( const struct dynamic_array *ls, struct dynamic_array **new_ls_cont )
+int list_copy( const struct dynamic_array *old, struct dynamic_array **new_ls_container )
 {
-    struct dynamic_array *new_ls = list_init_size( ls->el_size );
+    struct dynamic_array *new_ls = list_init_size( old->el_size );
     if ( new_ls == NULL )
         return RV_ERROR;
 
-    if ( list_extend_list( new_ls, ls ) != RV_SUCCESS )
+    if ( list_extend_list( new_ls, old ) != RV_SUCCESS )
     {
         list_destroy( new_ls );
         return f_stack_trace( RV_ERROR );
     }
 
-    *new_ls_cont = new_ls;
+    *new_ls_container = new_ls;
 
     return RV_SUCCESS;
 }
@@ -454,10 +453,9 @@ void list_destroy( struct dynamic_array *ls )
     free( ls );
 }
 
-void list_destroy_p( struct dynamic_array **lsp )
+void list_destroy_p( struct dynamic_array ls )
 {
-    list_destroy( *lsp );
-    *lsp = NULL;
+    free_n( ls.items );
 }
 
 
@@ -502,7 +500,7 @@ Private void list_print_mode( const struct dynamic_array *ls, // NOLINT(misc-no-
             for ( size_t i = 0; i < ls->size; ++i )
             {
                 printf( "\t" );
-                list_print_static( list_access( ls, i, struct dynamic_array * ),
+                list_print_static( list_fetch( ls, i, struct dynamic_array * ),
                                    LS_PRINT_NOFORMAT,
                                    print_size );
             }
@@ -551,9 +549,11 @@ void list_print( const struct dynamic_array *ls )
 
 /* ––––– GETTERS/SETTERS ––––– */
 
-/**
- * @return Number of elements in the list
- */
+bool list_is_empty( const struct dynamic_array *ls )
+{
+    return ls->size == 0;
+}
+
 size_t list_size( const struct dynamic_array *ls )
 {
     return ls->size;

@@ -2,12 +2,13 @@
 // Created by MacBook on 09.01.2025.
 //
 
-#include "../Structs/bigint.h" /* also includes dynarr.h, misc.h */
+#include "../Structs/bigint.h"
 
 #include "../array_printf.h"
 #include "../Dev/assert_that.h" /* assert_that(), #include "../errors.h" */
 #include "../Dev/unit_tests.h"  /* TEST, UNIT_TEST, RUN_TEST, FINISH_TESTING */
 #include "../string_utils.h"    /* str types */
+#include "../Structs/Bigint/numbers_list.h"
 
 #include <assert.h>
 #include <inttypes.h> /* PRIi64 */
@@ -477,10 +478,8 @@ TEST( add )
     set_number_array( bi,
                       SIGN_POS,
                       5,
-                      ( uint64_t[] ){ BIGINT_LIST_MEMBER_MAX,
-                                      BIGINT_LIST_MEMBER_MAX,
-                                      BIGINT_LIST_MEMBER_MAX,
-                                      BIGINT_LIST_MEMBER_MAX,
+                      ( uint64_t[] ){ BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX,
+                                      BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX,
                                       1 } );
     bigint_add_i( bi, 1 );
     UNIT_TEST( test_number_array( bi, 5, ( uint64_t[] ){ 0, 0, 0, 0, 2 } ) );
@@ -488,10 +487,8 @@ TEST( add )
     set_number_array( bi,
                       SIGN_POS,
                       5,
-                      ( uint64_t[] ){ BIGINT_LIST_MEMBER_MAX,
-                                      BIGINT_LIST_MEMBER_MAX,
-                                      BIGINT_LIST_MEMBER_MAX - 1,
-                                      BIGINT_LIST_MEMBER_MAX,
+                      ( uint64_t[] ){ BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX,
+                                      BIGINT_LIST_MEMBER_MAX - 1, BIGINT_LIST_MEMBER_MAX,
                                       1 } );
     bigint_add_i( bi, 1 );
     UNIT_TEST( test_number_array(
@@ -502,21 +499,12 @@ TEST( add )
     set_number_array( bi,
                       SIGN_POS,
                       5,
-                      ( uint64_t[] ){ INT64_MAX + 2ULL,
-                                      BIGINT_LIST_MEMBER_MAX,
-                                      BIGINT_LIST_MEMBER_MAX,
-                                      BIGINT_LIST_MEMBER_MAX,
+                      ( uint64_t[] ){ INT64_MAX + 2ULL, BIGINT_LIST_MEMBER_MAX,
+                                      BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX,
                                       1 } );
-    assert( test_metadata( bi,
-                           SIGN_POS,
-                           5,
-                           ( uint64_t[] ){ INT64_MAX + 2ULL,
-                                           BIGINT_LIST_MEMBER_MAX,
-                                           BIGINT_LIST_MEMBER_MAX,
-                                           BIGINT_LIST_MEMBER_MAX,
-                                           1 } ) );
     bigint_add_i( bi, INT64_MAX );
-    UNIT_TEST( test_number_array( bi, 5, ( uint64_t[] ){ 0, 0, 0, 0, 2ULL } ) );
+    UNIT_TEST( test_number_array(
+            bi, 5, ( uint64_t[ 5 ] ){ UINT64_C( 8446744073709551616 ), 0, 0, 0, 2 } ) );
 
     bigint_destroy( bi );
 }
@@ -559,7 +547,7 @@ TEST( sub )
                     bi, SIGN_POS, 3, ( uint64_t[] ){ BIGINT_LIST_MEMBER_MAX, 1234, 1 } ),
             "incorrect set: sign=%i, size=%zu",
             bi->sign,
-            bigint_sizeof( bi ) );
+            bigint_ndigs_64( bi ) );
     bigint_add_i( bi, -11 );
     UNIT_TEST( test_metadata(
             bi, SIGN_POS, 3, ( uint64_t[] ){ BIGINT_LIST_MEMBER_MAX - 11, 1234, 1 } ) );
@@ -615,7 +603,7 @@ TEST( sub )
     reset_number_array( bi );
     assert( bi->sign == SIGN_POS );
     bigint_add_power( bi, 1, 0x1000 );
-    UNIT_TEST( bigint_sizeof( bi ) == 0x1000 + 1 );
+    UNIT_TEST( bigint_ndigs_64( bi ) == 0x1000 + 1 );
 #ifdef PRINT_BIG_ONE_
     SetTerminalColor( FOREGROUND_MAGENTA );
     list_printf( bi->numbers, uint64_t, "%" PRIu64 );
@@ -640,6 +628,8 @@ TEST( sub )
                       2,
                       ( const uint64_t[ 2 ] ){ 349687096872653812, 273942803749284867 } );
     bigint_add_b( bi, sub );
+    // [928293509809835029, 39520395] + -[349687096872653812, 273942803749284867]
+    // 395203950928293509809835029 + -2739428037492848670349687096872653812
     UNIT_TEST( test_metadata(
             bi,
             SIGN_NEG,
@@ -687,8 +677,8 @@ TEST( bigint_add_b )
     set_number_array( bi1,
                       SIGN_POS,
                       3,
-                      ( const uint64_t[ 3 ] ){
-                              BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX, 1509730 } );
+                      ( const uint64_t[ 3 ] ){ BIGINT_LIST_MEMBER_MAX,
+                                               BIGINT_LIST_MEMBER_MAX, 1509730 } );
     set_number_array( bi2, SIGN_POS, 1, ( const uint64_t[ 1 ] ){ 1 } );
     bigint_add_b( bi1, bi2 );
     UNIT_TEST(
@@ -753,7 +743,7 @@ Tester test_one_from_string( string_t str,
     struct bigint *bi;
     int rv = bigint_from_string( str, &bi );
     assert_that( rv == RV_SUCCESS, "bigint from string: %s", rv_to_string( rv ) );
-    if ( bigint_sizeof( bi ) != count )
+    if ( bigint_ndigs_64( bi ) != count )
         return false;
     if ( !test_metadata( bi, sign, count, array ) )
         return false;
@@ -778,25 +768,22 @@ TEST( from_string )
             "999",
             SIGN_POS,
             5,
-            ( uint64_t[ 5 ] ){ BIGINT_LIST_MEMBER_MAX,
-                               BIGINT_LIST_MEMBER_MAX,
-                               123123123,
-                               123123,
-                               935 } ) );
+            ( uint64_t[ 5 ] ){ BIGINT_LIST_MEMBER_MAX, BIGINT_LIST_MEMBER_MAX, 123123123,
+                               123123, 935 } ) );
     UNIT_TEST( test_one_from_string(
             "-100000000000000000000000000000000000000000000000000000093500000000000001231"
             "23000000000012312312300000000000010905800000000157539609843",
             SIGN_NEG,
             8,
-            ( uint64_t[ 8 ] ){
-                    157539609843, 1090580, 123123123, 123123, 935, 0, 0, 1 } ) );
+            ( uint64_t[ 8 ] ){ 157539609843, 1090580, 123123123, 123123, 935, 0, 0,
+                               1 } ) );
     UNIT_TEST( test_one_from_string(
             "+100000000000000000100000000000000000000000000000000000093500000000000001231"
             "23000000000012312312300000000000010905800000000157539609843",
             SIGN_POS,
             8,
-            ( uint64_t[ 8 ] ){
-                    157539609843, 1090580, 123123123, 123123, 935, 0, 10, 1 } ) );
+            ( uint64_t[ 8 ] ){ 157539609843, 1090580, 123123123, 123123, 935, 0, 10,
+                               1 } ) );
 
     struct bigint *bi;
     UNIT_TEST( bigint_from_string( "Hovenko", &bi ) == RV_EXCEPTION );

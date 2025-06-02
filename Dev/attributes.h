@@ -10,8 +10,8 @@
 #ifdef __has_attribute
 #define HAS_ATTRIBUTE( TOK ) __has_attribute( TOK )
 #else // ndef __has_attribute
-/* false */
 #define HAS_ATTRIBUTE( TOK ) 0
+/* false */
 #endif // __has_attribute
 
 
@@ -63,13 +63,20 @@
 #define NoReturn
 #endif // constructor
 
+#if HAS_ATTRIBUTE( deprecated )
+#define Deprecated __attribute__( ( deprecated ) )
+#else
+#define Deprecated
+#endif
+
+
 /**
  * Function allocates memory for an object.
  * Not using function's return value results in a memory leak (or worse).
  */
 #define Constructor UseResult
 
-/** Function is not visible outside of the current file */
+/** Function is not visible outside the current file */
 #define Private static
 
 /** Function is defined in a header file */

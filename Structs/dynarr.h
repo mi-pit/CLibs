@@ -4,6 +4,7 @@
 #include "../array_printf.h"   /* for list_printf */
 #include "../Dev/attributes.h" /* Private */
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/cdefs.h>
@@ -19,15 +20,15 @@ typedef struct dynamic_array List;
 
 
 enum ListPrinters {
-    LS_PRINT_NOFORMAT = ( -1 ), /* Lets each list to choose its own print method */
-    LS_PRINT_BYTE     = 0,      /* default;
-                                 * prints any data as pairs of hexadecimal digits */
-    LS_PRINT_STR,               /* List contents are strings */
-    LS_PRINT_SIGNED,            /* List contents are signed whole numbers */
-    LS_PRINT_UNSIGNED,          /* List contents are unsigned whole numbers */
-    LS_PRINT_DEC,               /* List contents are rational numbers */
-    LS_PRINT_PTR,               /* List contents are pointers */
-    LS_PRINT_LIST,              /* List contents are other lists */
+    LS_PRINT_NOFORMAT = -1, /* Lets each list to choose its own print method */
+    LS_PRINT_BYTE     = 0,  /* default;
+                             * prints any data as pairs of hexadecimal digits */
+    LS_PRINT_STR,           /* List contents are strings */
+    LS_PRINT_SIGNED,        /* List contents are signed whole numbers */
+    LS_PRINT_UNSIGNED,      /* List contents are unsigned whole numbers */
+    LS_PRINT_DEC,           /* List contents are rational numbers */
+    LS_PRINT_PTR,           /* List contents are pointers */
+    LS_PRINT_LIST,          /* List contents are other lists */
 };
 
 /**
@@ -54,11 +55,11 @@ Constructor struct dynamic_array *list_init_size_p( size_t el_size, int mode );
 
 /**
  * Creates a copy of the List and stores it in ‹new_ls_cont›
- * @param ls            old List to be copied
- * @param new_ls_cont   pointer to your place in memory to store a List pointer
+ * @param old               old List to be copied
+ * @param new_ls_container  pointer to your place in memory to store a List pointer
  * @return RV_ERROR if an error occurs, else RV_SUCCESS
  */
-int list_copy( const struct dynamic_array *, struct dynamic_array **new_ls_container );
+int list_copy( const struct dynamic_array *old, struct dynamic_array **new_ls_container );
 /**
  * Creates a copy of the original List
  * @return newly allocated list pointer (see `list_init_*`)
@@ -69,22 +70,43 @@ Constructor struct dynamic_array *list_copy_p( const struct dynamic_array * );
 
 
 /**
- * @returns The element of type ‹type› at the specified index
+ * Gets a non-mutable look of the element at the specified index
+ *
+ * @returns \code const void *\endcode to the element
  */
 const void *list_see( const struct dynamic_array *ls, size_t idx );
 /**
+ * Gets a non-mutable look of the last element
  *
- * @return Returns the address of the last element
+ * @return \code const void *\endcode to the last element
  */
 const void *list_peek( const struct dynamic_array *ls );
 
-#define list_access( list, idx, type ) ( *( ( type * ) list_see( list, idx ) ) )
+/**
+ * Fetches an item at the specified index;
+ * type must be the same as the list element type
+ */
+#define list_fetch( LIST, IDX, TYPE ) \
+    ( *( ( const TYPE * ) list_see( ( LIST ), ( IDX ) ) ) )
 
 /**
- * @return An address of ‹idx›'th element in the List
+ * Gets a mutable look of the element at the specified index
+ *
+ * @return pointer to the element
  */
 void *list_at( struct dynamic_array *, size_t idx );
+/**
+ * Gets a mutable look of the last element
+ *
+ * @return pointer to the last element
+ */
 void *list_at_last( struct dynamic_array * );
+
+/**
+ * Accesses the list as if it was an array (assignment is possible);
+ * OOB index dereferences a NULL pointer.
+ */
+#define list_access( LIST, IDX, TYPE ) ( *( ( TYPE * ) list_at( ( LIST ), ( IDX ) ) ) )
 
 /**
  * Changes element at ‹index› to ‹data›
@@ -114,13 +136,15 @@ int list_extend_list( struct dynamic_array *ls, const struct dynamic_array *app 
  * The function assumes ‹data›
  * is of the same type as the List
  * @return -1 if reallocation fails, 0 otherwise
- * @example @code
- * List ls = list_init( int );
- * int number = 123;
- * list_append( ls, &number );
  *
- * List ls_outer = list_init( List );
- * List ls_inner = list_init( char );
+ * @example
+ * @code
+ * List ls = list_init_type( int );
+ * int number = 123;
+ * list_append( ls, &number ); // note the `&`
+ * // or
+ * List ls_outer = list_init_type( List );
+ * List ls_inner = list_init_type( char );
  * list_append( ls_outer, &ls_inner );
  * @endcode
  */
@@ -129,7 +153,9 @@ int list_append( struct dynamic_array *, const void *datap );
  * Inserts data to list at specified index, all following data is moved one place forward
  * @param index index of new element
  * @param data  pointer to data of size ls::el_size
- * @return RV_SUCCESS
+ * @return  if index is OOB  -> RV_EXCEPTION,
+ *          if realloc fails -> RV_ERROR
+ *          otherwise        -> RV_SUCCESS
  */
 int list_insert( struct dynamic_array *, size_t index, const void *data );
 
@@ -153,19 +179,23 @@ int list_remove_fast( struct dynamic_array *, size_t index, void *container );
  */
 int list_remove( struct dynamic_array *, size_t index, void *container );
 
-
+/// Binary search, returns pointer (NULL if not found)
 const void *list_bsearch_p( const struct dynamic_array *,
                             const void *needle,
                             int ( *cmp )( const void *, const void * ) );
+/// Binary search, returns index (-1 if not found)
 int64_t list_bsearch_i( const struct dynamic_array *,
                         const void *needle,
                         int ( *cmp )( const void *, const void * ) );
 
+/// Linear search, returns pointer (NULL if not found)
 const void *list_lsearch_p( const struct dynamic_array *, const void *needle );
+/// Linear search, returns index (-1 if not found)
 int64_t list_lsearch_i( const struct dynamic_array *, const void *needle );
 
 /**
- * qsort
+ * Uses stdlib's qsort
+ *
  * @param ls    List to be sorted
  * @param cmp   compare function for the elements of the List
  */
@@ -200,14 +230,14 @@ int list_cmp_elsize( const void *l1, const void *l2 );
 void list_destroy( struct dynamic_array * );
 
 /**
- * Frees all memory owned by the List pointed to in *lsp and sets *lsp to NULL
+ * Frees all memory owned by the List, but not the list itself
  */
-void list_destroy_p( struct dynamic_array **lsp );
+void list_destroy_p( struct dynamic_array ls );
 
 
 /* ––––––––––––––––––––––––––––––– PRINTERS ––––––––––––––––––––––––––––––– */
 
-///@see \code array_printf_d
+///@see \code array_printf_d\endcode
 #define list_printf_sde( LIST, ITEM_TYPE, FORMAT, START_STR, DELIM, END_STR ) \
     array_printf_sde( list_items( LIST ),                                     \
                       list_size( LIST ),                                      \
@@ -255,17 +285,20 @@ void list_destroy_p( struct dynamic_array **lsp );
  * This function is sort of an afterthought and
  * probably doesn't work very well\n
  */
-void list_print( const struct dynamic_array * );
-void list_printm( const struct dynamic_array *, int print_mode );
+Deprecated void list_print( const struct dynamic_array * );
+Deprecated void list_printm( const struct dynamic_array *, int print_mode );
 /**
  * Works like list_printm(), but also prints the List size
  */
-void list_prints( const struct dynamic_array *, int print_mode );
+Deprecated void list_prints( const struct dynamic_array *, int print_mode );
 
 /* ––––– GETTERS ––––– */
 
+/// Returns true if list is empty
+bool list_is_empty( const struct dynamic_array * );
+/// Returns number of elements in the list
 size_t list_size( const struct dynamic_array * );
-
+/// Returns sizeof elements (e.g. if list element type is char, returns 1)
 size_t list_el_size( const struct dynamic_array * );
 
 const void *list_items( const struct dynamic_array *ls );
