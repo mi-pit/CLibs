@@ -2,13 +2,14 @@
 
 !.gitignore
 !CMakeLists.txt
+
 !*.c
 !*.h
 
 !*.sh
-!*.hs
 
 !/Tests/
-!/Dev/
-!/Structs/
-!/Structs/Bigint/
+!/src/
+!/src/Dev/
+!/src/Structs/
+!/src/Structs/Bigint/

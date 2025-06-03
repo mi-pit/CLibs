@@ -2,11 +2,11 @@
 // Created by MacBook on 08.01.2025.
 //
 
-#include "../Dev/assert_that.h"
-#include "../Dev/unit_tests.h"
-#include "../misc.h"
-#include "../string_utils.h"
-#include "../Structs/dynstring.h"
+#include "../src/Dev/assert_that.h"
+#include "../src/Dev/unit_tests.h"
+#include "../src/misc.h"
+#include "../src/string_utils.h"
+#include "../src/Structs/dynstring.h"
 
 #include <assert.h>
 
