@@ -31,27 +31,27 @@ add_compile_definitions(_POSIX_C_SOURCE=200809L)
 # ————————————————————————————————————
 
 set(CLIB_SOURCES
-        string_utils.c
-        misc.c
-        swexpr.c
+        src/string_utils.c
+        src/misc.c
+        src/swexpr.c
 
-        Structs/dynarr.c
-        Structs/dynstring.c
-        Structs/sets.c
+        src/Structs/dynarr.c
+        src/Structs/dynstring.c
+        src/Structs/sets.c
 
-        item_print_functions.c
+        src/item_print_functions.c
 )
 
 set(CLIB_PUBLIC_HDRS
-        string_utils.h
-        misc.h
-        swexpr.h
+        src/string_utils.h
+        src/misc.h
+        src/swexpr.h
 
-        Structs/dynarr.h
-        Structs/dynstring.h
-        Structs/sets.h
+        src/Structs/dynarr.h
+        src/Structs/dynstring.h
+        src/Structs/sets.h
 
-        item_print_functions.h
+        src/item_print_functions.h
 )
 
 add_library(clib_core STATIC ${CLIB_SOURCES})
@@ -59,7 +59,7 @@ add_library(clib_core STATIC ${CLIB_SOURCES})
 target_include_directories(clib_core PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/Structs
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dev      # if Test code (or library itself) needs those “Dev/*.h”
+        ${CMAKE_CURRENT_SOURCE_DIR}/Dev
 )
 
 install(TARGETS clib_core ARCHIVE DESTINATION lib)
@@ -71,9 +71,6 @@ install(TARGETS clib_core ARCHIVE DESTINATION lib)
 
 enable_testing()
 
-#
-#  3a) “Tests” executable (tests.c + everything it needs)
-#
 add_executable(Tests
         Tests/tests.c
 )
@@ -85,16 +82,12 @@ target_include_directories(Tests PRIVATE
 )
 
 # Register it with CTest so that “ctest” will pick it up automatically:
-# (If your Tests/tests.c dispatcher accepts command‐line flags, you can add multiple add_test() lines here.)
 add_test(
         NAME all_unit_tests
         COMMAND Tests
 )
 
 
-#
-#  3b) “TestSets” executable (only test_sets.c + the minimal pieces)
-#
 add_executable(TestSets
         Tests/test_sets.c
 )
@@ -112,19 +105,7 @@ add_test(
 )
 
 
-#
-#  3c) Add more tests here…
-#  e.g. add a “TestDynStr” if you want to split them up:
-#    add_executable(TestDynStr   Tests/test_dynstr.c)
-#    target_link_libraries(TestDynStr PRIVATE clib_core)
-#    target_include_directories(TestDynStr PRIVATE
-#        ${CMAKE_CURRENT_SOURCE_DIR}
-#        ${CMAKE_CURRENT_SOURCE_DIR}/Dev
-#        ${CMAKE_CURRENT_SOURCE_DIR}/Structs
-#        ${CMAKE_CURRENT_SOURCE_DIR}/Tests
-#    )
-#    add_test(NAME dynstr_tests COMMAND TestDynStr)
-#
+# Add more tests here…
 
 
 # ————————————————————————————————————
