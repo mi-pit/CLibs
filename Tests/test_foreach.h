@@ -11,8 +11,10 @@
 #include "../src/string_utils.h"
 #include "../src/Structs/dynarr.h"
 #include "../src/Structs/dynstring.h"
+#include "../src/Structs/sets.h"
 
-// must be after dynarr.h
+// must be after dynarr.h and sets.h
+#include "../src/Dev/pointer_utils.h"
 #include "../src/foreach.h"
 
 
@@ -38,9 +40,14 @@ Tester test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
     }
     return true;
 }
+
 Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
 {
-    foreach_uni( int64_t, num, numbers_arr[ foreach_index_num ], count )
+    foreach_uni( const int64_t,
+                 num,
+                 numbers_arr[ foreach_index_num ],
+                 numbers_arr[ foreach_index_num ],
+                 count )
     {
         if ( num != numbers_arr[ foreach_index_num ] )
             return false;
@@ -112,6 +119,42 @@ TEST( foreach )
     UNIT_TEST( test_one_foreach_dynstr( "" ) );
     UNIT_TEST( test_one_foreach_dynstr( "HOVNO" ) );
     UNIT_TEST( test_one_foreach_dynstr( "a\nb'\0'" ) );
+}
+END_TEST
+
+
+TEST( foreach_set )
+{
+    Set *const set = set_init();
+    assert_that( set != NULL, "set init" );
+
+    assert_that( set_insert( set, &set, sizeof set ) == SETINSERT_INSERTED,
+                 "couldn't insert set" );
+    const int num = 1423;
+    assert_that( set_insert( set, &num, sizeof num ) == SETINSERT_INSERTED,
+                 "couldn't insert num" );
+
+    // check sanity
+    assert_that( set_insert( set, &set, sizeof set ) == SETINSERT_WAS_IN,
+                 "collision blocking not working" );
+    assert_that( set_size( set ) == 2, "two items must be present" );
+    assert_that( sizeof( Set * ) != sizeof( int ), "test assumes this" );
+
+    foreach_set( set )
+    {
+        UNIT_TEST( entry.index >= 0 );
+        const struct set_item *item = entry.item;
+        assert_that( item != NULL && item->data != NULL, "entry item" );
+
+        UNIT_TEST( item->size == sizeof( Set * ) || item->size == sizeof( int ) );
+
+        if ( item->size == sizeof( Set * ) )
+            UNIT_TEST( deref_as( Set *, item->data ) == set );
+        else if ( item->size == sizeof( int ) )
+            UNIT_TEST( deref_as( int, item->data ) == num );
+    }
+
+    set_destroy( set );
 }
 END_TEST
 

@@ -45,6 +45,7 @@ void run_string_utils( void )
 void run_foreach( void )
 {
     RUN_TEST( foreach );
+    RUN_TEST( foreach_set );
 }
 
 void run_swex( void )
