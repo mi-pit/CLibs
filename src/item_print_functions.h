@@ -2,6 +2,7 @@
 #define CLIBS_PRINT_FUNCTIONS_H
 
 #include "Dev/attributes.h"
+#include "Dev/errors.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -29,6 +30,7 @@ LibraryDefined bool PrintType = false;
 declare_print_func( byte );
 
 /* Basic types */
+declare_print_func( bool );
 declare_print_func( int );
 declare_print_func( size_t );
 declare_print_func( ssize_t );
@@ -37,11 +39,10 @@ declare_print_func( char );
 declare_print_func( float );
 declare_print_func( double );
 declare_print_func( pointer );
-declare_print_func( ptr );
 
 /* Special */
-declare_print_func( string ); /* These two      */
-declare_print_func( str );    /* are equivalent */
+declare_print_func( string );
+declare_print_func( string_direct );
 
 declare_print_func( List );
 declare_print_func( Set );
@@ -56,7 +57,7 @@ declare_print_func( Dict );
     {                                                              \
         if ( nbytes != sizeof( type ) )                            \
         {                                                          \
-            fprintf( stderr, "%s: invalid data", __func__ );       \
+            fwarnx( "invalid data" );                              \
             return;                                                \
         }                                                          \
                                                                    \
