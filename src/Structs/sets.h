@@ -5,6 +5,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 
 typedef struct hash_set Set;
@@ -67,7 +68,7 @@ int set_union( const Set *set_1, const Set *set_2, Set **result );
 int set_unionize( Set *set, const Set *add );
 
 int set_difference( const Set *, const Set *sub, Set **result );
-int set_subtract( Set, const Set *sub );
+int set_subtract( Set *, const Set *sub );
 
 
 int set_cmp( const Set *set_1, const Set *set_2 );
@@ -75,6 +76,25 @@ int set_cmp( const Set *set_1, const Set *set_2 );
 
 void set_destroy( Set * );
 void set_destroy_n( int n, ... );
+
+
+size_t set_size( const Set *set );
+size_t set_capacity( const Set *set );
+
+
+typedef struct {
+    const struct set_item *item;
+    const int64_t index;
+} SetEnumeratedEntry;
+
+/**
+ * Iterator over set
+ *
+ * @param set set
+ * @param index_last index of the last iterated element
+ * @return SetEnumeratedEntry (tuple of item* and index)
+ */
+SetEnumeratedEntry set_get_next( const Set *set, int64_t index_last );
 
 
 #ifndef SET_ITEMCOUNT_LINE_LENGTH

@@ -3,11 +3,12 @@
 #include "../Dev/errors.h" /* RVs, warns, ... */
 #include "../misc.h"       /* cmp_size_t */
 
-#include <assert.h> /* assert */
-#include <stdarg.h> /* va_list, ... */
-#include <stdio.h>  /* print */
-#include <stdlib.h> /* malloc */
-#include <string.h> /* memcpy */
+#include <assert.h>   /* assert */
+#include <inttypes.h> /* PRIi64 */
+#include <stdarg.h>   /* va_list, ... */
+#include <stdio.h>    /* print */
+#include <stdlib.h>   /* malloc */
+#include <string.h>   /* memcpy */
 
 
 /**
@@ -26,6 +27,45 @@ struct hash_set {
     size_t capacity;
     struct set_item *items;
 };
+
+size_t set_size( const Set *set )
+{
+    return set->n_items;
+}
+
+size_t set_capacity( const Set *set )
+{
+    return set->capacity;
+}
+
+
+SetEnumeratedEntry set_get_next( const Set *set, const int64_t index_last )
+{
+    if ( index_last < -1 )
+    {
+        fwarnx( "index must not be negative except -1 for initialization" );
+        return ( SetEnumeratedEntry ) { .item = NULL, .index = RV_EXCEPTION };
+    }
+    if ( index_last >= 0 && ( size_t ) index_last >= set->capacity )
+    {
+        fwarnx( "index %" PRIi64 " out of bounds for set of length %zu", index_last,
+                set->capacity );
+
+        return ( SetEnumeratedEntry ) { .item = NULL, .index = RV_EXCEPTION };
+    }
+
+    size_t i = index_last + 1;
+    while ( i < set->capacity )
+    {
+        if ( set->items[ i ].data != NULL )
+            return ( SetEnumeratedEntry ) { .item  = ( set->items + i ),
+                                            .index = ( int64_t ) i };
+
+        i++;
+    }
+
+    return ( SetEnumeratedEntry ) { .item = NULL, .index = -1 };
+}
 
 
 static int set_item_cmp( const void *s1, const void *s2 )
