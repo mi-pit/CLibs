@@ -36,10 +36,10 @@
  * @param item  name of the new variable
  * @param array array of type 'type[]'
  */
-#define foreach_arr( ITEM_TYPE, ITEM_NAME, ARRAY, COUNT )                 \
-    foreach_helper_init( COUNT, ITEM_NAME ) foreach_helper_assign(        \
-            ITEM_TYPE, ITEM_NAME, ( ARRAY )[ foreach_index_##ITEM_NAME ], \
-            ( ARRAY )[ foreach_index_##ITEM_NAME ] )
+#define foreach_arr( ITEM_TYPE, ITEM_NAME, ARRAY, COUNT )                \
+    foreach_helper_init( COUNT, ITEM_NAME )                              \
+            foreach_helper_assign( ITEM_TYPE, ITEM_NAME, ( ARRAY )[ 0 ], \
+                                   ( ARRAY )[ foreach_index_##ITEM_NAME ] )
 
 /**
  * Iterates over a string<br>
@@ -49,8 +49,7 @@
  */
 #define foreach_str( ITEM_NAME, STRING )                                      \
     foreach_helper_init( strlen( STRING ), ITEM_NAME ) foreach_helper_assign( \
-            char, ITEM_NAME, ( STRING )[ foreach_index_##ITEM_NAME ],         \
-            ( STRING )[ foreach_index_##ITEM_NAME ] )
+            char, ITEM_NAME, ( STRING )[ 0 ], ( STRING )[ foreach_index_##ITEM_NAME ] )
 
 #ifdef CLIBS_DYNAMIC_ARRAY_H
 /**
@@ -60,10 +59,10 @@
  * @param item  name of the new variable
  * @param ls string
  */
-#define foreach_ls( TYPE, ITEM_NAME, LIST )                                       \
-    foreach_helper_init( list_size( LIST ), ITEM_NAME ) foreach_helper_assign(    \
-            TYPE, ITEM_NAME, list_fetch( LIST, foreach_index_##ITEM_NAME, TYPE ), \
-            list_fetch( LIST, foreach_index_##ITEM_NAME, TYPE ) )
+#define foreach_ls( TYPE, ITEM_NAME, LIST )                                      \
+    foreach_helper_init( list_size( LIST ), ITEM_NAME )                          \
+            foreach_helper_assign( TYPE, ITEM_NAME, list_fetch( LIST, 0, TYPE ), \
+                                   list_fetch( LIST, foreach_index_##ITEM_NAME, TYPE ) )
 #endif //CLIBS_DYNAMIC_ARRAY_H
 
 
@@ -73,9 +72,9 @@
  *
  * @param SET set
  */
-#define foreach_set( SET )                                                     \
-    foreach_uni( const SetEnumeratedEntry, entry, set_get_next( ( SET ), -1 ), \
-                 set_get_next( ( SET ), entry.index ), set_size( ( SET ) ) )
+#define foreach_set( SET )                                                      \
+    foreach_uni ( const SetEnumeratedEntry, entry, set_get_next( ( SET ), -1 ), \
+                  set_get_next( ( SET ), entry.index ), set_size( ( SET ) ) )
 #endif //CLIBS_SETS_H
 
 

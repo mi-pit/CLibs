@@ -202,8 +202,8 @@ typedef unsigned int strsplit_mode_t;
  * @param split_tok     boundary
  * @param mode          see strsplit_mode_t
  * @return number of strings in the result,
- *         -1 on allocation fail,
- *         -2 if split_tok is invalid
+ *         (-1) on allocation fail,
+ *         (-2) if split_tok is invalid
  */
 ssize_t string_split( str_t **str_arr_cont,
                       string_t string,
