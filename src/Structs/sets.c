@@ -39,21 +39,24 @@ static int set_item_cmp( const void *s1, const void *s2 )
 }
 
 
-/*  resize -> insert_item -> insert_f -> resize -\
- *   <-------------------------------------------/  */
-static int set_resize( Set set, size_t new_size )
+/* resize -> insert_item -> insert_f -> resize -\
+ *  <-------------------------------------------/
+ *
+ * assert() prevents potential infinite recursion
+ */
+Private int set_resize( Set *set, const size_t new_size ) // NOLINT(*-no-recursion)
 {
-    Set new_set = set_init_cap( new_size );
+    Set *new_set = set_init_cap( new_size );
     if ( new_set == NULL )
         return RV_ERROR;
 
     for ( size_t i = 0; i < set->capacity; ++i )
     {
-        struct set_item *item = set->items + i;
+        const struct set_item *item = set->items + i;
         if ( item->data == NULL )
             continue;
 
-        int ins_rv = set_insert_item( new_set, item );
+        const int ins_rv = set_insert_item( new_set, item );
         if ( ins_rv < 0 )
         {
             set_destroy( new_set );
@@ -73,9 +76,9 @@ static int set_resize( Set set, size_t new_size )
 }
 
 
-Set set_init_cap( size_t capacity )
+Set *set_init_cap( const size_t capacity )
 {
-    Set new_set = calloc( 1, sizeof( struct hash_set ) );
+    Set *new_set = calloc( 1, sizeof( Set ) );
     if ( new_set == NULL )
         return ( void * ) fflwarn_ret( NULL, "calloc" );
 
@@ -93,7 +96,7 @@ Set set_init_cap( size_t capacity )
     return new_set;
 }
 
-Set set_init( void )
+Set *set_init( void )
 {
     return set_init_cap( SET_DEFAULT_CAP );
 }
@@ -107,13 +110,14 @@ Set set_init( void )
  * @param func
  * @return
  */
-int set_insert_f( Set set, const void *data, size_t len, PrintFunction func )
+/* NOLINT(*-no-recursion) */ int set_insert_f( Set *set, const void *data, size_t len,
+                                               const PrintFunction func )
 {
     if ( set->n_items + 1 >= set->capacity )
         if ( set_resize( set, set->capacity * 2 ) )
             return RV_ERROR;
 
-    size_t index = hash_func( data, len );
+    const size_t index = hash_func( data, len );
 
     const struct set_item new = {
         .size = len, .data = ( void * ) data,
@@ -122,8 +126,8 @@ int set_insert_f( Set set, const void *data, size_t len, PrintFunction func )
 
     for ( size_t i = 0; i < set->capacity; ++i )
     {
-        size_t current_index  = ( ( index + i ) % set->capacity );
-        struct set_item *curr = set->items + current_index;
+        const size_t current_index = ( index + i ) % set->capacity;
+        struct set_item *curr      = set->items + current_index;
 
         if ( set_item_cmp( &new, curr ) == 0 )
             return SETINSERT_WAS_IN;
@@ -149,17 +153,18 @@ int set_insert_f( Set set, const void *data, size_t len, PrintFunction func )
     return RV_ERROR;
 }
 
-int set_insert( Set set, const void *data, size_t len )
+int set_insert( Set *set, const void *data, const size_t len )
 {
     return set_insert_f( set, data, len, print_byte );
 }
 
-int set_insert_item( Set set, const struct set_item *item )
+/* NOLINT(*-no-recursion) */ int set_insert_item( Set *set, const struct set_item *item )
 {
     return set_insert_f( set, item->data, item->size, item->func );
 }
 
-int set_insert_array( Set set, size_t len, const struct set_item set_item_array[ len ] )
+int set_insert_array( Set *set, const size_t len,
+                      const struct set_item set_item_array[ len ] )
 {
     for ( size_t i = 0; i < len; ++i )
     {
@@ -172,20 +177,19 @@ int set_insert_array( Set set, size_t len, const struct set_item set_item_array[
 }
 
 
-int set_remove( Set set, const void *data, size_t len )
+int set_remove( Set *set, const void *data, const size_t len )
 {
-    size_t index = hash_func( data, len ) % set->capacity;
+    const size_t index = hash_func( data, len ) % set->capacity;
 
     const struct set_item to_remove = {
         .size = len, .data = ( void * ) data,
         /* data should still be const */
     };
 
-    struct set_item *curr;
     for ( size_t i = 0; i < set->capacity; ++i )
     {
-        size_t current_index = ( ( index + i ) % set->capacity );
-        curr                 = set->items + current_index;
+        const size_t current_index = ( index + i ) % set->capacity;
+        struct set_item *curr      = set->items + current_index;
 
         if ( set_item_cmp( &to_remove, curr ) == 0 )
         {
@@ -197,7 +201,7 @@ int set_remove( Set set, const void *data, size_t len )
 
             --set->n_items;
 
-            if ( set->n_items < set->capacity / 4 )
+            if ( set->n_items <= set->capacity / 4 )
                 if ( set_resize( set, set->capacity / 2 ) )
                     // [ a, b, _, _, _, _, _, _ ] => [ a, b, _, _ ]
                     return RV_ERROR;
@@ -212,12 +216,13 @@ int set_remove( Set set, const void *data, size_t len )
     return SETREMOVE_NOT_FOUND;
 }
 
-int set_remove_item( Set set, const struct set_item *item )
+int set_remove_item( Set *set, const struct set_item *item )
 {
     return set_remove( set, item->data, item->size );
 }
 
-int set_remove_array( Set set, size_t len, const struct set_item set_item_array[ len ] )
+int set_remove_array( Set *set, const size_t len,
+                      const struct set_item set_item_array[ len ] )
 {
     for ( size_t i = 0; i < len; ++i )
     {
@@ -232,20 +237,19 @@ int set_remove_array( Set set, size_t len, const struct set_item set_item_array[
 }
 
 
-bool set_search( ConstSet set, const void *data, size_t len )
+bool set_search( const Set *set, const void *data, const size_t len )
 {
-    size_t index = hash_func( data, len ) % set->capacity;
+    const size_t index = hash_func( data, len ) % set->capacity;
 
     const struct set_item new = {
         .size = len, .data = ( void * ) data,
         /* data is still const */
     };
 
-    struct set_item *curr;
     for ( size_t i = 0; i < set->capacity; ++i )
     {
-        size_t current_index = ( ( index + i ) % set->capacity );
-        curr                 = set->items + current_index;
+        const size_t current_index  = ( index + i ) % set->capacity;
+        const struct set_item *curr = set->items + current_index;
 
         if ( set_item_cmp( &new, curr ) == 0 )
             return true;
@@ -254,30 +258,30 @@ bool set_search( ConstSet set, const void *data, size_t len )
     return false;
 }
 
-bool set_search_item( ConstSet set, const struct set_item *item )
+bool set_search_item( const Set *set, const struct set_item *item )
 {
     return set_search( set, item->data, item->size );
 }
 
 
-int set_union( ConstSet set_1, ConstSet set_2, Set *result )
+int set_union( const Set *set_1, const Set *set_2, Set **result )
 {
     if ( *result == NULL )
         *result = set_init_cap( set_1->capacity + set_2->capacity );
 
-    int rv = set_insert_array( *result, set_2->capacity, set_2->items );
+    const int rv = set_insert_array( *result, set_2->capacity, set_2->items );
     if ( rv < 0 )
         return rv;
     return set_insert_array( *result, set_1->capacity, set_1->items );
 }
 
-int set_unionize( Set set, ConstSet snd )
+int set_unionize( Set *set, const Set *add )
 {
-    return set_insert_array( set, snd->capacity, snd->items );
+    return set_insert_array( set, add->capacity, add->items );
 }
 
 
-int set_intersection( ConstSet set_1, ConstSet set_2, Set *result )
+int set_intersection( const Set *set_1, const Set *set_2, Set **result )
 {
     if ( *result == NULL )
         *result = set_init_cap( set_1->capacity + set_2->capacity );
@@ -286,7 +290,7 @@ int set_intersection( ConstSet set_1, ConstSet set_2, Set *result )
 
     for ( size_t i = 0; i < set_2->capacity; ++i )
     {
-        struct set_item *item = set_2->items + i;
+        const struct set_item *item = set_2->items + i;
         if ( item->data == NULL )
             continue;
 
@@ -300,31 +304,31 @@ int set_intersection( ConstSet set_1, ConstSet set_2, Set *result )
     return RV_SUCCESS;
 }
 
-int set_intersect( Set set, ConstSet snd )
+int set_intersect( Set *set, const Set *intr )
 {
-    for ( size_t i = 0; i < snd->capacity; ++i )
+    for ( size_t i = 0; i < intr->capacity; ++i )
         if ( set->items->data != NULL )
-            if ( !set_search_item( snd, set->items + i ) )
+            if ( !set_search_item( intr, set->items + i ) )
                 if ( set_remove_item( set, set->items + i ) == RV_ERROR )
                     return RV_ERROR;
     return RV_SUCCESS;
 }
 
 
-int set_difference( ConstSet set, ConstSet snd, Set *result )
+int set_difference( const Set *set, const Set *sub, Set **result )
 {
     if ( *result == NULL )
-        *result = set_init_cap( set->capacity + snd->capacity );
+        *result = set_init_cap( set->capacity );
     if ( *result == NULL )
         return RV_ERROR;
 
     for ( size_t i = 0; i < set->capacity; ++i )
     {
-        struct set_item *item = set->items + i;
+        const struct set_item *item = set->items + i;
         if ( item->data == NULL )
             continue;
 
-        if ( set_search_item( snd, item ) )
+        if ( set_search_item( sub, item ) )
             continue;
 
         if ( set_insert_item( *result, item ) == RV_ERROR )
@@ -334,22 +338,22 @@ int set_difference( ConstSet set, ConstSet snd, Set *result )
     return RV_SUCCESS;
 }
 
-int set_subtract( Set set, ConstSet snd )
+int set_subtract( Set *set, const Set *snd )
 {
     return set_remove_array( set, snd->capacity, snd->items );
 }
 
 
-int set_cmp( ConstSet set_1, ConstSet set_2 )
+int set_cmp( const Set *set_1, const Set *set_2 )
 {
-    int cmp = cmp_size_t( set_1->items, set_2->items );
+    const int cmp = cmp_size_t( set_1->items, set_2->items );
     if ( cmp != 0 )
         return cmp;
 
     for ( size_t i = 0; i < set_1->capacity; ++i )
     {
-        struct set_item *item_1 = set_1->items + i;
-        struct set_item *item_2 = set_2->items + i;
+        const struct set_item *item_1 = set_1->items + i;
+        const struct set_item *item_2 = set_2->items + i;
         if ( !set_search_item( set_2, item_1 ) )
             return 1;
         if ( !set_search_item( set_1, item_2 ) )
@@ -360,7 +364,7 @@ int set_cmp( ConstSet set_1, ConstSet set_2 )
 }
 
 
-void set_destroy( Set set )
+void set_destroy( Set *set )
 {
     for ( size_t i = 0; i < set->capacity; ++i )
         free( set->items[ i ].data );
@@ -373,21 +377,21 @@ void set_destroy_n( int n, ... )
     va_list vaList;
     va_start( vaList, n );
     while ( n-- > 0 )
-        set_destroy( va_arg( vaList, Set ) );
+        set_destroy( va_arg( vaList, Set * ) );
 
     va_end( vaList );
 }
 
 
-void set_print_as( ConstSet set, PrintFunction func )
+void set_print_as( const Set *set, const PrintFunction func )
 {
     printf( "hash_set (size=%zu): {", set->n_items );
 
-    const char *delim;
-    size_t n = 0;
+    const char *delim = "";
+    size_t n          = 0;
     for ( size_t i = 0; i < set->capacity; ++i )
     {
-        struct set_item *item = set->items + i;
+        const struct set_item *item = set->items + i;
         if ( item->data == NULL )
             continue;
 
@@ -414,7 +418,7 @@ void set_print_as( ConstSet set, PrintFunction func )
     printf( "}\n" );
 }
 
-void set_print( ConstSet set )
+void set_print( const Set *set )
 {
     set_print_as( set, NULL );
 }
