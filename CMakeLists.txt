@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 project(CLibs VERSION 1.0 LANGUAGES C)
 
-set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD 99)
 
 # ————————————————————————————————————
 #  1) Set sanitizer flags and “build type” as options
