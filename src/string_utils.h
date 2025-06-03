@@ -61,7 +61,7 @@ int vsnprintf( char *str, size_t size, const char *restrict format, va_list ap )
  * Like `vsprintf`, except it heap-allocates memory for the resulting string.
  * (*strp) may be passed to free(3)
  */
-LibraryDefined int vasprintf( str_t *strp, string_t fmt, va_list args )
+LibraryDefined int vasprintf( str_t *strp, const string_t fmt, va_list args )
 {
     va_list vaList;
     va_copy( vaList, args );
@@ -75,17 +75,17 @@ LibraryDefined int vasprintf( str_t *strp, string_t fmt, va_list args )
     if ( !*strp )
         return -1;
 
-    int result = vsnprintf( *strp, ( size_t ) size + 1, fmt, vaList );
+    const int result = vsnprintf( *strp, ( size_t ) size + 1, fmt, vaList );
     va_end( args );
 
     return result;
 }
 
-LibraryDefined int asprintf( str_t *strp, string_t fmt, ... )
+LibraryDefined int asprintf( str_t *strp, const string_t fmt, ... )
 {
     va_list va;
     va_start( va, fmt );
-    int rv = vasprintf( strp, fmt, va );
+    const int rv = vasprintf( strp, fmt, va );
     va_end( va );
     return rv;
 }
@@ -223,10 +223,12 @@ ssize_t string_split( str_t **str_arr_cont,
  *         RV_EXCEPTION (-2) if split_tok is invalid
  */
 ssize_t string_split_regex( str_t **str_arr_cont,
-                            string_t __restrict string,
+                            string_t string,
                             const regex_t *__restrict regexp,
                             strsplit_mode_t mode );
 
+
+void string_split_destroy( size_t size, str_t **str_arr_cont );
 
 /* ==== Mathematical stuff ==== */
 
