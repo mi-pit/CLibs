@@ -4,15 +4,29 @@
 #include "../Dev/pointer_utils.h" /* free_n() */
 #include "../misc.h"              /* hash_func(), cmp_size_t(), cmpeq() */
 
+#include <stdalign.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 
-struct key_value_pair_set {
+struct dictionary {
     struct key_value_pair *items;
     size_t size;
     size_t capacity;
+};
+
+
+alignas( alignof( struct key_value_pair ) ) const struct const_kvp {
+    const void *key;
+    size_t key_size;
+    PrintFunction key_print;
+
+    const void *val;
+    size_t val_size;
+    PrintFunction val_print;
+
+    bool removed;
 };
 
 
@@ -38,16 +52,16 @@ int item_val_cmp( const void *i1, const void *i2 )
 
 int item_cmp( const void *i1, const void *i2 )
 {
-    int rv = item_key_cmp( i1, i2 );
+    const int rv = item_key_cmp( i1, i2 );
     if ( rv != 0 )
         return rv;
     return item_val_cmp( i1, i2 );
 }
 
 
-Dict dict_init( void )
+struct dictionary *dict_init( void )
 {
-    struct key_value_pair_set *dict = calloc( 1, sizeof( struct key_value_pair_set ) );
+    struct dictionary *dict = calloc( 1, sizeof( struct dictionary ) );
     if ( dict == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
@@ -63,28 +77,18 @@ Dict dict_init( void )
     return dict;
 }
 
-int dict_insert_f( struct key_value_pair_set *dict,
+int dict_insert_f( struct dictionary *dict,
                    const void *key,
                    size_t key_size,
                    const void *val,
                    size_t val_size,
-                   PrintFunction key_print,
-                   PrintFunction val_print )
+                   const PrintFunction key_print,
+                   const PrintFunction val_print )
 {
     // todo: resize
-    uint64_t hash = hash_func( key, key_size );
+    const uint64_t hash = hash_func( key, key_size );
 
-    struct const_kvp {
-        const void *key;
-        size_t key_size;
-        PrintFunction key_print;
-
-        const void *val;
-        size_t val_size;
-        PrintFunction val_print;
-
-        bool removed;
-    } new_item = {
+    const struct const_kvp new_item = {
         .key_size = key_size,
         .val_size = val_size,
         .key      = key,
@@ -93,7 +97,7 @@ int dict_insert_f( struct key_value_pair_set *dict,
 
     for ( size_t i = 0; i < dict->capacity; ++i )
     {
-        size_t index                = ( hash + i ) % dict->capacity;
+        const size_t index          = ( hash + i ) % dict->capacity;
         struct key_value_pair *item = dict->items + index;
 
         if ( item->key != NULL && item_key_cmp( &new_item, item ) != 0 )
@@ -108,7 +112,10 @@ int dict_insert_f( struct key_value_pair_set *dict,
         if ( ( item->key = malloc( key_size ) ) == NULL )
             return fwarn_ret( RV_ERROR, "malloc" );
         if ( ( item->val = malloc( val_size ) ) == NULL )
+        {
+            free( item->key );
             return fwarn_ret( RV_ERROR, "malloc" );
+        }
 
         memcpy( item->key, key, key_size );
         memcpy( item->val, val, val_size );
@@ -124,23 +131,24 @@ int dict_insert_f( struct key_value_pair_set *dict,
     return RV_ERROR;
 }
 
-int dict_insert( struct key_value_pair_set *dict,
+int dict_insert( struct dictionary *dict,
                  const void *key,
-                 size_t key_size,
+                 const size_t key_size,
                  const void *val,
-                 size_t val_size )
+                 const size_t val_size )
 {
     return dict_insert_f( dict, key, key_size, val, val_size, print_byte, print_byte );
 }
 
-static struct key_value_pair *dict_get_non_const( ConstDict dict,
-                                                  const void *data,
-                                                  size_t nbytes )
+static struct key_value_pair *dict_get_non_const(
+        const struct dictionary *const dict,
+        const void *data,
+        const size_t nbytes )
 {
     uint64_t hash = hash_func( data, nbytes );
 
     const struct key_value_pair search_for = {
-        .key      = ( void      *) data,
+        .key      = ( void * ) data,
         .key_size = nbytes,
     };
     struct key_value_pair *item;
@@ -159,18 +167,22 @@ static struct key_value_pair *dict_get_non_const( ConstDict dict,
     return NULL;
 }
 
-const struct key_value_pair *dict_get( ConstDict dict, const void *data, size_t nbytes )
+const struct key_value_pair *dict_get( const struct dictionary *dict,
+                                       const void *data,
+                                       size_t nbytes )
 {
     return dict_get_non_const( dict, data, nbytes );
 }
 
-const void *dict_get_val( ConstDict dict, const void *key, size_t key_size )
+const void *dict_get_val( const struct dictionary *dict,
+                          const void *key,
+                          size_t key_size )
 {
     const struct key_value_pair *item = dict_get_non_const( dict, key, key_size );
     return item == NULL ? NULL : item->val;
 }
 
-int dict_set_val( Dict dict,
+int dict_set_val( struct dictionary *dict,
                   const void *key,
                   size_t key_size,
                   const void *val,
@@ -191,14 +203,14 @@ int dict_set_val( Dict dict,
 }
 
 
-enum DictRemoveRV dict_remove( struct key_value_pair_set *dict,
+enum DictRemoveRV dict_remove( struct dictionary *dict,
                                const void *key_data,
                                size_t key_size )
 {
     uint64_t hash = hash_func( key_data, key_size );
 
     struct key_value_pair search = {
-        .key      = ( void      *) key_data,
+        .key      = ( void * ) key_data,
         .key_size = key_size,
     };
 
@@ -227,17 +239,17 @@ enum DictRemoveRV dict_remove( struct key_value_pair_set *dict,
 }
 
 
-size_t dict_size( ConstDict dict )
+size_t dict_size( const struct dictionary *dict )
 {
     return dict->size;
 }
 
-size_t dict_cap( ConstDict dict )
+size_t dict_cap( const struct dictionary *dict )
 {
     return dict->capacity;
 }
 
-struct key_value_pair *dict_items_as_array( ConstDict dict )
+struct key_value_pair *dict_items_as_array( const struct dictionary *dict )
 {
     struct key_value_pair *new_data = malloc( dict->size );
 
@@ -274,7 +286,7 @@ void kvp_print_as( const struct key_value_pair *item,
 }
 
 
-static void dict_print_d( const struct key_value_pair_set *dict,
+static void dict_print_d( const struct dictionary *dict,
                           PrintFunction key_print,
                           PrintFunction val_print )
 {
@@ -306,12 +318,12 @@ static void dict_print_d( const struct key_value_pair_set *dict,
     printf( "}\n" );
 }
 
-void dict_print( const struct key_value_pair_set *dict )
+void dict_print( const struct dictionary *dict )
 {
     dict_print_d( dict, NULL, NULL );
 }
 
-void dict_print_as( const struct key_value_pair_set *dict,
+void dict_print_as( const struct dictionary *dict,
                     PrintFunction key_print,
                     PrintFunction val_print )
 {
@@ -319,7 +331,7 @@ void dict_print_as( const struct key_value_pair_set *dict,
 }
 
 
-void dict_destroy( struct key_value_pair_set *dict )
+void dict_destroy( struct dictionary *dict )
 {
     for ( size_t i = 0; i < dict->capacity; ++i )
     {
