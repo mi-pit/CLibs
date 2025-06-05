@@ -32,7 +32,8 @@
  * Stores each array member in a new variable ‹item› (only
  * visible in the scope of the foreach loop)
  * @param type  C-keyword (or typedef/…) of the type of the array items and the new
- * variable
+ *              variable
+ *
  * @param item  name of the new variable
  * @param array array of type 'type[]'
  */
@@ -44,6 +45,7 @@
 /**
  * Iterates over a string<br>
  * Stores each character of the string in a new variable of type char
+ *
  * @param item  name of the new variable
  * @param strn string
  */
@@ -55,6 +57,7 @@
 /**
  * Iterates over the List<br>
  * Stores each list member in a new variable named ‹item› of type char
+ *
  * @param type  type of the new variable and items in the list
  * @param item  name of the new variable
  * @param ls string
@@ -69,6 +72,10 @@
 #ifdef CLIBS_SETS_H
 /**
  * Iterates over a set, results are set in an SetEnumeratedEntry
+ * "Retrieves" a `const SetEnumeratedEntry` struct (see sets.h);
+ * in short, `SetEnumeratedEntry` contains
+ * - `struct set_item *` -- the desired data
+ * - `index` -- for the iterator, doesn't really hold any value for the user
  *
  * @param SET set
  */

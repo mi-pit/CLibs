@@ -6,7 +6,7 @@
 
 #include "Dev/assert_that.h"   /* assert_that */
 #include "Dev/errors.h"        /* *warn* */
-#include "foreach.h"           /* foreach_arr */
+#include "Dev/foreach.h"       /* foreach_arr */
 #include "misc.h"              /* max_u64 */
 #include "Structs/dynarr.h"    /* List */
 #include "Structs/dynstring.h" /* dynstr */

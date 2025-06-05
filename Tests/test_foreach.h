@@ -14,13 +14,13 @@
 #include "../src/Structs/sets.h"
 
 // must be after dynarr.h and sets.h
+#include "../src/Dev/foreach.h"
 #include "../src/Dev/pointer_utils.h"
-#include "../src/foreach.h"
 
 
 Tester test_one_foreach_arr( const int64_t arr[], const size_t count )
 {
-    foreach_arr( int64_t, num, arr, count )
+    foreach_arr ( int64_t, num, arr, count )
     {
         if ( num != arr[ foreach_index_num ] )
             return false;
@@ -33,7 +33,7 @@ Tester test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
 {
     assert_that( list_size( numbers_ls ) == count, "list size != array size" );
 
-    foreach_ls( int64_t, num, numbers_ls )
+    foreach_ls ( int64_t, num, numbers_ls )
     {
         if ( num != numbers_arr[ foreach_index_num ] )
             return false;
@@ -43,11 +43,11 @@ Tester test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
 
 Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
 {
-    foreach_uni( const int64_t,
-                 num,
-                 numbers_arr[ foreach_index_num ],
-                 numbers_arr[ foreach_index_num ],
-                 count )
+    foreach_uni ( const int64_t,
+                  num,
+                  numbers_arr[ foreach_index_num ],
+                  numbers_arr[ foreach_index_num ],
+                  count )
     {
         if ( num != numbers_arr[ foreach_index_num ] )
             return false;
@@ -140,7 +140,7 @@ TEST( foreach_set )
     assert_that( set_size( set ) == 2, "two items must be present" );
     assert_that( sizeof( Set * ) != sizeof( int ), "test assumes this" );
 
-    foreach_set( set )
+    foreach_set ( set )
     {
         UNIT_TEST( entry.index >= 0 );
         const struct set_item *item = entry.item;

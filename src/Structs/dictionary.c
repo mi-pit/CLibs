@@ -17,7 +17,7 @@ struct dictionary {
 };
 
 
-alignas( alignof( struct key_value_pair ) ) const struct const_kvp {
+struct const_kvp {
     const void *key;
     size_t key_size;
     PrintFunction key_print;
@@ -140,10 +140,9 @@ int dict_insert( struct dictionary *dict,
     return dict_insert_f( dict, key, key_size, val, val_size, print_byte, print_byte );
 }
 
-static struct key_value_pair *dict_get_non_const(
-        const struct dictionary *const dict,
-        const void *data,
-        const size_t nbytes )
+static struct key_value_pair *dict_get_non_const( const struct dictionary *const dict,
+                                                  const void *data,
+                                                  const size_t nbytes )
 {
     uint64_t hash = hash_func( data, nbytes );
 
