@@ -2,6 +2,7 @@
 
 !.gitignore
 !CMakeLists.txt
+!.clang-format
 
 !/.github/
 !/.github/workflows/
