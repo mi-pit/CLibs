@@ -87,6 +87,7 @@ static int TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) = 0;
 static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
 
 
+#ifndef UNIT_TESTS_SILENT
 #define TEST( HANDLE )                                          \
     int TEST_NAME_CREATOR( HANDLE )( void )                     \
     {                                                           \
@@ -94,6 +95,14 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
         int TEST_NAME_CREATOR( ran_total )           = 0;       \
         const char *TEST_NAME_CREATOR( test_handle ) = #HANDLE; \
         printf( COLOR_TEST_TAG "[TEST]" COLOR_DEFAULT " " #HANDLE "\n" );
+#else
+#define TEST( HANDLE )                                    \
+    int TEST_NAME_CREATOR( HANDLE )( void )               \
+    {                                                     \
+        int TEST_NAME_CREATOR( failed_total )        = 0; \
+        int TEST_NAME_CREATOR( ran_total )           = 0; \
+        const char *TEST_NAME_CREATOR( test_handle ) = #HANDLE;
+#endif //UNIT_TESTS_SILENT
 
 #define END_TEST                                                                    \
     printf( COLOR_TEST_TAG "[TEST]" COLOR_DEFAULT " %s: ran %i tests, " PRINT_COLOR \
@@ -147,6 +156,7 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
                                 const char *filename,
                                 const int lineno )
 {
+#ifndef UNIT_TESTS_SILENT
     ssize_t ln = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + strlen( cond_str ) );
 
     printf( "    " COLOR_TEST_TAG "[UNIT TEST" );
@@ -173,6 +183,11 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
     printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",
             passed ? COLOR_SUCC : COLOR_FAIL,
             passed ? "SUCCESS" : "FAILURE" );
+#else
+    ( void ) ( cond_str );
+    ( void ) ( filename );
+    ( void ) ( lineno );
+#endif //UNIT_TESTS_SILENT
 
     return passed;
 }
