@@ -32,6 +32,7 @@ void run_string_utils( void )
 {
     RUN_TEST( replace );
     RUN_TEST( escape );
+    RUN_TEST( unescape );
     RUN_TEST( strspl_str );
     RUN_TEST( strspl_regex );
     RUN_TEST( string_to_UL );

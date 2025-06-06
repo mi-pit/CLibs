@@ -155,6 +155,55 @@ str_t string_escaped( const string_t old )
 }
 
 
+str_t string_unescaped( const string_t old )
+{
+    if ( old == NULL )
+        return ( void * ) fwarnx_ret( NULL, "string must not be null" );
+
+    const size_t len = strlen( old );
+
+    char *const new = calloc( len + 1, 1 );
+    if ( new == NULL )
+        return ( void * ) fwarn_ret( NULL, "calloc" );
+
+    size_t new_idx = 0;
+    for ( size_t i = 0; i < len; ++i, ++new_idx )
+    {
+        const char old_c = old[ i ];
+        if ( old_c != '\\' )
+        {
+            new[ new_idx ] = old[ i ];
+            continue;
+        }
+
+        switch ( old[ ++i ] )
+        {
+            case 'n':
+                new[ new_idx ] = '\n';
+                break;
+            case 't':
+                new[ new_idx ] = '\t';
+                break;
+            case 'r':
+                new[ new_idx ] = '\r';
+                break;
+            case 'f':
+                new[ new_idx ] = '\f';
+                break;
+            case 'v':
+                new[ new_idx ] = '\v';
+                break;
+
+            default: // backslash, double-quote, ...?
+                new[ new_idx ] = old[ i ];
+                break;
+        }
+    }
+
+    return new;
+}
+
+
 str_t string_reversed( const string_t s )
 {
     char *const new = strdup( s );

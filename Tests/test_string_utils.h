@@ -58,6 +58,7 @@ Tester test_one_escape( string_t old, string_t new )
 
 TEST( escape )
 {
+    UNIT_TEST( test_one_escape( "", "" ) );
     UNIT_TEST( test_one_escape( "Hopspop", "Hopspop" ) );
     UNIT_TEST( test_one_escape( "Hopspop\n", "Hopspop\\n" ) );
     UNIT_TEST( test_one_escape( "Hopspop\nKokot\n", "Hopspop\\nKokot\\n" ) );
@@ -65,6 +66,26 @@ TEST( escape )
     UNIT_TEST( test_one_escape( "Hopspop\\nKokot\n", "Hopspop\\\\nKokot\\n" ) );
     UNIT_TEST( test_one_escape( "Hopspop\0Kokot\n", "Hopspop" ) );
     UNIT_TEST( test_one_escape( "\n\r\v\t\\\"", "\\n\\r\\v\\t\\\\\\\"" ) );
+}
+END_TEST
+
+
+Tester test_one_unescape( string_t old, string_t new )
+{
+    str_t esc = string_unescaped( old );
+    bool rv   = strcmp( esc, new ) == 0;
+    free( esc );
+    return rv;
+}
+
+TEST( unescape )
+{
+    UNIT_TEST( test_one_unescape( "", "" ) );
+    UNIT_TEST( test_one_unescape( "Hopspop", "Hopspop" ) );
+    UNIT_TEST( test_one_unescape( "Hopspop\\n", "Hopspop\n" ) );
+    UNIT_TEST( test_one_unescape( "Hopspop\n", "Hopspop\n" ) );
+    UNIT_TEST( test_one_unescape( "\\n\\r\\v\\t\\\\\\\"", "\n\r\v\t\\\"" ) );
+    UNIT_TEST( test_one_unescape( "Hops\0pop", "Hops" ) );
 }
 END_TEST
 

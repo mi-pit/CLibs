@@ -128,6 +128,9 @@ void string_strip( str_t );
  */
 UseResult str_t string_escaped( string_t );
 
+/// Opposite of `string_escaped`
+UseResult str_t string_unescaped( string_t );
+
 /**
  * Creates a new string with the same characters as the supplied one, reversed.
  *
