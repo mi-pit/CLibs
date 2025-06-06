@@ -2,7 +2,7 @@
 #define CLIBS_MISC_H
 
 #include "Dev/attributes.h" /* LibraryDefined */
-#include "extra_types.h"    /* byte, (u)int64_t */
+#include "Dev/extra_types.h"
 
 #include <stdbool.h> /* bool (is_within) */
 #include <stddef.h>  /* size_t */

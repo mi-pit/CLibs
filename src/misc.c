@@ -1,7 +1,5 @@
 #include "misc.h"
 
-#include "extra_types.h"
-
 
 uint64_t hash_func( const void *data, size_t nbytes )
 {

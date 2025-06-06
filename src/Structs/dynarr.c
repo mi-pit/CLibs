@@ -2,9 +2,9 @@
 #include "dynarr.h"
 
 #include "../Dev/errors.h" /* RVs, fwarn* */
+#include "../Dev/extra_types.h"
 #include "../Dev/pointer_utils.h"
-#include "../extra_types.h" /* byte */
-#include "../misc.h"        /* cmpeq() */
+#include "../misc.h" /* cmpeq() */
 
 #include <stdio.h>  /* *print* */
 #include <stdlib.h> /* malloc, free, bsearch, qsort */
