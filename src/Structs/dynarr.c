@@ -474,6 +474,7 @@ Private void list_print_mode( const struct dynamic_array *ls, // NOLINT(misc-no-
     {
         default:
             fwarnx( "invalid print format" );
+            __attribute__( ( fallthrough ) );
         case LS_PRINT_BYTE:
             list_printf_d( ls, byte, "%02x", " " );
             break;

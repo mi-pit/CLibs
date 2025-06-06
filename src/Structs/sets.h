@@ -4,6 +4,7 @@
 #include "../item_print_functions.h" /* PrintFunction */
 
 #include <stdbool.h>
+#include <stdint.h> /* for linux ...? */
 
 
 typedef struct hash_set Set;
