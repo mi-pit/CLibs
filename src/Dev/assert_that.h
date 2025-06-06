@@ -43,6 +43,7 @@
  * @code
  * // like this:
  * #define CLIBS_ASSERT_THAT_H_EXIT_VAL RV_EXCEPTION
+ * #include "assert_that.h"
  * @endcode
  */
 #define assert_that( EXPRESSION, ... )                                  \

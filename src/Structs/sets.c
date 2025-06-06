@@ -378,9 +378,9 @@ int set_difference( const Set *set, const Set *sub, Set **result )
     return RV_SUCCESS;
 }
 
-int set_subtract( Set *set, const Set *snd )
+int set_subtract( Set *set, const Set *sub )
 {
-    return set_remove_array( set, snd->capacity, snd->items );
+    return set_remove_array( set, sub->capacity, sub->items );
 }
 
 
@@ -427,35 +427,28 @@ void set_print_as( const Set *set, const PrintFunction func )
 {
     printf( "hash_set (size=%zu): {", set->n_items );
 
-    const char *delim = "";
-    size_t n          = 0;
+    size_t n = 0;
     for ( size_t i = 0; i < set->capacity; ++i )
     {
         const struct set_item *item = set->items + i;
         if ( item->data == NULL )
             continue;
 
-        delim = item->size > 16 || n % SET_ITEMCOUNT_LINE_LENGTH == 0 ? ",\n\t" : ", ";
         if ( n == 0 )
-        {
             printf( set->n_items > SET_ITEMCOUNT_LINE_LENGTH ? "\n\t" : " " );
-        }
+        else if ( n % SET_ITEMCOUNT_LINE_LENGTH == 0 )
+            printf( set->n_items > SET_ITEMCOUNT_LINE_LENGTH ? ",\n\t" : ", " );
         else
-        {
-            printf( "%s", delim );
-        }
+            printf( item->size > 16 ? ",\n\t" : ", " );
 
-        // print
-        ( func != NULL ? func : item->func )( item->data, item->size );
+        // print the data
+        const PrintFunction print_func = func != NULL ? func : item->func;
+        print_func( item->data, item->size );
 
         ++n;
     }
 
-    if ( set->n_items > SET_ITEMCOUNT_LINE_LENGTH )
-        printf( "\n" );
-    else if ( cmpeq( strcmp( delim, ", " ) ) )
-        printf( " " );
-    printf( "}\n" );
+    printf( "%s}\n", set->n_items > SET_ITEMCOUNT_LINE_LENGTH ? "\n" : " " );
 }
 
 void set_print( const Set *set )
