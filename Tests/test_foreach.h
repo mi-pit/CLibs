@@ -54,9 +54,9 @@ Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
     }
     return true;
 }
-Tester test_one_foreach_str( string_t str )
+Tester test_one_foreach_str( const string_t str )
 {
-    foreach_str( c, str )
+    foreach_str ( c, str )
     {
         if ( foreach_cap_c != strlen( str ) )
         {
@@ -77,7 +77,7 @@ Tester test_one_foreach_dynstr( string_t str )
     assert_that( dynstr != NULL, "dynstr init" );
     assert_that( strlen( str ) == dynstr_len( dynstr ), "dynstr len" );
 
-    foreach_str( c, dynstr_data( dynstr ) )
+    foreach_str ( c, dynstr_data( dynstr ) )
     {
         if ( foreach_cap_c != strlen( str ) )
         {
@@ -100,7 +100,7 @@ TEST( foreach )
 {
     struct dynamic_array *numbers_ls = list_init_type( int64_t );
     assert_that( numbers_ls != NULL, "list init" );
-    int64_t numbers_arr[] = {
+    const int64_t numbers_arr[] = {
         1, 2, 4, 6, 7, -1, 2323, 3195,
     };
     assert_that( list_extend( numbers_ls, numbers_arr, countof( numbers_arr ) ) ==

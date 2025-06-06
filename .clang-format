@@ -71,6 +71,7 @@ FixNamespaceComments: true
 ForEachMacros:
   - foreach
   - foreach_uni
+  - foreach_str
   - foreach_arr
   - foreach_ls
   - foreach_set
