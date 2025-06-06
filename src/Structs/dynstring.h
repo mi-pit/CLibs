@@ -15,6 +15,9 @@
 #define DEFAULT_DYNSTRING_CAP 256
 
 
+typedef struct dynamic_string DynString;
+
+
 /* ==== Constructors/Destructors ==== */
 /**
  * Heap allocates a new DynamicString with a capacity of DEFAULT_DYNSTRING_CAP
