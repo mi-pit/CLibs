@@ -4,7 +4,6 @@
 #include "../Dev/pointer_utils.h" /* free_n() */
 #include "../misc.h"              /* hash_func(), cmp_size_t(), cmpeq() */
 
-#include <stdalign.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -109,9 +108,12 @@ int dict_insert_f( struct dictionary *dict,
         free( item->key );
         free( item->val );
 
-        if ( ( item->key = malloc( key_size ) ) == NULL )
+        item->key = malloc( key_size );
+        if ( item->key == NULL )
             return fwarn_ret( RV_ERROR, "malloc" );
-        if ( ( item->val = malloc( val_size ) ) == NULL )
+
+        item->val = malloc( val_size );
+        if ( item->val == NULL )
         {
             free( item->key );
             return fwarn_ret( RV_ERROR, "malloc" );
@@ -144,18 +146,17 @@ static struct key_value_pair *dict_get_non_const( const struct dictionary *const
                                                   const void *data,
                                                   const size_t nbytes )
 {
-    uint64_t hash = hash_func( data, nbytes );
+    const uint64_t hash = hash_func( data, nbytes );
 
     const struct key_value_pair search_for = {
         .key      = ( void * ) data,
         .key_size = nbytes,
     };
-    struct key_value_pair *item;
 
     for ( size_t i = 0; i < dict->capacity; ++i )
     {
-        size_t index = ( hash + i ) % dict->capacity;
-        item         = dict->items + index;
+        const size_t index          = ( hash + i ) % dict->capacity;
+        struct key_value_pair *item = dict->items + index;
 
         if ( item->key == NULL )
             continue;
@@ -167,15 +168,15 @@ static struct key_value_pair *dict_get_non_const( const struct dictionary *const
 }
 
 const struct key_value_pair *dict_get( const struct dictionary *dict,
-                                       const void *data,
-                                       size_t nbytes )
+                                       const void *key,
+                                       const size_t key_size )
 {
-    return dict_get_non_const( dict, data, nbytes );
+    return dict_get_non_const( dict, key, key_size );
 }
 
 const void *dict_get_val( const struct dictionary *dict,
                           const void *key,
-                          size_t key_size )
+                          const size_t key_size )
 {
     const struct key_value_pair *item = dict_get_non_const( dict, key, key_size );
     return item == NULL ? NULL : item->val;
@@ -183,9 +184,9 @@ const void *dict_get_val( const struct dictionary *dict,
 
 int dict_set_val( struct dictionary *dict,
                   const void *key,
-                  size_t key_size,
+                  const size_t key_size,
                   const void *val,
-                  size_t val_size )
+                  const size_t val_size )
 {
     struct key_value_pair *item = dict_get_non_const( dict, key, key_size );
     if ( item == NULL )
@@ -204,18 +205,18 @@ int dict_set_val( struct dictionary *dict,
 
 enum DictRemoveRV dict_remove( struct dictionary *dict,
                                const void *key_data,
-                               size_t key_size )
+                               const size_t key_size )
 {
-    uint64_t hash = hash_func( key_data, key_size );
+    const uint64_t hash = hash_func( key_data, key_size );
 
-    struct key_value_pair search = {
+    const struct key_value_pair search = {
         .key      = ( void * ) key_data,
         .key_size = key_size,
     };
 
     for ( size_t i = 0; i < dict->capacity; ++i )
     {
-        size_t index                = ( hash + i ) % dict->capacity;
+        const size_t index          = ( hash + i ) % dict->capacity;
         struct key_value_pair *item = dict->items + index;
 
         if ( item->key == NULL && !item->removed )
@@ -273,8 +274,8 @@ void kvp_print( const struct key_value_pair *item, const char *kv_sep )
 }
 
 void kvp_print_as( const struct key_value_pair *item,
-                   PrintFunction key_print,
-                   PrintFunction val_print,
+                   const PrintFunction key_print,
+                   const PrintFunction val_print,
                    const char *kv_sep )
 {
     printf( "|" );
@@ -286,21 +287,21 @@ void kvp_print_as( const struct key_value_pair *item,
 
 
 static void dict_print_d( const struct dictionary *dict,
-                          PrintFunction key_print,
-                          PrintFunction val_print )
+                          const PrintFunction key_print,
+                          const PrintFunction val_print )
 {
     printf( "dictionary (size=%zu): {", dict->size );
 
-    const char *delim;
-    size_t n = 0;
+    const char *delim = "";
+    size_t n          = 0;
     for ( size_t i = 0; i < dict->capacity; ++i )
     {
-        struct key_value_pair *item = dict->items + i;
+        const struct key_value_pair *item = dict->items + i;
         if ( item->key == NULL )
             continue;
 
-        delim = ( item->key_size > 16 || n % DICT_PRINT_LINE_MAX_ITEMS == 0 ) ? ",\n\t"
-                                                                              : ", ";
+        delim = item->key_size > 16 || n % DICT_PRINT_LINE_MAX_ITEMS == 0 ? ",\n\t"
+                                                                          : ", ";
         if ( n == 0 )
             delim = dict->size > DICT_PRINT_LINE_MAX_ITEMS ? "\n\t" : " ";
         printf( "%s", delim );
@@ -323,8 +324,8 @@ void dict_print( const struct dictionary *dict )
 }
 
 void dict_print_as( const struct dictionary *dict,
-                    PrintFunction key_print,
-                    PrintFunction val_print )
+                    const PrintFunction key_print,
+                    const PrintFunction val_print )
 {
     dict_print_d( dict, key_print, val_print );
 }

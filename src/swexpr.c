@@ -27,7 +27,7 @@ static const bool SWEX_FALSE = false;
     }                                                                      \
     while ( 0 )
 
-int switch_expression_push( size_t nbytes, const void *data )
+int switch_expression_push( const size_t nbytes, const void *const data )
 {
     try_push( switch_expr_sizes_stack, &nbytes, sizeof( size_t ) );
     try_push( switch_expr_values_stack, data, sizeof( void * ) );
@@ -41,7 +41,7 @@ int switch_expression_push( size_t nbytes, const void *data )
 
 bool switch_expression_is_assigned( void )
 {
-    return ( *( bool * ) list_peek( switch_expr_assigned_stack ) );
+    return *( bool * ) list_peek( switch_expr_assigned_stack );
 }
 
 int switch_expression_assign( void )

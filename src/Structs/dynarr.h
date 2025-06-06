@@ -5,7 +5,6 @@
 #include "../Dev/attributes.h" /* Private */
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <sys/cdefs.h>
 

@@ -9,7 +9,7 @@
 #include <string.h>
 
 
-void print_byte( const void *data, size_t nbytes )
+void print_byte( const void *data, const size_t nbytes )
 {
     printf( "'" );
     for ( size_t i = 0; i < nbytes; ++i )
@@ -22,7 +22,7 @@ void print_byte( const void *data, size_t nbytes )
     printf( "'" );
 }
 
-void print_bool( const void *data, size_t nbytes )
+void print_bool( const void *data, const size_t nbytes )
 {
     if ( nbytes != sizeof( bool ) )
     {
@@ -48,7 +48,7 @@ define_print_func( double, "%.4f" );
 define_print_func( int8_t, "%3d" );
 
 
-void print_pointer( const void *data, size_t nbytes )
+void print_pointer( const void *data, const size_t nbytes )
 {
     if ( nbytes != sizeof( void * ) )
     {
@@ -56,10 +56,10 @@ void print_pointer( const void *data, size_t nbytes )
         return;
     }
 
-    printf( "'pointer: \"%p\"'", *( ( void ** ) data ) );
+    printf( "'pointer: \"%p\"'", *( void ** ) data );
 }
 
-void print_string( const void *data, size_t nbytes )
+void print_string( const void *data, const size_t nbytes )
 {
     if ( nbytes != strlen( data ) )
     {
@@ -69,7 +69,7 @@ void print_string( const void *data, size_t nbytes )
     printf( "\"%s\"", deref_as( const char *, data ) );
 }
 
-void print_string_direct( const void *data, size_t nbytes )
+void print_string_direct( const void *data, const size_t nbytes )
 {
     printf( "\"%.*s\"", ( int ) nbytes, ( const char * ) data );
 }

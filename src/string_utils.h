@@ -164,8 +164,9 @@ UseResult str_t string_as_lower( string_t );
 
 /**
  * Creates a new string with all occurrences of the sub-string ‹old› replaced with ‹new›
- * @param old
- * @param new
+ *
+ * @param old old substring
+ * @param new new substring
  * @return new string, should be freed
  */
 UseResult str_t string_replaced( string_t, string_t old, string_t new );
@@ -229,6 +230,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
 
 
 void string_split_destroy( size_t size, str_t **str_arr_cont );
+
 
 /* ==== Mathematical stuff ==== */
 

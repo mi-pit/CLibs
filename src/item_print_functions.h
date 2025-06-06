@@ -5,7 +5,6 @@
 #include "Dev/errors.h"
 
 #include <stdbool.h>
-#include <stddef.h>
 
 
 #ifndef LINE_DELIM
@@ -52,24 +51,24 @@ declare_print_func( Dict );
 #define REQUIRE_SEMICOLON struct DECLARATION_MACRO_UNUSED_STRUCT
 #endif //REQUIRE_SEMICOLON
 
-#define define_print_func( type, format_str )                      \
-    void print_function( type )( const void *data, size_t nbytes ) \
-    {                                                              \
-        if ( nbytes != sizeof( type ) )                            \
-        {                                                          \
-            fwarnx( "invalid data" );                              \
-            return;                                                \
-        }                                                          \
-                                                                   \
-        if ( PrintType )                                           \
-        {                                                          \
-            printf( "‹" );                                         \
-            printf( #type TYPE_SEPARATOR );                        \
-        }                                                          \
-        printf( format_str, *( ( type * ) data ) );                \
-        if ( PrintType )                                           \
-            printf( "›" );                                         \
-    }                                                              \
+#define define_print_func( type, format_str )                            \
+    void print_function( type )( const void *data, const size_t nbytes ) \
+    {                                                                    \
+        if ( nbytes != sizeof( type ) )                                  \
+        {                                                                \
+            fwarnx( "invalid data" );                                    \
+            return;                                                      \
+        }                                                                \
+                                                                         \
+        if ( PrintType )                                                 \
+        {                                                                \
+            printf( "‹" );                                               \
+            printf( #type TYPE_SEPARATOR );                              \
+        }                                                                \
+        printf( format_str, *( ( type * ) data ) );                      \
+        if ( PrintType )                                                 \
+            printf( "›" );                                               \
+    }                                                                    \
     REQUIRE_SEMICOLON
 
 #endif //CLIBS_PRINT_FUNCTIONS_H

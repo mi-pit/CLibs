@@ -26,7 +26,7 @@
 #define RV_ERROR     ( -1 ) /* Fatal, un-recoverable error */
 #define RV_SUCCESS   0      /* Success */
 
-LibraryDefined const char *rv_to_string( int rv )
+LibraryDefined const char *rv_to_string( const int rv )
 {
     switch ( rv )
     {

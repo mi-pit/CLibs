@@ -85,7 +85,7 @@ int dict_set_val( struct dictionary *,
                   const void *val,
                   size_t val_size );
 
-enum DictRemoveRV dict_remove( struct dictionary *, const void *data, size_t nbytes );
+enum DictRemoveRV dict_remove( struct dictionary *, const void *key_data, size_t key_size );
 
 
 /* -------- SIZE/CAP -------- */
