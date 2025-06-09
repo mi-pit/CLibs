@@ -38,6 +38,8 @@ set(CLIB_SOURCES
         src/Structs/dynarr.c
         src/Structs/dynstring.c
         src/Structs/sets.c
+        src/Structs/dictionary.c
+        src/Structs/queue.c
 
         src/item_print_functions.c
 )
@@ -50,6 +52,8 @@ set(CLIB_PUBLIC_HDRS
         src/Structs/dynarr.h
         src/Structs/dynstring.h
         src/Structs/sets.h
+        src/Structs/dictionary.h
+        src/Structs/queue.h
 
         src/item_print_functions.h
 )
@@ -69,8 +73,6 @@ add_executable(Tests
         Tests/tests.c
 )
 target_link_libraries(Tests PRIVATE clib_core)
-
-# Register it with CTest so that “ctest” will pick it up automatically:
 add_test(
         NAME all_unit_tests
         COMMAND Tests
@@ -81,14 +83,21 @@ add_executable(TestSets
         Tests/test_sets.c
 )
 target_link_libraries(TestSets PRIVATE clib_core)
-
 add_test(
         NAME sets_tests
         COMMAND TestSets
 )
 
 
-# Add more tests here…
+add_executable(TestQueue
+        Tests/test_queue.c
+)
+target_link_libraries(TestQueue PRIVATE clib_core)
+target_compile_definitions(TestQueue PUBLIC UNIT_TESTS_SILENT)
+add_test(
+        NAME queue_test
+        COMMAND TestQueue
+)
 
 
 # ————————————————————————————————————
