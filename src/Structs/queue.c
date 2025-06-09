@@ -89,6 +89,7 @@ int queue_dequeue( struct fifo_queue *queue, void *data_cont )
     if ( queue->head == NULL )
         queue->tail = NULL;
 
+    free( first->data );
     free( first );
 
     return RV_SUCCESS;
