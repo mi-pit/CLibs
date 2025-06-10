@@ -88,6 +88,13 @@ add_test(
 )
 
 
+# Don't add_test, because this one should fail in some way
+add_executable(TestUnitTests
+        Tests/test_unit_tests.c
+)
+target_link_libraries(TestUnitTests PRIVATE clib_core)
+
+
 # Add more tests here…
 
 

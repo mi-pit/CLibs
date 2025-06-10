@@ -40,7 +40,6 @@ Tester test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
     }
     return true;
 }
-
 Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
 {
     foreach_uni ( const int64_t,

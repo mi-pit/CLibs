@@ -86,6 +86,13 @@ static int TEST_NAME_CREATOR( TOTAL_RAN )    = 0;
 static int TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) = 0;
 static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
 
+static bool TEST_NAME_CREATOR( YAP ) = true;
+
+
+/* todo:
+ *  silent section of TEST
+ *  remove END_TEST */
+
 
 #ifndef UNIT_TESTS_SILENT
 #define TEST( HANDLE )                                          \
@@ -157,32 +164,35 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
                                 const int lineno )
 {
 #ifndef UNIT_TESTS_SILENT
-    ssize_t ln = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + strlen( cond_str ) );
-
-    printf( "    " COLOR_TEST_TAG "[UNIT TEST" );
-    if ( !passed )
+    if ( TEST_NAME_CREATOR( YAP ) || !passed )
     {
-        char buffer[ PATH_MAX + 128 ];
-        ln -= snprintf( buffer, sizeof buffer, " // %s @ %d", filename, lineno );
-        printf( "%s", buffer );
+        ssize_t ln = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + strlen( cond_str ) );
+
+        printf( "    " COLOR_TEST_TAG "[UNIT TEST" );
+        if ( !passed )
+        {
+            char buffer[ PATH_MAX + 128 ];
+            ln -= snprintf( buffer, sizeof buffer, " // %s @ %d", filename, lineno );
+            printf( "%s", buffer );
+        }
+        printf( "]" COLOR_DEFAULT " %s ", cond_str );
+
+        const size_t ndots = ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_CONST_PART_LEN + 1;
+
+        if ( ln < 0 )
+        {
+            printf( "\n" );
+            for ( int i = 0; i < 16; ++i )
+                printf( " " );
+        }
+
+        for ( size_t i = 0; i < ndots; ++i )
+            printf( "." );
+
+        printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",
+                passed ? COLOR_SUCC : COLOR_FAIL,
+                passed ? "SUCCESS" : "FAILURE" );
     }
-    printf( "]" COLOR_DEFAULT " %s ", cond_str );
-
-    const size_t ndots = ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_CONST_PART_LEN + 1;
-
-    if ( ln < 0 )
-    {
-        printf( "\n" );
-        for ( int i = 0; i < 16; ++i )
-            printf( " " );
-    }
-
-    for ( size_t i = 0; i < ndots; ++i )
-        printf( "." );
-
-    printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",
-            passed ? COLOR_SUCC : COLOR_FAIL,
-            passed ? "SUCCESS" : "FAILURE" );
 #else
     ( void ) ( cond_str );
     ( void ) ( filename );
@@ -207,5 +217,19 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
         ++TEST_NAME_CREATOR( ran_total );                                    \
     }                                                                        \
     while ( 0 )
+
+
+/**
+ * If set to false, `UNIT_TEST`s do not show successes.
+ *
+ * This option is independent from the macro `UNIT_TESTS_SILENT`,
+ * which silences all messages.
+ *
+ * @param verbose true by default
+ */
+LibraryDefined void SET_UNIT_TEST_VERBOSITY( const bool verbose )
+{
+    TEST_NAME_CREATOR( YAP ) = verbose;
+}
 
 #endif //CLIBS_UNIT_TESTS_H
