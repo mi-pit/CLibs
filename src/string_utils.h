@@ -93,11 +93,44 @@ LibraryDefined int asprintf( str_t *strp, const string_t fmt, ... )
 
 
 /**
+ * Returns true if ascii string is blank
+ *
+ * @return true if each char in s tests positive for isspace(3)
+ */
+bool string_is_blank( string_t );
+/**
+ * Returns true if ascii string is blank
+ *
+ * @param len max string length
+ * @return true if each char in s tests positive for isspace(3)
+ */
+bool string_is_blank_l( string_t, size_t len );
+
+/**
+ * Evaluates to true if string contains no characters
+ *
+ * @param s string
+ * @return true if string is empty -- ""
+ */
+#define string_is_empty( s ) ( ( s )[ 0 ] == '\0' )
+
+/**
  * Heap-allocates a new string with all whitespace (as defined in isspace(3)) from either end stripped.
+ *
  * @return  New string – copy of the original with no whitespace at either end.
  *          Pointer should be freed with free(3).
  */
 UseResult str_t string_stripped( string_t );
+/**
+ * Heap-allocates a new string with all whitespace (as defined in isspace(3)) from either end stripped.
+ *
+ * String is treated as if it was `length' characters long (at most, may be less)
+ *
+ * @param length maximum number of characters read from string
+ * @return  New string – copy of the original with no whitespace at either end.
+ *          Pointer should be freed with free(3).
+ */
+UseResult str_t string_stripped_l( string_t, size_t length );
 /**
  * Removes all whitespace from either end of the string.
  * This is done in place.

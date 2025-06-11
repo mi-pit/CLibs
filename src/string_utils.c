@@ -16,17 +16,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-// string_stripped( string_t ) is implemented separately for memory efficiency
-str_t string_stripped( const string_t s )
+bool string_is_blank( string_t s )
 {
-    size_t str_len = strlen( s );
+    foreach_str ( c, s )
+        if ( !isspace( c ) )
+            return false;
 
+    return true;
+}
+
+bool string_is_blank_l( const string_t s, const size_t len )
+{
+    for ( size_t i = 0; i < len; ++i )
+        if ( !isspace( s[ i ] ) )
+            return false;
+
+    return true;
+}
+
+
+// `string_stripped` is implemented separately from `strip` for memory efficiency
+str_t string_stripped_l( const string_t s, size_t length )
+{
     size_t start_idx = -1;
-    size_t end_idx   = str_len;
+    size_t end_idx   = length;
 
     bool started = false, ended = false;
-    for ( size_t i = 0; i < str_len; ++i )
+    for ( size_t i = 0; i < length; ++i )
     {
         if ( !started && !isspace( s[ i ] ) )
         {
@@ -34,10 +50,10 @@ str_t string_stripped( const string_t s )
             start_idx = i;
         }
 
-        if ( !ended && !isspace( s[ str_len - i - 1 ] ) )
+        if ( !ended && !isspace( s[ length - i - 1 ] ) )
         {
             ended   = true;
-            end_idx = str_len - i - 1;
+            end_idx = length - i - 1;
         }
 
         if ( started && ended )
@@ -52,18 +68,23 @@ str_t string_stripped( const string_t s )
         return new;
     }
 
-    str_len         = end_idx - start_idx + 1;
-    char *const new = malloc( str_len + 1 );
+    length          = end_idx - start_idx + 1;
+    char *const new = malloc( length + 1 );
     if ( new == NULL )
         return ( void * ) fflwarn_ret( NULL, "malloc" );
 
-    for ( size_t i = 0; i < str_len; ++i )
+    for ( size_t i = 0; i < length; ++i )
     {
         new[ i ] = s[ i + start_idx ];
     }
-    new[ str_len ] = '\0';
+    new[ length ] = '\0';
 
     return new;
+}
+
+str_t string_stripped( const string_t s )
+{
+    return string_stripped_l( s, strlen( s ) );
 }
 
 void string_strip( char *const s )
