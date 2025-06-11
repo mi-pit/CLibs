@@ -422,8 +422,14 @@ ssize_t string_split( str_t **str_arr_cont,
                ( next != NULL && next - start + end_offset == 0 ) ) )
             continue;
 
-        str_t dup = next == NULL ? strdup( start )
-                                 : strndup( start, next - start + end_offset );
+        const size_t len = next == NULL ? strlen( start ) : next - start + end_offset;
+
+        if ( mode & STRSPLIT_EXCLUDE_EMPTY && mode & STRSPLIT_STRIP_RESULTS &&
+             string_is_blank_l( start, len ) )
+            continue;
+
+        char *const dup = mode & STRSPLIT_STRIP_RESULTS ? string_stripped_l( start, len )
+                                                        : strndup( start, len );
         if ( dup == NULL )
         {
             list_destroy( ls );

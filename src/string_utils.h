@@ -11,6 +11,7 @@
 #include <sys/types.h> /* ssize_t */
 
 /* include for user */
+#include <stdbool.h>
 #include <string.h>
 
 
@@ -211,20 +212,25 @@ UseResult str_t string_replaced( string_t, string_t old, string_t new );
 #define STRSPLIT_EXCLUDE_EMPTY     0x01
 #define STRSPLIT_KEEP_DELIM_BEFORE 0x02
 #define STRSPLIT_KEEP_DELIM_AFTER  0x04
+#define STRSPLIT_STRIP_RESULTS     0x08 // Only for string_split() (not regex)
 
 /**
  * Flags for the string_split[_regex] functions
  * @code
  * STRSPLIT_EXCLUDE_EMPTY       // = 0x01
- *     - resulting string array doesn't include empty strings ("")
+ *      - resulting string array doesn't include empty strings ("")
  *
  * STRSPLIT_KEEP_DELIM_BEFORE   // = 0x02
- *     - items include the delimiting strings;
- *       the delim is included at the end of the previous item
+ *      - items include the delimiting strings;
+ *        the delim is included at the end of the previous item
  *
  * STRSPLIT_KEEP_DELIM_AFTER    // = 0x04
- *     - items include the delimiting strings;
- *       the delim is included at the start of the next item
+ *      - items include the delimiting strings;
+ *        the delim is included at the start of the next item
+ *
+ * STRSPLIT_STRIP_RESULTS       // = 0x08
+ *      - strips whitespace from either end of each entry
+ *        only for string_split() (not regex)
  * @endcode
  */
 typedef unsigned int strsplit_mode_t;
