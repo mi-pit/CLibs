@@ -352,6 +352,10 @@ ERROR:
 }
 
 
+Private const strsplit_mode_t ALL_MODES =
+        STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY | STRSPLIT_KEEP_DELIM_AFTER |
+        STRSPLIT_KEEP_DELIM_BEFORE;
+
 Private ssize_t string_split_empty( str_t **str_arr_cont, const string_t string )
 {
     const size_t count = strlen( string );
@@ -383,6 +387,12 @@ ssize_t string_split( str_t **str_arr_cont,
         return fwarnx_ret( RV_EXCEPTION, "invalid split token" );
     if ( string == NULL )
         return fwarnx_ret( RV_EXCEPTION, "string cannot be null" );
+
+    if ( mode & ~ALL_MODES ) // contains mode not in ALL_MODES
+        return fwarnx_ret( RV_EXCEPTION,
+                           "invalid mode: 0x%X, only valid options are 0x%X",
+                           mode,
+                           ALL_MODES );
 
     if ( strcmp( split_tok, "" ) == 0 )
     {
@@ -455,6 +465,17 @@ ssize_t string_split_regex( str_t **str_arr_cont,
                             const regex_t *const __restrict regexp,
                             const strsplit_mode_t mode )
 {
+    if ( string == NULL )
+        return fwarnx_ret( RV_EXCEPTION, "string may not be NULL" );
+    if ( regexp == NULL )
+        return fwarnx_ret( RV_EXCEPTION, "regexp may not be NULL" );
+
+    if ( mode & ~ALL_MODES ) // contains mode not in ALL_MODES
+        return fwarnx_ret( RV_EXCEPTION,
+                           "invalid mode: 0x%X, only valid options are 0x%X",
+                           mode,
+                           ALL_MODES );
+
     struct dynamic_array *ls = list_init_type( str_t );
     if ( ls == NULL )
         return f_stack_trace( RV_ERROR );
