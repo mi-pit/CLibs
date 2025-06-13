@@ -64,5 +64,5 @@ int main( void )
     RUN_TEST( init );
     RUN_TEST( insert );
 
-    return 0;
+    FINISH_TESTING();
 }

@@ -15,6 +15,9 @@
 #define DEFAULT_DYNSTRING_CAP 256
 
 
+typedef struct dynamic_string DynString;
+
+
 /* ==== Constructors/Destructors ==== */
 /**
  * Heap allocates a new DynamicString with a capacity of DEFAULT_DYNSTRING_CAP
@@ -53,8 +56,8 @@ int dynstr_append( struct dynamic_string *, const char *app );
  * Appends at most `len` characters to the end of the dynstr
  * <p>
  * `app` may not be NULL
+ * </p>
  *
- * @param dynstr
  * @param app       appended string
  * @param len       maximum number of chars appended
  * @return RV_SUCCESS on success, RV_ERROR on allocation error

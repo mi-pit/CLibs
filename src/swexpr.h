@@ -10,7 +10,6 @@
 #include <err.h>     /* err() */
 #include <errno.h>   /* ENOMEM */
 #include <stdbool.h> /* bool */
-#include <string.h>  /* memcpy() */
 
 
 LibraryDefined void *swex_aux_variable_;

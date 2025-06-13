@@ -32,6 +32,7 @@ void run_string_utils( void )
 {
     RUN_TEST( replace );
     RUN_TEST( escape );
+    RUN_TEST( unescape );
     RUN_TEST( strspl_str );
     RUN_TEST( strspl_regex );
     RUN_TEST( string_to_UL );
@@ -45,6 +46,7 @@ void run_string_utils( void )
 void run_foreach( void )
 {
     RUN_TEST( foreach );
+    RUN_TEST( foreach_set );
 }
 
 void run_swex( void )

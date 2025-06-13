@@ -1,25 +1,36 @@
 #include "item_print_functions.h"
 
 #include "Dev/errors.h"
+#include "Dev/extra_types.h"
 #include "Dev/pointer_utils.h"
-#include "extra_types.h"
 
 #include <err.h>
 #include <stdio.h>
 #include <string.h>
 
 
-void print_byte( const void *data, size_t nbytes )
+void print_byte( const void *data, const size_t nbytes )
 {
     printf( "'" );
     for ( size_t i = 0; i < nbytes; ++i )
     {
         if ( i != 0 )
             printf( " " );
-        byte n = deref_as_offset( byte, data, i );
+        const byte n = deref_as_offset( byte, data, i );
         printf( "%02x", n );
     }
     printf( "'" );
+}
+
+void print_bool( const void *data, const size_t nbytes )
+{
+    if ( nbytes != sizeof( bool ) )
+    {
+        fwarnx( "invalid data" );
+        return;
+    }
+
+    printf( "%s", deref_as( bool, data ) ? "true" : "false" );
 }
 
 define_print_func( int, "%-d" );
@@ -37,7 +48,7 @@ define_print_func( double, "%.4f" );
 define_print_func( int8_t, "%3d" );
 
 
-void print_pointer( const void *data, size_t nbytes )
+void print_pointer( const void *data, const size_t nbytes )
 {
     if ( nbytes != sizeof( void * ) )
     {
@@ -45,22 +56,22 @@ void print_pointer( const void *data, size_t nbytes )
         return;
     }
 
-    printf( "'pointer: \"%p\"'", *( ( void ** ) data ) );
+    printf( "'pointer: \"%p\"'", *( void ** ) data );
 }
 
-void print_string( const void *data, size_t nbytes )
+void print_string( const void *data, const size_t nbytes )
 {
     if ( nbytes != strlen( data ) )
     {
-        warnx( "%s: strlen != nbytes", __func__ );
+        fwarnx( "strlen != nbytes" );
         return;
     }
-    printf( "\"%s\"", ( char * ) data );
+    printf( "\"%s\"", deref_as( const char *, data ) );
 }
 
-void print_str( const void *data, size_t nbytes )
+void print_string_direct( const void *data, const size_t nbytes )
 {
-    print_string( data, nbytes );
+    printf( "\"%.*s\"", ( int ) nbytes, ( const char * ) data );
 }
 
 

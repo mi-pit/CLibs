@@ -2,7 +2,7 @@
 #define CLIBS_MISC_H
 
 #include "Dev/attributes.h" /* LibraryDefined */
-#include "extra_types.h"    /* byte, (u)int64_t */
+#include "Dev/extra_types.h"
 
 #include <stdbool.h> /* bool (is_within) */
 #include <stddef.h>  /* size_t */
@@ -30,7 +30,7 @@ typedef enum {
 /**
  * Sign ( -1, 0, 1 ) of the number
  */
-LibraryDefined Mathematical inline signed int sgn_64( int64_t n )
+LibraryDefined Mathematical inline signed int sgn_64( const int64_t n )
 {
     return n == 0 ? 0 : n < 0 ? -1 : 1;
 }
@@ -63,20 +63,20 @@ LibraryDefined Mathematical inline signed int sgn_64( int64_t n )
  */
 #define max_m( NUM_A, NUM_B ) ( ( NUM_A ) > ( NUM_B ) ? ( NUM_A ) : ( NUM_B ) )
 
-LibraryDefined Mathematical inline int64_t min_i64( int64_t a, int64_t b )
+LibraryDefined Mathematical inline int64_t min_i64( const int64_t a, const int64_t b )
 {
     return min_m( a, b );
 }
-LibraryDefined Mathematical inline uint64_t min_u64( uint64_t a, uint64_t b )
+LibraryDefined Mathematical inline uint64_t min_u64( const uint64_t a, const uint64_t b )
 {
     return min_m( a, b );
 }
 
-LibraryDefined Mathematical inline int64_t max_i64( int64_t a, int64_t b )
+LibraryDefined Mathematical inline int64_t max_i64( const int64_t a, const int64_t b )
 {
     return max_m( a, b );
 }
-LibraryDefined Mathematical inline uint64_t max_u64( uint64_t a, uint64_t b )
+LibraryDefined Mathematical inline uint64_t max_u64( const uint64_t a, const uint64_t b )
 {
     return max_m( a, b );
 }
@@ -120,12 +120,14 @@ DEFINE_CMP_FUNCTION( uint64_t )
 
 /**
  * Creates an arbitrary hash of any data of the specified length
- * @param len number of bytes (chars) under the pointer
+ *
+ * @param nbytes number of bytes (chars) under the pointer
  * @return unsigned 64-bit int hash
  */
-uint64_t hash_func( const void *, size_t len );
+uint64_t hash_func( const void *, size_t nbytes );
 
 
+/// Number of elements in an array (stack-allocated)
 #define countof( array ) ( sizeof( array ) / sizeof *( array ) )
 
 /**
@@ -135,11 +137,12 @@ uint64_t hash_func( const void *, size_t len );
  * @param low   lower bound
  * @param num   tested number
  * @param high  upper bound
- * @return true if ‹ low \<= num \<= high ›
+ * @return true if ‹ low <= num <= high ›
  */
-LibraryDefined inline bool is_within( int64_t low, int64_t num, int64_t high )
+LibraryDefined inline bool is_within( const int64_t low, const int64_t num,
+                                      const int64_t high )
 {
-    return ( ( num ) >= ( low ) && ( num ) <= ( high ) );
+    return num >= low && num <= high;
 }
 
 

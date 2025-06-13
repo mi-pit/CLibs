@@ -26,7 +26,7 @@
 #define RV_ERROR     ( -1 ) /* Fatal, un-recoverable error */
 #define RV_SUCCESS   0      /* Success */
 
-LibraryDefined const char *rv_to_string( int rv )
+LibraryDefined const char *rv_to_string( const int rv )
 {
     switch ( rv )
     {
@@ -106,7 +106,7 @@ LibraryDefined const char *rv_to_string( int rv )
  * <p>
  * Prints
  * @code
- * ‹executable name›: ‹FileName›: ‹FunctionName› @ LineNumber: ‹formatted string›[:strerror(err_no)]
+ * ‹executable name›: ‹FileName›: ‹FunctionName› @ LineNumber: ‹formatted string›[: strerror(err_no)]
  * @endcode
  * </p>
  * <p>
@@ -114,11 +114,13 @@ LibraryDefined const char *rv_to_string( int rv )
  * then they are not printed.
  * </p>
  *
- * @example actual function-like macro defined in errors.h:
+ * @example
+ * actual function-like macro defined in errors.h:
  * @code
  * #define fwarn( ... )  ( void ) WarnUniversal( NULL, __func__, -1, errno, -1, __VA_ARGS__ )
  * @endcode
  *
+ * @param PrintProgName true if the function should print the executable name
  * @param FileName      name of the current file (__FILE_NAME__)
  * @param FunctionName  name of the function (__func__)
  * @param LineNumber    number of the line to warn about (__LINE__)
@@ -126,16 +128,17 @@ LibraryDefined const char *rv_to_string( int rv )
  * @param return_value  returned value
  * @param format        format string
  * @param ...           printf-like arguments for ‹format›
- * @return @code return_value @endcode
+ * @return @code return_value@endcode
+ *
  * @bugs %p for some reason sometimes throws compiler errors for non `void *` pointers
  */
 LibraryDefined PrintfLike( 7, 8 ) Cold ptrdiff_t
-        WarnUniversal( bool PrintProgName,
+        WarnUniversal( const bool PrintProgName,
                        const char *__restrict FileName,
                        const char *__restrict FunctionName,
-                       int LineNumber,
-                       int err_no,
-                       ptrdiff_t return_value,
+                       const int LineNumber,
+                       const int err_no,
+                       const ptrdiff_t return_value,
                        const char *__restrict format,
                        ... )
 {

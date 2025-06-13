@@ -6,8 +6,7 @@
 #include <stdbool.h>
 
 
-typedef struct key_value_pair_set *Dict;
-typedef const struct key_value_pair_set *ConstDict;
+typedef struct dictionary Dictionary;
 
 
 struct key_value_pair {
@@ -31,20 +30,29 @@ enum DictRemoveRV {
 };
 
 
-Dict dict_init( void );
+struct dictionary *dict_init( void );
 
 
 /**
- * Only compares the data in key and key_size
- * @param item_1 const struct key_value_pair *
- * @param item_2 const struct key_value_pair *
- * @return  -1, 0, 1 like memcmp
+ * Only compares the data in `key` and `key_size`
+ *
+ * @return  -1, 0, 1
  */
-int item_key_cmp( const void *item_1, const void *item_2 );
+int item_key_cmp( const void *, const void * );
+/**
+ * Only compares the data in `val` and `val_size`
+ *
+ * @return  -1, 0, 1
+ */
 int item_val_cmp( const void *, const void * );
+/**
+ * Compares the keys first, then values
+ *
+ * @return  -1, 0, 1
+ */
 int item_cmp( const void *, const void * );
 
-int dict_insert_f( Dict,
+int dict_insert_f( struct dictionary *,
                    const void *key,
                    size_t key_size,
                    const void *val,
@@ -62,33 +70,33 @@ int dict_insert_f( Dict,
  * @param val_size sizeof val
  * @return
  */
-int dict_insert( Dict,
+int dict_insert( struct dictionary *,
                  const void *key,
                  size_t key_size,
                  const void *val,
                  size_t val_size );
 
-const struct key_value_pair *dict_get( ConstDict, const void *key, size_t key_size );
+const struct key_value_pair *dict_get( const struct dictionary *, const void *key, size_t key_size );
 
-const void *dict_get_val( ConstDict, const void *key, size_t key_size );
-int dict_set_val( Dict,
+const void *dict_get_val( const struct dictionary *, const void *key, size_t key_size );
+int dict_set_val( struct dictionary *,
                   const void *key,
                   size_t key_size,
                   const void *val,
                   size_t val_size );
 
-enum DictRemoveRV dict_remove( Dict, const void *data, size_t nbytes );
+enum DictRemoveRV dict_remove( struct dictionary *, const void *key_data, size_t key_size );
 
 
 /* -------- SIZE/CAP -------- */
 
-size_t dict_size( ConstDict );
-size_t dict_cap( ConstDict );
-struct key_value_pair *dict_items_as_array( ConstDict dict );
+size_t dict_size( const struct dictionary * );
+size_t dict_cap( const struct dictionary * );
+struct key_value_pair *dict_items_as_array( const struct dictionary *dict );
 
 /* -------- DESTRUCTOR -------- */
 
-void dict_destroy( Dict );
+void dict_destroy( struct dictionary * );
 
 
 /* -------- PRINT -------- */
@@ -115,8 +123,8 @@ void dict_destroy( Dict );
 /**
  * Prints the contents of the dictionary as "‹key›: ‹val›"
  */
-void dict_print( ConstDict );
-void dict_print_as( ConstDict, PrintFunction key_print, PrintFunction val_print );
+void dict_print( const struct dictionary * );
+void dict_print_as( const struct dictionary *, PrintFunction key_print, PrintFunction val_print );
 
 void kvp_print( const struct key_value_pair *item, const char *kv_sep );
 void kvp_print_as( const struct key_value_pair *item,

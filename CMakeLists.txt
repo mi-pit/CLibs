@@ -56,12 +56,6 @@ set(CLIB_PUBLIC_HDRS
 
 add_library(clib_core STATIC ${CLIB_SOURCES})
 
-target_include_directories(clib_core PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/Structs
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dev
-)
-
 install(TARGETS clib_core ARCHIVE DESTINATION lib)
 
 
@@ -75,11 +69,6 @@ add_executable(Tests
         Tests/tests.c
 )
 target_link_libraries(Tests PRIVATE clib_core)
-target_include_directories(Tests PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dev
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tests
-)
 
 # Register it with CTest so that “ctest” will pick it up automatically:
 add_test(
@@ -92,17 +81,18 @@ add_executable(TestSets
         Tests/test_sets.c
 )
 target_link_libraries(TestSets PRIVATE clib_core)
-target_include_directories(TestSets PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/Dev
-        ${CMAKE_CURRENT_SOURCE_DIR}/Structs
-        ${CMAKE_CURRENT_SOURCE_DIR}/Tests
-)
 
 add_test(
         NAME sets_tests
         COMMAND TestSets
 )
+
+
+# Don't add_test, because this one should fail in some way
+add_executable(TestUnitTests
+        Tests/test_unit_tests.c
+)
+target_link_libraries(TestUnitTests PRIVATE clib_core)
 
 
 # Add more tests here…

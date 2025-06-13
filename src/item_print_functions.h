@@ -2,9 +2,9 @@
 #define CLIBS_PRINT_FUNCTIONS_H
 
 #include "Dev/attributes.h"
+#include "Dev/errors.h"
 
 #include <stdbool.h>
-#include <stddef.h>
 
 
 #ifndef LINE_DELIM
@@ -29,6 +29,7 @@ LibraryDefined bool PrintType = false;
 declare_print_func( byte );
 
 /* Basic types */
+declare_print_func( bool );
 declare_print_func( int );
 declare_print_func( size_t );
 declare_print_func( ssize_t );
@@ -37,11 +38,10 @@ declare_print_func( char );
 declare_print_func( float );
 declare_print_func( double );
 declare_print_func( pointer );
-declare_print_func( ptr );
 
 /* Special */
-declare_print_func( string ); /* These two      */
-declare_print_func( str );    /* are equivalent */
+declare_print_func( string );
+declare_print_func( string_direct );
 
 declare_print_func( List );
 declare_print_func( Set );
@@ -51,24 +51,24 @@ declare_print_func( Dict );
 #define REQUIRE_SEMICOLON struct DECLARATION_MACRO_UNUSED_STRUCT
 #endif //REQUIRE_SEMICOLON
 
-#define define_print_func( type, format_str )                      \
-    void print_function( type )( const void *data, size_t nbytes ) \
-    {                                                              \
-        if ( nbytes != sizeof( type ) )                            \
-        {                                                          \
-            fprintf( stderr, "%s: invalid data", __func__ );       \
-            return;                                                \
-        }                                                          \
-                                                                   \
-        if ( PrintType )                                           \
-        {                                                          \
-            printf( "‹" );                                         \
-            printf( #type TYPE_SEPARATOR );                        \
-        }                                                          \
-        printf( format_str, *( ( type * ) data ) );                \
-        if ( PrintType )                                           \
-            printf( "›" );                                         \
-    }                                                              \
+#define define_print_func( type, format_str )                            \
+    void print_function( type )( const void *data, const size_t nbytes ) \
+    {                                                                    \
+        if ( nbytes != sizeof( type ) )                                  \
+        {                                                                \
+            fwarnx( "invalid data" );                                    \
+            return;                                                      \
+        }                                                                \
+                                                                         \
+        if ( PrintType )                                                 \
+        {                                                                \
+            printf( "‹" );                                               \
+            printf( #type TYPE_SEPARATOR );                              \
+        }                                                                \
+        printf( format_str, *( ( type * ) data ) );                      \
+        if ( PrintType )                                                 \
+            printf( "›" );                                               \
+    }                                                                    \
     REQUIRE_SEMICOLON
 
 #endif //CLIBS_PRINT_FUNCTIONS_H

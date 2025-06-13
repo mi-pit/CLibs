@@ -58,6 +58,7 @@ Tester test_one_escape( string_t old, string_t new )
 
 TEST( escape )
 {
+    UNIT_TEST( test_one_escape( "", "" ) );
     UNIT_TEST( test_one_escape( "Hopspop", "Hopspop" ) );
     UNIT_TEST( test_one_escape( "Hopspop\n", "Hopspop\\n" ) );
     UNIT_TEST( test_one_escape( "Hopspop\nKokot\n", "Hopspop\\nKokot\\n" ) );
@@ -69,12 +70,26 @@ TEST( escape )
 END_TEST
 
 
-static void free_spl( const size_t count, str_t strings[ count ] )
+Tester test_one_unescape( string_t old, string_t new )
 {
-    for ( size_t i = 0; i < count; ++i )
-        free( strings[ i ] );
-    free( strings );
+    str_t esc = string_unescaped( old );
+    bool rv   = strcmp( esc, new ) == 0;
+    free( esc );
+    return rv;
 }
+
+TEST( unescape )
+{
+    UNIT_TEST( test_one_unescape( "", "" ) );
+    UNIT_TEST( test_one_unescape( "Hopspop", "Hopspop" ) );
+    UNIT_TEST( test_one_unescape( "Hopspop\\n", "Hopspop\n" ) );
+    UNIT_TEST( test_one_unescape( "Hopspop\n", "Hopspop\n" ) );
+    UNIT_TEST( test_one_unescape( "\\n\\r\\v\\t\\\\\\\"", "\n\r\v\t\\\"" ) );
+    UNIT_TEST( test_one_unescape( "Hops\0pop", "Hops" ) );
+}
+END_TEST
+
+
 Tester test_one_strspl_str( string_t haystack,
                             string_t split_tok,
                             strsplit_mode_t mode,
@@ -82,32 +97,29 @@ Tester test_one_strspl_str( string_t haystack,
                             ... )
 {
     str_t *spl;
-    ssize_t strspl_rv = string_split( &spl, haystack, split_tok, mode );
+    const ssize_t strspl_rv = string_split( &spl, haystack, split_tok, mode );
     if ( strspl_rv < 0 )
-    {
-        ffl_stack_trace( 0 );
-        exit( 1 );
-    }
+        exit( ffl_stack_trace( 1 ) );
 
-    size_t n_got = ( size_t ) strspl_rv;
+    const size_t n_got = ( size_t ) strspl_rv;
 
-    bool rv = n_got == n_split;
-    if ( !rv )
+    if ( n_got != n_split )
     {
-        free_spl( n_got, spl );
+        string_split_destroy( n_got, &spl );
         return false;
     }
 
+    bool rv = true;
     va_list vaList;
     va_start( vaList, n_split );
     for ( size_t i = 0; i < n_got && rv; ++i )
     {
-        string_t cmp = va_arg( vaList, string_t );
-        rv           = strcmp( spl[ i ], cmp ) == 0;
+        const string_t cmp = va_arg( vaList, string_t );
+        rv                 = strcmp( spl[ i ], cmp ) == 0;
     }
     va_end( vaList );
 
-    free_spl( n_got, spl );
+    string_split_destroy( n_got, &spl );
     return rv;
 }
 Tester test_one_strspl_regex( string_t haystack,
@@ -139,7 +151,7 @@ Tester test_one_strspl_regex( string_t haystack,
     bool rv = n_got == n_split;
     if ( !rv )
     {
-        free_spl( n_got, spl );
+        string_split_destroy( n_got, &spl );
         return false;
     }
 
@@ -152,7 +164,7 @@ Tester test_one_strspl_regex( string_t haystack,
     }
     va_end( vaList );
 
-    free_spl( n_got, spl );
+    string_split_destroy( n_got, &spl );
     regfree( &reg );
 
     return rv;
@@ -193,12 +205,12 @@ TEST( strspl_str )
                                     "Sracka. ",
                                     "Kokot." ) );
 
-    UNIT_TEST( test_one_strspl_str( CSV_STR, ".", 0xFF, 1, CSV_STR ) );
+    UNIT_TEST( test_one_strspl_str( CSV_STR, ".", 0, 1, CSV_STR ) );
 
-    UNIT_TEST( test_one_strspl_str(
-            CSV_STR, ";", 0, 4, "Hovno", "Prdel", "Sracka", "Kokot" ) );
-    UNIT_TEST( test_one_strspl_str(
-            CSV_STR ";", ";", 0, 5, "Hovno", "Prdel", "Sracka", "Kokot", "" ) );
+    UNIT_TEST( test_one_strspl_str( CSV_STR, ";", 0, 4, "Hovno", "Prdel", "Sracka",
+                                    "Kokot" ) );
+    UNIT_TEST( test_one_strspl_str( CSV_STR ";", ";", 0, 5, "Hovno", "Prdel", "Sracka",
+                                    "Kokot", "" ) );
 
     UNIT_TEST( test_one_strspl_str( CSV_STR ";",
                                     ";",
@@ -249,6 +261,28 @@ TEST( strspl_str )
     UNIT_TEST( test_one_strspl_str( "ABCDEF", "", 0, 6, "A", "B", "C", "D", "E", "F" ) );
 
     UNIT_TEST( test_one_strspl_str( "", "", 0, 0 ) );
+
+    UNIT_TEST( test_one_strspl_str( "Jedna, Dva, Tri , Ctyri ",
+                                    ",",
+                                    STRSPLIT_STRIP_RESULTS,
+                                    4,
+                                    "Jedna",
+                                    "Dva",
+                                    "Tri",
+                                    "Ctyri" ) );
+
+    UNIT_TEST( test_one_strspl_str( "\n \rJedna, Dva, Tri , \t \n\n\r \v\v Ctyri \n", ",",
+                                    STRSPLIT_STRIP_RESULTS, 4, "Jedna", "Dva", "Tri",
+                                    "Ctyri" ) );
+
+    UNIT_TEST( test_one_strspl_str( " ,   ,,neco", ",",
+                                    STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY, 1,
+                                    "neco" ) );
+
+    UNIT_TEST( test_one_strspl_str( " dva tri", " ", 0, 3, "", "dva", "tri" ) );
+
+    UNIT_TEST( test_one_strspl_str( " dva tri", " ", STRSPLIT_STRIP_RESULTS, 3, "", "dva",
+                                    "tri" ) );
 }
 END_TEST
 
@@ -325,8 +359,8 @@ TEST( strspl_regex )
                                       ";Sracka",
                                       ",Kokot" ) );
 
-    UNIT_TEST( test_one_strspl_regex(
-            ";;a,,b,c,;d;e", "[,;]", 0, 0, 9, "", "", "a", "", "b", "c", "", "d", "e" ) );
+    UNIT_TEST( test_one_strspl_regex( ";;a,,b,c,;d;e", "[,;]", 0, 0, 9, "", "", "a", "",
+                                      "b", "c", "", "d", "e" ) );
 
     UNIT_TEST( test_one_strspl_regex( ";;a,,b,c,;d;e",
                                       "[,;]",

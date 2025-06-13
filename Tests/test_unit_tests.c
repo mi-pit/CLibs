@@ -2,9 +2,9 @@
 // Created by MacBook on 03.01.2025.
 //
 
-#include "../Dev/errors.h"
-#include "../Dev/unit_tests.h"
-#include "../misc.h"
+#include "../src/Dev/errors.h"
+#include "../src/Dev/unit_tests.h"
+#include "../src/misc.h"
 
 #include <string.h>
 
@@ -31,22 +31,41 @@ TEST( this_one_actually_passes )
     UNIT_TEST( true );
 
     UNIT_TEST( fwarnx_ret( 123, "Testing warn & stack trace" ) == 123 );
-    UNIT_TEST( f_stack_trace( -1 ) == ( int ) -1 );
+    UNIT_TEST( f_stack_trace( -1 ) == -1 );
+}
+END_TEST
+
+TEST( loop )
+{
+    {
+        const bool no_loop = true;
+        UNIT_TEST( no_loop );
+    }
+
+    SET_UNIT_TEST_VERBOSITY( false );
+    const bool this_one_should_show = false;
+    UNIT_TEST( this_one_should_show );
+    {
+        const bool this_one_shouldnt_show = true;
+        for ( int i = 0; i < 10; ++i )
+            UNIT_TEST( this_one_shouldnt_show );
+    }
+    SET_UNIT_TEST_VERBOSITY( true );
+
+    {
+        const bool loop_finished = true;
+        UNIT_TEST( loop_finished );
+    }
 }
 END_TEST
 
 
 int main( void )
 {
-    int a, b, c, d;
-    UNUSED( a );
-    UNUSED( b );
-    UNUSED( c );
-    UNUSED( d );
-
     RUN_TEST( all_fail );
     RUN_TEST( test_example );
     RUN_TEST( this_one_actually_passes );
+    RUN_TEST( loop );
 
     f_stack_trace( 0 );
 

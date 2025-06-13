@@ -11,14 +11,16 @@
 #include "../src/string_utils.h"
 #include "../src/Structs/dynarr.h"
 #include "../src/Structs/dynstring.h"
+#include "../src/Structs/sets.h"
 
-// must be after dynarr.h
-#include "../src/foreach.h"
+// must be after dynarr.h and sets.h
+#include "../src/Dev/foreach.h"
+#include "../src/Dev/pointer_utils.h"
 
 
 Tester test_one_foreach_arr( const int64_t arr[], const size_t count )
 {
-    foreach_arr( int64_t, num, arr, count )
+    foreach_arr ( int64_t, num, arr, count )
     {
         if ( num != arr[ foreach_index_num ] )
             return false;
@@ -31,7 +33,7 @@ Tester test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
 {
     assert_that( list_size( numbers_ls ) == count, "list size != array size" );
 
-    foreach_ls( int64_t, num, numbers_ls )
+    foreach_ls ( int64_t, num, numbers_ls )
     {
         if ( num != numbers_arr[ foreach_index_num ] )
             return false;
@@ -40,16 +42,20 @@ Tester test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
 }
 Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
 {
-    foreach_uni( int64_t, num, numbers_arr[ foreach_index_num ], count )
+    foreach_uni ( const int64_t,
+                  num,
+                  numbers_arr[ foreach_index_num ],
+                  numbers_arr[ foreach_index_num ],
+                  count )
     {
         if ( num != numbers_arr[ foreach_index_num ] )
             return false;
     }
     return true;
 }
-Tester test_one_foreach_str( string_t str )
+Tester test_one_foreach_str( const string_t str )
 {
-    foreach_str( c, str )
+    foreach_str ( c, str )
     {
         if ( foreach_cap_c != strlen( str ) )
         {
@@ -70,7 +76,7 @@ Tester test_one_foreach_dynstr( string_t str )
     assert_that( dynstr != NULL, "dynstr init" );
     assert_that( strlen( str ) == dynstr_len( dynstr ), "dynstr len" );
 
-    foreach_str( c, dynstr_data( dynstr ) )
+    foreach_str ( c, dynstr_data( dynstr ) )
     {
         if ( foreach_cap_c != strlen( str ) )
         {
@@ -93,7 +99,7 @@ TEST( foreach )
 {
     struct dynamic_array *numbers_ls = list_init_type( int64_t );
     assert_that( numbers_ls != NULL, "list init" );
-    int64_t numbers_arr[] = {
+    const int64_t numbers_arr[] = {
         1, 2, 4, 6, 7, -1, 2323, 3195,
     };
     assert_that( list_extend( numbers_ls, numbers_arr, countof( numbers_arr ) ) ==
@@ -112,6 +118,42 @@ TEST( foreach )
     UNIT_TEST( test_one_foreach_dynstr( "" ) );
     UNIT_TEST( test_one_foreach_dynstr( "HOVNO" ) );
     UNIT_TEST( test_one_foreach_dynstr( "a\nb'\0'" ) );
+}
+END_TEST
+
+
+TEST( foreach_set )
+{
+    Set *const set = set_init();
+    assert_that( set != NULL, "set init" );
+
+    assert_that( set_insert( set, &set, sizeof set ) == SETINSERT_INSERTED,
+                 "couldn't insert set" );
+    const int num = 1423;
+    assert_that( set_insert( set, &num, sizeof num ) == SETINSERT_INSERTED,
+                 "couldn't insert num" );
+
+    // check sanity
+    assert_that( set_insert( set, &set, sizeof set ) == SETINSERT_WAS_IN,
+                 "collision blocking not working" );
+    assert_that( set_size( set ) == 2, "two items must be present" );
+    assert_that( sizeof( Set * ) != sizeof( int ), "test assumes this" );
+
+    foreach_set ( set )
+    {
+        UNIT_TEST( entry.index >= 0 );
+        const struct set_item *item = entry.item;
+        assert_that( item != NULL && item->data != NULL, "entry item" );
+
+        UNIT_TEST( item->size == sizeof( Set * ) || item->size == sizeof( int ) );
+
+        if ( item->size == sizeof( Set * ) )
+            UNIT_TEST( deref_as( Set *, item->data ) == set );
+        else if ( item->size == sizeof( int ) )
+            UNIT_TEST( deref_as( int, item->data ) == num );
+    }
+
+    set_destroy( set );
 }
 END_TEST
 

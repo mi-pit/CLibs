@@ -45,13 +45,15 @@
     array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, "[ ", DELIM, " ]\n" )
 
 /**
- * Prints the array of a set length and type.\n
+ * Prints the array of a set length and type.
  * <p>
- * Items are separated by ", "\n
+ * Items are separated by ", "
+ * </p>
  * <p>
- * requires @code #include "Structs/dynstring.h" @endcode
+ * requires @code #include "Structs/dynstring.h"@endcode
+ * </p>
  *
- * @see \code array_printf_d
+ * @see \code array_printf_d\endcode
 */
 #define array_printf( ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
     array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ", " )
@@ -59,7 +61,7 @@
 /**
  * Creates a new string of the array contents. Old contents of STRINGVAR are overwritten
  * <p>
- * requires @code #include "Structs/dynstring.h" @endcode
+ * requires @code #include "Structs/dynstring.h"@endcode
  */
 #define array_sprintf_d( STRINGVAR, ARRAY, ARRLEN, TYPE, FMTSTR, DELIM )           \
     do                                                                             \

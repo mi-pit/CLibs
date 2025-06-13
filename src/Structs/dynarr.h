@@ -1,11 +1,10 @@
 #ifndef CLIBS_DYNAMIC_ARRAY_H
 #define CLIBS_DYNAMIC_ARRAY_H
 
-#include "../array_printf.h"   /* for list_printf */
+#include "../Dev/array_printf.h"
 #include "../Dev/attributes.h" /* Private */
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <sys/cdefs.h>
 
