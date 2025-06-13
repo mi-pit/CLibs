@@ -134,8 +134,8 @@ LibraryDefined const char *rv_to_string( const int rv )
  */
 LibraryDefined PrintfLike( 7, 8 ) Cold ptrdiff_t
         WarnUniversal( const bool PrintProgName,
-                       const char *FileName,
-                       const char *FunctionName,
+                       const char *__restrict FileName,
+                       const char *__restrict FunctionName,
                        const int LineNumber,
                        const int err_no,
                        const ptrdiff_t return_value,
