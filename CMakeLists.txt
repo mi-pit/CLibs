@@ -61,10 +61,10 @@ install(TARGETS clib_core ARCHIVE DESTINATION lib)
 
 enable_testing()
 
-add_executable(Tests
+add_executable(tests
         tests/tests.c
 )
-target_link_libraries(Tests PRIVATE clib_core)
+target_link_libraries(tests PRIVATE clib_core)
 
 # Register it with CTest so that “ctest” will pick it up automatically:
 add_test(
@@ -73,22 +73,22 @@ add_test(
 )
 
 
-add_executable(TestSets
+add_executable(test_sets
         tests/test_sets.c
 )
-target_link_libraries(TestSets PRIVATE clib_core)
+target_link_libraries(test_sets PRIVATE clib_core)
 
 add_test(
         NAME sets_tests
-        COMMAND TestSets
+        COMMAND test_sets
 )
 
 
 # Don't add_test, because this one should fail in some way
-add_executable(TestUnitTests
+add_executable(test_unit_tests
         tests/test_unit_tests.c
 )
-target_link_libraries(TestUnitTests PRIVATE clib_core)
+target_link_libraries(test_unit_tests PRIVATE clib_core)
 
 
 # Add more tests here…
