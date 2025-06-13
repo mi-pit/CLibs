@@ -76,10 +76,10 @@
  */
 #define Constructor UseResult
 
-/** Function is not visible outside the current file */
+/** Function or variable is not visible outside the current file */
 #define Private static
 
-/** Function is defined in a header file */
+/** Function or variable is defined in a header file */
 #define LibraryDefined static UsageOptional
 
 /**

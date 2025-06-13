@@ -33,7 +33,6 @@ add_compile_definitions(_POSIX_C_SOURCE=200809L)
 set(CLIB_SOURCES
         src/string_utils.c
         src/misc.c
-        src/swexpr.c
 
         src/Structs/dynarr.c
         src/Structs/dynstring.c
@@ -45,7 +44,7 @@ set(CLIB_SOURCES
 set(CLIB_PUBLIC_HDRS
         src/string_utils.h
         src/misc.h
-        src/swexpr.h
+        src/Dev/swexpr.h
 
         src/Structs/dynarr.h
         src/Structs/dynstring.h
