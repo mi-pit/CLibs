@@ -1,19 +1,20 @@
 *
 
 !.gitignore
-!CMakeLists.txt
-!.clang-format
 
 !/.github/
 !/.github/workflows/
 !*.yml
+
+!CMakeLists.txt
+!.clang-format
 
 !*.c
 !*.h
 
 !*.sh
 
-!/Tests/
+!/tests/
 !/src/
 !/src/Dev/
 !/src/Structs/
