@@ -35,9 +35,9 @@ set(CLIB_SOURCES
         src/item_print_functions.c
         src/math.c
 
-        src/Structs/dynarr.c
-        src/Structs/dynstring.c
-        src/Structs/sets.c
+        src/structs/dynarr.c
+        src/structs/dynstring.c
+        src/structs/sets.c
 )
 
 set(CLIB_PUBLIC_HDRS
@@ -45,10 +45,9 @@ set(CLIB_PUBLIC_HDRS
         src/item_print_functions.h
         src/math.h
 
-        src/Structs/dynarr.h
-        src/Structs/dynstring.h
-        src/Structs/sets.h
-
+        src/structs/dynarr.h
+        src/structs/dynstring.h
+        src/structs/sets.h
 )
 
 add_library(clib_core STATIC ${CLIB_SOURCES})
@@ -63,19 +62,19 @@ install(TARGETS clib_core ARCHIVE DESTINATION lib)
 enable_testing()
 
 add_executable(Tests
-        testing/tests.c
+        tests/tests.c
 )
 target_link_libraries(Tests PRIVATE clib_core)
 
 # Register it with CTest so that “ctest” will pick it up automatically:
 add_test(
         NAME all_unit_tests
-        COMMAND testing
+        COMMAND tests
 )
 
 
 add_executable(TestSets
-        testing/test_sets.c
+        tests/test_sets.c
 )
 target_link_libraries(TestSets PRIVATE clib_core)
 
@@ -87,7 +86,7 @@ add_test(
 
 # Don't add_test, because this one should fail in some way
 add_executable(TestUnitTests
-        testing/test_unit_tests.c
+        tests/test_unit_tests.c
 )
 target_link_libraries(TestUnitTests PRIVATE clib_core)
 
