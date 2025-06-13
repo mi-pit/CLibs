@@ -51,7 +51,7 @@
  */
 #define foreach_str( ITEM_NAME, STRING )                                      \
     foreach_helper_init( strlen( STRING ), ITEM_NAME ) foreach_helper_assign( \
-            char, ITEM_NAME, ( STRING )[ 0 ], ( STRING )[ foreach_index_##ITEM_NAME ] )
+            const char, ITEM_NAME, ( STRING )[ 0 ], ( STRING )[ foreach_index_##ITEM_NAME ] )
 
 #ifdef CLIBS_DYNAMIC_ARRAY_H
 /**

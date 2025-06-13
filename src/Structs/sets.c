@@ -190,7 +190,7 @@ Set *set_init( void )
         return SETINSERT_INSERTED;
     }
 
-    return RV_ERROR;
+    return fwarnx_ret( RV_EXCEPTION, "unrecognized error" );
 }
 
 int set_insert( Set *set, const void *data, const size_t len )

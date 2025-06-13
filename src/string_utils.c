@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-bool string_is_blank( string_t s )
+bool string_is_blank( const string_t s )
 {
     foreach_str ( c, s )
         if ( !isspace( c ) )
@@ -36,6 +36,7 @@ bool string_is_blank_l( const string_t s, const size_t len )
 
 
 // `string_stripped` is implemented separately from `strip` for memory efficiency
+
 str_t string_stripped_l( const string_t s, size_t length )
 {
     size_t start_idx = -1;
