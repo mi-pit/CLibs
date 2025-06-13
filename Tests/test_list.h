@@ -5,8 +5,8 @@
 #ifndef CLIBS_TEST_LIST_H
 #define CLIBS_TEST_LIST_H
 
+#include "../src/Dev/misc.h"       /* STRLEN */
 #include "../src/Dev/unit_tests.h" /* ... */
-#include "../src/misc.h"           /* STRLEN */
 #include "../src/Structs/dynarr.h" /* ... */
 
 

@@ -32,25 +32,23 @@ add_compile_definitions(_POSIX_C_SOURCE=200809L)
 
 set(CLIB_SOURCES
         src/string_utils.c
-        src/misc.c
+        src/item_print_functions.c
+        src/math.c
 
         src/Structs/dynarr.c
         src/Structs/dynstring.c
         src/Structs/sets.c
-
-        src/item_print_functions.c
 )
 
 set(CLIB_PUBLIC_HDRS
         src/string_utils.h
-        src/misc.h
-        src/Dev/swexpr.h
+        src/item_print_functions.h
+        src/math.h
 
         src/Structs/dynarr.h
         src/Structs/dynstring.h
         src/Structs/sets.h
 
-        src/item_print_functions.h
 )
 
 add_library(clib_core STATIC ${CLIB_SOURCES})

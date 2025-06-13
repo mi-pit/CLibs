@@ -3,8 +3,8 @@
 //
 
 #include "../src/Dev/errors.h"
+#include "../src/Dev/misc.h"
 #include "../src/Dev/unit_tests.h"
-#include "../src/misc.h"
 
 #include <string.h>
 

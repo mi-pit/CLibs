@@ -3,8 +3,8 @@
 
 #include "../Dev/errors.h" /* RVs, fwarn* */
 #include "../Dev/extra_types.h"
+#include "../Dev/misc.h"
 #include "../Dev/pointer_utils.h"
-#include "../misc.h" /* cmpeq() */
 
 #include <stdio.h>  /* *print* */
 #include <stdlib.h> /* malloc, free, bsearch, qsort */

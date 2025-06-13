@@ -3,10 +3,10 @@
 //
 #include "dynstring.h"
 
-#include "../Dev/errors.h"   /* RV, warn */
-#include "../misc.h"         /* min_64() */
-#include "../string_utils.h" /* vasprintf (in case it's not defined in <stdio.h>),
-                              * str_t, string_t */
+#include "../Dev/errors.h"      /* RV, warn */
+#include "../Dev/simple_math.h" /* min */
+#include "../string_utils.h"    /* vasprintf (in case it's not defined in <stdio.h>),
+                                 * str_t, string_t */
 
 #include <assert.h> //
 #include <stdio.h>  /* fprintf() */

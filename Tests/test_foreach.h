@@ -6,8 +6,8 @@
 #define CLIBS_TEST_FOREACH_H
 
 #include "../src/Dev/assert_that.h"
+#include "../src/Dev/misc.h"
 #include "../src/Dev/unit_tests.h"
-#include "../src/misc.h"
 #include "../src/string_utils.h"
 #include "../src/Structs/dynarr.h"
 #include "../src/Structs/dynstring.h"
