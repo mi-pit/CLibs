@@ -1,10 +1,10 @@
 
 #include "dynarr.h"
 
-#include "../Dev/errors.h" /* RVs, fwarn* */
-#include "../Dev/extra_types.h"
-#include "../Dev/misc.h"
-#include "../Dev/pointer_utils.h"
+#include "../headers/errors.h" /* RVs, fwarn* */
+#include "../headers/extra_types.h"
+#include "../headers/misc.h"
+#include "../headers/pointer_utils.h"
 
 #include <stdio.h>  /* *print* */
 #include <stdlib.h> /* malloc, free, bsearch, qsort */

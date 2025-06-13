@@ -5,17 +5,17 @@
 #ifndef CLIBS_TEST_FOREACH_H
 #define CLIBS_TEST_FOREACH_H
 
-#include "../src/Dev/assert_that.h"
-#include "../src/Dev/misc.h"
-#include "../src/Dev/unit_tests.h"
+#include "../src/headers/assert_that.h"
+#include "../src/headers/misc.h"
+#include "../src/headers/unit_tests.h"
 #include "../src/string_utils.h"
-#include "../src/Structs/dynarr.h"
-#include "../src/Structs/dynstring.h"
-#include "../src/Structs/sets.h"
+#include "../src/structs/dynarr.h"
+#include "../src/structs/dynstring.h"
+#include "../src/structs/sets.h"
 
 // must be after dynarr.h and sets.h
-#include "../src/Dev/foreach.h"
-#include "../src/Dev/pointer_utils.h"
+#include "../src/headers/foreach.h"
+#include "../src/headers/pointer_utils.h"
 
 
 Tester test_one_foreach_arr( const int64_t arr[], const size_t count )

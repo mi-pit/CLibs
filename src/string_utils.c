@@ -4,12 +4,12 @@
 
 #include "string_utils.h"
 
-#include "Dev/assert_that.h"   /* assert_that */
-#include "Dev/errors.h"        /* *warn* */
-#include "Dev/foreach.h"       /* foreach_arr */
-#include "Dev/simple_math.h"   /* min */
-#include "Structs/dynarr.h"    /* List */
-#include "Structs/dynstring.h" /* dynstr */
+#include "headers/assert_that.h" /* assert_that */
+#include "headers/errors.h"      /* *warn* */
+#include "headers/foreach.h"     /* foreach_arr */
+#include "headers/simple_math.h" /* min */
+#include "structs/dynarr.h"      /* List */
+#include "structs/dynstring.h"   /* dynstr */
 
 #include <ctype.h>
 #include <regex.h>

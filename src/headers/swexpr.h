@@ -4,7 +4,7 @@
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
 
-#include "../Structs/dynarr.h"
+#include "../structs/dynarr.h"
 #include "errors.h"
 #include "pointer_utils.h"
 

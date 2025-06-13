@@ -5,11 +5,11 @@
 #ifndef CLIBS_MATH_H
 #define CLIBS_MATH_H
 
-#include "Dev/attributes.h"
-#include "Dev/extra_types.h"
+#include "headers/attributes.h"
+#include "headers/extra_types.h"
 
 // import
-#include "Dev/simple_math.h"
+#include "headers/simple_math.h"
 
 
 /**

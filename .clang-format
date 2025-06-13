@@ -26,6 +26,12 @@ AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: Yes
+AttributeMacros:
+  - Private
+  - UsageOptional
+  - LibraryDefined
+  - NoReturn
+  - PrintfLike
 BinPackArguments: true
 BinPackParameters: true
 BreakBeforeBraces: Custom

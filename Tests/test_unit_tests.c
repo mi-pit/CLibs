@@ -2,9 +2,9 @@
 // Created by MacBook on 03.01.2025.
 //
 
-#include "../src/Dev/errors.h"
-#include "../src/Dev/misc.h"
-#include "../src/Dev/unit_tests.h"
+#include "../src/headers/errors.h"
+#include "../src/headers/misc.h"
+#include "../src/headers/unit_tests.h"
 
 #include <string.h>
 

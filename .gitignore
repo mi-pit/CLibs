@@ -16,6 +16,4 @@
 
 !/tests/
 !/src/
-!/src/Dev/
-!/src/Structs/
-!/src/Structs/Bigint/
+!/src/*

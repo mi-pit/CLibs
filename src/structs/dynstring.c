@@ -3,8 +3,8 @@
 //
 #include "dynstring.h"
 
-#include "../Dev/errors.h"      /* RV, warn */
-#include "../Dev/simple_math.h" /* min */
+#include "../headers/errors.h"      /* RV, warn */
+#include "../headers/simple_math.h" /* min */
 #include "../string_utils.h"    /* vasprintf (in case it's not defined in <stdio.h>),
                                  * str_t, string_t */
 

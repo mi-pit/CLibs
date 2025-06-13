@@ -1,6 +1,6 @@
-#include "../src/Dev/assert_that.h"
-#include "../src/Dev/unit_tests.h"
-#include "../src/Structs/sets.h"
+#include "../src/headers/assert_that.h"
+#include "../src/headers/unit_tests.h"
+#include "../src/structs/sets.h"
 
 TEST( init )
 {
