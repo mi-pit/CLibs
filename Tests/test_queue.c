@@ -15,10 +15,10 @@ struct queue_node {
 };
 
 struct fifo_queue {
-    struct queue_node *head;
-    struct queue_node *tail;
+    struct queue_node *head; // first in line; first out
+    struct queue_node *tail; // last
 
-    size_t el_size;
+    size_t el_size; // each element must be the same size
 };
 
 
@@ -100,15 +100,23 @@ TEST( get )
     for ( data = 0; data <= 123; data++ )
         assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
 
-    int got = -2;
+    int got;
+    got = -2;
     UNIT_TEST( queue_get( queue, 100, &got ) == RV_SUCCESS );
     UNIT_TEST( got == 99 );
+
+    int tail;
+    UNIT_TEST( queue_get( queue, queue_get_size( queue ) - 1, &got ) == RV_SUCCESS );
+    UNIT_TEST( queue_get_tail( queue, &tail ) == RV_SUCCESS );
+    UNIT_TEST( tail == got );
 
     got = -2;
     UNIT_TEST( queue_get( queue, 100, &got ) == RV_SUCCESS );
     UNIT_TEST( got == 99 );
 
     UNIT_TEST( queue_get( queue, 0, &got ) == RV_SUCCESS );
+    UNIT_TEST( got == -1 );
+    UNIT_TEST( queue_get_head( queue, &got ) == RV_SUCCESS );
     UNIT_TEST( got == -1 );
 
     UNIT_TEST( queue_get( queue, 1234, &got ) == RV_EXCEPTION );
@@ -125,14 +133,17 @@ TEST( get_size )
     assert_that( queue != NULL, "init failed" );
 
     UNIT_TEST( queue_get_size( queue ) == 0 );
+    UNIT_TEST( queue_is_empty( queue ) );
 
     int data = -1;
     assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
     UNIT_TEST( queue_get_size( queue ) == 1 );
+    UNIT_TEST( !queue_is_empty( queue ) );
     for ( data = 0; data <= 123; data++ )
     {
         assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
         UNIT_TEST( queue_get_size( queue ) == data + 2ul );
+        UNIT_TEST( !queue_is_empty( queue ) );
     }
 
     queue_destroy( queue );
