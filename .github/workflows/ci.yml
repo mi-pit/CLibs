@@ -77,6 +77,9 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           cd build
+          cc -D_POSIX_C_SOURCE=200809L -DUNIT_TESTS_SILENT -o tests ../src/*.c ../src/structs/*.c ../tests/tests.c
+          cc -D_POSIX_C_SOURCE=200809L -DUNIT_TESTS_SILENT -o test_sets ../src/*.c ../src/structs/*.c ../tests/test_sets.c
+          cc -D_POSIX_C_SOURCE=200809L -DUNIT_TESTS_SILENT -o test_queue ../src/*.c ../src/structs/*.c ../tests/test_queue.c
           leaks -quiet --atExit -- ./tests
           leaks -quiet --atExit -- ./test_sets
           leaks -quiet --atExit -- ./test_queue
@@ -86,6 +89,9 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           cd build
+          cc -D_POSIX_C_SOURCE=200809L -DUNIT_TESTS_SILENT -o tests ../src/*.c ../src/structs/*.c ../tests/tests.c
+          cc -D_POSIX_C_SOURCE=200809L -DUNIT_TESTS_SILENT -o test_sets ../src/*.c ../src/structs/*.c ../tests/test_sets.c
+          cc -D_POSIX_C_SOURCE=200809L -DUNIT_TESTS_SILENT -o test_queue ../src/*.c ../src/structs/*.c ../tests/test_queue.c
           valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./tests
           valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./test_sets
           valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./test_queue
