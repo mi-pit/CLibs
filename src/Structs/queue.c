@@ -96,7 +96,7 @@ int queue_dequeue( struct fifo_queue *queue, void *data_cont )
 }
 
 
-int queue_get( const struct fifo_queue *queue, size_t index, void *const data_cont )
+int queue_get( const struct fifo_queue *queue, const size_t index, void *const data_cont )
 {
     if ( queue->head == NULL )
         return fwarnx_ret( RV_EXCEPTION, "queue is empty" );
@@ -107,17 +107,25 @@ int queue_get( const struct fifo_queue *queue, size_t index, void *const data_co
         return RV_SUCCESS;
     }
 
+    size_t actual_size_idx      = 0;
+    size_t distance_from_target = index;
+
     const struct queue_node *node = queue->head;
     while ( ( node = node->next ) != NULL )
     {
-        if ( --index == 0 )
+        ++actual_size_idx;
+        if ( --distance_from_target == 0 )
         {
             memcpy( data_cont, node->data, queue->el_size );
             return RV_SUCCESS;
         }
+        assert( distance_from_target > 0 );
     }
 
-    return fwarnx_ret( RV_EXCEPTION, "queue index out of bounds" );
+    return fwarnx_ret( RV_EXCEPTION,
+                       "queue index %zu out of bounds for queue of length %zu",
+                       index,
+                       actual_size_idx );
 }
 
 int queue_get_head( const struct fifo_queue *queue, void *data_cont )
