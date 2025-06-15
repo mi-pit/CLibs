@@ -7,14 +7,6 @@ set(CMAKE_C_STANDARD 99)
 #  1) Set sanitizer flags and “build type” as options
 # ————————————————————————————————————
 
-# Option to enable Address+Undefined sanitizer (ON by default for Debug builds).
-option(USE_SANITIZERS "Compile & link with -fsanitize=address,undefined" OFF)
-if (USE_SANITIZERS)
-    message(STATUS "→ Building with Address+Undefined sanitizers enabled")
-    add_compile_options(-fsanitize=address -fsanitize=undefined)
-    add_link_options(-fsanitize=address -fsanitize=undefined)
-endif ()
-
 # Allow the user to pass -DCMAKE_BUILD_TYPE=Debug/Release from the command line.
 # By default, set it to “Release” if nothing was specified:
 if (NOT CMAKE_BUILD_TYPE)
@@ -63,44 +55,63 @@ install(TARGETS clib_core ARCHIVE DESTINATION lib)
 #  3) Enable CTest and define each test executable
 # ————————————————————————————————————
 
-enable_testing()
+# Don't add_test, because this one should fail in some way
+add_executable(test_unit_tests
+        tests/test_unit_tests.c
+)
+target_link_libraries(test_unit_tests PRIVATE clib_core)
+
+# ================ Without ASAN ================
 
 add_executable(tests
         tests/tests.c
 )
 target_link_libraries(tests PRIVATE clib_core)
-add_test(
-        NAME all_unit_tests
-        COMMAND tests
-)
-
 
 add_executable(test_sets
         tests/test_sets.c
 )
 target_link_libraries(test_sets PRIVATE clib_core)
-add_test(
-        NAME sets_tests
-        COMMAND test_sets
-)
-
 
 add_executable(test_queue
         tests/test_queue.c
 )
 target_link_libraries(test_queue PRIVATE clib_core)
 target_compile_definitions(test_queue PUBLIC UNIT_TESTS_SILENT)
+
+
+# ================ With ASAN ================
+enable_testing()
+
+add_executable(tests_asan
+        tests/tests.c
+)
+target_link_options(tests_asan PRIVATE -fsanitize=address -fsanitize=undefined)
+target_link_libraries(tests_asan PRIVATE clib_core)
+add_test(
+        NAME all_unit_tests
+        COMMAND tests
+)
+
+add_executable(test_sets_asan
+        tests/test_sets.c
+)
+target_link_options(test_sets_asan PRIVATE -fsanitize=address -fsanitize=undefined)
+target_link_libraries(test_sets_asan PRIVATE clib_core)
+add_test(
+        NAME sets_tests
+        COMMAND test_sets_asan
+)
+
+add_executable(test_queue_asan
+        tests/test_queue.c
+)
+target_link_libraries(test_queue_asan PRIVATE clib_core)
+target_compile_definitions(test_queue_asan PUBLIC UNIT_TESTS_SILENT)
 add_test(
         NAME queue_test
-        COMMAND test_queue
+        COMMAND test_queue_asan
 )
-
-
-# Don't add_test, because this one should fail in some way
-add_executable(test_unit_tests
-        tests/test_unit_tests.c
-)
-target_link_libraries(test_unit_tests PRIVATE clib_core)
 
 
 # ————————————————————————————————————
