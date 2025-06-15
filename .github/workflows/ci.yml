@@ -5,6 +5,7 @@
 # • Tests with both GCC and Clang.
 # • Enables sanitizers on Debug builds.
 # • Runs CTest to execute all registered tests.
+# • (Optional) Captures coverage on Ubuntu/GCC.
 
 name: C/C++ CI
 
@@ -68,3 +69,19 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure
+
+      - name: Check memory leaks (macOS)
+        shell: bash
+        if: runner.os == 'macOS'
+        run: |
+          leaks -quiet --atExit -- ./tests
+          leaks -quiet --atExit -- ./test_sets
+          leaks -quiet --atExit -- ./test_queue
+
+      - name: Check memory leaks (Linux)
+        shell: bash
+        if: runner.os == 'Linux'
+        run: |
+          valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./tests
+          valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./test_sets
+          valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./test_queue
