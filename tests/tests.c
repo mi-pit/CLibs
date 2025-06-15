@@ -48,6 +48,7 @@ void run_foreach( void )
 {
     RUN_TEST( foreach );
     RUN_TEST( foreach_set );
+    RUN_TEST( foreach_queue );
 }
 
 void run_swex( void )
