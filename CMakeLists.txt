@@ -38,6 +38,7 @@ set(CLIB_SOURCES
         src/structs/dynarr.c
         src/structs/dynstring.c
         src/structs/sets.c
+        src/structs/dictionary.c
 )
 
 set(CLIB_PUBLIC_HDRS
