@@ -76,6 +76,7 @@ jobs:
         shell: bash
         if: runner.os == 'macOS'
         run: |
+          cd build
           leaks -quiet --atExit -- ./tests
           leaks -quiet --atExit -- ./test_sets
           leaks -quiet --atExit -- ./test_queue
@@ -84,6 +85,7 @@ jobs:
         shell: bash
         if: runner.os == 'Linux'
         run: |
+          cd build
           valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./tests
           valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./test_sets
           valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./test_queue
