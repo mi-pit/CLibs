@@ -1,8 +1,8 @@
 #include "dictionary.h"
 
-#include "../Dev/errors.h"        /* includes misc.h */
-#include "../Dev/pointer_utils.h" /* free_n() */
-#include "../misc.h"              /* hash_func(), cmp_size_t(), cmpeq() */
+#include "../headers/errors.h"        /* includes misc.h */
+#include "../headers/misc.h"          /* hash_func(), cmp_size_t(), cmpeq() */
+#include "../headers/pointer_utils.h" /* free_n() */
 
 #include <stdio.h>
 #include <stdlib.h>

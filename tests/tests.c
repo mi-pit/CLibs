@@ -4,6 +4,7 @@
 
 // tests
 
+#include "test_dict.c"
 #include "test_dynstr.h"
 #include "test_foreach.h"
 #include "test_list.h"
@@ -47,6 +48,7 @@ void run_foreach( void )
 {
     RUN_TEST( foreach );
     RUN_TEST( foreach_set );
+    RUN_TEST( foreach_queue );
 }
 
 void run_swex( void )
@@ -93,6 +95,8 @@ int main( void )
     run_string_utils();
     run_dynstr();
     run_list();
+
+    RUN_TEST( dict_init );
 
     RUN_TEST( array_sprintf );
 
