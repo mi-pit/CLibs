@@ -173,3 +173,20 @@ bool queue_is_empty( const struct fifo_queue *queue )
 
     return no_head;
 }
+
+
+QueueEnumeratedEntry queue_get_next( const struct fifo_queue *queue,
+                                     const struct queue_node *prev,
+                                     const bool get_first )
+{
+    if ( get_first )
+        return ( QueueEnumeratedEntry ) { .item = queue->head,
+                                          .data = queue->head->data };
+
+    if ( queue->head == NULL || prev == NULL )
+        return ( QueueEnumeratedEntry ) { 0 };
+
+    const struct queue_node *node = prev->next;
+
+    return ( QueueEnumeratedEntry ) { .item = node, .data = node->data };
+}

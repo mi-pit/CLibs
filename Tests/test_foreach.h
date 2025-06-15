@@ -11,6 +11,7 @@
 #include "../src/string_utils.h"
 #include "../src/Structs/dynarr.h"
 #include "../src/Structs/dynstring.h"
+#include "../src/Structs/queue.h"
 #include "../src/Structs/sets.h"
 
 // must be after dynarr.h and sets.h
@@ -155,6 +156,26 @@ TEST( foreach_set )
     }
 
     set_destroy( set );
+}
+END_TEST
+
+
+TEST( foreach_queue )
+{
+    struct fifo_queue *const queue = queue_init( sizeof( int ) );
+    assert_that( queue != NULL, "queue init" );
+
+    for ( int i = 16; i > 0; --i )
+        assert_that( queue_enqueue( queue, &i ) == RV_SUCCESS, "enqueue" );
+    assert_that( queue_get_size( queue ) == 16, );
+
+    foreach_que( queue )
+    {
+        const int data = deref_as( int, entry.data );
+        UNIT_TEST( data == ( int ) ( 16 - foreach_index_entry ) );
+    }
+
+    queue_destroy( queue );
 }
 END_TEST
 

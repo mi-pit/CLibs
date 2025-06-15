@@ -7,9 +7,6 @@
 
 #include "../Dev/extra_types.h"
 
-/// single node of a queue (linked list)
-struct queue_node;
-
 /**
  * First in, first out.
  *
@@ -45,5 +42,20 @@ int queue_get_tail( const struct fifo_queue *queue, void *data_cont );
 
 size_t queue_get_size( const struct fifo_queue *queue );
 bool queue_is_empty( const struct fifo_queue *queue );
+
+typedef struct {
+    const struct queue_node *item;
+    void *const data;
+} QueueEnumeratedEntry;
+
+/**
+ * Iterator over queue
+ *
+ * @return QueueEnumeratedEntry
+ */
+QueueEnumeratedEntry queue_get_next( const struct fifo_queue *,
+                                     const struct queue_node *prev,
+                                     bool get_first );
+
 
 #endif //CLIBS_QUEUE_H

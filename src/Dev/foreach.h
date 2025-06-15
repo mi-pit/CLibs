@@ -53,6 +53,7 @@
     foreach_helper_init( strlen( STRING ), ITEM_NAME ) foreach_helper_assign( \
             char, ITEM_NAME, ( STRING )[ 0 ], ( STRING )[ foreach_index_##ITEM_NAME ] )
 
+
 #ifdef CLIBS_DYNAMIC_ARRAY_H
 /**
  * Iterates over the List<br>
@@ -83,6 +84,31 @@
     foreach_uni ( const SetEnumeratedEntry, entry, set_get_next( ( SET ), -1 ), \
                   set_get_next( ( SET ), entry.index ), set_size( ( SET ) ) )
 #endif //CLIBS_SETS_H
+
+
+#ifdef CLIBS_QUEUE_H
+/**
+ * Iterates over a set, results are set in an SetEnumeratedEntry
+ * "Retrieves" a `const QueueEnumeratedEntry` struct (see queue.h);
+ * in short, `QueueEnumeratedEntry` contains
+ * - `struct set_item *` -- the desired data
+ * - `index` -- for the iterator, doesn't really hold any value for the user
+ *
+ * @param QUEUE valid fifo_queue *
+ *
+ * @example
+ * @code
+ * foreach_que( queue )
+ *     const int data = deref_as( int, entry.data );
+ * @endcode
+ */
+#define foreach_que( QUEUE )                                      \
+    foreach_uni ( const QueueEnumeratedEntry, entry,              \
+                  queue_get_next( ( QUEUE ), NULL, true ),        \
+                  queue_get_next( ( QUEUE ), entry.item, false ), \
+                  queue_get_size( ( QUEUE ) ) )
+// TODO?: remove `queue_get_size` call (for efficiency)
+#endif //CLIBS_QUEUE_H
 
 
 #endif //CLIBS_FOREACH_H
