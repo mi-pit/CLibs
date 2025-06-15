@@ -5,7 +5,7 @@
 #ifndef CLIBS_STRING_UTILS_H
 #define CLIBS_STRING_UTILS_H
 
-#include "Dev/attributes.h" /* UseResult */
+#include "headers/attributes.h" /* UseResult */
 
 #include <regex.h>     /* regex_t */
 #include <sys/types.h> /* ssize_t */

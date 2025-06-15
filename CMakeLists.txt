@@ -32,26 +32,22 @@ add_compile_definitions(_POSIX_C_SOURCE=200809L)
 
 set(CLIB_SOURCES
         src/string_utils.c
-        src/misc.c
-        src/swexpr.c
-
-        src/Structs/dynarr.c
-        src/Structs/dynstring.c
-        src/Structs/sets.c
-
         src/item_print_functions.c
+        src/math.c
+
+        src/structs/dynarr.c
+        src/structs/dynstring.c
+        src/structs/sets.c
 )
 
 set(CLIB_PUBLIC_HDRS
         src/string_utils.h
-        src/misc.h
-        src/swexpr.h
-
-        src/Structs/dynarr.h
-        src/Structs/dynstring.h
-        src/Structs/sets.h
-
         src/item_print_functions.h
+        src/math.h
+
+        src/structs/dynarr.h
+        src/structs/dynstring.h
+        src/structs/sets.h
 )
 
 add_library(clib_core STATIC ${CLIB_SOURCES})
@@ -65,34 +61,34 @@ install(TARGETS clib_core ARCHIVE DESTINATION lib)
 
 enable_testing()
 
-add_executable(Tests
-        Tests/tests.c
+add_executable(tests
+        tests/tests.c
 )
-target_link_libraries(Tests PRIVATE clib_core)
+target_link_libraries(tests PRIVATE clib_core)
 
 # Register it with CTest so that “ctest” will pick it up automatically:
 add_test(
         NAME all_unit_tests
-        COMMAND Tests
+        COMMAND tests
 )
 
 
-add_executable(TestSets
-        Tests/test_sets.c
+add_executable(test_sets
+        tests/test_sets.c
 )
-target_link_libraries(TestSets PRIVATE clib_core)
+target_link_libraries(test_sets PRIVATE clib_core)
 
 add_test(
         NAME sets_tests
-        COMMAND TestSets
+        COMMAND test_sets
 )
 
 
 # Don't add_test, because this one should fail in some way
-add_executable(TestUnitTests
-        Tests/test_unit_tests.c
+add_executable(test_unit_tests
+        tests/test_unit_tests.c
 )
-target_link_libraries(TestUnitTests PRIVATE clib_core)
+target_link_libraries(test_unit_tests PRIVATE clib_core)
 
 
 # Add more tests here…

@@ -2,8 +2,8 @@
 // Created by MacBook on 08.01.2025.
 //
 
-#include "../src/Dev/assert_that.h"
-#include "../src/Dev/unit_tests.h"
+#include "../src/headers/assert_that.h"
+#include "../src/headers/unit_tests.h"
 #include "../src/string_utils.h"
 
 

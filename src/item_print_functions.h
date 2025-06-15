@@ -1,8 +1,8 @@
 #ifndef CLIBS_PRINT_FUNCTIONS_H
 #define CLIBS_PRINT_FUNCTIONS_H
 
-#include "Dev/attributes.h"
-#include "Dev/errors.h"
+#include "headers/attributes.h"
+#include "headers/errors.h"
 
 #include <stdbool.h>
 

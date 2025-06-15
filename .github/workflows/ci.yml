@@ -5,7 +5,6 @@
 # • Tests with both GCC and Clang.
 # • Enables sanitizers on Debug builds.
 # • Runs CTest to execute all registered tests.
-# • (Optional) Captures coverage on Ubuntu/GCC.
 
 name: C/C++ CI
 

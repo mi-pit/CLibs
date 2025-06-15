@@ -1,8 +1,8 @@
 #ifndef CLIBS_DYNAMIC_ARRAY_H
 #define CLIBS_DYNAMIC_ARRAY_H
 
-#include "../Dev/array_printf.h"
-#include "../Dev/attributes.h" /* Private */
+#include "../headers/array_printf.h"
+#include "../headers/attributes.h" /* Private */
 
 #include <stdbool.h>
 #include <stdint.h>

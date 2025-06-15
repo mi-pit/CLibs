@@ -1,16 +1,8 @@
-#include "misc.h"
+//
+// Created by Michal Pitner on 13.06.2025.
+//
 
-
-uint64_t hash_func( const void *const data, const size_t nbytes )
-{
-    uint64_t hash = 5381 * nbytes;
-
-    const byte *data_byte = ( byte * ) data;
-    for ( size_t i = 0; i < nbytes; ++i )
-        hash = ( hash << 5 ) + hash + data_byte[ i ];
-
-    return hash;
-}
+#include "math.h"
 
 
 uint64_t digitsof( uint64_t num, const unsigned base )
