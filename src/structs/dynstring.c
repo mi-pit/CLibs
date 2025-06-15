@@ -5,8 +5,7 @@
 
 #include "../headers/errors.h"      /* RV, warn */
 #include "../headers/simple_math.h" /* min */
-#include "../string_utils.h"    /* vasprintf (in case it's not defined in <stdio.h>),
-                                 * str_t, string_t */
+#include "../string_utils.h"        /* vasprintf (if it's not defined in <stdio.h>) */
 
 #include <assert.h> //
 #include <stdio.h>  /* fprintf() */
