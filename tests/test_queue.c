@@ -125,7 +125,13 @@ TEST( get )
     UNIT_TEST( got == -1 );
 
     UNIT_TEST( queue_get( queue, 1234, &got ) == RV_EXCEPTION );
+    UNIT_TEST( queue_get( queue, 124, &got ) != RV_EXCEPTION );
+    UNIT_TEST( queue_get( queue, 125, &got ) == RV_EXCEPTION );
+    UNIT_TEST( queue_get( queue, queue_get_size( queue ), &got ) == RV_EXCEPTION );
+    UNIT_TEST( queue_get( queue, 123, &got ) != RV_EXCEPTION );
     UNIT_TEST( queue_get( queue, -1, &got ) == RV_EXCEPTION );
+
+    UNIT_TEST( queue_get( queue, 0, NULL ) == RV_EXCEPTION );
 
     queue_destroy( queue );
 }

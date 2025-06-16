@@ -98,6 +98,9 @@ int queue_dequeue( struct fifo_queue *queue, void *data_cont )
 
 int queue_get( const struct fifo_queue *queue, const size_t index, void *const data_cont )
 {
+    if ( data_cont == NULL )
+        return fwarnx_ret( RV_EXCEPTION, "data_cont must not be NULL" );
+
     if ( queue->head == NULL )
         return fwarnx_ret( RV_EXCEPTION, "queue is empty" );
 
@@ -107,7 +110,7 @@ int queue_get( const struct fifo_queue *queue, const size_t index, void *const d
         return RV_SUCCESS;
     }
 
-    size_t actual_size_idx      = 0;
+    size_t actual_size_idx      = 1;
     size_t distance_from_target = index;
 
     const struct queue_node *node = queue->head;
@@ -130,6 +133,9 @@ int queue_get( const struct fifo_queue *queue, const size_t index, void *const d
 
 int queue_get_head( const struct fifo_queue *queue, void *data_cont )
 {
+    if ( data_cont == NULL )
+        return fwarnx_ret( RV_EXCEPTION, "data_cont must not be NULL" );
+
     if ( queue->head == NULL )
     {
         assert( queue->tail == NULL );
@@ -142,6 +148,9 @@ int queue_get_head( const struct fifo_queue *queue, void *data_cont )
 
 int queue_get_tail( const struct fifo_queue *queue, void *data_cont )
 {
+    if ( data_cont == NULL )
+        return fwarnx_ret( RV_EXCEPTION, "data_cont must not be NULL" );
+
     if ( queue->tail == NULL )
     {
         assert( queue->head == NULL );
