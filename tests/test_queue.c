@@ -41,6 +41,7 @@ TEST( enqueue )
     UNIT_TEST( node != NULL );
     UNIT_TEST( queue->head == queue->tail );
 
+    SET_UNIT_TEST_VERBOSITY( false );
     for ( data = 0; data <= 123; data++ )
     {
         int rv;
@@ -59,6 +60,8 @@ TEST( enqueue )
             break;
         }
     }
+    SET_UNIT_TEST_VERBOSITY( true );
+
     queue_destroy( queue );
 }
 END_TEST
@@ -73,12 +76,14 @@ TEST( dequeue )
     for ( data = 0; data <= 123; data++ )
         assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
 
+    SET_UNIT_TEST_VERBOSITY( false );
     for ( data = -1; data <= 123; data++ )
     {
         int num;
         UNIT_TEST( queue_dequeue( queue, &num ) == RV_SUCCESS );
         UNIT_TEST( num == data );
     }
+    SET_UNIT_TEST_VERBOSITY( true );
 
     int cont;
     UNIT_TEST( queue_dequeue( queue, &cont ) == RV_EXCEPTION );
@@ -139,12 +144,14 @@ TEST( get_size )
     assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
     UNIT_TEST( queue_get_size( queue ) == 1 );
     UNIT_TEST( !queue_is_empty( queue ) );
+    SET_UNIT_TEST_VERBOSITY( false );
     for ( data = 0; data <= 123; data++ )
     {
         assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
         UNIT_TEST( queue_get_size( queue ) == data + 2ul );
         UNIT_TEST( !queue_is_empty( queue ) );
     }
+    SET_UNIT_TEST_VERBOSITY( true );
 
     queue_destroy( queue );
 }

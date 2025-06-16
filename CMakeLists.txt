@@ -89,7 +89,6 @@ add_executable(test_queue
         tests/test_queue.c
 )
 target_link_libraries(test_queue PRIVATE clib_core)
-target_compile_definitions(test_queue PUBLIC UNIT_TESTS_SILENT)
 add_test(
         NAME queue_test
         COMMAND test_queue
