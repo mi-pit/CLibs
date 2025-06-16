@@ -1,5 +1,12 @@
 # Library for the C language
 
+## Standard
+
+C99
+
+`src/header/terminal_colors.h`
+requires a posix-compliant system
+
 ---
 
 ## Includes

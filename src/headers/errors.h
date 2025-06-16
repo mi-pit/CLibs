@@ -6,9 +6,12 @@
 #define CLIBS_ERRORS_H
 
 /* for this header */
-#include "attributes.h"      /* PrintfLike, LibraryDefined */
-#include "filenames.h"       /* get_prog_name(), __FILE_NAME__ */
+#include "attributes.h" /* PrintfLike, LibraryDefined */
+#include "filenames.h"  /* get_prog_name(), __FILE_NAME__ */
+
+#if defined( _POSIX_C_SOURCE )
 #include "terminal_colors.h" /* COLORs, PrintInColor */
+#endif                       //defined(_POSIX_C_SOURCE)
 
 #include <errno.h>  /* for WarnUniversal + include */
 #include <stddef.h> /* ptrdiff_t */
@@ -133,17 +136,19 @@ LibraryDefined const char *rv_to_string( const int rv )
  * @bugs %p for some reason sometimes throws compiler errors for non `void *` pointers
  */
 LibraryDefined PrintfLike( 7, 8 ) Cold ptrdiff_t
-        WarnUniversal( const bool PrintProgName,
-                       const char *__restrict FileName,
-                       const char *__restrict FunctionName,
-                       const int LineNumber,
-                       const int err_no,
-                       const ptrdiff_t return_value,
-                       const char *__restrict format,
-                       ... )
+WarnUniversal( const bool PrintProgName,
+               const char *__restrict FileName,
+               const char *__restrict FunctionName,
+               const int LineNumber,
+               const int err_no,
+               const ptrdiff_t return_value,
+               const char *__restrict format,
+               ... )
 {
 #ifndef SUPPRESS_WARNINGS
+#if defined( _POSIX_C_SOURCE )
     SetTerminalColor( stderr, COLOR_WARNING );
+#endif //def _POSIX
 
     if ( PrintProgName )
         fprintf( stderr, "%s", get_prog_name() );
@@ -165,10 +170,13 @@ LibraryDefined PrintfLike( 7, 8 ) Cold ptrdiff_t
     if ( err_no >= 0 )
         fprintf( stderr, ": %s", strerror( err_no ) );
 
-    fprintf( stderr, "\n" );                   //
-    SetTerminalColor( stderr, COLOR_DEFAULT ); // maybe swap these two lines?
+#if defined( _POSIX_C_SOURCE )
+    SetTerminalColor( stderr, COLOR_DEFAULT );
+#endif /* _POSIX */
 
-#else
+    fprintf( stderr, "\n" );
+
+#else  // defined( SUPPRESS_WARNINGS )
     ( void ) ( PrintProgName );
     ( void ) ( FileName );
     ( void ) ( FunctionName );
