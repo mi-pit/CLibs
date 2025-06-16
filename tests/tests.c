@@ -4,7 +4,7 @@
 
 // tests
 
-#include "test_dict.c"
+#include "test_dict.h"
 #include "test_dynstr.h"
 #include "test_foreach.h"
 #include "test_list.h"
