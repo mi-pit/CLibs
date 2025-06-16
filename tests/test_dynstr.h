@@ -11,13 +11,13 @@
 #include <assert.h>
 
 
-typedef int( PendFunction )( struct dynamic_string *, string_t );
+typedef ssize_t( PendFunction )( struct dynamic_string *, string_t );
 
 Tester test_one_pend( string_t init, string_t app, string_t expected, PendFunction func )
 {
     struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr alloc" );
-    assert_that( func( dynstr, app ) == RV_SUCCESS, "append rv" );
+    assert_that( func( dynstr, app ) >= 0, "append rv" );
 
     bool rv = strcmp( dynstr_data( dynstr ), expected ) == 0;
 
@@ -44,7 +44,7 @@ Tester test_one_appendn( string_t init, string_t app, size_t len, string_t expec
 {
     struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr alloc" );
-    assert_that( dynstr_appendn( dynstr, app, len ) == RV_SUCCESS, "append rv" );
+    assert_that( dynstr_appendn( dynstr, app, len ) == ( ssize_t ) len, "append rv" );
 
     bool rv = strcmp( dynstr_data( dynstr ), expected ) == 0;
 
@@ -206,8 +206,7 @@ PrintfLike( 2, 3 ) Tester test_one_vappendf( string_t init, string_t fmt, ... )
     struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr init" );
 
-    assert_that( dynstr_vappendf( dynstr, fmt, vaList ) == RV_SUCCESS,
-                 "dynstr_vappendf" );
+    assert_that( dynstr_vappendf( dynstr, fmt, vaList ) >= 0, "dynstr_vappendf" );
 
     bool rv = strcmp( dynstr_data( dynstr ), formatted ) == 0;
 
@@ -217,15 +216,15 @@ PrintfLike( 2, 3 ) Tester test_one_vappendf( string_t init, string_t fmt, ... )
     return rv;
 }
 
-#define TEST_ONE_APPENDF( INIT, DESIRED, FMT, ... )                         \
-    do                                                                      \
-    {                                                                       \
-        struct dynamic_string *dynstr = dynstr_init_as( INIT );             \
-        assert( dynstr != NULL );                                           \
-        assert( dynstr_appendf( dynstr, FMT, __VA_ARGS__ ) == RV_SUCCESS ); \
-        UNIT_TEST( strcmp( dynstr_data( dynstr ), ( DESIRED ) ) == 0 );     \
-        dynstr_destroy( dynstr );                                           \
-    }                                                                       \
+#define TEST_ONE_APPENDF( INIT, DESIRED, FMT, ... )                     \
+    do                                                                  \
+    {                                                                   \
+        struct dynamic_string *dynstr = dynstr_init_as( INIT );         \
+        assert( dynstr != NULL );                                       \
+        assert( dynstr_appendf( dynstr, FMT, __VA_ARGS__ ) >= 0 );      \
+        UNIT_TEST( strcmp( dynstr_data( dynstr ), ( DESIRED ) ) == 0 ); \
+        dynstr_destroy( dynstr );                                       \
+    }                                                                   \
     while ( 0 )
 
 
