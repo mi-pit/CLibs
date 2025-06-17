@@ -274,7 +274,7 @@ ssize_t string_split_regex( str_t **str_arr_cont,
 void string_split_destroy( size_t size, str_t **str_arr_cont );
 
 
-str_t string_join( size_t len, const string_t strarr[ len ], string_t joiner );
+UseResult str_t string_join( size_t len, const string_t strarr[ len ], string_t joiner );
 
 /* ==== Mathematical stuff ==== */
 
