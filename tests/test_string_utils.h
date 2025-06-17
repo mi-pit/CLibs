@@ -394,6 +394,16 @@ TEST( strspl_regex )
 END_TEST
 
 
+TEST( join )
+{
+    string_t strarr[] = { "Hops", "pop", "!" };
+    str_t got         = string_join( countof( strarr ), strarr, " " );
+    UNIT_TEST( strcmp( got, "Hops pop !" ) == 0 );
+    free( got );
+}
+END_TEST
+
+
 typedef void( StringToUL )( str_t );
 Tester test_one_string_to_UL( StringToUL func, string_t old, string_t new )
 {
@@ -524,3 +534,20 @@ TEST( strings_misc )
     UNIT_TEST( strcmp( get_file_name( "Directory/Subdir/" ), "Subdir/" ) == 0 );
 }
 END_TEST
+
+LibraryDefined void run_string_utils( void )
+{
+    RUN_TEST( replace );
+    RUN_TEST( escape );
+    RUN_TEST( unescape );
+    RUN_TEST( strspl_str );
+    RUN_TEST( strspl_regex );
+    RUN_TEST( string_to_UL );
+    RUN_TEST( string_as_UL );
+    RUN_TEST( reverse_str );
+    RUN_TEST( strip );
+
+    RUN_TEST( strings_misc );
+
+    RUN_TEST( join );
+}

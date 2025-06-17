@@ -553,6 +553,28 @@ void string_split_destroy( const size_t size, str_t **str_arr_cont )
 }
 
 
+str_t string_join( const size_t len, const string_t strarr[ len ], const string_t joiner )
+{
+    if ( len == 0 )
+        return NULL; // fixme
+
+    const size_t joiner_len = strlen( joiner );
+
+    DynString *builder = dynstr_init();
+    foreach_arr ( const string_t, string, strarr, len )
+    {
+        dynstr_append( builder, string );
+        if ( foreach_index_string < len - 1 )
+            dynstr_appendn( builder, joiner, joiner_len );
+    }
+
+    const str_t data_copy = dynstr_data_copy( builder );
+    dynstr_destroy( builder );
+
+    return data_copy;
+}
+
+
 str_t mul_uint_strings( const string_t str_1, const string_t str_2 )
 {
     typedef uint8_t digit_t;

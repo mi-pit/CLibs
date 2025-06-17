@@ -29,21 +29,6 @@ void run_dynstr( void )
     RUN_TEST( appendf );
 }
 
-void run_string_utils( void )
-{
-    RUN_TEST( replace );
-    RUN_TEST( escape );
-    RUN_TEST( unescape );
-    RUN_TEST( strspl_str );
-    RUN_TEST( strspl_regex );
-    RUN_TEST( string_to_UL );
-    RUN_TEST( string_as_UL );
-    RUN_TEST( reverse_str );
-    RUN_TEST( strip );
-
-    RUN_TEST( strings_misc );
-}
-
 void run_foreach( void )
 {
     RUN_TEST( foreach );
