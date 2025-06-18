@@ -11,7 +11,7 @@
 #include "../../src/string_utils.h"
 #include "../../src/structs/dynstring.h"
 
-Private TEST( array_sprintf )
+TEST( array_sprintf )
 {
     int array[ 10 ];
     for ( size_t i = 0; i < countof( array ); ++i )

@@ -353,9 +353,9 @@ ERROR:
 }
 
 
-Private const strsplit_mode_t ALL_MODES =
-        STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY | STRSPLIT_KEEP_DELIM_AFTER |
-        STRSPLIT_KEEP_DELIM_BEFORE;
+Private const strsplit_mode_t ALL_MODES = STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY
+                                          | STRSPLIT_KEEP_DELIM_AFTER
+                                          | STRSPLIT_KEEP_DELIM_BEFORE;
 
 Private ssize_t string_split_empty( str_t **str_arr_cont, const string_t string )
 {
@@ -428,15 +428,15 @@ ssize_t string_split( str_t **str_arr_cont,
         const char *start       = curr + start_offset;
         const size_t end_offset = mode & STRSPLIT_KEEP_DELIM_BEFORE ? split_tok_len : 0;
 
-        if ( mode & STRSPLIT_EXCLUDE_EMPTY &&
-             ( ( next == NULL && *start == '\0' ) ||
-               ( next != NULL && next - start + end_offset == 0 ) ) )
+        if ( mode & STRSPLIT_EXCLUDE_EMPTY
+             && ( ( next == NULL && *start == '\0' )
+                  || ( next != NULL && next - start + end_offset == 0 ) ) )
             continue;
 
         const size_t len = next == NULL ? strlen( start ) : next - start + end_offset;
 
-        if ( mode & STRSPLIT_EXCLUDE_EMPTY && mode & STRSPLIT_STRIP_RESULTS &&
-             string_is_blank_l( start, len ) )
+        if ( mode & STRSPLIT_EXCLUDE_EMPTY && mode & STRSPLIT_STRIP_RESULTS
+             && string_is_blank_l( start, len ) )
             continue;
 
         char *const dup = mode & STRSPLIT_STRIP_RESULTS ? string_stripped_l( start, len )
@@ -605,8 +605,8 @@ str_t mul_uint_strings( const string_t str_1, const string_t str_2 )
         digit_t carry = 0;
         for ( ssize_t j = ( ssize_t ) len_2 - 1; j >= 0; --j )
         {
-            const digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry +
-                                 ( result[ i + j + 1 ] - '0' );
+            const digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry
+                                 + ( result[ i + j + 1 ] - '0' );
             result[ i + j + 1 ] = ( char ) ( prod % 10 + '0' );
             carry               = prod / 10;
         }

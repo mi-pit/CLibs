@@ -68,7 +68,8 @@ ssize_t dynstr_appendn( struct dynamic_string *, const char *app, size_t len );
  *
  * @return RV_ERROR on allocation error, else the number of appended chars
  */
-PrintfLike( 2, 3 ) ssize_t dynstr_appendf( struct dynamic_string *, const char *fmt, ... );
+PrintfLike( 2, 3 ) ssize_t dynstr_appendf( struct dynamic_string *, const char *fmt,
+                                           ... );
 /**
  * Appends a formatted string to the end of a DynamicString
  *
@@ -82,8 +83,8 @@ ssize_t dynstr_vappendf( struct dynamic_string *, const char *fmt, va_list vargs
  */
 ssize_t dynstr_prepend( struct dynamic_string *, const char * );
 ssize_t dynstr_prependn( struct dynamic_string *dynstr, const char *s, size_t len );
-PrintfLike( 2, 3 ) ssize_t dynstr_prependf( struct dynamic_string *dynstr, const char *fmt,
-                                        ... );
+PrintfLike( 2, 3 ) ssize_t dynstr_prependf( struct dynamic_string *dynstr,
+                                            const char *fmt, ... );
 ssize_t dynstr_vprependf( struct dynamic_string *dynstr, const char *fmt, va_list vargs );
 
 /**

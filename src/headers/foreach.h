@@ -17,8 +17,8 @@
 #define foreach_helper_init( SIZE, ITEM_NAME )                                \
     for ( size_t foreach_keep_##ITEM_NAME = 1, foreach_index_##ITEM_NAME = 0, \
                  foreach_cap_##ITEM_NAME = ( SIZE );                          \
-          foreach_keep_##ITEM_NAME &&                                         \
-          foreach_index_##ITEM_NAME < foreach_cap_##ITEM_NAME;                \
+          foreach_keep_##ITEM_NAME                                            \
+          && foreach_index_##ITEM_NAME < foreach_cap_##ITEM_NAME;             \
           foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME,               \
                  ++foreach_index_##ITEM_NAME )
 
