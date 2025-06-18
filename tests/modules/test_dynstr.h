@@ -1,12 +1,14 @@
 //
 // Created by MacBook on 08.01.2025.
 //
+#ifndef TEST_DYNSTR_H
+#define TEST_DYNSTR_H
 
-#include "../src/headers/assert_that.h"
-#include "../src/headers/misc.h"
-#include "../src/headers/unit_tests.h"
-#include "../src/string_utils.h"
-#include "../src/structs/dynstring.h"
+#include "../../src/headers/assert_that.h"
+#include "../../src/headers/misc.h"
+#include "../../src/headers/unit_tests.h"
+#include "../../src/string_utils.h"
+#include "../../src/structs/dynstring.h"
 
 #include <assert.h>
 
@@ -241,3 +243,15 @@ TEST( appendf )
             "", "%zu\\\n\r\t\v\"\'Kokot %s\n" ESCAPED_CHARS, 1023uL, "hovno" ) );
 }
 END_TEST
+
+
+LibraryDefined void RUNALL_DYNSTR( void )
+{
+    RUN_TEST( init_as );
+    RUN_TEST( slices );
+    RUN_TEST( append );
+    RUN_TEST( appendn );
+    RUN_TEST( appendf );
+}
+
+#endif

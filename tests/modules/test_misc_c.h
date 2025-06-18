@@ -5,9 +5,9 @@
 #ifndef CLIBS_TEST_MISC_C_H
 #define CLIBS_TEST_MISC_C_H
 
-#include "../src/headers/misc.h"
-#include "../src/headers/unit_tests.h" /* ... */
-#include "../src/math.h"
+#include "../../src/headers/misc.h"
+#include "../../src/headers/unit_tests.h"
+#include "../../src/math.h"
 
 Tester test_one_reverse_int( int64_t n, unsigned base, uint64_t res )
 {
@@ -97,5 +97,11 @@ TEST( misc_c )
     UNIT_TEST( get_prev_power_of_two( ( 1 << 24 ) + 1 ) == ( 1 << 24 ) );
 }
 END_TEST
+
+
+LibraryDefined void RUNALL_MISC( void )
+{
+    RUN_TEST( misc_c );
+}
 
 #endif //CLIBS_TEST_MISC_C_H

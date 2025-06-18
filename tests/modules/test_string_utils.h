@@ -2,9 +2,9 @@
 // Created by MacBook on 08.01.2025.
 //
 
-#include "../src/headers/assert_that.h"
-#include "../src/headers/unit_tests.h"
-#include "../src/string_utils.h"
+#include "../../src/headers/assert_that.h"
+#include "../../src/headers/unit_tests.h"
+#include "../../src/string_utils.h"
 
 
 Tester test_one_replace( string_t orig, string_t old, string_t new, string_t expected )
@@ -535,7 +535,7 @@ TEST( strings_misc )
 }
 END_TEST
 
-LibraryDefined void run_string_utils( void )
+LibraryDefined void RUNALL_STRING_UTILS( void )
 {
     RUN_TEST( replace );
     RUN_TEST( escape );

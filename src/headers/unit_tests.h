@@ -232,4 +232,9 @@ LibraryDefined void SET_UNIT_TEST_VERBOSITY( const bool verbose )
     TEST_NAME_CREATOR( YAP ) = verbose;
 }
 
+LibraryDefined bool GET_UNIT_TEST_VERBOSITY( void )
+{
+    return TEST_NAME_CREATOR( YAP );
+}
+
 #endif //CLIBS_UNIT_TESTS_H

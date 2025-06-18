@@ -75,26 +75,6 @@ add_test(
 )
 
 
-add_executable(test_sets
-        tests/test_sets.c
-)
-target_link_libraries(test_sets PRIVATE clib_core)
-add_test(
-        NAME sets_tests
-        COMMAND test_sets
-)
-
-
-add_executable(test_queue
-        tests/test_queue.c
-)
-target_link_libraries(test_queue PRIVATE clib_core)
-add_test(
-        NAME queue_test
-        COMMAND test_queue
-)
-
-
 # Don't add_test, because this one should fail in some way
 add_executable(test_unit_tests
         tests/test_unit_tests.c
