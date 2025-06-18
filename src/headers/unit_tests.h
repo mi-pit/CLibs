@@ -64,10 +64,6 @@ static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
 static bool TEST_NAME_CREATOR( YAP ) = true;
 
 
-/* todo:
- *  remove END_TEST? */
-
-
 #ifndef UNIT_TESTS_SILENT
 #define TEST( HANDLE )                                          \
     int TEST_NAME_CREATOR( HANDLE )( void )                     \
