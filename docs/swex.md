@@ -20,7 +20,7 @@ allowing more control flow than plain-C switch/case.
 ```c++
 void swex_example( const char *choice )
 {
-    swex_init_str( branch_3 ) as_new( int, rv )
+    swex_init_str( choice ) as_new( int, rv )
     {
         swex_case_str( "Custom" ) {
             resolve( int, 100 );
