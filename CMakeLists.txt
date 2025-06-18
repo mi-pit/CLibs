@@ -81,6 +81,17 @@ add_executable(test_unit_tests
 )
 target_link_libraries(test_unit_tests PRIVATE clib_core)
 
+# Not even really a test
+add_executable(test_hash
+        tests/test_hash_func.c
+)
+target_link_libraries(test_hash PRIVATE clib_core)
+
+add_executable(test_leet
+        tests/test_leet.c
+)
+target_link_libraries(test_leet PRIVATE clib_core)
+
 
 # ————————————————————————————————————
 #  4) Installation rules for headers & library
