@@ -454,9 +454,12 @@ void list_destroy( struct dynamic_array *ls )
     free( ls );
 }
 
-void list_destroy_p( struct dynamic_array ls )
+void list_clear( struct dynamic_array *ls )
 {
-    free_n( ls.items );
+    free_n( ls->items );
+    ls->capacity = LIST_DEF_SIZE;
+    ls->items    = calloc( ls->capacity, ls->el_size );
+    ls->size     = 0;
 }
 
 

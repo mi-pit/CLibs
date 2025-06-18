@@ -231,9 +231,9 @@ int list_cmp_elsize( const void *l1, const void *l2 );
 void list_destroy( struct dynamic_array * );
 
 /**
- * Frees all memory owned by the List, but not the list itself
+ * Resets the list to the defaults
  */
-void list_destroy_p( struct dynamic_array ls );
+void list_clear( struct dynamic_array *ls );
 
 
 /* ––––––––––––––––––––––––––––––– PRINTERS ––––––––––––––––––––––––––––––– */
