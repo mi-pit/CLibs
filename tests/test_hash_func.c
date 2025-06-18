@@ -2,9 +2,9 @@
 // Created by MacBook on 30.12.2024.
 //
 
-#include "../Dev/assert_that.h" /* assert_that(), include errors.h */
-#include "../misc.h"            /* hash_func() */
-#include "../Structs/sets.h"    /* Set */
+#include "../src/headers/assert_that.h" /* assert_that(), include errors.h */
+#include "../src/headers/misc.h"        /* hash_func() */
+#include "../src/structs/sets.h"        /* Set */
 
 #include <stdlib.h>
 
@@ -42,7 +42,7 @@ int main( void )
     Hash = hash_func( buffer, 128 );
     printf( "`%s`\t:= %s -> %llu\n", "char[128]", "rand() % 0xFF", Hash );
 
-    Set set = set_init();
+    Set *set = set_init();
     if ( set == NULL )
         err( -1, "set_init" );
 
