@@ -12,9 +12,9 @@
 #include "../../src/structs/dynarr.h"
 #include "../../src/structs/dynstring.h"
 #include "../../src/structs/queue.h"
-#include "../../src/structs/sets.h"
+#include "../../src/structs/set.h"
 
-// must be after dynarr.h and sets.h
+// must be after dynarr.h and set.h
 #include "../../src/headers/foreach.h"
 #include "../../src/headers/pointer_utils.h"
 

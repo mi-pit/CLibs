@@ -3,7 +3,7 @@
 
 #include "../../src/headers/assert_that.h"
 #include "../../src/headers/unit_tests.h"
-#include "../../src/structs/sets.h"
+#include "../../src/structs/set.h"
 
 TEST( set_init )
 {

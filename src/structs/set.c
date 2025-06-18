@@ -1,7 +1,6 @@
-#include "sets.h"
-
 #include "../headers/errors.h" /* RVs, warns, ... */
 #include "../headers/misc.h"   /* cmp_size_t */
+#include "set.h"
 
 #include <assert.h>   /* assert */
 #include <inttypes.h> /* PRIi64 */

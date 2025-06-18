@@ -3,9 +3,6 @@
 
 #include "../item_print_functions.h" /* PrintFunction */
 
-#include <stdbool.h>
-#include <stdint.h> /* int64_t */
-
 
 typedef struct hash_set Set;
 

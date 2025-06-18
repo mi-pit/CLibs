@@ -37,7 +37,7 @@ set(CLIB_SOURCES
 
         src/structs/dynarr.c
         src/structs/dynstring.c
-        src/structs/sets.c
+        src/structs/set.c
         src/structs/dictionary.c
         src/structs/queue.c
 )
@@ -49,7 +49,7 @@ set(CLIB_PUBLIC_HDRS
 
         src/structs/dynarr.h
         src/structs/dynstring.h
-        src/structs/sets.h
+        src/structs/set.h
         src/Structs/dictionary.h
         src/Structs/queue.h
 )
