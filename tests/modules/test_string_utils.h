@@ -394,12 +394,38 @@ TEST( strspl_regex )
 END_TEST
 
 
+#define test_one_join( WANTED, JOINER, ... )                               \
+    do                                                                     \
+    {                                                                      \
+        const string_t arr[] = { __VA_ARGS__ };                            \
+        str_t got            = string_join( countof( arr ), arr, JOINER ); \
+        UNIT_TEST( strcmp( WANTED, got ) == 0 );                           \
+        free( got );                                                       \
+    }                                                                      \
+    while ( 0 )
+
 TEST( join )
 {
-    string_t strarr[] = { "Hops", "pop", "!" };
-    str_t got         = string_join( countof( strarr ), strarr, " " );
-    UNIT_TEST( strcmp( got, "Hops pop !" ) == 0 );
-    free( got );
+    test_one_join( "Hopspop!", "", "Hops", "pop", "!" );
+    test_one_join( "Hops pop !", " ", "Hops", "pop", "!" );
+    test_one_join( "Hops.pop.!", ".", "Hops", "pop", "!" );
+    test_one_join( "Hops\npop\n!", "\n", "Hops", "pop", "!" );
+    test_one_join( "HopsHopspopHops!", "Hops", "Hops", "pop", "!" );
+
+    test_one_join( "Hops", "\n", "Hops" );
+    test_one_join( "Hops", "", "Hops" );
+
+    {
+        str_t arr[ 1 ] = { strdup( "hops" ) };
+        str_t got      = string_join( 0, ( const string_t * ) arr, "\n" );
+        UNIT_TEST( strcmp( got, "" ) == 0 );
+        free( got );
+
+        UNIT_TEST( string_join( 1, ( const string_t * ) arr, NULL ) == NULL );
+        free( arr[ 0 ] );
+    }
+
+    UNIT_TEST( string_join( 0, NULL, "\n" ) == NULL );
 }
 END_TEST
 
