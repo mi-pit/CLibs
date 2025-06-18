@@ -22,6 +22,7 @@
 #define UsageOptional
 #endif // unused
 
+
 #if HAS_ATTRIBUTE( format )
 /// Tells the compiler which varargs correspond to a format string
 #define PrintfLike( FORMAT_STRING, FIRST_VAR_ARG ) \
@@ -45,11 +46,13 @@
 #define Cold
 #endif // cold
 
+
 #if HAS_ATTRIBUTE( const )
 #define Const __attribute__( ( __const__ ) )
 #else // const
 #define Const
 #endif // const
+
 
 #if HAS_ATTRIBUTE( constructor )
 #define BeforeMain __attribute__( ( constructor ) )
@@ -57,11 +60,13 @@
 #define BeforeMain UsageOptional
 #endif // constructor
 
+
 #if HAS_ATTRIBUTE( noreturn )
 #define NoReturn __attribute__( ( noreturn ) )
 #else
 #define NoReturn
 #endif // constructor
+
 
 #if HAS_ATTRIBUTE( deprecated )
 #define Deprecated __attribute__( ( deprecated ) )

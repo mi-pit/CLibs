@@ -1,6 +1,7 @@
 //
 // Created by MacBook on 18.02.2024.
 //
+
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
 

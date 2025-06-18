@@ -55,8 +55,11 @@
                                         ": " __VA_ARGS__ ) );           \
     }                                                                   \
     while ( 0 )
+
 #else
+
 #define assert_that( EXPRESSION, ... )
+
 #endif //NDEBUG
 
 #endif //CLIBS_ASSERT_THAT_H
