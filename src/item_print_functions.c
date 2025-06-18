@@ -33,19 +33,19 @@ void print_bool( const void *data, const size_t nbytes )
     printf( "%s", deref_as( bool, data ) ? "true" : "false" );
 }
 
-define_print_func( int, "%-d" );
+DEFINE_PRINT_FUNC( int, "%-d" );
 
-define_print_func( size_t, "%-zu" );
+DEFINE_PRINT_FUNC( size_t, "%-zu" );
 
-define_print_func( ssize_t, "%-zd" );
+DEFINE_PRINT_FUNC( ssize_t, "%-zd" );
 
-define_print_func( char, "'%c'" );
+DEFINE_PRINT_FUNC( char, "'%c'" );
 
-define_print_func( float, "%.2f" );
+DEFINE_PRINT_FUNC( float, "%.2f" );
 
-define_print_func( double, "%.4f" );
+DEFINE_PRINT_FUNC( double, "%.4f" );
 
-define_print_func( int8_t, "%3d" );
+DEFINE_PRINT_FUNC( int8_t, "%3d" );
 
 
 void print_pointer( const void *data, const size_t nbytes )
