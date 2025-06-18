@@ -1,3 +1,9 @@
+/*
+ * Miscellaneous things that don't fit elsewhere.
+ *
+ * UNUSED, countof, cmp functions, ...
+ */
+
 #ifndef CLIBS_MISC_H
 #define CLIBS_MISC_H
 

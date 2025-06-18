@@ -1,35 +1,10 @@
-//
-// Created by MacBook on 03.01.2025.
-//
-/**
- * @example
- * @code
- * TEST( test_example )
- *     UNIT_TEST( 1 == 1 );
- *     UNIT_TEST( 1 == 2 );
- *     UNIT_TEST( 2 == 1 );
- *     UNIT_TEST( 2 == 2 );
- * END_TEST()
+/*
+ * Header for unit-testing.
  *
- * int main( void )
- * {
- *     RUN( test_example );
- *     FINISH_TESTING();
- * }
+ * For more info see `docs/unit-tests.md`.
  *
- * @endcode
- * <p>
- * prints:
- * @code
- * "[TEST] test_example
- *     [UNIT TEST] 1 == 1 ................... SUCCESS
- *     [UNIT TEST] 1 == 2 ................... FAILURE
- *     [UNIT TEST] 2 == 1 ................... FAILURE
- *     [UNIT TEST] 2 == 2 ................... SUCCESS
- * [TEST] test_example: ran 4 tests, 2 successful, 2 failed
- * [SUMMARY] total tests failed: 1
- * "
- * @endcode
+ *
+ * Created by MacBook on 03.01.2025.
  */
 
 #ifndef CLIBS_UNIT_TESTS_H
@@ -90,8 +65,7 @@ static bool TEST_NAME_CREATOR( YAP ) = true;
 
 
 /* todo:
- *  silent section of TEST
- *  remove END_TEST */
+ *  remove END_TEST? */
 
 
 #ifndef UNIT_TESTS_SILENT

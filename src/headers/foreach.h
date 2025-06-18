@@ -1,6 +1,12 @@
-//
-// Created by MacBook on 23.10.2024.
-//
+/*
+ * Macros for iterating over different structures (arrays, strings, sets, ...).
+ *
+ * To define `foreach` for a data structure in `src/structs`,
+ * first include the struct, then this header.
+ *
+ *
+ * Created by MacBook on 23.10.2024.
+ */
 
 #ifndef CLIBS_FOREACH_H
 #define CLIBS_FOREACH_H
@@ -23,6 +29,15 @@
           foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME )
 
 
+/**
+ * Universal foreach macro
+ *
+ * @param TYPE          type of the item
+ * @param ITEM_NAME     name of the variable created and assigned in the loop
+ * @param INITIALIZER   runs on the first pass through the loop
+ * @param ACCESSOR      runs every other time (index variable is foreach_index_ITEM_NAME)
+ * @param SIZE          number of elements in the structure
+ */
 #define foreach_uni( TYPE, ITEM_NAME, INITIALIZER, ACCESSOR, SIZE ) \
     foreach_helper_init( SIZE, ITEM_NAME )                          \
             foreach_helper_assign( TYPE, ITEM_NAME, INITIALIZER, ACCESSOR )
@@ -43,15 +58,18 @@
                                    ( ARRAY )[ foreach_index_##ITEM_NAME ] )
 
 /**
- * Iterates over a string<br>
+ * Iterates over a string
+ * <p>
  * Stores each character of the string in a new variable of type char
+ * </p>
  *
  * @param item  name of the new variable
  * @param strn string
  */
-#define foreach_str( ITEM_NAME, STRING )                                      \
-    foreach_helper_init( strlen( STRING ), ITEM_NAME ) foreach_helper_assign( \
-            const char, ITEM_NAME, ( STRING )[ 0 ], ( STRING )[ foreach_index_##ITEM_NAME ] )
+#define foreach_str( ITEM_NAME, STRING )                                   \
+    foreach_helper_init( strlen( STRING ), ITEM_NAME )                     \
+            foreach_helper_assign( const char, ITEM_NAME, ( STRING )[ 0 ], \
+                                   ( STRING )[ foreach_index_##ITEM_NAME ] )
 
 
 #ifdef CLIBS_DYNAMIC_ARRAY_H

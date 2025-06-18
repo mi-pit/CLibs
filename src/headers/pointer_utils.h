@@ -1,6 +1,9 @@
-//
-// Created by MacBook on 01.11.2024.
-//
+/*
+ * Utility functions and macros for working with pointers.
+ *
+ *
+ * Created by MacBook on 01.11.2024.
+ */
 
 #ifndef CLIBS_POINTER_UTILS_H
 #define CLIBS_POINTER_UTILS_H

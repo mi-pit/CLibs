@@ -1,6 +1,9 @@
-//
-// Created by MacBook on 14.01.2025.
-//
+/*
+ * Functions and macros for working with colors on UNIX terminals.
+ *
+ *
+ * Created by MacBook on 14.01.2025.
+ */
 
 #ifndef CLIBS_TERMINAL_COLORS_H
 #define CLIBS_TERMINAL_COLORS_H

@@ -1,6 +1,11 @@
-//
-// Created by MacBook on 18.02.2024.
-//
+/*
+ * A switch which works with more complex data structures.
+ *
+ * For more info, see `docs/swex.md`
+ *
+ *
+ * Created by MacBook on 18.02.2024.
+ */
 
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
@@ -9,8 +14,6 @@
 #include "errors.h"
 #include "pointer_utils.h"
 
-#include <err.h>     /* err() */
-#include <errno.h>   /* ENOMEM */
 #include <stdbool.h> /* bool */
 
 

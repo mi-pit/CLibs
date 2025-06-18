@@ -1,14 +1,17 @@
-//
-// Created by MacBook on 28.10.2024.
-//
+/*
+ * Utility functions and macros for working with C ASCII strings.
+ *
+ *
+ * Created by MacBook on 28.10.2024.
+ */
 
 #ifndef CLIBS_STRING_UTILS_H
 #define CLIBS_STRING_UTILS_H
 
 #include "headers/attributes.h" /* UseResult */
 
-#include <regex.h> /* regex_t */
-#include <stdbool.h>
+#include <regex.h>     /* regex_t */
+#include <stdbool.h>   /* bool */
 #include <sys/types.h> /* ssize_t */
 
 /* include for user */
@@ -17,6 +20,7 @@
 
 typedef const char *string_t;
 typedef char *str_t;
+
 
 #if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
 #include <stdlib.h> /* malloc */
@@ -275,6 +279,10 @@ void string_split_destroy( size_t size, str_t **str_arr_cont );
 
 
 UseResult str_t string_join( size_t len, const string_t strarr[ len ], string_t joiner );
+
+/// String array being passed to `string_join` may be typecast to this
+typedef const string_t *strjoin_strarr_t;
+
 
 /* ==== Mathematical stuff ==== */
 

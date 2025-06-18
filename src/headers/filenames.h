@@ -1,9 +1,14 @@
-//
-// Created by MacBook on 21.01.2025.
-//
+/*
+ * Utility functions and macros for working with file names.
+ *
+ * Trying to be platform-independent.
+ *
+ *
+ * Created by MacBook on 21.01.2025.
+ */
 
-#ifndef CLIBS_GET_PROG_NAME_H
-#define CLIBS_GET_PROG_NAME_H
+#ifndef CLIBS_FILENAMES_H
+#define CLIBS_FILENAMES_H
 
 #include "attributes.h"
 
@@ -21,8 +26,8 @@
 #elif defined( __linux__ )
 #include <linux/limits.h>
 #else
-#define PATH_MAX 1024
-#endif // Get PATH_MAX
+#define PATH_MAX 4096
+#endif
 #endif //ndef PATH_MAX
 
 LibraryDefined char ProgName[ PATH_MAX + 1 ] = "current-program";
@@ -102,4 +107,4 @@ BeforeMain LibraryDefined bool set_prog_name( void )
 #endif // get_prog_name()
 
 
-#endif //CLIBS_GET_PROG_NAME_H
+#endif //CLIBS_FILENAMES_H

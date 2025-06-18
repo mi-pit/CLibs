@@ -1,6 +1,14 @@
-//
-// Created by MacBook on 30.10.2024.
-//
+/*
+ * Utility functions for handling errors.
+ *
+ * Includes (among others):
+ *   return values
+ *   better warn
+ *   stack trace printing
+ *
+ *
+ * Created by MacBook on 30.10.2024.
+ */
 
 #ifndef CLIBS_ERRORS_H
 #define CLIBS_ERRORS_H

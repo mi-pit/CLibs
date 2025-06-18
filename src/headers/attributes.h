@@ -1,11 +1,33 @@
-//
-// Created by MacBook on 10.01.2025.
-//
+/*
+ * Function and variable attributes.
+ *
+ * Whether the compiler supports attributes (GCC/Clang), `declspec`s (MSVC) or neither,
+ * this header creates platform-independent macros for certain attributes a function
+ * or variable may have.
+ *
+ * Some combinations may (definitely will) be missing; this isn't an exhaustive list.
+ * (Though all macros are safe to use)
+ *
+ *
+ * Created by MacBook on 10.01.2025.
+ */
 
 #ifndef CLIBS_ATTRIBUTES_H
 #define CLIBS_ATTRIBUTES_H
 
 #include <sys/cdefs.h>
+
+
+#if defined( __clang__ )
+#define COMPILER_CLANG
+#elif defined( __GNUC__ )
+#define COMPILER_GCC
+#elif defined( _MSC_VER )
+#define COMPILER_MSVC
+#else
+#define COMPILER_UNKNOWN
+#endif
+
 
 #ifdef __has_attribute
 #define HAS_ATTRIBUTE( TOK ) __has_attribute( TOK )
@@ -27,8 +49,11 @@
 /// Tells the compiler which varargs correspond to a format string
 #define PrintfLike( FORMAT_STRING, FIRST_VAR_ARG ) \
     __attribute__( ( __format__( __printf__, FORMAT_STRING, FIRST_VAR_ARG ) ) )
+#define ScanfLike( FORMAT_STRING, FIRST_VAR_ARG ) \
+    __attribute__( ( __format__( __scanf__, FORMAT_STRING, FIRST_VAR_ARG ) ) )
 #else // format
 #define PrintfLike( FORMAT_STRING, FIRST_VAR_ARG )
+#define ScanfLike( FORMAT_STRING, FIRST_VAR_ARG )
 #endif // format
 
 
@@ -63,6 +88,8 @@
 
 #if HAS_ATTRIBUTE( noreturn )
 #define NoReturn __attribute__( ( noreturn ) )
+#elif defined( COMPILER_MSVC )
+#define NoReturn __declspec( noreturn )
 #else
 #define NoReturn
 #endif // constructor
@@ -70,6 +97,8 @@
 
 #if HAS_ATTRIBUTE( deprecated )
 #define Deprecated __attribute__( ( deprecated ) )
+#elif defined( COMPILER_MSVC )
+#define Deprecated __declspec( deprecated )
 #else
 #define Deprecated
 #endif
