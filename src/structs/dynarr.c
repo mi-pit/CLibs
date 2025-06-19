@@ -1,13 +1,13 @@
-
 #include "dynarr.h"
 
-#include "../headers/errors.h" /* RVs, fwarn* */
-#include "../headers/extra_types.h"
-#include "../headers/misc.h"
-#include "../headers/pointer_utils.h"
+#include "../headers/assert_that.h"
+#include "../headers/errors.h"        /* RVs, fwarn* */
+#include "../headers/extra_types.h"   /* byte, size_t */
+#include "../headers/misc.h"          /* cmp */
+#include "../headers/pointer_utils.h" /* deref_as */
 
 #include <stdio.h>  /* *print* */
-#include <stdlib.h> /* malloc, free, bsearch, qsort */
+#include <stdlib.h> /* alloc, bsearch, qsort */
 #include <string.h> /* mem* */
 
 

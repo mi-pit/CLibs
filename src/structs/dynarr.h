@@ -88,8 +88,9 @@ const void *list_see( const struct dynamic_array *ls, size_t idx );
 const void *list_peek( const struct dynamic_array *ls );
 
 /**
- * Fetches an item at the specified index;
- * type must be the same as the list element type
+ * Fetches an item at the specified index.
+ * OOB index dereferences a NULL pointer (so don't do that).
+ * Type must be the same as the list element type.
  */
 #define list_fetch( LIST, IDX, TYPE ) \
     ( *( ( const TYPE * ) list_see( ( LIST ), ( IDX ) ) ) )
@@ -108,8 +109,9 @@ void *list_at( struct dynamic_array *, size_t idx );
 void *list_at_last( struct dynamic_array * );
 
 /**
- * Accesses the list as if it was an array (assignment is possible);
- * OOB index dereferences a NULL pointer.
+ * Accesses the list as if it was an array – like ARRAY[IDX] => assignment is possible.
+ * OOB index dereferences a NULL pointer (so don't do that).
+ * Type must be the same as the list element type.
  */
 #define list_access( LIST, IDX, TYPE ) ( *( ( TYPE * ) list_at( ( LIST ), ( IDX ) ) ) )
 
