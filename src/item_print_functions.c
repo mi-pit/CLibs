@@ -75,19 +75,6 @@ void print_string_direct( const void *data, const size_t nbytes )
 }
 
 
-#ifdef CLIBS_DYNAMIC_ARRAY_H
-void print_List( const void *data, size_t nbytes )
-{
-    if ( nbytes != sizeof( List ) )
-    {
-        printf( "%s: invalid data", __func__ );
-        return;
-    }
-    ConstList ls = *( List * ) data;
-    list_print( ls );
-}
-#endif //CLIBS_DYNAMIC_ARRAY_H
-
 #ifdef CLIBS_SETS_H
 void print_Set( const void *data, size_t nbytes )
 {
