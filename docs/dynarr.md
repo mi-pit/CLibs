@@ -2,8 +2,9 @@
 
 A flexible dynamic array ("list") implementation in C.
 
-It can store elements of arbitrary size, provides dynamic resizing, and supports basic operations such as adding,
-removing, sorting, and more.
+It can store elements of arbitrary (fixed) size,
+provides dynamic resizing, and supports basic operations such as
+adding, removing, sorting, and more.
 
 ---
 
@@ -32,81 +33,100 @@ List *list_init_type( char * ); // Element type: char *
 List *list_init_size( size_t el_size ); // e.g., sizeof(struct Foo)
 ```
 
-### `_p` Suffix
-
-The `_p` variants also accept a **print mode**, which determines how elements are printed (see section **Printing**).
-
 ---
 
 ## Default Configuration
 
-```
-List::capacity = LIST_DEF_SIZE  // Default: 64
+```c++
 List::size     = 0
-List::items    = calloc(capacity, el_size)
+List::capacity = LIST_DEF_SIZE  // Default: 64
 List::el_size  = sizeof(element)
+List::items    = calloc(capacity, el_size)
 ```
 
 ---
 
 ## Core API
 
-### Add & Insert
+All method names start with `list_` followed by method name
 
-The functions `list_append` & `insert` accept a pointer to the data.
+### Adding elements
+
+Methods `append` & `insert` accept a pointer to the data.
 
 This means the usage is
 
 ```c++
 List *num_ls = list_init_type(int);
-int num = 123;
+int num = 123; // type must be the same as in the init function
 list_append(num_ls, &num); // note the `&'
 ```
 
-#### Other methods
+### Removing elements
 
-* `list_access` – similar to array indexing, allows modification
-* `list_fetch` – returns a value from the list, doesn't allow modification
-* `list_copy`
-* `list_destroy`
-* `list_clear`
-* `list_extend`
-* `list_extend_list`
-* `list_insert`
-* `list_is_empty`
-* `list_size`
-* `list_pop`
-* `list_remove`
-* `list_remove_fast`
-* `list_reverse`
-* `list_set_print_mode`
-* `list_sort`
-* `list_cmp_elsize`
-* `list_cmp_size`
+Methods `pop`, `remove` and `remove_fast` all allow
+the caller to specify if and where the removed element's data is stored.
 
-and probably more
+```c++
+List *num_ls = list_init_type(int);
+// add some elements
+int cont;
+list_pop(num_ls, &cont); // the last number in num_ls gets stored in cont
+```
 
 ### Printing
 
-* #### `list_printf` Macros
+Prototype:
 
 ```c++
 list_printf( LIST, ITEM_TYPE, FORMAT )
 ```
 
-see `array_printf` for more info
+where
 
-* #### `list_print` Family Functions
+- `LIST` is a valid `List *`,
+- `ITEM_TYPE` is a C keyword/typedef/…,
+- `FORMAT` is a printf-like format string (e.g. `"%i"` for `int`)
 
-deprecated, use `list_printf`
+Also allows the caller to choose the beginning, separator, and end strings (see `_d` & `_sde` variants).
+By default, these are `[`, `, ` and `]` respectively
+
+See `array_printf` for more info
+
+Note that all `list_printf` variants are macros, not functions.
 
 ---
 
+### Other methods
+
+* `access` – similar to array indexing, allows modification
+* `fetch` – returns a value from the list, doesn't allow modification
+* `copy` – creates a copy of another list
+* `destroy` – frees all memory owned by the list
+* `clear` – resets the list to the defaults
+* `append` – appends one (1) item to the end of the list
+* `extend` – appends any number of items from an array
+* `extend_list` – appends all items from another list
+* `insert`
+  * inserts one item at a specified index
+  * all following items are moved forward
+* `is_empty`
+* `size` – returns the number of items in the list
+* `pop` – removes the last item
+* `remove` – removes an item from the specified index 
+* `remove_fast`
+* `reverse`
+* `sort` – uses `<stdlib.h>`'s `qsort` to sort its elements
+* `cmp_size` – compares lists based on number of items
+* `cmp_elsize` – compares lists based on element size
+
+and probably more
+
 ## Notes
 
-- All elements must be **fixed size** and homogeneous. All methods assume this.
-- All functions perform bounds checks and return either pointers or `int` success status. (see `headers/errors.h`)
-- All functions have their own – more detailed – docs in the header file
+- All elements must be **fixed size** and homogeneous. All methods assume this and not following this rule is UB.
+- Functions perform bounds checks and return either pointers or `int` success status. (see `headers/errors.h`)
+- Functions have their own – more detailed – docs in the header file
 
 ---
 

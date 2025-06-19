@@ -24,39 +24,22 @@ typedef struct dynamic_array List;
 #define LIST_CAP_SIZE_RATIO 2
 
 
-enum ListPrinters {
-    LS_PRINT_NOFORMAT = -1, /* Lets each list to choose its own print method */
-    LS_PRINT_BYTE     = 0,  /* default;
-                             * prints any data as pairs of hexadecimal digits */
-    LS_PRINT_STR,           /* List contents are strings */
-    LS_PRINT_SIGNED,        /* List contents are signed whole numbers */
-    LS_PRINT_UNSIGNED,      /* List contents are unsigned whole numbers */
-    LS_PRINT_DEC,           /* List contents are rational numbers */
-    LS_PRINT_PTR,           /* List contents are pointers */
-    LS_PRINT_LIST,          /* List contents are other lists */
-};
-
 /**
  * Initializes the List to be of type ‹type›
  */
 #define list_init_type( type ) list_init_size( sizeof( type ) )
 /**
- * Initializes the List to be of type ‹type›\n
- * \n
- * Sets the print_mode to ‹pt›
- */
-#define list_init_type_p( type, print_mode ) \
-    list_init_size_p( sizeof( type ), print_mode )
-/**
  * Initializes the lists items to be of size ‹el_size›.\n
  */
 Constructor struct dynamic_array *list_init_size( size_t el_size );
 /**
- * Initializes the lists items to be of size ‹el_size›.\n
- * \n
- * Sets the print_mode to ‹mode›
+ * Creates a new list
+ *
+ * @param el_size   sizeof a single element
+ * @param init_cap  initial capacity in terms of elements (rather than bytes)
+ * @return pointer to a new empty List, or NULL if allocation fails
  */
-Constructor struct dynamic_array *list_init_size_p( size_t el_size, int mode );
+Constructor struct dynamic_array *list_init_cap_size( size_t el_size, size_t init_cap );
 
 /**
  * Creates a copy of the List and stores it in ‹new_ls_cont›
@@ -69,7 +52,7 @@ int list_copy( const struct dynamic_array *old, struct dynamic_array **new_ls_co
  * Creates a copy of the original List
  * @return newly allocated list pointer (see `list_init_*`)
  *         with a shallow copy of the data inside.
- *         This list may be passed to `free()`
+ *         This list may be passed to `list_destroy()`
  */
 Constructor struct dynamic_array *list_copy_p( const struct dynamic_array * );
 
@@ -169,7 +152,7 @@ int list_append( struct dynamic_array *, const void *datap );
 int list_insert( struct dynamic_array *, size_t index, const void *data );
 
 /**
- * Removes the last element from the List, puts the result as_new ‹container›.\n
+ * Removes the last element from the List, puts the result into ‹container›.\n
  * If ‹container› is NULL, list_pop() discards the last element
  * @param ls pointer to a valid List struct
  * @param container pointer to valid space in memory
@@ -241,7 +224,7 @@ void list_destroy( struct dynamic_array * );
 /**
  * Resets the list to the defaults
  */
-void list_clear( struct dynamic_array *ls );
+int list_clear( struct dynamic_array *ls );
 
 
 /* ––––––––––––––––––––––––––––––– PRINTERS ––––––––––––––––––––––––––––––– */
