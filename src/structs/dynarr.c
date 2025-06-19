@@ -391,16 +391,26 @@ int list_reverse( struct dynamic_array *ls )
 
 struct dynamic_array *list_reversed( const struct dynamic_array *ls )
 {
-    // todo: re-implement this for efficiency
-    struct dynamic_array *rev;
-    if ( list_copy( ls, &rev ) != RV_SUCCESS )
+    struct dynamic_array *rev = list_init_size( ls->el_size );
+    if ( rev == NULL )
         return ( void * ) f_stack_trace( NULL );
 
-    if ( list_reverse( rev ) != RV_SUCCESS )
+    for ( size_t i = 0; i < ls->size; ++i )
     {
-        list_destroy( rev );
-        return ( void * ) f_stack_trace( NULL );
+        const size_t index = ls->size - 1 - i;
+        const void *datap  = list_see( ls, index );
+        assert_that( datap != NULL,
+                     "index %zu must be in bounds (size=%zu)",
+                     index,
+                     ls->size );
+
+        if ( list_append( rev, datap ) != RV_SUCCESS )
+        {
+            list_destroy( rev );
+            return ( void * ) f_stack_trace( NULL );
+        }
     }
+
     return rev;
 }
 
