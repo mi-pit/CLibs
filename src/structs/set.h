@@ -1,6 +1,7 @@
 #ifndef CLIBS_SETS_H
 #define CLIBS_SETS_H
 
+#include "../headers/extra_types.h"  /* stddef, stdint, stdbool */
 #include "../item_print_functions.h" /* PrintFunction */
 
 
