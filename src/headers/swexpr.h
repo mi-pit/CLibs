@@ -10,9 +10,9 @@
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
 
-#include "../structs/dynarr.h"
-#include "errors.h"
-#include "pointer_utils.h"
+#include "../structs/dynarr.h" /* stack-like lists */
+#include "errors.h"            /* err */
+#include "pointer_utils.h"     /* deref_as, free_n */
 
 #include <stdbool.h> /* bool */
 
@@ -60,9 +60,7 @@
     as( NEW_VAR_NAME )
 
 
-/**
- * Assigns the 'result' into the swexpr variable
- */
+/// Assigns the 'result' into the swexpr variable
 #define resolve( result_type, result )                                          \
     do                                                                          \
     {                                                                           \
@@ -81,7 +79,7 @@
     {                                                                           \
         if ( _Swex_aux_variable_ != NULL )                                      \
         {                                                                       \
-            free( _Swex_aux_variable_ );                                        \
+            free_n( _Swex_aux_variable_ );                                      \
             _Swex_aux_variable_ = NULL;                                         \
         }                                                                       \
         _Swex_aux_variable_ = malloc( sizeof( type ) );                         \
@@ -124,13 +122,12 @@
  * Not calling this function will cause undefined behaviour and calling it prematurely
  * will probably cause a NULL pointer dereference.
  */
-#define swex_finish()                \
-    do                               \
-    {                                \
-        _Switch_expression_pop_();   \
-        free( _Swex_aux_variable_ ); \
-        _Swex_aux_variable_ = NULL;  \
-    }                                \
+#define swex_finish()                  \
+    do                                 \
+    {                                  \
+        _Switch_expression_pop_();     \
+        free_n( _Swex_aux_variable_ ); \
+    }                                  \
     while ( 0 )
 
 
@@ -139,10 +136,10 @@
 /* DO NOT USE */
 
 
-LibraryDefined List *_Switch_expr_values_stack_    = NULL;
-LibraryDefined List *_Switch_expr_variables_stack_ = NULL;
-LibraryDefined List *_Switch_expr_sizes_stack_     = NULL;
-LibraryDefined List *_Switch_expr_assigned_stack_  = NULL;
+LibraryDefined List /* <void *> */ *_Switch_expr_values_stack_    = NULL;
+LibraryDefined List /* <void *> */ *_Switch_expr_variables_stack_ = NULL;
+LibraryDefined List /* <size_t> */ *_Switch_expr_sizes_stack_     = NULL;
+LibraryDefined List /* <bool> */ *_Switch_expr_assigned_stack_    = NULL;
 
 
 LibraryDefined void *_Swex_aux_variable_;
@@ -160,8 +157,8 @@ LibraryDefined int _Switch_expression_push_( const size_t nbytes, const void *co
     }                                                                      \
     while ( 0 )
 
-    static const bool SWEX_FALSE  = false;
-    static const void *const null = NULL;
+    static const bool SWEX_FALSE = false;
+    static void *const null      = NULL;
 
     try_push( _Switch_expr_sizes_stack_, &nbytes, sizeof( size_t ) );
     try_push( _Switch_expr_values_stack_, data, sizeof( void * ) );
@@ -225,12 +222,12 @@ LibraryDefined void *_Switch_expression_get_varaddr_( void )
 
 LibraryDefined size_t _Switch_expression_size_peek_( void )
 {
-    return *( size_t * ) list_peek( _Switch_expr_sizes_stack_ );
+    return deref_as( size_t, list_peek( _Switch_expr_sizes_stack_ ) );
 }
 
 LibraryDefined void *_Switch_expression_value_peek_( void )
 {
-    return *( void ** ) list_peek( _Switch_expr_values_stack_ );
+    return deref_as( void *, list_peek( _Switch_expr_values_stack_ ) );
 }
 
 #endif //CLIBS_SWEXPR_H

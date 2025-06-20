@@ -33,7 +33,7 @@ void swex_example( const char *choice )
         }
     }
     swex_finish();
-    
+
     printf( "%d\n", rv );
 }
 ```
@@ -50,5 +50,7 @@ void swex_example( const char *choice )
 - `swex_default()` – Default case fallback
 - `resolve(type, val)` – Resolves the switch to a value
 - `swex_finish()` – Closes a switch block (must be present after every block)
+
+case type must be the same as the type in init
 
 ---
