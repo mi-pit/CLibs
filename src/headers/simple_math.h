@@ -96,5 +96,11 @@ LibraryDefined Mathematical inline bool is_within( const int64_t low, const int6
     return num >= low && num <= high;
 }
 
+/// Returns true if num is a power of two
+LibraryDefined Mathematical inline bool is_power_of_two( const uint64_t num )
+{
+    return num != 0 && !( num & ( num - 1 ) );
+}
+
 
 #endif //SIMPLE_MATH_H
