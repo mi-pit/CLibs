@@ -7,6 +7,7 @@
 #include "modules/test_dynstr.h"
 #include "modules/test_foreach.h"
 #include "modules/test_list.h"
+#include "modules/test_math.h"
 #include "modules/test_misc_c.h"
 #include "modules/test_queue.h"
 #include "modules/test_sets.h"
@@ -26,6 +27,7 @@ int main( void )
     RUNALL_QUEUE();
 
     RUNALL_MISC();
+    RUNALL_MATH();
 
     RUNALL_ARRAYPRINTF();
     RUNALL_FOREACH();
