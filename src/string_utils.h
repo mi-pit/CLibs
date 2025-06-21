@@ -213,10 +213,10 @@ UseResult str_t string_as_lower( string_t );
 UseResult str_t string_replaced( string_t, string_t old, string_t new );
 
 
-#define STRSPLIT_EXCLUDE_EMPTY     0x01
-#define STRSPLIT_KEEP_DELIM_BEFORE 0x02
-#define STRSPLIT_KEEP_DELIM_AFTER  0x04
-#define STRSPLIT_STRIP_RESULTS     0x08 // Only for string_split() (not regex)
+#define STRSPLIT_EXCLUDE_EMPTY     ( 1 << 0 )
+#define STRSPLIT_KEEP_DELIM_BEFORE ( 1 << 1 )
+#define STRSPLIT_KEEP_DELIM_AFTER  ( 1 << 2 )
+#define STRSPLIT_STRIP_RESULTS     ( 1 << 3 ) // Only for string_split() (not regex)
 
 /**
  * Flags for the string_split[_regex] functions
