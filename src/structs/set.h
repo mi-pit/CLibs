@@ -50,15 +50,15 @@ bool set_search( const Set *set, const void *data, size_t len );
 bool set_search_item( const Set *set, const struct set_item *item );
 
 /**
+ * Creates an intersection of the two sets and shallowly copies the data to
+ * a new set, stored under `result`
  *
- * @param set_1
- * @param set_2
  * @param result    if the val at result is NULL, the function creates a new
  * hash set with the proper values. If the val isn't NULL, the function
  * adds the intersecting values to the hash set in result
  * @return -1 on error, else 0
  */
-int set_intersection( const Set *set_1, const Set *set_2, Set **result );
+int set_intersection( const Set *, const Set *, Set **result );
 int set_intersect( Set *set, const Set *intr );
 
 int set_union( const Set *set_1, const Set *set_2, Set **result );
@@ -68,7 +68,12 @@ int set_difference( const Set *, const Set *sub, Set **result );
 int set_subtract( Set *, const Set *sub );
 
 
-int set_cmp( const Set *set_1, const Set *set_2 );
+/**
+ * Compares sets (pretty arbitrarily). First by size, then by items.
+ *
+ * @return 1, 0, -1
+ */
+int set_cmp( const Set *, const Set * );
 
 
 void set_destroy( Set * );
@@ -113,6 +118,7 @@ SetEnumeratedEntry set_get_next( const Set *set, int64_t index_last );
         set_print_as( set, print_func ); \
     }                                    \
     while ( 0 )
+
 void set_print( const Set * );
 void set_print_as( const Set *, PrintFunction );
 
