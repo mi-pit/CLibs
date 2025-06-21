@@ -12,7 +12,8 @@
 
 #include "attributes.h"
 
-#include <string.h>
+#include <stdbool.h> /* bool */
+#include <string.h>  /* strrchr */
 
 #ifndef __FILE_NAME__
 #define __FILE_NAME__ \
@@ -68,22 +69,37 @@ LibraryDefined inline const char *get_prog_name( void )
     return ProgName;
 }
 
+/// Sets the static `ProgName` to the current program's name if possible
+BeforeMain LibraryDefined bool set_prog_name( void );
+
+
 #if defined( __APPLE__ ) /* not sure if it actually works on iPhones :D */
+#include <err.h>         /* warn */
 #include <mach-o/dyld.h> /* _NSGetExecutablePath() */
+#include <stdlib.h>      /* malloc */
 
 BeforeMain LibraryDefined bool set_prog_name( void )
 {
-    char path[ PATH_MAX ];
-    uint32_t size = PATH_MAX;
-    if ( _NSGetExecutablePath( path, &size ) == 0 )
+    char path[ PATH_MAX + 1 ];
+    uint32_t size = sizeof path;
+    if ( _NSGetExecutablePath( path, &size ) != 0 )
     {
+        char *const alloced = malloc( size );
+        if ( alloced == NULL || _NSGetExecutablePath( path, &size ) != 0 )
+        {
+            warn( "not able to initialize prog name" ); // use std warn to avoid circular import
+            return false;
+        }
         const char *name = get_file_name( path );
-        strncpy( ProgName, name, PATH_MAX );
+        strncpy( ProgName, name, size );
+        free( alloced );
         return true;
     }
-
-    return false;
+    const char *name = get_file_name( path );
+    strncpy( ProgName, name, PATH_MAX );
+    return true;
 }
+
 #elif ( defined( __APPLE__ ) || defined( __FreeBSD__ ) ) && !defined( _POSIX_C_SOURCE )
 #include <stdlib.h>
 #define get_prog_name() getprogname()
