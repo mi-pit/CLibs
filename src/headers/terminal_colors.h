@@ -18,7 +18,11 @@
 
 /**
  * When supplied with the correct ANSI color code,
- * this macro creates the escape code for the corresponding color
+ * this macro creates the escape code for the corresponding color.
+ * @code
+ * #define COLOR_DEFAULT    COLOR_CREATOR( "0" )
+ * #define FOREGROUND_BLACK COLOR_CREATOR( GROUND_FORE COLORCODE_BLACK )
+ * @endcode
  */
 #define COLOR_CREATOR( NUM ) "\033[" NUM "m"
 
@@ -62,40 +66,41 @@
 #define BACKGROUND_GRAY COLOR_CREATOR( GROUND_BACK "8;5;238" )
 
 
-LibraryDefined PrintfLike( 3, 4 ) void PrintInColor( FILE *file,
-                                                     const char *Color,
-                                                     const char *__restrict format,
-                                                     ... );
-
-LibraryDefined inline void SetTerminalColor( FILE *stream, const char *Color )
+LibraryDefined inline bool SetTerminalColor( FILE *stream, const char *Color )
 {
-    if ( fprintf( stream, "%s", Color ) < 0 )
-        PrintInColor( stderr, BACKGROUND_RED, "%s: fprintf", __func__ );
+    return fprintf( stream, "%s", Color ) > 0;
 }
 
-inline void PrintInColor( FILE *file,
-                          const char *Color,
-                          const char *__restrict format,
-                          ... )
+LibraryDefined inline int VPrintInColor( FILE *file,
+                                         const char *Color,
+                                         const char *format,
+                                         va_list vaList )
 {
-    fprintf( file, PRINT_COLOR, Color );
+    if ( !SetTerminalColor( file, Color ) )
+        return -1;
 
+    const int rv = vfprintf( file, format, vaList );
+
+    if ( !SetTerminalColor( file, COLOR_DEFAULT ) )
+        return -1;
+
+    return rv;
+}
+
+/**
+ * Since there exists no reliable way to retrieve the current terminal color,
+ * this function resets it to the default
+ */
+LibraryDefined PrintfLike( 3, 4 ) inline int PrintInColor( FILE *file,
+                                                           const char *Color,
+                                                           const char *format,
+                                                           ... )
+{
     va_list va;
     va_start( va, format );
-    vfprintf( file, format, va );
+    const int rv = VPrintInColor( file, Color, format, va );
     va_end( va );
-
-    fprintf( file, COLOR_DEFAULT );
-}
-
-LibraryDefined inline void VPrintInColor( FILE *file,
-                                          const char *Color,
-                                          const char *__restrict format,
-                                          va_list vaList )
-{
-    fprintf( file, PRINT_COLOR, Color );
-    vfprintf( file, format, vaList );
-    fprintf( file, COLOR_DEFAULT );
+    return rv;
 }
 
 
