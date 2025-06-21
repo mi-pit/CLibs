@@ -1,13 +1,13 @@
 //
 // Created by MacBook on 03.01.2025.
 //
-#include "../Dev/assert_that.h"
-#include "../Dev/pointer_utils.h"
-#include "../Structs/dictionary.h"
-#include "../Structs/dynarr.h"
+#include "../src/headers/assert_that.h"
+#include "../src/headers/pointer_utils.h"
+#include "../src/structs/dictionary.h"
+#include "../src/structs/dynarr.h"
 
 // after dynarr
-#include "../foreach.h"
+#include "../src/headers/foreach.h"
 
 
 typedef int64_t Number;
@@ -30,9 +30,9 @@ define_print_func( pointer_t, "%p" );
 
 Type majority_element( struct dynamic_array *nums )
 {
-    Dict freq = dict_init();
+    Dictionary *freq = dict_init();
 
-    foreach_ls( Type, num, nums )
+    foreach_ls ( Type, num, nums )
     {
         const struct key_value_pair *kvp = dict_get( freq, &num, sizeof num );
         count_t count = ( kvp == NULL ? 0 : deref_as( count_t, kvp->val ) ) + 1;
@@ -41,7 +41,7 @@ Type majority_element( struct dynamic_array *nums )
 
     dict_printn_as( freq, print_function( Type ), print_size_t );
 
-    foreach_ls( Type, num, nums )
+    foreach_ls ( Type, num, nums )
     {
         const struct key_value_pair *kvp = dict_get( freq, &num, sizeof num );
         Type key                         = deref_as( Type, kvp->key );

@@ -5,9 +5,9 @@
 #ifndef CLIBS_TEST_LIST_H
 #define CLIBS_TEST_LIST_H
 
-#include "../src/headers/misc.h"       /* STRLEN */
-#include "../src/headers/unit_tests.h" /* ... */
-#include "../src/structs/dynarr.h"     /* ... */
+#include "../../src/headers/misc.h"
+#include "../../src/headers/unit_tests.h"
+#include "../../src/structs/dynarr.h"
 
 
 Tester test_list_array_uint64( const struct dynamic_array *ls,
@@ -213,6 +213,13 @@ TEST( list_advanced )
 #undef STRING2
 }
 END_TEST
+
+LibraryDefined void RUNALL_LIST( void )
+{
+    RUN_TEST( list_init );
+    RUN_TEST( list_basic );
+    RUN_TEST( list_advanced );
+}
 
 
 #endif //CLIBS_TEST_LIST_H

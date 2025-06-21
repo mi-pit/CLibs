@@ -2,9 +2,9 @@
 // Created by MacBook on 08.01.2025.
 //
 
-#include "../src/headers/assert_that.h"
-#include "../src/headers/unit_tests.h"
-#include "../src/string_utils.h"
+#include "../../src/headers/assert_that.h"
+#include "../../src/headers/unit_tests.h"
+#include "../../src/string_utils.h"
 
 
 Tester test_one_replace( string_t orig, string_t old, string_t new, string_t expected )
@@ -394,6 +394,42 @@ TEST( strspl_regex )
 END_TEST
 
 
+#define test_one_join( WANTED, JOINER, ... )                               \
+    do                                                                     \
+    {                                                                      \
+        const string_t arr[] = { __VA_ARGS__ };                            \
+        str_t got            = string_join( countof( arr ), arr, JOINER ); \
+        UNIT_TEST( strcmp( WANTED, got ) == 0 );                           \
+        free( got );                                                       \
+    }                                                                      \
+    while ( 0 )
+
+TEST( join )
+{
+    test_one_join( "Hopspop!", "", "Hops", "pop", "!" );
+    test_one_join( "Hops pop !", " ", "Hops", "pop", "!" );
+    test_one_join( "Hops.pop.!", ".", "Hops", "pop", "!" );
+    test_one_join( "Hops\npop\n!", "\n", "Hops", "pop", "!" );
+    test_one_join( "HopsHopspopHops!", "Hops", "Hops", "pop", "!" );
+
+    test_one_join( "Hops", "\n", "Hops" );
+    test_one_join( "Hops", "", "Hops" );
+
+    {
+        str_t arr[ 1 ] = { strdup( "hops" ) };
+        str_t got      = string_join( 0, ( const string_t * ) arr, "\n" );
+        UNIT_TEST( strcmp( got, "" ) == 0 );
+        free( got );
+
+        UNIT_TEST( string_join( 1, ( const string_t * ) arr, NULL ) == NULL );
+        free( arr[ 0 ] );
+    }
+
+    UNIT_TEST( string_join( 0, NULL, "\n" ) == NULL );
+}
+END_TEST
+
+
 typedef void( StringToUL )( str_t );
 Tester test_one_string_to_UL( StringToUL func, string_t old, string_t new )
 {
@@ -524,3 +560,20 @@ TEST( strings_misc )
     UNIT_TEST( strcmp( get_file_name( "Directory/Subdir/" ), "Subdir/" ) == 0 );
 }
 END_TEST
+
+LibraryDefined void RUNALL_STRING_UTILS( void )
+{
+    RUN_TEST( replace );
+    RUN_TEST( escape );
+    RUN_TEST( unescape );
+    RUN_TEST( strspl_str );
+    RUN_TEST( strspl_regex );
+    RUN_TEST( string_to_UL );
+    RUN_TEST( string_as_UL );
+    RUN_TEST( reverse_str );
+    RUN_TEST( strip );
+
+    RUN_TEST( strings_misc );
+
+    RUN_TEST( join );
+}

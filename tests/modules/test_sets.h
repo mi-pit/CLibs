@@ -1,8 +1,11 @@
-#include "../src/headers/assert_that.h"
-#include "../src/headers/unit_tests.h"
-#include "../src/structs/sets.h"
+#ifndef TEST_SETS_H
+#define TEST_SETS_H
 
-TEST( init )
+#include "../../src/headers/assert_that.h"
+#include "../../src/headers/unit_tests.h"
+#include "../../src/structs/sets.h"
+
+TEST( set_init )
 {
     struct hash_set *set = set_init();
     UNIT_TEST( set != NULL );
@@ -10,7 +13,7 @@ TEST( init )
 }
 END_TEST
 
-TEST( insert )
+TEST( set_insert )
 {
     struct hash_set *set = set_init();
     assert_that( set != NULL, "init failed" );
@@ -59,10 +62,11 @@ TEST( insert )
 }
 END_TEST
 
-int main( void )
-{
-    RUN_TEST( init );
-    RUN_TEST( insert );
 
-    FINISH_TESTING();
+LibraryDefined void RUNALL_SETS( void )
+{
+    RUN_TEST( set_init );
+    RUN_TEST( set_insert );
 }
+
+#endif

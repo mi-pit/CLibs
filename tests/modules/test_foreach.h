@@ -5,18 +5,18 @@
 #ifndef CLIBS_TEST_FOREACH_H
 #define CLIBS_TEST_FOREACH_H
 
-#include "../src/headers/assert_that.h"
-#include "../src/headers/misc.h"
-#include "../src/headers/unit_tests.h"
-#include "../src/string_utils.h"
-#include "../src/structs/dynarr.h"
-#include "../src/structs/dynstring.h"
-#include "../src/structs/queue.h"
-#include "../src/structs/sets.h"
+#include "../../src/headers/assert_that.h"
+#include "../../src/headers/misc.h"
+#include "../../src/headers/unit_tests.h"
+#include "../../src/string_utils.h"
+#include "../../src/structs/dynarr.h"
+#include "../../src/structs/dynstring.h"
+#include "../../src/structs/queue.h"
+#include "../../src/structs/sets.h"
 
 // must be after dynarr.h and sets.h
-#include "../src/headers/foreach.h"
-#include "../src/headers/pointer_utils.h"
+#include "../../src/headers/foreach.h"
+#include "../../src/headers/pointer_utils.h"
 
 
 Tester test_one_foreach_arr( const int64_t arr[], const size_t count )
@@ -177,6 +177,14 @@ TEST( foreach_queue )
     queue_destroy( queue );
 }
 END_TEST
+
+
+LibraryDefined void RUNALL_FOREACH( void )
+{
+    RUN_TEST( foreach );
+    RUN_TEST( foreach_set );
+    RUN_TEST( foreach_queue );
+}
 
 
 #endif //CLIBS_TEST_FOREACH_H

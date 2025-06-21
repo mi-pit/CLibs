@@ -73,22 +73,22 @@
         for ( size_t print_array_idx__ = 0; print_array_idx__ < ( ARRLEN );        \
               ++print_array_idx__ )                                                \
         {                                                                          \
-            on_fail( dynstr_appendf( dynstr, FMTSTR,                               \
-                                     ( ( TYPE * ) ARRAY )[ print_array_idx__ ] ) ) \
+            if ( dynstr_appendf( dynstr, FMTSTR,                                   \
+                                 ( ( TYPE * ) ARRAY )[ print_array_idx__ ] ) < 0 ) \
             {                                                                      \
                 dynstr_destroy( dynstr );                                          \
                 break;                                                             \
             }                                                                      \
             if ( print_array_idx__ != ( ARRLEN ) - 1 )                             \
             {                                                                      \
-                on_fail( dynstr_append( dynstr, DELIM ) )                          \
+                if ( dynstr_append( dynstr, DELIM ) < 0 )                          \
                 {                                                                  \
                     dynstr_destroy( dynstr );                                      \
                     break;                                                         \
                 }                                                                  \
             }                                                                      \
         }                                                                          \
-        on_fail( dynstr_append( dynstr, " ]" ) )                                   \
+        if ( dynstr_append( dynstr, " ]" ) < 0 )                                   \
         {                                                                          \
             dynstr_destroy( dynstr );                                              \
             break;                                                                 \

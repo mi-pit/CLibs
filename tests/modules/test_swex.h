@@ -5,9 +5,9 @@
 #ifndef CLIBS_TEST_SWEX_H
 #define CLIBS_TEST_SWEX_H
 
-#include "../src/headers/swexpr.h"
-#include "../src/headers/unit_tests.h"
-#include "../src/string_utils.h"
+#include "../../src/headers/swexpr.h"
+#include "../../src/headers/unit_tests.h"
+#include "../../src/string_utils.h"
 
 static int get_swex_val( int branch_1, int branch_2, string_t branch_3 )
 {
@@ -80,5 +80,11 @@ TEST( swex )
     UNIT_TEST( test_one_swex( 1, 2, "Hovno", -100 ) );
 }
 END_TEST
+
+LibraryDefined void RUNALL_SWEX( void )
+{
+    RUN_TEST( swex );
+}
+
 
 #endif //CLIBS_TEST_SWEX_H

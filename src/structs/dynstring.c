@@ -85,29 +85,28 @@ Private int dynstr_resize( struct dynamic_string *dynstr, const size_t new_size 
 }
 
 
-Private int dynstr_VPendF( struct dynamic_string *dynstr,
-                           int( pender )( struct dynamic_string *, const char * ),
-                           const char *fmt,
-                           va_list vaList )
+Private ssize_t dynstr_VPendF( struct dynamic_string *dynstr,
+                               ssize_t( pender )( struct dynamic_string *, const char * ),
+                               const char *fmt,
+                               va_list vaList )
 {
     str_t buffer;
-    if ( vasprintf( &buffer, fmt, vaList ) == RV_ERROR )
-        return f_stack_trace( RV_ERROR );
-
-    if ( pender( dynstr, buffer ) != RV_SUCCESS )
+    vasprintf( &buffer, fmt, vaList );
+    const ssize_t rv = pender( dynstr, buffer ) != RV_SUCCESS;
+    if ( rv == RV_ERROR )
         return f_stack_trace( RV_ERROR );
 
     free( buffer );
-    return RV_SUCCESS;
+    return rv;
 }
 
 
-int dynstr_append( struct dynamic_string *dynstr, const char *app )
+ssize_t dynstr_append( struct dynamic_string *dynstr, const char *app )
 {
     return dynstr_appendn( dynstr, app, strlen( app ) );
 }
 
-int dynstr_appendn( struct dynamic_string *dynstr, const char *app, size_t len )
+ssize_t dynstr_appendn( struct dynamic_string *dynstr, const char *app, size_t len )
 {
     const size_t new_size = dynstr->len + len;
     if ( new_size + 1 >= dynstr->cap )
@@ -124,30 +123,30 @@ int dynstr_appendn( struct dynamic_string *dynstr, const char *app, size_t len )
     dynstr->data[ new_size ] = '\0';
     dynstr->len              = new_size;
 
-    return RV_SUCCESS;
+    return ( ssize_t ) len;
 }
 
-int dynstr_appendf( struct dynamic_string *dynstr, const char *fmt, ... )
+ssize_t dynstr_appendf( struct dynamic_string *dynstr, const char *fmt, ... )
 {
     va_list va;
     va_start( va, fmt );
-    const int rv = dynstr_VPendF( dynstr, dynstr_append, fmt, va );
+    const ssize_t rv = dynstr_VPendF( dynstr, dynstr_append, fmt, va );
     va_end( va );
     return rv;
 }
 
-int dynstr_vappendf( struct dynamic_string *dynstr, const char *fmt, va_list vargs )
+ssize_t dynstr_vappendf( struct dynamic_string *dynstr, const char *fmt, va_list vargs )
 {
     return dynstr_VPendF( dynstr, dynstr_append, fmt, vargs );
 }
 
 
-int dynstr_prepend( struct dynamic_string *dynstr, const string_t s )
+ssize_t dynstr_prepend( struct dynamic_string *dynstr, const string_t s )
 {
     return dynstr_prependn( dynstr, s, strlen( s ) );
 }
 
-int dynstr_prependn( struct dynamic_string *dynstr, const char *s, size_t len )
+ssize_t dynstr_prependn( struct dynamic_string *dynstr, const char *s, size_t len )
 {
     const size_t new_size = dynstr->len + len;
     if ( new_size >= dynstr->cap )
@@ -164,19 +163,19 @@ int dynstr_prependn( struct dynamic_string *dynstr, const char *s, size_t len )
     dynstr->data[ new_size ] = '\0';
     dynstr->len              = new_size;
 
-    return RV_SUCCESS;
+    return ( ssize_t ) len;
 }
 
-int dynstr_prependf( struct dynamic_string *dynstr, const char *fmt, ... )
+ssize_t dynstr_prependf( struct dynamic_string *dynstr, const char *fmt, ... )
 {
     va_list va;
     va_start( va, fmt );
-    const int rv = dynstr_VPendF( dynstr, dynstr_prepend, fmt, va );
+    const ssize_t rv = dynstr_VPendF( dynstr, dynstr_prepend, fmt, va );
     va_end( va );
     return rv;
 }
 
-int dynstr_vprependf( struct dynamic_string *dynstr, const char *fmt, va_list vargs )
+ssize_t dynstr_vprependf( struct dynamic_string *dynstr, const char *fmt, va_list vargs )
 {
     return dynstr_VPendF( dynstr, dynstr_prepend, fmt, vargs );
 }
