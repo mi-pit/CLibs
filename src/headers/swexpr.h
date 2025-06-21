@@ -20,8 +20,16 @@
 /* ================================ User usable ================================ */
 
 
+/** Initializes the swexpr to, in each ‹case›, compare it to this expression */
+#define swex_init_val( expr_type, expr )                                 \
+    expr_type swex_init_imm_tmp_var_##expr_type##_##expr##__ = ( expr ); \
+    expr_type *swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ =       \
+            &( swex_init_imm_tmp_var_##expr_type##_##expr##__ );         \
+    _Switch_expression_push_( sizeof( expr_type ),                       \
+                              &( swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ ) );
+
 /**
- * Initializes the swexpr to, in each ‹ case ›,
+ * Initializes the swexpr to, in each ‹case›,
  * compare it to the data behind the supplied pointer
  */
 #define swex_init_ptr( expr, nbytes ) _Switch_expression_push_( nbytes, ( expr ) );
@@ -31,30 +39,14 @@
     _Switch_expression_push_( strlen( expr ),                              \
                               &( swex_init_imm_tmp_var_##expr_type##_##expr##__ ) );
 
-/**
- * Initializes the swexpr to, in each ‹ case ›, compare it to this expression
- */
-#define swex_init_val( expr_type, expr )                                     \
-    expr_type swex_init_imm_tmp_var_##expr_type##_##expr##__ = ( expr );     \
-    expr_type *swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ =           \
-            &( swex_init_imm_tmp_var_##expr_type##_##expr##__ );             \
-    assert( _Switch_expression_push_(                                        \
-                    sizeof( expr_type ),                                     \
-                    &( swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ ) ) \
-            == RV_SUCCESS );
-
-/**
- * Uses an existing variable to store the result from ‹ resolve ›
- */
+/** Uses an existing variable to store the result from ‹resolve› */
 #define as( VAR_NAME )                                     \
     {                                                      \
         void *swex_as_var_addr = &( VAR_NAME );            \
         _Switch_expression_init_var_( &swex_as_var_addr ); \
     }
 
-/**
- * Creates a new local variable to store the result from ‹ resolve ›
- */
+/** Creates a new local variable to store the result from ‹resolve› */
 #define as_new( NEW_VAR_TYPE, NEW_VAR_NAME )        \
     NEW_VAR_TYPE NEW_VAR_NAME = ( NEW_VAR_TYPE ) 0; \
     as( NEW_VAR_NAME )
