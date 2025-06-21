@@ -18,17 +18,6 @@
 #include <sys/cdefs.h>
 
 
-#if defined( __clang__ )
-#define COMPILER_CLANG
-#elif defined( __GNUC__ )
-#define COMPILER_GCC
-#elif defined( _MSC_VER )
-#define COMPILER_MSVC
-#else
-#define COMPILER_UNKNOWN
-#endif
-
-
 #ifdef __has_attribute
 #define HAS_ATTRIBUTE( TOK ) __has_attribute( TOK )
 #else // ndef __has_attribute
@@ -88,8 +77,6 @@
 
 #if HAS_ATTRIBUTE( noreturn )
 #define NoReturn __attribute__( ( noreturn ) )
-#elif defined( COMPILER_MSVC )
-#define NoReturn __declspec( noreturn )
 #else
 #define NoReturn
 #endif // constructor
@@ -97,8 +84,6 @@
 
 #if HAS_ATTRIBUTE( deprecated )
 #define Deprecated __attribute__( ( deprecated ) )
-#elif defined( COMPILER_MSVC )
-#define Deprecated __declspec( deprecated )
 #else
 #define Deprecated
 #endif
