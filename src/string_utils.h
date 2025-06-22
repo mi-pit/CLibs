@@ -212,6 +212,20 @@ UseResult str_t string_as_lower( string_t );
  */
 UseResult str_t string_replaced( string_t, string_t old, string_t new );
 
+/**
+ * Replaces all occurrences of a substring with another one.
+ * This is done in-place.
+ *
+ * The substitution string must be the same length as the old substituted string.
+ * (for arbitrary lengths use \code string_replaced\endcode)
+ *
+ * @param string    this string is modified
+ * @param old   must be the same length as new
+ * @param new   must be the same length as old
+ * @return RV_SUCCESS/RV_EXCEPTION
+ */
+int string_replace( str_t string, string_t old, string_t new );
+
 
 #define STRSPLIT_EXCLUDE_EMPTY     ( 1 << 0 )
 #define STRSPLIT_KEEP_DELIM_BEFORE ( 1 << 1 )

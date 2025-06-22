@@ -9,6 +9,33 @@
 #include "../../src/string_utils.h"
 
 
+TEST( replace )
+{
+    char buffer[ 128 ] = "This,is,a,string.";
+
+    UNIT_TEST( string_replace( buffer, ",", " " ) == RV_SUCCESS );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, NULL, "str" ) == RV_EXCEPTION );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, "str", NULL ) == RV_EXCEPTION );
+    UNIT_TEST( string_replace( NULL, "", "" ) == RV_EXCEPTION );
+
+    UNIT_TEST( string_replace( buffer, " ", "long replacement" ) == RV_EXCEPTION );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, "long", "sh" ) == RV_EXCEPTION );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, "", "" ) == RV_SUCCESS );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, "", "" ) == RV_SUCCESS );
+}
+END_TEST
+
+
 Tester test_one_replace( string_t orig, string_t old, string_t new, string_t expected )
 {
     str_t got = string_replaced( orig, old, new );
@@ -18,7 +45,7 @@ Tester test_one_replace( string_t orig, string_t old, string_t new, string_t exp
     return rv;
 }
 
-TEST( replace )
+TEST( replaced )
 {
     UNIT_TEST( test_one_replace( "Hopspop", "p", "-", "Ho-s-o-" ) );
     UNIT_TEST( test_one_replace( "Hops Pop", "p", "-", "Ho-s Po-" ) );
@@ -566,6 +593,7 @@ END_TEST
 LibraryDefined void RUNALL_STRING_UTILS( void )
 {
     RUN_TEST( replace );
+    RUN_TEST( replaced );
     RUN_TEST( escape );
     RUN_TEST( unescape );
     RUN_TEST( strspl_str );

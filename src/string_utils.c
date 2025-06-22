@@ -352,6 +352,31 @@ ERROR:
     return ( void * ) f_stack_trace( NULL );
 }
 
+int string_replace( const str_t string, const string_t old, const string_t new )
+{
+    if ( string == NULL || old == NULL || new == NULL )
+        return fwarnx_ret( RV_EXCEPTION, "an argument is NULL" );
+
+    const size_t repl_len = strlen( old );
+    if ( repl_len != strlen( new ) )
+        return fwarnx_ret(
+                RV_EXCEPTION,
+                "replacement must be the same length as the string it's replacing" );
+
+    if ( repl_len == 0 )
+        return RV_SUCCESS;
+
+    char *occ = strstr( string, old );
+    if ( occ == NULL )
+        return RV_SUCCESS;
+
+    do
+        strncpy( occ, new, repl_len );
+    while ( ( occ = strstr( occ, old ) ) != NULL );
+
+    return RV_SUCCESS;
+}
+
 
 Private const strsplit_mode_t ALL_MODES = STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY
                                           | STRSPLIT_KEEP_DELIM_AFTER
