@@ -16,6 +16,11 @@
  *  array_fprintf */
 
 
+#define ARRAY_PRINT_DEFAULT_STARTSTR "[ "
+#define ARRAY_PRINT_DEFAULT_ENDSTR   " ]\n"
+#define ARRAY_PRINT_DEFAULT_DELIM    ", "
+
+
 /* ––––– Array Print ––––– */
 
 #define array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, START_STR, DELIM, END_STR ) \
@@ -35,20 +40,21 @@
 
 
 /**
- * Prints the array of a set length and type to stdout.\n
+ * Prints the array of a set length and type to stdout.
  * <p>
  * Each item is printed according to the ‹FORMAT_STR› (as in printf)\n
  * Array starts with '[' and ends with ']\\n'\n
  * Items in array are separated by ‹DELIM› (string)
- * <p>
+ * </p>
  * @example
  * @code
- * #define array_printf( ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
- *     array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ", " )
+   #define array_printf( ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
+       array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ", " )
  * @endcode
  */
-#define array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, DELIM ) \
-    array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, "[ ", DELIM, " ]\n" )
+#define array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, DELIM )                     \
+    array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, ARRAY_PRINT_DEFAULT_STARTSTR, \
+                      DELIM, ARRAY_PRINT_DEFAULT_ENDSTR )
 
 /**
  * Prints the array of a set length and type.
@@ -56,13 +62,13 @@
  * Items are separated by ", "
  * </p>
  * <p>
- * requires @code #include "Structs/dynstring.h"@endcode
+ * requires @code #include "structs/dynstring.h"@endcode
  * </p>
  *
  * @see \code array_printf_d\endcode
 */
 #define array_printf( ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
-    array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ", " )
+    array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ARRAY_PRINT_DEFAULT_DELIM )
 
 #ifdef CLIBS_DYNSTRING_H
 /**
