@@ -37,9 +37,7 @@ Constructor struct dynamic_string *dynstr_init_cap( size_t cap );
  */
 Constructor struct dynamic_string *dynstr_init_as( const char * );
 
-/**
- * Frees all memory associated with the DynamicString
- */
+/** Frees all memory owned by the dynamic_string */
 void dynstr_destroy( struct dynamic_string * );
 
 
@@ -68,8 +66,7 @@ ssize_t dynstr_appendn( struct dynamic_string *, const char *app, size_t len );
  *
  * @return RV_ERROR on allocation error, else the number of appended chars
  */
-PrintfLike( 2, 3 ) ssize_t dynstr_appendf( struct dynamic_string *, const char *fmt,
-                                           ... );
+PrintfLike( 2, 3 ) ssize_t dynstr_appendf( DynString *, const char *fmt, ... );
 /**
  * Appends a formatted string to the end of a DynamicString
  *
@@ -79,12 +76,11 @@ ssize_t dynstr_vappendf( struct dynamic_string *, const char *fmt, va_list vargs
 
 /**
  * Adds a string to the start of the DynamicString
- * @return RV_ERROR on allocation error, else the number of pre-pended
+ * @return RV_ERROR on allocation error, else the number of pre-pended chars
  */
 ssize_t dynstr_prepend( struct dynamic_string *, const char * );
 ssize_t dynstr_prependn( struct dynamic_string *dynstr, const char *s, size_t len );
-PrintfLike( 2, 3 ) ssize_t dynstr_prependf( struct dynamic_string *dynstr,
-                                            const char *fmt, ... );
+PrintfLike( 2, 3 ) ssize_t dynstr_prependf( DynString *dynstr, const char *fmt, ... );
 ssize_t dynstr_vprependf( struct dynamic_string *dynstr, const char *fmt, va_list vargs );
 
 /**
@@ -133,7 +129,12 @@ int dynstr_slice_s( struct dynamic_string *, size_t start_idx );
  */
 int dynstr_reset( struct dynamic_string * );
 
-/// Sets the dynstr's data to a provided string
+/**
+ * Sets the dynstr's contents to a new string.
+ *
+ * @param string    this string is copied
+ * @return RV_ERROR if allocation fails, else RV_SUCCESS
+ */
 int dynstr_set( struct dynamic_string *, const char *string );
 
 /**
@@ -151,10 +152,14 @@ int dynstr_set_at( struct dynamic_string *dynstr, size_t idx, char c );
  */
 UseResult char *dynstr_data_copy( const struct dynamic_string * );
 /**
+ * Returns a `const` view of the string.
+ *
  * @return a pointer of the DynamicStrings data
  */
 const char *dynstr_data( const struct dynamic_string * );
 /**
+ * Fetches the length of the string in constant time
+ *
  * @return length of the string
  */
 size_t dynstr_len( const struct dynamic_string * );
