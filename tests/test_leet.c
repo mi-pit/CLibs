@@ -18,11 +18,11 @@ typedef size_t count_t;
 #if TypeNumber == 1
 #define Type Number
 #include <inttypes.h>
-define_print_func( Number, "%" PRIi64 );
+DEFINE_PRINT_FUNC( Number, "%" PRIi64 );
 
 #elif TypeNumber == 2
 typedef void *pointer_t;
-define_print_func( pointer_t, "%p" );
+DEFINE_PRINT_FUNC( pointer_t, "%p" );
 #define Type pointer_t
 
 #endif //TypeNumber

@@ -32,8 +32,8 @@ TEST( list_init )
     {
         int_arr[ i ] = i;
         assert( list_append( ls, &i ) == RV_SUCCESS );
-        if ( list_el_size( ls ) != sizeof( uint64_t ) || list_size( ls ) != i + 1 ||
-             list_items( ls ) == NULL )
+        if ( list_el_size( ls ) != sizeof( uint64_t ) || list_size( ls ) != i + 1
+             || list_items( ls ) == NULL )
             break;
 
         if ( !test_list_array_uint64( ls, list_size( ls ), int_arr ) )
@@ -42,9 +42,9 @@ TEST( list_init )
     for ( uint64_t i = 0; i < DEFAULT_DYNSTRING_CAP * 8; ++i )
     {
         assert( list_pop( ls, NULL ) == RV_SUCCESS );
-        if ( list_el_size( ls ) != sizeof( uint64_t ) ||
-             list_size( ls ) != DEFAULT_DYNSTRING_CAP * 8 - i - 1 ||
-             list_items( ls ) == NULL )
+        if ( list_el_size( ls ) != sizeof( uint64_t )
+             || list_size( ls ) != DEFAULT_DYNSTRING_CAP * 8 - i - 1
+             || list_items( ls ) == NULL )
             break;
 
         if ( !test_list_array_uint64( ls, list_size( ls ), int_arr ) )
@@ -204,9 +204,6 @@ TEST( list_advanced )
 
     UNIT_TEST( list_remove_fast( ls, SIZE_MAX, ( void * ) 1 ) == RV_EXCEPTION );
     UNIT_TEST( list_remove( ls, list_size( ls ), ( void * ) 1 ) == RV_EXCEPTION );
-
-    list_printf_sde( ls, char, "%c", "\t\t> '" FOREGROUND_CYAN, "",
-                     COLOR_DEFAULT "' <\n" );
 
     list_destroy( ls );
 #undef STRING

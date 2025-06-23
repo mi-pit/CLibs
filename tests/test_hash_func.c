@@ -4,7 +4,7 @@
 
 #include "../src/headers/assert_that.h" /* assert_that(), include errors.h */
 #include "../src/headers/misc.h"        /* hash_func() */
-#include "../src/structs/sets.h"        /* Set */
+#include "../src/structs/set.h"         /* Set */
 
 #include <inttypes.h>
 #include <stdlib.h>

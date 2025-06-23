@@ -1,6 +1,6 @@
-//
-// Created by Michal Pitner on 13.06.2025.
-//
+/*
+ * Math functions & other number operations.
+ */
 
 #ifndef CLIBS_MATH_H
 #define CLIBS_MATH_H

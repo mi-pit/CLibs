@@ -37,7 +37,7 @@ set(CLIB_SOURCES
 
         src/structs/dynarr.c
         src/structs/dynstring.c
-        src/structs/sets.c
+        src/structs/set.c
         src/structs/dictionary.c
         src/structs/queue.c
 )
@@ -49,7 +49,7 @@ set(CLIB_PUBLIC_HDRS
 
         src/structs/dynarr.h
         src/structs/dynstring.h
-        src/structs/sets.h
+        src/structs/set.h
         src/Structs/dictionary.h
         src/Structs/queue.h
 )
@@ -91,6 +91,11 @@ add_executable(test_leet
         tests/test_leet.c
 )
 target_link_libraries(test_leet PRIVATE clib_core)
+
+add_executable(test_prints
+        tests/test_printing.c
+)
+target_link_libraries(test_prints PRIVATE clib_core)
 
 
 # ————————————————————————————————————

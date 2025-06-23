@@ -9,6 +9,8 @@
 !CMakeLists.txt
 !.clang-format
 
+!*.md
+
 !*.c
 !*.h
 
@@ -18,3 +20,5 @@
 !/tests/modules/
 !/src/
 !/src/*
+
+!/docs/

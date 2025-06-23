@@ -2,11 +2,12 @@
 // Created by MacBook on 06.01.2025.
 //
 
-#include "modules/test_arrayprintf.h"
+#include "modules/test_array_sprintf.h"
 #include "modules/test_dict.h"
 #include "modules/test_dynstr.h"
 #include "modules/test_foreach.h"
 #include "modules/test_list.h"
+#include "modules/test_math.h"
 #include "modules/test_misc_c.h"
 #include "modules/test_queue.h"
 #include "modules/test_sets.h"
@@ -26,6 +27,7 @@ int main( void )
     RUNALL_QUEUE();
 
     RUNALL_MISC();
+    RUNALL_MATH();
 
     RUNALL_ARRAYPRINTF();
     RUNALL_FOREACH();

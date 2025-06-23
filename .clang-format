@@ -54,7 +54,7 @@ BraceWrapping:
   SplitEmptyFunction: true
   SplitEmptyRecord: true
   SplitEmptyNamespace: true
-BreakBeforeBinaryOperators: None
+BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeInheritanceComma: false
 BreakInheritanceList: BeforeColon
 BreakBeforeTernaryOperators: true
@@ -81,20 +81,16 @@ ForEachMacros:
   - foreach_arr
   - foreach_ls
   - foreach_set
-  - Q_FOREACH
-  - BOOST_FOREACH
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '^"(llvm|llvm-c|clang|clang-c)/'
-    Priority: 3
-    SortPriority: 0
-  - Regex: '^(<|"(gtest|gmock|isl|json)/)'
-    Priority: 4
-    SortPriority: 0
-  - Regex: '<.*>'
+  - Regex: '"so?u?rce?s?/.*"'
     Priority: 1
-  - Regex: '".*"'
+  - Regex: '"lib/.*"'
     Priority: 2
+  - Regex: '".*"'
+    Priority: 3
+  - Regex: '<.*>'
+    Priority: 4
 IncludeIsMainRegex: '(_test)?$'
 IncludeIsMainSourceRegex: ''
 IndentCaseLabels: true

@@ -1,17 +1,22 @@
-//
-// Created by MacBook on 30.10.2024.
-//
+/*
+ * Utility functions for handling errors.
+ *
+ * Includes (among others):
+ *   return values
+ *   better warn
+ *   stack trace printing
+ *
+ *
+ * Created by MacBook on 30.10.2024.
+ */
 
 #ifndef CLIBS_ERRORS_H
 #define CLIBS_ERRORS_H
 
 /* for this header */
-#include "attributes.h" /* PrintfLike, LibraryDefined */
-#include "filenames.h"  /* get_prog_name(), __FILE_NAME__ */
-
-#if defined( _POSIX_C_SOURCE )
+#include "attributes.h"      /* PrintfLike, LibraryDefined */
+#include "filenames.h"       /* get_prog_name(), __FILE_NAME__ */
 #include "terminal_colors.h" /* COLORs, PrintInColor */
-#endif                       //defined(_POSIX_C_SOURCE)
 
 #include <errno.h>  /* for WarnUniversal + include */
 #include <stddef.h> /* ptrdiff_t */
@@ -146,9 +151,7 @@ WarnUniversal( const bool PrintProgName,
                ... )
 {
 #ifndef SUPPRESS_WARNINGS
-#if defined( _POSIX_C_SOURCE )
     SetTerminalColor( stderr, COLOR_WARNING );
-#endif //def _POSIX
 
     if ( PrintProgName )
         fprintf( stderr, "%s", get_prog_name() );
@@ -170,9 +173,7 @@ WarnUniversal( const bool PrintProgName,
     if ( err_no >= 0 )
         fprintf( stderr, ": %s", strerror( err_no ) );
 
-#if defined( _POSIX_C_SOURCE )
     SetTerminalColor( stderr, COLOR_DEFAULT );
-#endif /* _POSIX */
 
     fprintf( stderr, "\n" );
 

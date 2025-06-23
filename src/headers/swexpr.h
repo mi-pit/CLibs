@@ -1,23 +1,35 @@
-//
-// Created by MacBook on 18.02.2024.
-//
+/*
+ * A switch which works with more complex data structures.
+ *
+ * For more info, see `docs/swex.md`
+ *
+ *
+ * Created by MacBook on 18.02.2024.
+ */
+
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
 
-#include "../structs/dynarr.h"
-#include "errors.h"
-#include "pointer_utils.h"
+#include "../structs/dynarr.h" /* stack-like lists */
+#include "errors.h"            /* err */
+#include "pointer_utils.h"     /* deref_as, free_n */
 
-#include <err.h>     /* err() */
-#include <errno.h>   /* ENOMEM */
 #include <stdbool.h> /* bool */
 
 
 /* ================================ User usable ================================ */
 
 
+/** Initializes the swexpr to, in each ‹case›, compare it to this expression */
+#define swex_init_val( expr_type, expr )                                 \
+    expr_type swex_init_imm_tmp_var_##expr_type##_##expr##__ = ( expr ); \
+    expr_type *swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ =       \
+            &( swex_init_imm_tmp_var_##expr_type##_##expr##__ );         \
+    _Switch_expression_push_( sizeof( expr_type ),                       \
+                              &( swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ ) );
+
 /**
- * Initializes the swexpr to, in each ‹ case ›,
+ * Initializes the swexpr to, in each ‹case›,
  * compare it to the data behind the supplied pointer
  */
 #define swex_init_ptr( expr, nbytes ) _Switch_expression_push_( nbytes, ( expr ) );
@@ -27,38 +39,20 @@
     _Switch_expression_push_( strlen( expr ),                              \
                               &( swex_init_imm_tmp_var_##expr_type##_##expr##__ ) );
 
-/**
- * Initializes the swexpr to, in each ‹ case ›, compare it to this expression
- */
-#define swex_init_val( expr_type, expr )                                        \
-    expr_type swex_init_imm_tmp_var_##expr_type##_##expr##__ = ( expr );        \
-    expr_type *swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ =              \
-            &( swex_init_imm_tmp_var_##expr_type##_##expr##__ );                \
-    assert( _Switch_expression_push_(                                           \
-                    sizeof( expr_type ),                                        \
-                    &( swex_init_imm_tmp_var_##expr_type##_##expr##_ptr_ ) ) == \
-            RV_SUCCESS );
-
-/**
- * Uses an existing variable to store the result from ‹ resolve ›
- */
+/** Uses an existing variable to store the result from ‹resolve› */
 #define as( VAR_NAME )                                     \
     {                                                      \
         void *swex_as_var_addr = &( VAR_NAME );            \
         _Switch_expression_init_var_( &swex_as_var_addr ); \
     }
 
-/**
- * Creates a new local variable to store the result from ‹ resolve ›
- */
+/** Creates a new local variable to store the result from ‹resolve› */
 #define as_new( NEW_VAR_TYPE, NEW_VAR_NAME )        \
     NEW_VAR_TYPE NEW_VAR_NAME = ( NEW_VAR_TYPE ) 0; \
     as( NEW_VAR_NAME )
 
 
-/**
- * Assigns the 'result' into the swexpr variable
- */
+/// Assigns the 'result' into the swexpr variable
 #define resolve( result_type, result )                                          \
     do                                                                          \
     {                                                                           \
@@ -77,7 +71,7 @@
     {                                                                           \
         if ( _Swex_aux_variable_ != NULL )                                      \
         {                                                                       \
-            free( _Swex_aux_variable_ );                                        \
+            free_n( _Swex_aux_variable_ );                                      \
             _Swex_aux_variable_ = NULL;                                         \
         }                                                                       \
         _Swex_aux_variable_ = malloc( sizeof( type ) );                         \
@@ -86,22 +80,23 @@
         type swex_case_imm_aux_var_ = expr_case;                                \
         memcpy( _Swex_aux_variable_, &swex_case_imm_aux_var_, sizeof( type ) ); \
     }                                                                           \
-    if ( !_Switch_expression_is_assigned_() &&                                  \
-         ( _Switch_expression_size_peek_() ) == sizeof( type ) &&               \
-         memcmp( _Switch_expression_value_peek_(),                              \
-                 _Swex_aux_variable_,                                           \
-                 sizeof( type ) ) == 0 )                                        \
+    if ( !_Switch_expression_is_assigned_()                                     \
+         && ( _Switch_expression_size_peek_() ) == sizeof( type )               \
+         && memcmp( _Switch_expression_value_peek_(),                           \
+                    _Swex_aux_variable_,                                        \
+                    sizeof( type ) )                                            \
+                    == 0 )                                                      \
         if ( _Switch_expression_assign_() != 1 )
 
-#define swex_case_ptr( expr_case, nbytes )                                    \
-    if ( !_Switch_expression_is_assigned_() &&                                \
-         ( _Switch_expression_size_peek_() ) == sizeof( void * ) &&           \
-         memcmp( _Switch_expression_value_peek_(), expr_case, nbytes ) == 0 ) \
+#define swex_case_ptr( expr_case, nbytes )                                       \
+    if ( !_Switch_expression_is_assigned_()                                      \
+         && ( _Switch_expression_size_peek_() ) == sizeof( void * )              \
+         && memcmp( _Switch_expression_value_peek_(), expr_case, nbytes ) == 0 ) \
         if ( _Switch_expression_assign_() != 1 )
 
-#define swex_case_str( expr_case )                                    \
-    if ( !_Switch_expression_is_assigned_() &&                        \
-         strcmp( _Switch_expression_value_peek_(), expr_case ) == 0 ) \
+#define swex_case_str( expr_case )                                       \
+    if ( !_Switch_expression_is_assigned_()                              \
+         && strcmp( _Switch_expression_value_peek_(), expr_case ) == 0 ) \
         if ( _Switch_expression_assign_() != 1 )
 
 /**
@@ -119,13 +114,12 @@
  * Not calling this function will cause undefined behaviour and calling it prematurely
  * will probably cause a NULL pointer dereference.
  */
-#define swex_finish()                \
-    do                               \
-    {                                \
-        _Switch_expression_pop_();   \
-        free( _Swex_aux_variable_ ); \
-        _Swex_aux_variable_ = NULL;  \
-    }                                \
+#define swex_finish()                  \
+    do                                 \
+    {                                  \
+        _Switch_expression_pop_();     \
+        free_n( _Swex_aux_variable_ ); \
+    }                                  \
     while ( 0 )
 
 
@@ -134,10 +128,10 @@
 /* DO NOT USE */
 
 
-LibraryDefined List *_Switch_expr_values_stack_    = NULL;
-LibraryDefined List *_Switch_expr_variables_stack_ = NULL;
-LibraryDefined List *_Switch_expr_sizes_stack_     = NULL;
-LibraryDefined List *_Switch_expr_assigned_stack_  = NULL;
+LibraryDefined List /* <void *> */ *_Switch_expr_values_stack_    = NULL;
+LibraryDefined List /* <void *> */ *_Switch_expr_variables_stack_ = NULL;
+LibraryDefined List /* <size_t> */ *_Switch_expr_sizes_stack_     = NULL;
+LibraryDefined List /* <bool> */ *_Switch_expr_assigned_stack_    = NULL;
 
 
 LibraryDefined void *_Swex_aux_variable_;
@@ -155,8 +149,8 @@ LibraryDefined int _Switch_expression_push_( const size_t nbytes, const void *co
     }                                                                      \
     while ( 0 )
 
-    static const bool SWEX_FALSE  = false;
-    static const void *const null = NULL;
+    static const bool SWEX_FALSE = false;
+    static void *const null      = NULL;
 
     try_push( _Switch_expr_sizes_stack_, &nbytes, sizeof( size_t ) );
     try_push( _Switch_expr_values_stack_, data, sizeof( void * ) );
@@ -220,12 +214,12 @@ LibraryDefined void *_Switch_expression_get_varaddr_( void )
 
 LibraryDefined size_t _Switch_expression_size_peek_( void )
 {
-    return *( size_t * ) list_peek( _Switch_expr_sizes_stack_ );
+    return deref_as( size_t, list_peek( _Switch_expr_sizes_stack_ ) );
 }
 
 LibraryDefined void *_Switch_expression_value_peek_( void )
 {
-    return *( void ** ) list_peek( _Switch_expr_values_stack_ );
+    return deref_as( void *, list_peek( _Switch_expr_values_stack_ ) );
 }
 
 #endif //CLIBS_SWEXPR_H

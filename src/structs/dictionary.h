@@ -76,7 +76,9 @@ int dict_insert( struct dictionary *,
                  const void *val,
                  size_t val_size );
 
-const struct key_value_pair *dict_get( const struct dictionary *, const void *key, size_t key_size );
+const struct key_value_pair *dict_get( const struct dictionary *,
+                                       const void *key,
+                                       size_t key_size );
 
 const void *dict_get_val( const struct dictionary *, const void *key, size_t key_size );
 int dict_set_val( struct dictionary *,
@@ -85,7 +87,9 @@ int dict_set_val( struct dictionary *,
                   const void *val,
                   size_t val_size );
 
-enum DictRemoveRV dict_remove( struct dictionary *, const void *key_data, size_t key_size );
+enum DictRemoveRV dict_remove( struct dictionary *,
+                               const void *key_data,
+                               size_t key_size );
 
 
 /* -------- SIZE/CAP -------- */
@@ -124,7 +128,9 @@ void dict_destroy( struct dictionary * );
  * Prints the contents of the dictionary as "‹key›: ‹val›"
  */
 void dict_print( const struct dictionary * );
-void dict_print_as( const struct dictionary *, PrintFunction key_print, PrintFunction val_print );
+void dict_print_as( const struct dictionary *,
+                    PrintFunction key_print,
+                    PrintFunction val_print );
 
 void kvp_print( const struct key_value_pair *item, const char *kv_sep );
 void kvp_print_as( const struct key_value_pair *item,

@@ -3,7 +3,7 @@
 
 #include "../../src/headers/assert_that.h"
 #include "../../src/headers/unit_tests.h"
-#include "../../src/structs/sets.h"
+#include "../../src/structs/set.h"
 
 TEST( set_init )
 {
@@ -25,12 +25,13 @@ TEST( set_insert )
     for ( int i = 0; i < SET_DEFAULT_CAP; ++i )
     {
         if ( i == 1 )
-            insert_SET_DEFAULT_CAP = insert_SET_DEFAULT_CAP &&
-                                     set_insert( set, &i, sizeof i ) == SETINSERT_WAS_IN;
+            insert_SET_DEFAULT_CAP =
+                    insert_SET_DEFAULT_CAP
+                    && set_insert( set, &i, sizeof i ) == SETINSERT_WAS_IN;
         else
             insert_SET_DEFAULT_CAP =
-                    insert_SET_DEFAULT_CAP &&
-                    set_insert( set, &i, sizeof i ) == SETINSERT_INSERTED;
+                    insert_SET_DEFAULT_CAP
+                    && set_insert( set, &i, sizeof i ) == SETINSERT_INSERTED;
     }
     UNIT_TEST( insert_SET_DEFAULT_CAP );
 
@@ -39,12 +40,12 @@ TEST( set_insert )
     {
         if ( i < SET_DEFAULT_CAP )
             insert_SET_4_DEFAULT_CAP =
-                    insert_SET_4_DEFAULT_CAP &&
-                    set_insert( set, &i, sizeof i ) == SETINSERT_WAS_IN;
+                    insert_SET_4_DEFAULT_CAP
+                    && set_insert( set, &i, sizeof i ) == SETINSERT_WAS_IN;
         else
             insert_SET_4_DEFAULT_CAP =
-                    insert_SET_4_DEFAULT_CAP &&
-                    set_insert( set, &i, sizeof i ) == SETINSERT_INSERTED;
+                    insert_SET_4_DEFAULT_CAP
+                    && set_insert( set, &i, sizeof i ) == SETINSERT_INSERTED;
     }
     UNIT_TEST( insert_SET_4_DEFAULT_CAP );
 

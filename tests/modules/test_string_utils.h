@@ -1,10 +1,39 @@
 //
 // Created by MacBook on 08.01.2025.
 //
+#ifndef TEST_STRING_UTILS_H
+#define TEST_STRING_UTILS_H
 
 #include "../../src/headers/assert_that.h"
 #include "../../src/headers/unit_tests.h"
 #include "../../src/string_utils.h"
+
+
+TEST( replace )
+{
+    char buffer[ 128 ] = "This,is,a,string.";
+
+    UNIT_TEST( string_replace( buffer, ",", " " ) == RV_SUCCESS );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, NULL, "str" ) == RV_EXCEPTION );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, "str", NULL ) == RV_EXCEPTION );
+    UNIT_TEST( string_replace( NULL, "", "" ) == RV_EXCEPTION );
+
+    UNIT_TEST( string_replace( buffer, " ", "long replacement" ) == RV_EXCEPTION );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, "long", "sh" ) == RV_EXCEPTION );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, "", "" ) == RV_SUCCESS );
+    UNIT_TEST( strcmp( buffer, "This is a string." ) == 0 );
+
+    UNIT_TEST( string_replace( buffer, "", "" ) == RV_SUCCESS );
+}
+END_TEST
 
 
 Tester test_one_replace( string_t orig, string_t old, string_t new, string_t expected )
@@ -16,7 +45,7 @@ Tester test_one_replace( string_t orig, string_t old, string_t new, string_t exp
     return rv;
 }
 
-TEST( replace )
+TEST( replaced )
 {
     UNIT_TEST( test_one_replace( "Hopspop", "p", "-", "Ho-s-o-" ) );
     UNIT_TEST( test_one_replace( "Hops Pop", "p", "-", "Ho-s Po-" ) );
@@ -416,12 +445,12 @@ TEST( join )
     test_one_join( "Hops", "", "Hops" );
 
     {
-        str_t arr[ 1 ] = { strdup( "hops" ) };
-        str_t got      = string_join( 0, ( const string_t * ) arr, "\n" );
+        const str_t arr[ 1 ] = { strdup( "hops" ) };
+        const str_t got      = string_join( 0, ( strjoin_strarr_t ) arr, "\n" );
         UNIT_TEST( strcmp( got, "" ) == 0 );
         free( got );
 
-        UNIT_TEST( string_join( 1, ( const string_t * ) arr, NULL ) == NULL );
+        UNIT_TEST( string_join( 1, ( strjoin_strarr_t ) arr, NULL ) == NULL );
         free( arr[ 0 ] );
     }
 
@@ -564,6 +593,7 @@ END_TEST
 LibraryDefined void RUNALL_STRING_UTILS( void )
 {
     RUN_TEST( replace );
+    RUN_TEST( replaced );
     RUN_TEST( escape );
     RUN_TEST( unescape );
     RUN_TEST( strspl_str );
@@ -577,3 +607,5 @@ LibraryDefined void RUNALL_STRING_UTILS( void )
 
     RUN_TEST( join );
 }
+
+#endif

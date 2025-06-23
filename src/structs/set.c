@@ -1,4 +1,4 @@
-#include "sets.h"
+#include "set.h"
 
 #include "../headers/errors.h" /* RVs, warns, ... */
 #include "../headers/misc.h"   /* cmp_size_t */
@@ -386,7 +386,7 @@ int set_subtract( Set *set, const Set *sub )
 
 int set_cmp( const Set *set_1, const Set *set_2 )
 {
-    const int cmp = cmp_size_t( set_1->items, set_2->items );
+    const int cmp = cmp_size_t( &set_1->n_items, &set_2->n_items );
     if ( cmp != 0 )
         return cmp;
 
@@ -442,8 +442,7 @@ void set_print_as( const Set *set, const PrintFunction func )
             printf( item->size > 16 ? ",\n\t" : ", " );
 
         // print the data
-        const PrintFunction print_func = func != NULL ? func : item->func;
-        print_func( item->data, item->size );
+        ( func != NULL ? func : item->func )( item->data, item->size );
 
         ++n;
     }

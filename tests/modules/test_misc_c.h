@@ -32,12 +32,12 @@ TEST( misc_c )
     {
         int a = 1;
         int b = 1;
-        PrintInColor( stdout, FOREGROUND_CYAN, "%i\n", min_m( a, b++ ) );
+        PrintInColor( stderr, FOREGROUND_CYAN, "%i\n", min_m( a, b++ ) );
     }
     {
         double a = 1;
         double b;
-        PrintInColor( stdout, FOREGROUND_CYAN, "%f\n", min_m( a, b = .9 ) );
+        PrintInColor( stderr, FOREGROUND_CYAN, "%f\n", min_m( a, b = .9 ) );
     }
     UNIT_TEST( min_i64( 1, 2 ) == 1 );
     UNIT_TEST( min_i64( 10, 2 ) == 2 );

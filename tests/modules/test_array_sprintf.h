@@ -5,13 +5,16 @@
 #ifndef TEST_ARRAYPRINTF_H
 #define TEST_ARRAYPRINTF_H
 
-#include "../../src/headers/array_printf.h"
 #include "../../src/headers/misc.h"
 #include "../../src/headers/unit_tests.h"
 #include "../../src/string_utils.h"
 #include "../../src/structs/dynstring.h"
 
-Private TEST( array_sprintf )
+// after dynstring
+#include "../../src/headers/array_printf.h"
+
+
+TEST( array_sprintf )
 {
     int array[ 10 ];
     for ( size_t i = 0; i < countof( array ); ++i )
@@ -20,7 +23,6 @@ Private TEST( array_sprintf )
     str_t str, snd;
     array_sprintf_d( str, array, countof( array ), int, "%i", ", " );
     array_sprintf( snd, array, countof( array ), int, "%i" );
-    PrintInColor( stdout, BACKGROUND_YELLOW, "%s\n", str );
 
     UNIT_TEST( cmpeq( strcmp( str, "[ 0, 1, -4, 9, -16, 25, -36, 49, -64, 81 ]" ) ) );
     UNIT_TEST( cmpeq( strcmp( str, snd ) ) );
@@ -29,7 +31,6 @@ Private TEST( array_sprintf )
 
     void *items_gen = array;
     array_sprintf_d( str, items_gen, countof( array ), int, "%+02i", " | " );
-    PrintInColor( stdout, BACKGROUND_YELLOW, "%s\n", str );
 
     UNIT_TEST( cmpeq( strcmp(
             str, "[ +0 | +1 | -4 | +9 | -16 | +25 | -36 | +49 | -64 | +81 ]" ) ) );

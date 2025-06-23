@@ -1,6 +1,9 @@
-//
-// Created by Michal Pitner on 13.06.2025.
-//
+/*
+ * Functions and macros for simple math operations like min/max of two numbers.
+ *
+ *
+ * Created by Michal Pitner on 13.06.2025.
+ */
 
 #ifndef SIMPLE_MATH_H
 #define SIMPLE_MATH_H
@@ -91,6 +94,12 @@ LibraryDefined Mathematical inline bool is_within( const int64_t low, const int6
                                                    const int64_t high )
 {
     return num >= low && num <= high;
+}
+
+/// Returns true if num is a power of two
+LibraryDefined Mathematical inline bool is_power_of_two( const uint64_t num )
+{
+    return num != 0 && !( num & ( num - 1 ) );
 }
 
 

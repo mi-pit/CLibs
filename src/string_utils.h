@@ -1,14 +1,17 @@
-//
-// Created by MacBook on 28.10.2024.
-//
+/*
+ * Utility functions and macros for working with C ASCII strings.
+ *
+ *
+ * Created by MacBook on 28.10.2024.
+ */
 
 #ifndef CLIBS_STRING_UTILS_H
 #define CLIBS_STRING_UTILS_H
 
 #include "headers/attributes.h" /* UseResult */
 
-#include <regex.h> /* regex_t */
-#include <stdbool.h>
+#include <regex.h>     /* regex_t */
+#include <stdbool.h>   /* bool */
 #include <sys/types.h> /* ssize_t */
 
 /* include for user */
@@ -17,6 +20,7 @@
 
 typedef const char *string_t;
 typedef char *str_t;
+
 
 #if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
 #include <stdlib.h> /* malloc */
@@ -48,8 +52,8 @@ LibraryDefined UseResult str_t string_duplicate( string_t s )
 }
 #endif // ndef strdup
 
-#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) || \
-        defined( _POSIX_C_SOURCE ) // non-standard
+#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) \
+        || defined( _POSIX_C_SOURCE ) // non-standard
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -208,11 +212,25 @@ UseResult str_t string_as_lower( string_t );
  */
 UseResult str_t string_replaced( string_t, string_t old, string_t new );
 
+/**
+ * Replaces all occurrences of a substring with another one.
+ * This is done in-place.
+ *
+ * The substitution string must be the same length as the old substituted string.
+ * (for arbitrary lengths use \code string_replaced\endcode)
+ *
+ * @param string    this string is modified
+ * @param old   must be the same length as new
+ * @param new   must be the same length as old
+ * @return RV_SUCCESS/RV_EXCEPTION
+ */
+int string_replace( str_t string, string_t old, string_t new );
 
-#define STRSPLIT_EXCLUDE_EMPTY     0x01
-#define STRSPLIT_KEEP_DELIM_BEFORE 0x02
-#define STRSPLIT_KEEP_DELIM_AFTER  0x04
-#define STRSPLIT_STRIP_RESULTS     0x08 // Only for string_split() (not regex)
+
+#define STRSPLIT_EXCLUDE_EMPTY     ( 1 << 0 )
+#define STRSPLIT_KEEP_DELIM_BEFORE ( 1 << 1 )
+#define STRSPLIT_KEEP_DELIM_AFTER  ( 1 << 2 )
+#define STRSPLIT_STRIP_RESULTS     ( 1 << 3 ) // Only for string_split() (not regex)
 
 /**
  * Flags for the string_split[_regex] functions
@@ -275,6 +293,10 @@ void string_split_destroy( size_t size, str_t **str_arr_cont );
 
 
 UseResult str_t string_join( size_t len, const string_t strarr[ len ], string_t joiner );
+
+/// String array being passed to `string_join` may be typecast to this
+typedef const string_t *strjoin_strarr_t;
+
 
 /* ==== Mathematical stuff ==== */
 
