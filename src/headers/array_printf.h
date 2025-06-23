@@ -12,8 +12,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* TODO:
+ *  array_fprintf */
+
+
 /* ––––– Array Print ––––– */
-#define ARRAY_PRINT_STRING_FMTSTR "\\s"
 
 #define array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, START_STR, DELIM, END_STR ) \
     do                                                                                 \
