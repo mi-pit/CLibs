@@ -15,7 +15,7 @@
 
 
 #define ARRAY_PRINT_DEFAULT_STARTSTR "[ "
-#define ARRAY_PRINT_DEFAULT_ENDSTR   " ]\n"
+#define ARRAY_PRINT_DEFAULT_ENDSTR   " ]"
 #define ARRAY_PRINT_DEFAULT_DELIM    ", "
 
 
@@ -38,7 +38,8 @@
 
 #define array_fprintf_d( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR, DELIM ) \
     array_fprintf_sde( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR,           \
-                       ARRAY_PRINT_DEFAULT_STARTSTR, DELIM, ARRAY_PRINT_DEFAULT_ENDSTR )
+                       ARRAY_PRINT_DEFAULT_STARTSTR, DELIM,                   \
+                       ARRAY_PRINT_DEFAULT_ENDSTR "\n" )
 
 #define array_fprintf( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
     array_fprintf_d( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR,    \
@@ -65,7 +66,7 @@
  */
 #define array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, DELIM )                     \
     array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, ARRAY_PRINT_DEFAULT_STARTSTR, \
-                      DELIM, ARRAY_PRINT_DEFAULT_ENDSTR )
+                      DELIM, ARRAY_PRINT_DEFAULT_ENDSTR "\n" )
 
 /**
  * Prints the array of a set length and type.
