@@ -92,6 +92,11 @@ add_executable(test_leet
 )
 target_link_libraries(test_leet PRIVATE clib_core)
 
+add_executable(test_prints
+        tests/test_printing.c
+)
+target_link_libraries(test_prints PRIVATE clib_core)
+
 
 # ————————————————————————————————————
 #  4) Installation rules for headers & library
