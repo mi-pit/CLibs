@@ -205,9 +205,6 @@ TEST( list_advanced )
     UNIT_TEST( list_remove_fast( ls, SIZE_MAX, ( void * ) 1 ) == RV_EXCEPTION );
     UNIT_TEST( list_remove( ls, list_size( ls ), ( void * ) 1 ) == RV_EXCEPTION );
 
-    list_printf_sde( ls, char, "%c", "\t\t> '" FOREGROUND_CYAN, "",
-                     COLOR_DEFAULT "' <\n" );
-
     list_destroy( ls );
 #undef STRING
 #undef STRING2

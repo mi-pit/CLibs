@@ -2,7 +2,7 @@
 // Created by MacBook on 06.01.2025.
 //
 
-#include "modules/test_arrayprintf.h"
+#include "modules/test_array_sprintf.h"
 #include "modules/test_dict.h"
 #include "modules/test_dynstr.h"
 #include "modules/test_foreach.h"
