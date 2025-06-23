@@ -8,9 +8,7 @@
 #ifndef CLIBS_ARRAY_PRINTF_H
 #define CLIBS_ARRAY_PRINTF_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h> /* fprintf */
 
 /* TODO:
  *  array_fprintf */
@@ -21,22 +19,35 @@
 #define ARRAY_PRINT_DEFAULT_DELIM    ", "
 
 
-/* ––––– Array Print ––––– */
+#define array_fprintf_sde( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR, START_STR, \
+                           DELIM, END_STR )                                        \
+    do                                                                             \
+    {                                                                              \
+        fprintf( FILESTREAM, "%s", START_STR );                                    \
+        for ( size_t print_array_idx__ = 0; print_array_idx__ < ( ARRLEN );        \
+              ++print_array_idx__ )                                                \
+        {                                                                          \
+            fprintf( FILESTREAM, FORMAT_STR,                                       \
+                     ( ( TYPE * ) ARRAY )[ print_array_idx__ ] );                  \
+            if ( print_array_idx__ != ( ARRLEN ) - 1 )                             \
+                fprintf( FILESTREAM, "%s", DELIM );                                \
+        }                                                                          \
+        fprintf( FILESTREAM, "%s", END_STR );                                      \
+    }                                                                              \
+    while ( 0 )
+
+#define array_fprintf_d( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR, DELIM ) \
+    array_fprintf_sde( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR,           \
+                       ARRAY_PRINT_DEFAULT_STARTSTR, DELIM, ARRAY_PRINT_DEFAULT_ENDSTR )
+
+#define array_fprintf( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
+    array_fprintf_d( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR,    \
+                     ARRAY_PRINT_DEFAULT_DELIM )
+
 
 #define array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, START_STR, DELIM, END_STR ) \
-    do                                                                                 \
-    {                                                                                  \
-        printf( START_STR );                                                           \
-        for ( size_t print_array_idx__ = 0; print_array_idx__ < ( ARRLEN );            \
-              ++print_array_idx__ )                                                    \
-        {                                                                              \
-            printf( FORMAT_STR, ( ( TYPE * ) ARRAY )[ print_array_idx__ ] );           \
-            if ( print_array_idx__ != ( ARRLEN ) - 1 )                                 \
-                printf( "%s", DELIM );                                                 \
-        }                                                                              \
-        printf( END_STR );                                                             \
-    }                                                                                  \
-    while ( 0 )
+    array_fprintf_sde( stdout, ARRAY, ARRLEN, TYPE, FORMAT_STR, START_STR, DELIM,      \
+                       END_STR )
 
 
 /**
