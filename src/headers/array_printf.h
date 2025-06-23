@@ -82,50 +82,60 @@
 #define array_printf( ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
     array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ARRAY_PRINT_DEFAULT_DELIM )
 
-#ifdef CLIBS_DYNSTRING_H
+#if defined( CLIBS_DYNSTRING_H )
+/**
+ * If allocation fails at any point during the main body of this macro,
+ * this results in STRINGVAR being NULL
+ */
+#define array_sprintf_sde( STRINGVAR, ARRAY, ARRLEN, TYPE, FMTSTR, STARTSTR, DELIM, \
+                           ENDSTR )                                                 \
+    do                                                                              \
+    {                                                                               \
+        ( STRINGVAR )                 = NULL;                                       \
+        struct dynamic_string *dynstr = dynstr_init_as( STARTSTR );                 \
+        if ( dynstr == NULL )                                                       \
+            break;                                                                  \
+        for ( size_t print_array_idx__ = 0; print_array_idx__ < ( ARRLEN );         \
+              ++print_array_idx__ )                                                 \
+        {                                                                           \
+            if ( dynstr_appendf( dynstr, FMTSTR,                                    \
+                                 ( ( TYPE * ) ARRAY )[ print_array_idx__ ] )        \
+                 < 0 )                                                              \
+            {                                                                       \
+                dynstr_destroy( dynstr );                                           \
+                break;                                                              \
+            }                                                                       \
+            if ( print_array_idx__ != ( ARRLEN ) - 1 )                              \
+            {                                                                       \
+                if ( dynstr_append( dynstr, DELIM ) < 0 )                           \
+                {                                                                   \
+                    dynstr_destroy( dynstr );                                       \
+                    break;                                                          \
+                }                                                                   \
+            }                                                                       \
+        }                                                                           \
+        if ( dynstr_append( dynstr, ENDSTR ) < 0 )                                  \
+        {                                                                           \
+            dynstr_destroy( dynstr );                                               \
+            break;                                                                  \
+        }                                                                           \
+        ( STRINGVAR ) = dynstr_data_copy( dynstr );                                 \
+        dynstr_destroy( dynstr );                                                   \
+    }                                                                               \
+    while ( 0 )
+
+
 /**
  * Creates a new string of the array contents. Old contents of STRINGVAR are overwritten
  * <p>
  * requires @code #include "Structs/dynstring.h"@endcode
  */
-#define array_sprintf_d( STRINGVAR, ARRAY, ARRLEN, TYPE, FMTSTR, DELIM )     \
-    do                                                                       \
-    {                                                                        \
-        ( STRINGVAR )                 = NULL;                                \
-        struct dynamic_string *dynstr = dynstr_init_as( "[ " );              \
-        if ( dynstr == NULL )                                                \
-            break;                                                           \
-        for ( size_t print_array_idx__ = 0; print_array_idx__ < ( ARRLEN );  \
-              ++print_array_idx__ )                                          \
-        {                                                                    \
-            if ( dynstr_appendf( dynstr, FMTSTR,                             \
-                                 ( ( TYPE * ) ARRAY )[ print_array_idx__ ] ) \
-                 < 0 )                                                       \
-            {                                                                \
-                dynstr_destroy( dynstr );                                    \
-                break;                                                       \
-            }                                                                \
-            if ( print_array_idx__ != ( ARRLEN ) - 1 )                       \
-            {                                                                \
-                if ( dynstr_append( dynstr, DELIM ) < 0 )                    \
-                {                                                            \
-                    dynstr_destroy( dynstr );                                \
-                    break;                                                   \
-                }                                                            \
-            }                                                                \
-        }                                                                    \
-        if ( dynstr_append( dynstr, " ]" ) < 0 )                             \
-        {                                                                    \
-            dynstr_destroy( dynstr );                                        \
-            break;                                                           \
-        }                                                                    \
-        ( STRINGVAR ) = dynstr_data_copy( dynstr );                          \
-        dynstr_destroy( dynstr );                                            \
-    }                                                                        \
-    while ( 0 )
+#define array_sprintf_d( STRINGVAR, ARRAY, ARRLEN, TYPE, FMTSTR, DELIM ) \
+    array_sprintf_sde( STRINGVAR, ARRAY, ARRLEN, TYPE, FMTSTR,           \
+                       ARRAY_PRINT_DEFAULT_STARTSTR, DELIM, ARRAY_PRINT_DEFAULT_ENDSTR )
 
 #define array_sprintf( STRING, ARRAY, ARRLEN, TYPE, FMTSTR ) \
-    array_sprintf_d( STRING, ARRAY, ARRLEN, TYPE, FMTSTR, ", " )
+    array_sprintf_d( STRING, ARRAY, ARRLEN, TYPE, FMTSTR, ARRAY_PRINT_DEFAULT_DELIM )
 #endif // CLIBS_DYNSTRING_H
 
 
