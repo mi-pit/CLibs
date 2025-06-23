@@ -1,11 +1,13 @@
 //
 // Created by Michal Pitner on 09.06.2025.
 //
+#ifndef TEST_QUEUE_H
+#define TEST_QUEUE_H
 
-#include "../src/headers/assert_that.h"
-#include "../src/headers/pointer_utils.h"
-#include "../src/headers/unit_tests.h"
-#include "../src/structs/queue.h"
+#include "../../src/headers/assert_that.h"
+#include "../../src/headers/pointer_utils.h"
+#include "../../src/headers/unit_tests.h"
+#include "../../src/structs/queue.h"
 
 
 struct queue_node {
@@ -41,6 +43,7 @@ TEST( enqueue )
     UNIT_TEST( node != NULL );
     UNIT_TEST( queue->head == queue->tail );
 
+    const bool orig_verbosity = GET_UNIT_TEST_VERBOSITY();
     SET_UNIT_TEST_VERBOSITY( false );
     for ( data = 0; data <= 123; data++ )
     {
@@ -60,7 +63,7 @@ TEST( enqueue )
             break;
         }
     }
-    SET_UNIT_TEST_VERBOSITY( true );
+    SET_UNIT_TEST_VERBOSITY( orig_verbosity );
 
     queue_destroy( queue );
 }
@@ -76,6 +79,7 @@ TEST( dequeue )
     for ( data = 0; data <= 123; data++ )
         assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
 
+    const bool orig_verbosity = GET_UNIT_TEST_VERBOSITY();
     SET_UNIT_TEST_VERBOSITY( false );
     for ( data = -1; data <= 123; data++ )
     {
@@ -83,7 +87,7 @@ TEST( dequeue )
         UNIT_TEST( queue_dequeue( queue, &num ) == RV_SUCCESS );
         UNIT_TEST( num == data );
     }
-    SET_UNIT_TEST_VERBOSITY( true );
+    SET_UNIT_TEST_VERBOSITY( orig_verbosity );
 
     int cont;
     UNIT_TEST( queue_dequeue( queue, &cont ) == RV_EXCEPTION );
@@ -150,6 +154,9 @@ TEST( get_size )
     assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
     UNIT_TEST( queue_get_size( queue ) == 1 );
     UNIT_TEST( !queue_is_empty( queue ) );
+
+    const bool orig_verbosity = GET_UNIT_TEST_VERBOSITY();
+
     SET_UNIT_TEST_VERBOSITY( false );
     for ( data = 0; data <= 123; data++ )
     {
@@ -157,20 +164,20 @@ TEST( get_size )
         UNIT_TEST( queue_get_size( queue ) == data + 2ul );
         UNIT_TEST( !queue_is_empty( queue ) );
     }
-    SET_UNIT_TEST_VERBOSITY( true );
+    SET_UNIT_TEST_VERBOSITY( orig_verbosity );
 
     queue_destroy( queue );
 }
 END_TEST
 
 
-int main( void )
+LibraryDefined void RUNALL_QUEUE( void )
 {
     RUN_TEST( init );
     RUN_TEST( enqueue );
     RUN_TEST( dequeue );
     RUN_TEST( get );
     RUN_TEST( get_size );
-
-    FINISH_TESTING();
 }
+
+#endif

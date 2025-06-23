@@ -49,9 +49,9 @@ void dynstr_destroy( struct dynamic_string * );
  * <p>
  * `app` may not be NULL
  *
- * @return 0 on success, -1 on allocation error
+ * @return RV_ERROR on allocation error, else the number of appended chars
  */
-int dynstr_append( struct dynamic_string *, const char *app );
+ssize_t dynstr_append( struct dynamic_string *, const char *app );
 /**
  * Appends at most `len` characters to the end of the dynstr
  * <p>
@@ -60,31 +60,31 @@ int dynstr_append( struct dynamic_string *, const char *app );
  *
  * @param app       appended string
  * @param len       maximum number of chars appended
- * @return RV_SUCCESS on success, RV_ERROR on allocation error
+ * @return RV_ERROR on allocation error, else the number of appended chars (should be len)
  */
-int dynstr_appendn( struct dynamic_string *, const char *app, size_t len );
+ssize_t dynstr_appendn( struct dynamic_string *, const char *app, size_t len );
+/**
+ * Appends a formatted string to the end of a DynamicString
+ *
+ * @return RV_ERROR on allocation error, else the number of appended chars
+ */
+PrintfLike( 2, 3 ) ssize_t dynstr_appendf( struct dynamic_string *, const char *fmt, ... );
 /**
  * Appends a formatted string to the end of a DynamicString
  *
  * @return RV_ERROR on alloc fail, else RV_SUCCESS
  */
-PrintfLike( 2, 3 ) int dynstr_appendf( struct dynamic_string *, const char *fmt, ... );
-/**
- * Appends a formatted string to the end of a DynamicString
- *
- * @return RV_ERROR on alloc fail, else RV_SUCCESS
- */
-int dynstr_vappendf( struct dynamic_string *, const char *fmt, va_list vargs );
+ssize_t dynstr_vappendf( struct dynamic_string *, const char *fmt, va_list vargs );
 
 /**
  * Adds a string to the start of the DynamicString
- * @return 0 on success, -1 on allocation error
+ * @return RV_ERROR on allocation error, else the number of pre-pended
  */
-int dynstr_prepend( struct dynamic_string *, const char * );
-int dynstr_prependn( struct dynamic_string *dynstr, const char *s, size_t len );
-PrintfLike( 2, 3 ) int dynstr_prependf( struct dynamic_string *dynstr, const char *fmt,
+ssize_t dynstr_prepend( struct dynamic_string *, const char * );
+ssize_t dynstr_prependn( struct dynamic_string *dynstr, const char *s, size_t len );
+PrintfLike( 2, 3 ) ssize_t dynstr_prependf( struct dynamic_string *dynstr, const char *fmt,
                                         ... );
-int dynstr_vprependf( struct dynamic_string *dynstr, const char *fmt, va_list vargs );
+ssize_t dynstr_vprependf( struct dynamic_string *dynstr, const char *fmt, va_list vargs );
 
 /**
  * Sets the string to be a slice of itself, from ‹start_idx› to ‹end_idx›.

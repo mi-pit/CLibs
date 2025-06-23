@@ -15,5 +15,6 @@
 !*.sh
 
 !/tests/
+!/tests/modules/
 !/src/
 !/src/*
