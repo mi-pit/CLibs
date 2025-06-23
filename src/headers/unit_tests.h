@@ -19,7 +19,6 @@
 #include <string.h>  /* strlen */
 
 #define Tester static bool
-// todo?: #define TESTER( NAME ) static bool test_one_##NAME
 
 
 #define MSG_CONST_PART_LEN 25

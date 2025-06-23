@@ -10,9 +10,6 @@
 
 #include <stdio.h> /* fprintf */
 
-/* TODO:
- *  array_fprintf */
-
 
 #define ARRAY_PRINT_DEFAULT_STARTSTR "[ "
 #define ARRAY_PRINT_DEFAULT_ENDSTR   " ]"
