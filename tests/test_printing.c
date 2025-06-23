@@ -11,6 +11,8 @@
 // dynstr.h
 #include "../src/headers/array_printf.h"
 
+#include <limits.h> /* INT_MAX, INT_MIN */
+
 
 static void TEST_array_print( void )
 {
