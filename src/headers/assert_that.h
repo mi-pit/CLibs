@@ -51,14 +51,15 @@
  * @endcode
  * Or `-DCLIBS_ASSERT_THAT_EXIT_VAL=123` during compilation
  */
-#define assert_that( EXPRESSION, ... )                                   \
-    do                                                                   \
-    {                                                                    \
-        if ( !( EXPRESSION ) )                                           \
-            exit( ( int ) fflwarnx_ret( CLIBS_ASSERT_THAT_EXIT_VAL,      \
-                                        "Assertion error: [" #EXPRESSION \
-                                        "]: " __VA_ARGS__ ) );           \
-    }                                                                    \
+#define assert_that( EXPRESSION, ... )                                          \
+    do                                                                          \
+    {                                                                           \
+        if ( !( EXPRESSION ) )                                                  \
+            exit( ( int ) fflwarnx_ret(                                         \
+                    CLIBS_ASSERT_THAT_EXIT_VAL,                                 \
+                    "Assertion error: " COLOR_DEFAULT #EXPRESSION COLOR_WARNING \
+                    ": " __VA_ARGS__ ) );                                       \
+    }                                                                           \
     while ( 0 )
 
 #else
