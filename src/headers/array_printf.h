@@ -64,6 +64,7 @@
 #define array_printf( ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
     array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ", " )
 
+#ifdef CLIBS_DYNSTRING_H
 /**
  * Creates a new string of the array contents. Old contents of STRINGVAR are overwritten
  * <p>
@@ -107,6 +108,7 @@
 
 #define array_sprintf( STRING, ARRAY, ARRLEN, TYPE, FMTSTR ) \
     array_sprintf_d( STRING, ARRAY, ARRLEN, TYPE, FMTSTR, ", " )
+#endif // CLIBS_DYNSTRING_H
 
 
 #endif //CLIBS_ARRAY_PRINTF_H
