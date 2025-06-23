@@ -250,6 +250,16 @@ int dynstr_reset( struct dynamic_string *dynstr )
     return RV_SUCCESS;
 }
 
+int dynstr_set( struct dynamic_string *dynstr, const string_t string )
+{
+    const size_t len = strlen( string );
+    if ( ( dynstr->data = strdup( string ) ) == NULL )
+        return fwarn_ret( RV_ERROR, "strdup" );
+    dynstr->len = len;
+    dynstr->cap = len + 1;
+    return RV_SUCCESS;
+}
+
 
 int dynstr_set_at( struct dynamic_string *dynstr, const size_t idx, const char c )
 {

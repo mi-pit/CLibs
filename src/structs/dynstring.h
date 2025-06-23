@@ -131,7 +131,10 @@ int dynstr_slice_s( struct dynamic_string *, size_t start_idx );
  * Resets the dynstr to an empty string
  * @return RV_ERROR on realloc fail, else RV_SUCCESS
  */
-int dynstr_reset( struct dynamic_string *dynstr );
+int dynstr_reset( struct dynamic_string * );
+
+/// Sets the dynstr's data to a provided string
+int dynstr_set( struct dynamic_string *, const char *string );
 
 /**
  * Sets char @ idx to `c`
