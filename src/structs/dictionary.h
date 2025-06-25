@@ -95,7 +95,6 @@ enum DictRemoveRV dict_remove( struct dictionary *,
 /* -------- SIZE/CAP -------- */
 
 size_t dict_size( const struct dictionary * );
-size_t dict_cap( const struct dictionary * );
 struct key_value_pair *dict_items_as_array( const struct dictionary *dict );
 
 /* -------- DESTRUCTOR -------- */

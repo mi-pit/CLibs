@@ -244,11 +244,6 @@ size_t dict_size( const struct dictionary *dict )
     return dict->size;
 }
 
-size_t dict_cap( const struct dictionary *dict )
-{
-    return dict->capacity;
-}
-
 struct key_value_pair *dict_items_as_array( const struct dictionary *dict )
 {
     struct key_value_pair *new_data = malloc( dict->size );
