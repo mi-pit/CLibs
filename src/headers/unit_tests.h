@@ -16,19 +16,17 @@
 #include <stdbool.h> /* * */
 #include <stdio.h>   /* printf */
 #include <stdlib.h>  /* exit */
-#include <string.h>  /* strlen */
 
 #define Tester static bool
 
 
-#define MSG_CONST_PART_LEN 25
-
+/* number of chars */
 #if !defined( LINE_PREF_WIDTH )
-#define LINE_PREF_WIDTH 158
+#define LINE_PREF_WIDTH 166
 #endif
 
-#if LINE_PREF_WIDTH < MSG_CONST_PART_LEN
-#define TESTS_LINE_WIDTH ( MSG_CONST_PART_LEN + 1 )
+#if LINE_PREF_WIDTH < 32
+#define TESTS_LINE_WIDTH ( 32 + 1 )
 #else
 #define TESTS_LINE_WIDTH LINE_PREF_WIDTH
 #endif
@@ -130,30 +128,45 @@ LibraryDefined NoReturn void FINISH_TESTING( void )
 LibraryDefined bool UNIT_TEST_( const char *cond_str,
                                 const bool passed,
                                 const char *filename,
-                                const int lineno )
+                                const int lineno,
+                                const bool isCritical )
 {
 #ifndef UNIT_TESTS_SILENT
-    if ( TEST_NAME_CREATOR( YAP ) || !passed )
+    if ( TEST_NAME_CREATOR( YAP ) || !passed || isCritical )
     {
-        ssize_t ln = TESTS_LINE_WIDTH - ( MSG_CONST_PART_LEN + strlen( cond_str ) );
+        printf( "    " );
+        static const size_t msg_indent = STRLEN( "    " );
+        ssize_t ln                     = TESTS_LINE_WIDTH - msg_indent;
 
-        printf( "    " COLOR_TEST_TAG "[UNIT TEST" );
+        SetTerminalColor( stdout,
+                          !isCritical ? COLOR_TEST_TAG
+                          : passed    ? COLOR_SUCC
+                                      : COLOR_FAIL );
+
+        ln -= printf( "[%s", isCritical ? "CRITICAL" : "UNIT TEST" );
+
         if ( !passed )
         {
-            char buffer[ PATH_MAX + 128 ];
-            ln -= snprintf( buffer, sizeof buffer, " // %s @ %d", filename, lineno );
-            printf( "%s", buffer );
+            static char buffer[ sizeof( __FILE_NAME__ ) + 20 + 7 + 1 ];
+            snprintf( buffer, sizeof buffer, " // %s @ %d", filename, lineno );
+            ln -= printf( "%s", buffer );
         }
-        printf( "]" COLOR_DEFAULT " %s ", cond_str );
+        ln -= printf( "]" );
+        SetTerminalColor( stdout, COLOR_DEFAULT );
+        ln -= printf( " %s ", cond_str );
 
-        const size_t ndots = ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_CONST_PART_LEN + 1;
+        static const size_t MSG_END_PART_LEN = STRLEN( " SUCCESS" ) /* or failure */;
+
+        ln -= MSG_END_PART_LEN;
 
         if ( ln < 0 )
         {
             printf( "\n" );
-            for ( int i = 0; i < 16; ++i )
+            for ( size_t i = 0; i < msg_indent; ++i )
                 printf( " " );
         }
+        const size_t ndots =
+                ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_END_PART_LEN - msg_indent;
 
         for ( size_t i = 0; i < ndots; ++i )
             printf( "." );
@@ -163,13 +176,14 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
                 passed ? "SUCCESS" : "FAILURE" );
     }
 #else
-    ( void ) ( cond_str );
-    ( void ) ( filename );
-    ( void ) ( lineno );
+    ( void ) cond_str;
+    ( void ) filename;
+    ( void ) lineno;
 #endif //UNIT_TESTS_SILENT
 
     return passed;
 }
+
 
 /**
  * If condition evaluates to true, "SUCCESS" is printed
@@ -178,14 +192,28 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
  * If condition evaluates to false, "FAILURE" is printed
  * in the color defined in COLOR_FAIL (red by default)
  */
-#define UNIT_TEST( CONDITION )                                               \
-    do                                                                       \
-    {                                                                        \
-        if ( !UNIT_TEST_( #CONDITION, CONDITION, __FILE_NAME__, __LINE__ ) ) \
-            ++TEST_NAME_CREATOR( failed_total );                             \
-        ++TEST_NAME_CREATOR( ran_total );                                    \
-    }                                                                        \
+#define UNIT_TEST( CONDITION )                                                      \
+    do                                                                              \
+    {                                                                               \
+        if ( !UNIT_TEST_( #CONDITION, CONDITION, __FILE_NAME__, __LINE__, false ) ) \
+            ++TEST_NAME_CREATOR( failed_total );                                    \
+        ++TEST_NAME_CREATOR( ran_total );                                           \
+    }                                                                               \
     while ( 0 )
+
+// clang-format off
+#define CRITICAL_TEST( CONDITION )                                                      \
+    do                                                                                  \
+    {                                                                                   \
+        ++TEST_NAME_CREATOR( ran_total );                                               \
+        if ( !UNIT_TEST_( #CONDITION, CONDITION, __FILE_NAME__, __LINE__, true ) )      \
+        {                                                                               \
+            ++TEST_NAME_CREATOR( failed_total );                                        \
+            { END_TEST /* the END_TEST macro has a terminating bracket `}' */           \
+        }                                                                               \
+    }                                                                                   \
+    while ( 0 )
+// clang-format on
 
 
 /**
