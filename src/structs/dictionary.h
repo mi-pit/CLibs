@@ -1,3 +1,8 @@
+/*
+ * For more information, see `docs/set.md`.
+ * Lots of relevant information is shared between the two structures.
+ */
+
 #ifndef CLIBS_DICTIONARY_H
 #define CLIBS_DICTIONARY_H
 
