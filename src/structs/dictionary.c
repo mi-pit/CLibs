@@ -64,14 +64,14 @@ struct dictionary *dict_init( void )
     if ( dict == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
-    dict->items = calloc( DICT_DEF_SIZE, sizeof( struct key_value_pair ) );
+    dict->items = calloc( DICT_DEF_CAP, sizeof( struct key_value_pair ) );
     if ( dict->items == NULL )
     {
         free( dict );
         return ( void * ) fwarn_ret( NULL, "calloc" );
     }
 
-    dict->capacity = DICT_DEF_SIZE;
+    dict->capacity = DICT_DEF_CAP;
 
     return dict;
 }

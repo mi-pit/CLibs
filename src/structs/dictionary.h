@@ -27,7 +27,8 @@ struct key_value_pair {
 };
 
 
-#define DICT_DEF_SIZE 64
+#define DICT_DEF_CAP 64
+
 
 enum DictRemoveRV {
     DICTREMOVE_REMOVED   = 0,
