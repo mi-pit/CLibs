@@ -125,12 +125,12 @@ void dict_destroy( struct dictionary * );
     }                                     \
     while ( 0 )
 
-#define dict_printn_as( DICTIONARY, key_func, val_func ) \
-    do                                                   \
-    {                                                    \
-        printf( "\"" #DICTIONARY "\" " );                \
-        dict_print_as( DICTIONARY, key_func, val_func ); \
-    }                                                    \
+#define dict_printn_as( DICTIONARY, KEY_PRINT_FUNC, VAL_PRINT_FUNC ) \
+    do                                                               \
+    {                                                                \
+        printf( "\"" #DICTIONARY "\" " );                            \
+        dict_print_as( DICTIONARY, KEY_PRINT_FUNC, VAL_PRINT_FUNC ); \
+    }                                                                \
     while ( 0 )
 
 /**
