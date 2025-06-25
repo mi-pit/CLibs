@@ -23,7 +23,7 @@ Requires no external dependencies.
 ### Optional definitions
 
 * `UNIT_TESTS_SILENT` – If this macro is defined, **all** `UNIT_TEST` calls are silenced completely
-* `LINE_PREF_WIDTH` – Preferred width of a line – basically the number of dots in a test case (some constraints apply)
+* `LINE_PREF_WIDTH` – Preferred width of a line – dictates the number of dots in a test case (some constraints apply)
 * `COLOR_FAIL` – Color of a failed test – `FOREGROUND_RED` by default
 * `COLOR_SUCC` – Color of a successful test – `FOREGROUND_GREEN` by default
 * `COLOR_NOTE` – Color of the summary note – `FOREGROUND_CYAN` by default
