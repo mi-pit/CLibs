@@ -25,8 +25,8 @@ struct key_value_pair {
 #define DICT_DEF_SIZE 64
 
 enum DictRemoveRV {
-    DICTREMOVE_REMOVED   = 1,
-    DICTREMOVE_NOT_FOUND = 2,
+    DICTREMOVE_REMOVED   = 0,
+    DICTREMOVE_NOT_FOUND = 1,
 };
 
 
