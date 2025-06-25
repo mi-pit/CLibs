@@ -29,6 +29,11 @@ enum DictRemoveRV {
     DICTREMOVE_NOT_FOUND = 1,
 };
 
+enum DictInsertRV {
+    DICTINSERT_INSERTED = 0,
+    DICTINSERT_WAS_IN   = 1,
+};
+
 
 struct dictionary *dict_init( void );
 

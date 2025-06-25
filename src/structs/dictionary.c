@@ -99,8 +99,12 @@ int dict_insert_f( struct dictionary *dict,
         const size_t index          = ( hash + i ) % dict->capacity;
         struct key_value_pair *item = dict->items + index;
 
-        if ( item->key != NULL && item_key_cmp( &new_item, item ) != 0 )
+        if ( item->key != NULL )
+        {
+            if ( item_key_cmp( &new_item, item ) == 0 )
+                return DICTINSERT_WAS_IN;
             continue;
+        }
 
         if ( item->key == NULL )
             dict->size++;
@@ -127,7 +131,7 @@ int dict_insert_f( struct dictionary *dict,
         item->val_print = val_print;
         item->removed   = false;
 
-        return RV_SUCCESS;
+        return DICTINSERT_INSERTED;
     }
 
     return RV_ERROR;
