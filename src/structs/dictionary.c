@@ -29,7 +29,7 @@ struct const_kvp {
 };
 
 
-int item_key_cmp( const void *i1, const void *i2 )
+int dict_item_key_cmp( const void *i1, const void *i2 )
 {
     const struct key_value_pair *item1 = i1;
     const struct key_value_pair *item2 = i2;
@@ -39,7 +39,7 @@ int item_key_cmp( const void *i1, const void *i2 )
     return memcmp( item1->key, item2->key, item1->key_size );
 }
 
-int item_val_cmp( const void *i1, const void *i2 )
+int dict_item_val_cmp( const void *i1, const void *i2 )
 {
     const struct key_value_pair *item1 = i1;
     const struct key_value_pair *item2 = i2;
@@ -49,12 +49,12 @@ int item_val_cmp( const void *i1, const void *i2 )
     return memcmp( item1->val, item2->val, item1->val_size );
 }
 
-int item_cmp( const void *i1, const void *i2 )
+int dict_item_cmp( const void *i1, const void *i2 )
 {
-    const int rv = item_key_cmp( i1, i2 );
+    const int rv = dict_item_key_cmp( i1, i2 );
     if ( rv != 0 )
         return rv;
-    return item_val_cmp( i1, i2 );
+    return dict_item_val_cmp( i1, i2 );
 }
 
 
@@ -101,7 +101,7 @@ int dict_insert_f( struct dictionary *dict,
 
         if ( item->key != NULL )
         {
-            if ( item_key_cmp( &new_item, item ) == 0 )
+            if ( dict_item_key_cmp( &new_item, item ) == 0 )
                 return DICTINSERT_WAS_IN;
             continue;
         }
@@ -164,7 +164,7 @@ static struct key_value_pair *dict_get_non_const( const struct dictionary *const
 
         if ( item->key == NULL )
             continue;
-        if ( item_key_cmp( item, &search_for ) == 0 )
+        if ( dict_item_key_cmp( item, &search_for ) == 0 )
             return item;
     }
 
@@ -226,7 +226,7 @@ enum DictRemoveRV dict_remove( struct dictionary *dict,
         if ( item->key == NULL && !item->removed )
             return DICTREMOVE_NOT_FOUND;
 
-        if ( !cmpeq( item_key_cmp( &search, item ) ) )
+        if ( !cmpeq( dict_item_key_cmp( &search, item ) ) )
             continue;
 
         free_n( item->key );

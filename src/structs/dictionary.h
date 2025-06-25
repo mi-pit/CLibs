@@ -49,19 +49,19 @@ struct dictionary *dict_init( void );
  *
  * @return  -1, 0, 1
  */
-int item_key_cmp( const void *, const void * );
+int dict_item_key_cmp( const void *, const void * );
 /**
  * Only compares the data in `val` and `val_size`
  *
  * @return  -1, 0, 1
  */
-int item_val_cmp( const void *, const void * );
+int dict_item_val_cmp( const void *, const void * );
 /**
  * Compares the keys first, then values
  *
  * @return  -1, 0, 1
  */
-int item_cmp( const void *, const void * );
+int dict_item_cmp( const void *, const void * );
 
 int dict_insert_f( struct dictionary *,
                    const void *key,
