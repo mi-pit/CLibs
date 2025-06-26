@@ -12,9 +12,6 @@
 typedef struct dictionary Dictionary;
 
 
-#define DICT_DEF_CAP 64
-
-
 enum DictRemoveRV {
     DICTREMOVE_REMOVED   = 0,
     DICTREMOVE_NOT_FOUND = 1,
@@ -97,9 +94,6 @@ void dict_destroy( struct dictionary * );
 
 
 /* -------- PRINT -------- */
-
-/** Maximum items printed on one line */
-#define DICT_PRINT_LINE_MAX_ITEMS 4
 
 #define dict_printn( DICTIONARY )         \
     do                                    \

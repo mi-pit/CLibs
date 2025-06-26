@@ -1,5 +1,6 @@
 #include "dictionary.h"
 
+#include "../headers/assert_that.h"
 #include "../headers/errors.h"        /* includes misc.h */
 #include "../headers/misc.h"          /* hash_func(), cmp_size_t(), cmpeq() */
 #include "../headers/pointer_utils.h" /* free_n() */
@@ -56,6 +57,9 @@ int dict_item_cmp( const void *i1, const void *i2 )
         return rv;
     return dict_item_val_cmp( i1, i2 );
 }
+
+
+#define DICT_DEF_CAP 64
 
 
 struct dictionary *dict_init( void )
@@ -263,6 +267,9 @@ static void dict_print_d( const struct dictionary *dict,
                           const PrintFunction key_print,
                           const PrintFunction val_print )
 {
+    /** Maximum items printed on one line */
+    static const size_t line_max_items = 4;
+
     printf( "{" );
 
     const char *delim = "";
@@ -273,10 +280,9 @@ static void dict_print_d( const struct dictionary *dict,
         if ( item->key == NULL )
             continue;
 
-        delim = item->key_size > 16 || n % DICT_PRINT_LINE_MAX_ITEMS == 0 ? ",\n\t"
-                                                                          : ", ";
+        delim = item->key_size > 16 || n % line_max_items == 0 ? ",\n\t" : ", ";
         if ( n == 0 )
-            delim = dict->size > DICT_PRINT_LINE_MAX_ITEMS ? "\n\t" : " ";
+            delim = dict->size > line_max_items ? "\n\t" : " ";
         printf( "%s", delim );
 
         kvp_print_as( item, key_print, val_print, ": " );
@@ -284,7 +290,7 @@ static void dict_print_d( const struct dictionary *dict,
         ++n;
     }
 
-    if ( dict->size > DICT_PRINT_LINE_MAX_ITEMS )
+    if ( dict->size > line_max_items )
         printf( "\n" );
     else if ( !strchr( delim, '\n' ) )
         printf( " " );
