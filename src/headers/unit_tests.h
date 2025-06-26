@@ -11,6 +11,7 @@
 #define CLIBS_UNIT_TESTS_H
 
 #include "filenames.h"       /* PATH_MAX */
+#include "misc.h"            /* STRLEN */
 #include "terminal_colors.h" /* colors */
 
 #include <stdbool.h> /* * */
