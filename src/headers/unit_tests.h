@@ -22,7 +22,7 @@
 
 /* number of chars */
 #if !defined( LINE_PREF_WIDTH )
-#define LINE_PREF_WIDTH 166
+#define LINE_PREF_WIDTH 100
 #endif
 
 #if LINE_PREF_WIDTH < 32
