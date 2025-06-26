@@ -44,7 +44,7 @@ size_t queue_get_size( const struct fifo_queue *queue );
 bool queue_is_empty( const struct fifo_queue *queue );
 
 typedef struct {
-    const struct queue_node *item;
+    const struct queue_node *const item;
     void *const data;
 } QueueEnumeratedEntry;
 
