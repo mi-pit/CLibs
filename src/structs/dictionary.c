@@ -255,6 +255,10 @@ Private inline void kvp_print_as( const struct key_value_pair *item,
                                   const PrintFunction val_print,
                                   const char *kv_sep )
 {
+    assert_that( ( item->key_print != NULL || key_print != NULL )
+                         && ( item->val_print != NULL || val_print != NULL ),
+                 "no way to print values, this shouldn't happen" );
+
     printf( "\"" );
     ( key_print != NULL ? key_print : item->key_print )( item->key, item->key_size );
     printf( "%s", kv_sep );
@@ -263,9 +267,9 @@ Private inline void kvp_print_as( const struct key_value_pair *item,
 }
 
 
-static void dict_print_d( const struct dictionary *dict,
-                          const PrintFunction key_print,
-                          const PrintFunction val_print )
+void dict_print_as( const struct dictionary *dict,
+                    const PrintFunction key_print,
+                    const PrintFunction val_print )
 {
     /** Maximum items printed on one line */
     static const size_t line_max_items = 4;
@@ -299,14 +303,7 @@ static void dict_print_d( const struct dictionary *dict,
 
 void dict_print( const struct dictionary *dict )
 {
-    dict_print_d( dict, NULL, NULL );
-}
-
-void dict_print_as( const struct dictionary *dict,
-                    const PrintFunction key_print,
-                    const PrintFunction val_print )
-{
-    dict_print_d( dict, key_print, val_print );
+    dict_print_as( dict, NULL, NULL );
 }
 
 
