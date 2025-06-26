@@ -146,9 +146,9 @@ int dict_insert( struct dictionary *dict,
     return dict_insert_f( dict, key, key_size, val, val_size, print_byte, print_byte );
 }
 
-static struct key_value_pair *dict_get_non_const( const struct dictionary *const dict,
-                                                  const void *data,
-                                                  const size_t nbytes )
+Private struct key_value_pair *dict_get_non_const( const struct dictionary *const dict,
+                                                   const void *data,
+                                                   const size_t nbytes )
 {
     const uint64_t hash = hash_func( data, nbytes );
 
@@ -171,16 +171,9 @@ static struct key_value_pair *dict_get_non_const( const struct dictionary *const
     return NULL;
 }
 
-const struct key_value_pair *dict_get( const struct dictionary *dict,
-                                       const void *key,
-                                       const size_t key_size )
-{
-    return dict_get_non_const( dict, key, key_size );
-}
-
 bool dict_has_key( const struct dictionary *dict, const void *key, size_t key_size )
 {
-    return dict_get( dict, key, key_size ) != NULL;
+    return dict_get_non_const( dict, key, key_size ) != NULL;
 }
 
 const void *dict_get_val( const struct dictionary *dict,
@@ -199,7 +192,7 @@ int dict_set_val( struct dictionary *dict,
 {
     struct key_value_pair *item = dict_get_non_const( dict, key, key_size );
     if ( item == NULL )
-        return RV_EXCEPTION;
+        return fwarnx_ret( RV_EXCEPTION, "couldn't find key" );
 
     free( item->val );
     item->val = malloc( val_size );
@@ -253,34 +246,10 @@ size_t dict_size( const struct dictionary *dict )
     return dict->size;
 }
 
-struct key_value_pair *dict_items_as_array( const struct dictionary *dict )
-{
-    struct key_value_pair *new_data = malloc( dict->size );
-
-    size_t count = 0;
-
-    for ( size_t i = 0; i < dict->capacity; ++i )
-    {
-        if ( dict->items[ i ].key == NULL )
-            continue;
-
-        memcpy( new_data + count++, dict->items + i, sizeof( struct key_value_pair ) );
-        new_data[ count++ ] = dict->items[ i ];
-    }
-
-    return new_data;
-}
-
-
-void kvp_print( const struct key_value_pair *item, const char *kv_sep )
-{
-    kvp_print_as( item, NULL, NULL, kv_sep );
-}
-
-void kvp_print_as( const struct key_value_pair *item,
-                   const PrintFunction key_print,
-                   const PrintFunction val_print,
-                   const char *kv_sep )
+Private inline void kvp_print_as( const struct key_value_pair *item,
+                                  const PrintFunction key_print,
+                                  const PrintFunction val_print,
+                                  const char *kv_sep )
 {
     printf( "|" );
     ( key_print != NULL ? key_print : item->key_print )( item->key, item->key_size );

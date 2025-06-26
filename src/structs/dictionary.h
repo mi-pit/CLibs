@@ -72,10 +72,6 @@ int dict_insert( struct dictionary *,
                  const void *val,
                  size_t val_size );
 
-const struct key_value_pair *dict_get( const struct dictionary *,
-                                       const void *key,
-                                       size_t key_size );
-
 bool dict_has_key( const struct dictionary *, const void *key, size_t key_size );
 
 const void *dict_get_val( const struct dictionary *, const void *key, size_t key_size );
@@ -94,7 +90,6 @@ enum DictRemoveRV dict_remove( struct dictionary *,
 /* -------- SIZE/CAP -------- */
 
 size_t dict_size( const struct dictionary * );
-struct key_value_pair *dict_items_as_array( const struct dictionary *dict );
 
 /* -------- DESTRUCTOR -------- */
 
@@ -129,11 +124,5 @@ void dict_print( const struct dictionary * );
 void dict_print_as( const struct dictionary *,
                     PrintFunction key_print,
                     PrintFunction val_print );
-
-void kvp_print( const struct key_value_pair *item, const char *kv_sep );
-void kvp_print_as( const struct key_value_pair *item,
-                   PrintFunction key_print,
-                   PrintFunction val_print,
-                   const char *kv_sep );
 
 #endif //CLIBS_DICTIONARY_H
