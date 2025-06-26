@@ -18,18 +18,16 @@
 #include <stdio.h>   /* printf */
 #include <stdlib.h>  /* exit */
 
-#define Tester static bool
 
-
-/* number of chars */
 #if !defined( LINE_PREF_WIDTH )
+/** Preferred number of chars in a line */
 #define LINE_PREF_WIDTH 100
 #endif
 
 #if LINE_PREF_WIDTH < 32
-#define TESTS_LINE_WIDTH ( 32 + 1 )
+static const size_t TESTS_LINE_WIDTH = ( 32 + 1 );
 #else
-#define TESTS_LINE_WIDTH LINE_PREF_WIDTH
+static const size_t TESTS_LINE_WIDTH = LINE_PREF_WIDTH;
 #endif
 
 
@@ -50,6 +48,7 @@
 #endif //COLOR_TEST_TAG
 
 
+/// To avoid namespace collisions
 #define TEST_NAME_CREATOR( TOK ) CLIBS_UNIT_TESTS_##TOK
 
 
@@ -63,6 +62,17 @@ static bool TEST_NAME_CREATOR( YAP ) = true;
 
 
 #ifndef UNIT_TESTS_SILENT
+/**
+ * Begin a test block.
+ *
+ * Counts the number of tests ran/failed.
+ * Must be terminated by `END_TEST`.
+ *
+ * If `UNIT_TESTS_SILENT` is **not** defined,
+ * this macro prints the test name as the start of the test case.
+ *
+ * @param HANDLE handle of the test case -- must be unique
+ */
 #define TEST( HANDLE )                                          \
     int TEST_NAME_CREATOR( HANDLE )( void )                     \
     {                                                           \
@@ -79,6 +89,11 @@ static bool TEST_NAME_CREATOR( YAP ) = true;
         const char *TEST_NAME_CREATOR( test_handle ) = #HANDLE;
 #endif //UNIT_TESTS_SILENT
 
+/**
+ * Ends a `TEST()` block.
+ *
+ * Prints a summary of the test case and returns if it failed.
+ */
 #define END_TEST                                                                    \
     printf( COLOR_TEST_TAG "[TEST]" COLOR_DEFAULT " %s: ran %i tests, " PRINT_COLOR \
                            "%i successful" COLOR_DEFAULT ", " PRINT_COLOR           \
@@ -97,6 +112,11 @@ static bool TEST_NAME_CREATOR( YAP ) = true;
     }
 
 
+/**
+ * Runs a test block and increments the proper static variables.
+ *
+ * @param HANDLE handle as used in `TEST( HANDLE )`
+ */
 #define RUN_TEST( HANDLE )                                                  \
     do                                                                      \
     {                                                                       \
@@ -106,6 +126,11 @@ static bool TEST_NAME_CREATOR( YAP ) = true;
     while ( 0 )
 
 
+/**
+ * Prints a summary of all `TEST()` and `UNIT_TEST()` cases and exits.
+ *
+ * Exit value is `EXIT_SUCCESS` if no unit test failed, else `EXIT_FAILURE`.
+ */
 LibraryDefined NoReturn void FINISH_TESTING( void )
 {
     printf( "\n" COLOR_NOTE "[SUMMARY]" COLOR_DEFAULT " total unit tests ran: " COLOR_NOTE
@@ -126,6 +151,7 @@ LibraryDefined NoReturn void FINISH_TESTING( void )
 }
 
 
+/** @cond INTERNAL */
 LibraryDefined bool UNIT_TEST_( const char *cond_str,
                                 const bool passed,
                                 const char *filename,
@@ -190,14 +216,15 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
 
     return passed;
 }
+/** @endcond */
 
 
 /**
  * If condition evaluates to true, "SUCCESS" is printed
- * in the color defined in COLOR_SUCC (green by default).
- * <p>
+ * in the color defined in `COLOR_SUCC` (green by default).
+ *
  * If condition evaluates to false, "FAILURE" is printed
- * in the color defined in COLOR_FAIL (red by default)
+ * in the color defined in `COLOR_FAIL` (red by default)
  */
 #define UNIT_TEST( CONDITION )                                                      \
     do                                                                              \
@@ -208,7 +235,16 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
     }                                                                               \
     while ( 0 )
 
+
 // clang-format off
+/**
+ * If condition evaluates to true, "SUCCESS" is printed
+ * in the color defined in `COLOR_SUCC` (green by default).
+ *
+ * If condition evaluates to false, "FAILURE" is printed
+ * in the color defined in `COLOR_FAIL` (red by default),
+ * and the `TEST()` case returns.
+ */
 #define CRITICAL_TEST( CONDITION )                                                      \
     do                                                                                  \
     {                                                                                   \
@@ -226,7 +262,7 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
 /**
  * If set to false, `UNIT_TEST`s do not show successes.
  *
- * This option is independent from the macro `UNIT_TESTS_SILENT`,
+ * This option is independent of the macro `UNIT_TESTS_SILENT`,
  * which silences all messages.
  *
  * @param verbose true by default
@@ -236,6 +272,9 @@ LibraryDefined void SET_UNIT_TEST_VERBOSITY( const bool verbose )
     TEST_NAME_CREATOR( YAP ) = verbose;
 }
 
+/**
+ * @return value of the static verbosity variable
+ */
 LibraryDefined bool GET_UNIT_TEST_VERBOSITY( void )
 {
     return TEST_NAME_CREATOR( YAP );
