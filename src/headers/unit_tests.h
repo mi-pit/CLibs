@@ -23,7 +23,7 @@
 
 /* number of chars */
 #if !defined( LINE_PREF_WIDTH )
-#define LINE_PREF_WIDTH 166
+#define LINE_PREF_WIDTH 100
 #endif
 
 #if LINE_PREF_WIDTH < 32
@@ -166,8 +166,14 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
             for ( size_t i = 0; i < msg_indent; ++i )
                 printf( " " );
         }
+
+#if defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 201112L
+        _Static_assert( TESTS_LINE_WIDTH > ( MSG_END_PART_LEN + msg_indent ),
+                        "TESTS_LINE_WIDTH must be greater than the const part" );
+#endif
+
         const size_t ndots =
-                ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_END_PART_LEN - msg_indent;
+                ln > 0 ? ( size_t ) ln : TESTS_LINE_WIDTH - MSG_END_PART_LEN - msg_indent;
 
         for ( size_t i = 0; i < ndots; ++i )
             printf( "." );

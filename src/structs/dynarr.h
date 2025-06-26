@@ -12,7 +12,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <sys/cdefs.h>
 
 
 struct dynamic_array; // defined in dynarr.c
@@ -254,35 +253,6 @@ int list_clear( struct dynamic_array *ls );
 #define list_sprintf( STRING, LIST, TYPE, FMTSTR ) \
     array_sprintf( STRING, list_items( LIST ), list_size( LIST ), TYPE, FMTSTR )
 
-
-/* ––––– Pre–Formatted ––––– */
-
-/**
- * Prints the contents of the List in one of the following formats:
- * @code
- * LS_PRINT_NOFORMAT = ( -1 ), // Lets each list to choose its own print method
- * LS_PRINT_BYTE     = 0,      // default;
- *                             // prints any data as pairs of hexadecimal digits
- * LS_PRINT_STR      = 1,      // List contents are strings
- * LS_PRINT_INT      = 2,      // List contents are whole numbers
- * LS_PRINT_DEC      = 3,      // List contents are rational numbers
- * LS_PRINT_PTR      = 4,      // List contents are pointers
- * LS_PRINT_LIST     = 5,      // List contents are other lists
- * @endcode
- *
- * @deprecated
- * list_print, list_printm, list_prints
- * are bad, just use list_printf\n
- * \n
- * This function is sort of an afterthought and
- * probably doesn't work very well\n
- */
-Deprecated void list_print( const struct dynamic_array * );
-Deprecated void list_printm( const struct dynamic_array *, int print_mode );
-/**
- * Works like list_printm(), but also prints the List size
- */
-Deprecated void list_prints( const struct dynamic_array *, int print_mode );
 
 /* ––––– GETTERS ––––– */
 
