@@ -27,18 +27,23 @@
 #elif defined( __linux__ )
 #include <linux/limits.h>
 #else
+/// Maximum length of a file name
 #define PATH_MAX 4096
 #endif
 #endif //ndef PATH_MAX
 
+/**
+ * Static buffer for saving the program name.
+ *
+ * If all efforts to set it to the actual name, it defaults to `"current-program"`
+ */
 LibraryDefined char ProgName[ PATH_MAX + 1 ] = "current-program";
 
 /**
  * This function doesn't allocate any memory on the heap.
- * Its return value is a pointer to a part of the full_path.
- * @param full_path Full path to file
- * @return pointer to the last part of ‹full_path›
- * @example
+ * Its return value is a pointer to a part of the `full_path`.
+ * <p>
+ * Example:
  * @code
  * get_file_name( "/home/user/Hovno" )  // => "Hovno"
  * get_file_name( "Hovno" )             // => "Hovno"
@@ -46,6 +51,10 @@ LibraryDefined char ProgName[ PATH_MAX + 1 ] = "current-program";
  * get_file_name( "./a" )               // => "a"
  * get_file_name( "Directory/Subdir/" ) // => "Subdir/"
  * @endcode
+ * </p>
+ *
+ * @param full_path Full path to file
+ * @return pointer to the last part of ‹full_path›
  */
 LibraryDefined const char *get_file_name( const char *const full_path )
 {
@@ -64,12 +73,21 @@ LibraryDefined const char *get_file_name( const char *const full_path )
     return full_path;
 }
 
+/**
+ * Fetches the name of the program currently being run.
+ *
+ * @return Pointer to a static buffer
+ */
 LibraryDefined inline const char *get_prog_name( void )
 {
     return ProgName;
 }
 
-/// Sets the static `ProgName` to the current program's name if possible
+/**
+ * Sets the static `ProgName` buffer to the current program's name if possible.
+ *
+ * @return `false` if not successful
+ */
 BeforeMain LibraryDefined bool set_prog_name( void );
 
 
@@ -100,11 +118,7 @@ BeforeMain LibraryDefined bool set_prog_name( void )
     return true;
 }
 
-#elif ( defined( __APPLE__ ) || defined( __FreeBSD__ ) ) && !defined( _POSIX_C_SOURCE )
-#include <stdlib.h>
-#define get_prog_name() getprogname()
 #elif defined( __linux__ )
-#include <stdbool.h>
 #include <unistd.h> /* readlink */
 
 BeforeMain LibraryDefined bool set_prog_name( void )
@@ -112,15 +126,13 @@ BeforeMain LibraryDefined bool set_prog_name( void )
     char path[ PATH_MAX ] = { 0 };
 
     if ( readlink( "/proc/self/exe", path, PATH_MAX ) == -1 )
-        return 1;
+        return true;
 
     strncpy( ProgName, get_file_name( path ), PATH_MAX );
-    return 0;
+    return false;
 }
 
-#elif defined( __FILE_NAME__ ) /* this kinda sucks, but hey, what are you gonna do? */
-#define get_prog_name() __FILE_NAME__
-#endif // get_prog_name()
+#endif // set_prog_name()
 
 
 #endif //CLIBS_FILENAMES_H
