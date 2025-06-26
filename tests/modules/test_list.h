@@ -10,7 +10,7 @@
 #include "../../src/structs/dynarr.h"
 
 
-Tester test_list_array_uint64( const struct dynamic_array *ls,
+Private bool test_list_array_uint64( const struct dynamic_array *ls,
                                size_t size,
                                const uint64_t array[ size ] )
 {
@@ -58,7 +58,7 @@ TEST( list_init )
 END_TEST
 
 
-Tester test_list_items( const List *ls, size_t count, const int array[ count ] )
+Private bool test_list_items( const List *ls, size_t count, const int array[ count ] )
 {
     assert_that( list_el_size( ls ) == sizeof( int ), "list element size" );
 

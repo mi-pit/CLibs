@@ -15,7 +15,7 @@
 
 typedef ssize_t( PendFunction )( struct dynamic_string *, string_t );
 
-Tester test_one_pend( string_t init, string_t app, string_t expected, PendFunction func )
+Private bool test_one_pend( string_t init, string_t app, string_t expected, PendFunction func )
 {
     struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr alloc" );
@@ -42,7 +42,7 @@ TEST( append )
 END_TEST
 
 
-Tester test_one_appendn( string_t init, string_t app, size_t len, string_t expected )
+Private bool test_one_appendn( string_t init, string_t app, size_t len, string_t expected )
 {
     struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr alloc" );
@@ -64,7 +64,7 @@ TEST( appendn )
 END_TEST
 
 
-Tester test_one_init_as( string_t init )
+Private bool test_one_init_as( string_t init )
 {
     size_t str_len                = strlen( init );
     struct dynamic_string *dynstr = dynstr_init_as( init );
@@ -86,7 +86,7 @@ TEST( init_as )
 END_TEST
 
 
-Tester test_one_slice( string_t str,
+Private bool test_one_slice( string_t str,
                        size_t start,
                        ssize_t end,
                        int rv_want,
@@ -111,7 +111,7 @@ Tester test_one_slice( string_t str,
     dynstr_destroy( s );
     return rv;
 }
-Tester test_one_slice_e( string_t str, ssize_t end, int rv_want, string_t res )
+Private bool test_one_slice_e( string_t str, ssize_t end, int rv_want, string_t res )
 {
     struct dynamic_string *s = dynstr_init_as( str );
     assert_that( s != NULL, "strdup" );
@@ -132,7 +132,7 @@ Tester test_one_slice_e( string_t str, ssize_t end, int rv_want, string_t res )
     dynstr_destroy( s );
     return rv;
 }
-Tester test_one_slice_s( string_t str, size_t start, int rv_want, string_t res )
+Private bool test_one_slice_s( string_t str, size_t start, int rv_want, string_t res )
 {
     struct dynamic_string *s = dynstr_init_as( str );
     assert_that( s != NULL, "strdup" );
@@ -189,7 +189,7 @@ TEST( slices )
 }
 END_TEST
 
-PrintfLike( 2, 3 ) Tester test_one_vappendf( string_t init, string_t fmt, ... )
+PrintfLike( 2, 3 ) Private bool test_one_vappendf( string_t init, string_t fmt, ... )
 {
     va_list vaList, vaCopy;
     va_start( vaList, fmt );

@@ -9,7 +9,7 @@
 #include "../../src/headers/unit_tests.h"
 #include "../../src/math.h"
 
-Tester test_one_reverse_int( int64_t n, unsigned base, uint64_t res )
+Private bool test_one_reverse_int( int64_t n, unsigned base, uint64_t res )
 {
     return reverse_integer( n, base ) == res;
 }
