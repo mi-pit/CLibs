@@ -76,7 +76,10 @@ const struct key_value_pair *dict_get( const struct dictionary *,
                                        const void *key,
                                        size_t key_size );
 
+bool dict_has_key( const struct dictionary *, const void *key, size_t key_size );
+
 const void *dict_get_val( const struct dictionary *, const void *key, size_t key_size );
+
 int dict_set_val( struct dictionary *,
                   const void *key,
                   size_t key_size,

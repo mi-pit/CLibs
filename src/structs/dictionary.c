@@ -178,6 +178,11 @@ const struct key_value_pair *dict_get( const struct dictionary *dict,
     return dict_get_non_const( dict, key, key_size );
 }
 
+bool dict_has_key( const struct dictionary *dict, const void *key, size_t key_size )
+{
+    return dict_get( dict, key, key_size ) != NULL;
+}
+
 const void *dict_get_val( const struct dictionary *dict,
                           const void *key,
                           const size_t key_size )
