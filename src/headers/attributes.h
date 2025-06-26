@@ -19,10 +19,11 @@
 
 
 #ifdef __has_attribute
+/** Evaluates as true if the compiler (clang/GCC) supports the attribute */
 #define HAS_ATTRIBUTE( TOK ) __has_attribute( TOK )
 #else // ndef __has_attribute
+/** This compiler doesn't have any attributes */
 #define HAS_ATTRIBUTE( TOK ) 0
-/* false */
 #endif // __has_attribute
 
 
@@ -38,6 +39,7 @@
 /// Tells the compiler which varargs correspond to a format string
 #define PrintfLike( FORMAT_STRING, FIRST_VAR_ARG ) \
     __attribute__( ( __format__( __printf__, FORMAT_STRING, FIRST_VAR_ARG ) ) )
+/// Tells the compiler which varargs correspond to a format string
 #define ScanfLike( FORMAT_STRING, FIRST_VAR_ARG ) \
     __attribute__( ( __format__( __scanf__, FORMAT_STRING, FIRST_VAR_ARG ) ) )
 #else // format
@@ -69,6 +71,7 @@
 
 
 #if HAS_ATTRIBUTE( constructor )
+/// Function runs before entering `main`
 #define BeforeMain __attribute__( ( constructor ) )
 #else
 #define BeforeMain UsageOptional
@@ -76,6 +79,7 @@
 
 
 #if HAS_ATTRIBUTE( noreturn )
+/// Function always exits
 #define NoReturn __attribute__( ( noreturn ) )
 #else
 #define NoReturn
@@ -83,6 +87,7 @@
 
 
 #if HAS_ATTRIBUTE( deprecated )
+/// Function is deprecated and shouldn't be used
 #define Deprecated __attribute__( ( deprecated ) )
 #else
 #define Deprecated
