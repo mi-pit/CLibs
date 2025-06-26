@@ -27,7 +27,9 @@
 
 
 /**
- * Creates a new comparator function with limited visibility for already comparable numeric types.
+ * Creates a new static comparator function with limited visibility
+ * for already comparable numeric types.
+ *
  * `TYPE` has to be a single token since it's used to define the name of the function.
  */
 #define DEFINE_CMP_FUNCTION( TYPE )                                 \
@@ -52,7 +54,9 @@ DEFINE_CMP_FUNCTION( uint64_t )
 
 
 /**
- * Creates an arbitrary hash of any data of the specified length
+ * Creates an arbitrary hash of any data of the specified length.
+ *
+ * Used, for example, in `set.h` and `dictionary.h`.
  *
  * @param nbytes number of bytes (chars) under the pointer
  * @return unsigned 64-bit int hash
