@@ -16,12 +16,12 @@ struct dictionary {
 };
 
 
-struct const_kvp {
-    const void *key;
+struct key_value_pair {
+    void *key;
     size_t key_size;
     PrintFunction key_print;
 
-    const void *val;
+    void *val;
     size_t val_size;
     PrintFunction val_print;
 
@@ -87,11 +87,11 @@ int dict_insert_f( struct dictionary *dict,
     // todo: resize
     const uint64_t hash = hash_func( key, key_size );
 
-    const struct const_kvp new_item = {
+    const struct key_value_pair new_item = {
         .key_size = key_size,
         .val_size = val_size,
-        .key      = key,
-        .val      = val,
+        .key      = ( void * ) key,
+        .val      = ( void * ) val,
     };
 
     for ( size_t i = 0; i < dict->capacity; ++i )

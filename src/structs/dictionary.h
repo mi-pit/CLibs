@@ -8,23 +8,8 @@
 
 #include "../item_print_functions.h"
 
-#include <stdbool.h>
-
 
 typedef struct dictionary Dictionary;
-
-
-struct key_value_pair {
-    void *key;
-    size_t key_size;
-    PrintFunction key_print;
-
-    void *val;
-    size_t val_size;
-    PrintFunction val_print;
-
-    bool removed;
-};
 
 
 #define DICT_DEF_CAP 64
