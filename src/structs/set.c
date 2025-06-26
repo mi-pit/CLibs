@@ -131,7 +131,7 @@ Set *set_init_cap( const size_t capacity )
     new_set->capacity = capacity;
 
     for ( size_t i = 0; i < new_set->capacity; ++i )
-        new_set->items[ i ].func = print_byte;
+        new_set->items[ i ].func = ITEM_PRINT_FUNCTION_NAME( byte );
 
     return new_set;
 }
@@ -195,7 +195,7 @@ Set *set_init( void )
 
 int set_insert( Set *set, const void *data, const size_t len )
 {
-    return set_insert_f( set, data, len, print_byte );
+    return set_insert_f( set, data, len, ITEM_PRINT_FUNCTION_NAME( byte ) );
 }
 
 /* NOLINT(*-no-recursion) */ int set_insert_item( Set *set, const struct set_item *item )

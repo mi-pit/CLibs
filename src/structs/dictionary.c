@@ -147,7 +147,13 @@ int dict_insert( struct dictionary *dict,
                  const void *val,
                  const size_t val_size )
 {
-    return dict_insert_f( dict, key, key_size, val, val_size, print_byte, print_byte );
+    return dict_insert_f( dict,
+                          key,
+                          key_size,
+                          val,
+                          val_size,
+                          ITEM_PRINT_FUNCTION_NAME( byte ),
+                          ITEM_PRINT_FUNCTION_NAME( byte ) );
 }
 
 Private struct key_value_pair *dict_get_non_const( const struct dictionary *const dict,
@@ -236,7 +242,7 @@ enum DictRemoveRV dict_remove( struct dictionary *dict,
         item->key_size  = 0;
         item->val_size  = 0;
         item->removed   = true;
-        item->key_print = item->val_print = print_byte;
+        item->key_print = item->val_print = ITEM_PRINT_FUNCTION_NAME( byte );
         dict->size--;
         return DICTREMOVE_REMOVED;
     }
