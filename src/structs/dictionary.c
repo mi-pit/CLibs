@@ -251,11 +251,11 @@ Private inline void kvp_print_as( const struct key_value_pair *item,
                                   const PrintFunction val_print,
                                   const char *kv_sep )
 {
-    printf( "|" );
+    printf( "\"" );
     ( key_print != NULL ? key_print : item->key_print )( item->key, item->key_size );
     printf( "%s", kv_sep );
     ( val_print != NULL ? val_print : item->val_print )( item->val, item->val_size );
-    printf( "|" );
+    printf( "\"" );
 }
 
 
@@ -263,7 +263,7 @@ static void dict_print_d( const struct dictionary *dict,
                           const PrintFunction key_print,
                           const PrintFunction val_print )
 {
-    printf( "dictionary (size=%zu): {", dict->size );
+    printf( "{" );
 
     const char *delim = "";
     size_t n          = 0;
