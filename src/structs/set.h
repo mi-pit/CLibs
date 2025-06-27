@@ -103,22 +103,9 @@ SetEnumeratedEntry set_get_next( const Set *set, int64_t index_last );
 #define SET_ITEMCOUNT_LINE_LENGTH 4
 #endif //SET_ITEMCOUNT_LINE_LENGTH
 
-#define set_printn( set )          \
-    do                             \
-    {                              \
-        printf( "\"" #set "\" " ); \
-        set_print( set );          \
-    }                              \
-    while ( 0 )
-
-#define set_printn_as( set, print_func ) \
-    do                                   \
-    {                                    \
-        printf( "\"" #set "\" " );       \
-        set_print_as( set, print_func ); \
-    }                                    \
-    while ( 0 )
-
+/**
+ *
+ */
 void set_print( const Set * );
 void set_print_as( const Set *, PrintFunction );
 
