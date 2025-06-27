@@ -58,7 +58,8 @@ DEFINE_CMP_FUNCTION( uint64_t )
  *
  * Used, for example, in `set.h` and `dictionary.h`.
  *
- * @param nbytes number of bytes (chars) under the pointer
+ * @param data      pointer to data
+ * @param nbytes    number of bytes (chars) under the pointer
  * @return unsigned 64-bit int hash
  */
 LibraryDefined uint64_t hash_func( const void *const data, const size_t nbytes )
