@@ -33,12 +33,6 @@ size_t set_size( const Set *set )
     return set->n_items;
 }
 
-size_t set_capacity( const Set *set )
-{
-    return set->capacity;
-}
-
-
 SetEnumeratedEntry set_get_next( const Set *set, const int64_t index_last )
 {
     if ( index_last < -1 )

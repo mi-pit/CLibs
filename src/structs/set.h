@@ -81,7 +81,6 @@ void set_destroy_n( int n, ... );
 
 
 size_t set_size( const Set *set );
-size_t set_capacity( const Set *set );
 
 
 typedef struct {
