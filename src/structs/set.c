@@ -406,16 +406,6 @@ void set_destroy( Set *set )
     free( set );
 }
 
-void set_destroy_n( int n, ... )
-{
-    va_list vaList;
-    va_start( vaList, n );
-    while ( n-- > 0 )
-        set_destroy( va_arg( vaList, Set * ) );
-
-    va_end( vaList );
-}
-
 
 void set_print_as( const Set *set, const PrintFunction func )
 {

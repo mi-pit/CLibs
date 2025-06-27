@@ -77,7 +77,6 @@ int set_cmp( const Set *, const Set * );
 
 
 void set_destroy( Set * );
-void set_destroy_n( int n, ... );
 
 
 size_t set_size( const Set *set );
