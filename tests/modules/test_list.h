@@ -10,9 +10,12 @@
 #include "../../src/structs/dynarr.h"
 
 
+#define DEFAULT_DYNSTRING_CAP 256
+
+
 Private bool test_list_array_uint64( const struct dynamic_array *ls,
-                               size_t size,
-                               const uint64_t array[ size ] )
+                                     size_t size,
+                                     const uint64_t array[ size ] )
 {
     for ( size_t i = 0; i < size; ++i )
         if ( array[ i ] != ( ( uint64_t * ) list_items( ls ) )[ i ] )
