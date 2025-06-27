@@ -64,6 +64,7 @@
 
 
 #if HAS_ATTRIBUTE( const )
+/** Functions return value only depends on its parameters */
 #define Const __attribute__( ( __const__ ) )
 #else // const
 #define Const
