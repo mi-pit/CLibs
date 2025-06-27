@@ -1,12 +1,5 @@
 /**
  * Math functions & other number operations.
- *
- * @example
- * @code
- * reverse_integer( 123, 10 )   // => 321
- * reverse_integer( 0xFA, 16 )  // => 0xAF
- * reverse_integer( 0b0101, 2 ) // => 0b101
- * @endcode
  */
 
 #ifndef CLIBS_MATH_H
@@ -48,6 +41,13 @@ Mathematical uint64_t upower( uint64_t base, unsigned exp );
 /**
  * Reverses the digits of the number `n`.
  * Ignores lead zeroes, works in any base.
+ *
+ * Example:
+ * @code
+ * reverse_integer( 123, 10 )   // => 321
+ * reverse_integer( 0xFA, 16 )  // => 0xAF
+ * reverse_integer( 0b0101, 2 ) // => 0b101
+ * @endcode
  *
  * @param n     number to be reversed
  * @param base  numeric base of the number
