@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+/** @cond INTERNAL */
 #define foreach_helper_init( SIZE, ITEM_NAME )                                \
     for ( size_t foreach_keep_##ITEM_NAME = 1, foreach_index_##ITEM_NAME = 0, \
                  foreach_cap_##ITEM_NAME = ( SIZE );                          \
@@ -27,6 +29,7 @@
                                                               : ( ACCESSOR );   \
           foreach_keep_##ITEM_NAME;                                             \
           foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME )
+/** @endcond */
 
 
 /**
@@ -73,7 +76,7 @@
                                    ( STRING )[ foreach_index_##ITEM_NAME ] )
 
 
-#ifdef CLIBS_DYNAMIC_ARRAY_H
+#if defined( CLIBS_FOREACH_LIST ) || defined( CLIBS_DYNAMIC_ARRAY_H )
 /**
  * Iterates over a list.
  *
@@ -83,16 +86,18 @@
  * @param ITEM_NAME name of the new variable
  * @param LIST      a valid `List *`
  *
- * @attention requires previous inclusion of `src/structs/dynarr.h`
+ * @attention
+ * Requires previous definition of `CLIBS_FOREACH_LIST` or `CLIBS_DYNAMIC_ARRAY_H`.
+ * The latter is defined when including `src/structs/dynarr.h`.
 */
 #define foreach_ls( TYPE, ITEM_NAME, LIST )                                      \
     foreach_helper_init( list_size( LIST ), ITEM_NAME )                          \
             foreach_helper_assign( TYPE, ITEM_NAME, list_fetch( LIST, 0, TYPE ), \
                                    list_fetch( LIST, foreach_index_##ITEM_NAME, TYPE ) )
-#endif //CLIBS_DYNAMIC_ARRAY_H
+#endif // List
 
 
-#ifdef CLIBS_SETS_H
+#if defined( CLIBS_FOREACH_SET ) || defined( CLIBS_SETS_H )
 /**
  * Iterates over a set.
  *
@@ -102,15 +107,17 @@
  *
  * @param SET a valid `Set *`
  *
- * @attention requires previous inclusion of `src/structs/set.h`
+ * @attention
+ * Requires previous definition of `CLIBS_FOREACH_SET` or `CLIBS_SETS_H`.
+ * The latter is defined when including `src/structs/set.h`.
  */
 #define foreach_set( SET )                                                      \
     foreach_uni ( const SetEnumeratedEntry, entry, set_get_next( ( SET ), -1 ), \
                   set_get_next( ( SET ), entry.index ), set_size( ( SET ) ) )
-#endif //CLIBS_SETS_H
+#endif // Set
 
 
-#ifdef CLIBS_QUEUE_H
+#if defined( CLIBS_FOREACH_QUEUE ) || defined( CLIBS_QUEUE_H )
 /**
  * Iterates over a queue.
  *
@@ -126,7 +133,9 @@
  *
  * @param QUEUE valid `struct fifo_queue *`
  *
- * @attention requires previous inclusion of `src/structs/queue.h`
+ * @attention
+ * Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
+ * The latter is defined when including `src/structs/queue.h`.
  */
 #define foreach_que( QUEUE )                                      \
     foreach_uni ( const QueueEnumeratedEntry, entry,              \
@@ -134,7 +143,7 @@
                   queue_get_next( ( QUEUE ), entry.item, false ), \
                   queue_get_size( ( QUEUE ) ) )
 // TODO?: remove `queue_get_size` call (for efficiency)
-#endif //CLIBS_QUEUE_H
+#endif // Queue
 
 
 #endif //CLIBS_FOREACH_H
