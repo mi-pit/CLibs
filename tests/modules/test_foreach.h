@@ -29,8 +29,8 @@ Private bool test_one_foreach_arr( const int64_t arr[], const size_t count )
     return true;
 }
 Private bool test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
-                            const int64_t numbers_arr[],
-                            const size_t count )
+                                  const int64_t numbers_arr[],
+                                  const size_t count )
 {
     assert_that( list_size( numbers_ls ) == count, "list size != array size" );
 
