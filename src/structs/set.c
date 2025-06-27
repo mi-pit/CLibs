@@ -5,23 +5,14 @@
 
 #include <assert.h>   /* assert */
 #include <inttypes.h> /* PRIi64 */
-#include <stdarg.h>   /* va_list, ... */
 #include <stdio.h>    /* print */
 #include <stdlib.h>   /* malloc */
 #include <string.h>   /* memcpy */
 
 
-/**
- * Sets implemented via a hash table\n
- * Sets contain at most one copy of an item\n
- * \n
- * Items can be of any type -- they are treated as arrays of bytes.\n
- * Their keys are a combination of the number of bytes and each byte of the data
- *
- * @param n_items   : size_t; number of currently held items in the hash_set
- * @param capacity  : size_t; size of items array
- * @param items     : struct set_item *; array of type set_item
- */
+#define SET_DEFAULT_CAP 64
+
+
 struct hash_set {
     size_t n_items;
     size_t capacity;
@@ -70,6 +61,12 @@ static int set_item_cmp( const void *s1, const void *s2 )
     if ( item1->size != item2->size )
         return cmp_size_t( &item1->size, &item2->size );
     return memcmp( item1->data, item2->data, item1->size );
+}
+
+Private int /* NOLINT(*-no-recursion) */ set_insert_item( Set *set,
+                                                          const struct set_item *item )
+{
+    return set_insert_f( set, item->data, item->size, item->func );
 }
 
 
@@ -184,7 +181,7 @@ Set *set_init( void )
         return SETINSERT_INSERTED;
     }
 
-    return fwarnx_ret( RV_EXCEPTION, "unrecognized error" );
+    return fwarnx_ret( RV_EXCEPTION, "unrecognized exception" );
 }
 
 int set_insert( Set *set, const void *data, const size_t len )
@@ -192,13 +189,8 @@ int set_insert( Set *set, const void *data, const size_t len )
     return set_insert_f( set, data, len, ITEM_PRINT_FUNCTION_NAME( byte ) );
 }
 
-/* NOLINT(*-no-recursion) */ int set_insert_item( Set *set, const struct set_item *item )
-{
-    return set_insert_f( set, item->data, item->size, item->func );
-}
-
-int set_insert_array( Set *set, const size_t len,
-                      const struct set_item set_item_array[ len ] )
+Private int set_insert_array( Set *set, const size_t len,
+                              const struct set_item set_item_array[ len ] )
 {
     for ( size_t i = 0; i < len; ++i )
     {
@@ -250,7 +242,7 @@ int set_remove( Set *set, const void *data, const size_t len )
     return SETREMOVE_NOT_FOUND;
 }
 
-int set_remove_item( Set *set, const struct set_item *item )
+Private int set_remove_item( Set *set, const struct set_item *item )
 {
     return set_remove( set, item->data, item->size );
 }
@@ -292,7 +284,7 @@ bool set_search( const Set *set, const void *data, const size_t len )
     return false;
 }
 
-bool set_search_item( const Set *set, const struct set_item *item )
+Private bool set_search_item( const Set *set, const struct set_item *item )
 {
     return set_search( set, item->data, item->size );
 }
