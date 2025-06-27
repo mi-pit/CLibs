@@ -48,33 +48,33 @@
     }                                                                              \
     while ( 0 )
 
-/// See `array_fprintf_sde()`
+/// @see `array_fprintf_sde()`
 #define array_fprintf_d( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR, DELIM ) \
     array_fprintf_sde( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR,           \
                        ARRAY_PRINT_DEFAULT_STARTSTR, DELIM,                   \
                        ARRAY_PRINT_DEFAULT_ENDSTR "\n" )
 
-/// See `array_fprintf_sde()`
+/// @see `array_fprintf_sde()`
 #define array_fprintf( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
     array_fprintf_d( FILESTREAM, ARRAY, ARRLEN, TYPE, FORMAT_STR,    \
                      ARRAY_PRINT_DEFAULT_DELIM )
 
 
-/// See `array_fprintf_sde()`
+/// @see `array_fprintf_sde()`
 #define array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, START_STR, DELIM, END_STR ) \
     array_fprintf_sde( stdout, ARRAY, ARRLEN, TYPE, FORMAT_STR, START_STR, DELIM,      \
                        END_STR )
 
-/// See `array_fprintf_sde()`
+/// @see `array_fprintf_sde()`
 #define array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, DELIM )                     \
     array_printf_sde( ARRAY, ARRLEN, TYPE, FORMAT_STR, ARRAY_PRINT_DEFAULT_STARTSTR, \
                       DELIM, ARRAY_PRINT_DEFAULT_ENDSTR "\n" )
 
-/// See `array_fprintf_sde()`
+/// @see `array_fprintf_sde()`
 #define array_printf( ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
     array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ARRAY_PRINT_DEFAULT_DELIM )
 
-#if defined( CLIBS_DYNSTRING_H )
+#if defined( CLIBS_DYNSTRING_H ) || defined( CLIBS_ARRAY_PRINTF_DOCS )
 /**
  * The contents of `STRINGVAR` are overwritten (the pointer itself is).
  *
@@ -84,7 +84,7 @@
  * Requires previous definition of `CLIBS_DYNSTRING_H`,
  * for example by `#include "src/structs/dynstring.h"`
  *
- * Also see `array_fprintf_sde()`
+ * @see `array_fprintf_sde()`
  *
  * @param STRINGVAR a local variable into which a pointer to
  * a string (a `char *`) gets saved
@@ -126,12 +126,12 @@
     }                                                                               \
     while ( 0 )
 
-/// See `array_sprintf_sde()`
+/// @see `array_sprintf_sde()`
 #define array_sprintf_d( STRINGVAR, ARRAY, ARRLEN, TYPE, FMTSTR, DELIM ) \
     array_sprintf_sde( STRINGVAR, ARRAY, ARRLEN, TYPE, FMTSTR,           \
                        ARRAY_PRINT_DEFAULT_STARTSTR, DELIM, ARRAY_PRINT_DEFAULT_ENDSTR )
 
-/// See `array_sprintf_sde()`
+/// @see `array_sprintf_sde()`
 #define array_sprintf( STRING, ARRAY, ARRLEN, TYPE, FMTSTR ) \
     array_sprintf_d( STRING, ARRAY, ARRLEN, TYPE, FMTSTR, ARRAY_PRINT_DEFAULT_DELIM )
 #endif // CLIBS_DYNSTRING_H
