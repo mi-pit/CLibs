@@ -1,3 +1,21 @@
+/**
+ * @file queue.h
+ * @brief First in, first out.
+ *
+ * | Method     | Time complexity |
+ * |------------|-----------------|
+ * | `init`     | O(1)            |
+ * | `destroy`  | O(n)            |
+ * | `clear`    | O(n)            |
+ * | `enqueue`  | O(1)            |
+ * | `dequeue`  | O(1)            |
+ * | `get`      | O(n)            |
+ * | `get_head` | O(1)            |
+ * | `get_tail` | O(1)            |
+ * | `get_size` | O(n)            |
+ * | `is_empty` | O(1)            |
+ */
+
 //
 // Created by Michal Pitner on 08.06.2025.
 //
@@ -5,43 +23,80 @@
 #ifndef CLIBS_QUEUE_H
 #define CLIBS_QUEUE_H
 
+#include "../headers/attributes.h"
 #include "../headers/extra_types.h"
 
-/**
- * First in, first out.
- *
- * \code
- * // Create/destroy
- * init        O(1)
- * destroy     O(n)
- * clear       O(n)
- * // Modify
- * enqueue     O(1)
- * dequeue     O(1)
- * // getters
- * get         O(n) | n = index
- * get_head    O(1)
- * get_tail    O(1)
- * get_size    O(n)
- * is_empty    O(1)
- * \endcode
- */
+
 struct fifo_queue;
+typedef struct fifo_queue Queue;
 
 
-struct fifo_queue *queue_init( size_t el_size );
-void queue_destroy( struct fifo_queue *queue );
-void queue_clear( struct fifo_queue *queue );
+/**
+ * Initializes a FIFO queue.
+ *
+ * @param el_size `sizeof` a single element
+ * @return pointer to a valid Queue or `NULL`
+ */
+Constructor Queue *queue_init( size_t el_size );
+/**
+ * Frees all memory owned by the queue.
+ */
+void queue_destroy( Queue * );
+/**
+ * Truncates the queue to length = 0.
+ */
+void queue_clear( Queue * );
 
-int queue_enqueue( struct fifo_queue *queue, const void *data );
-int queue_dequeue( struct fifo_queue *queue, void *data_cont );
+/**
+ * Appends an element to the end of the Queue.
+ *
+ * @param data pointer to data
+ * @return `RV_ERROR` if alloc fails, else `RV_SUCCESS`
+ */
+int queue_enqueue( Queue *, const void *data );
+/**
+ * Removes an element from the front of the Queue.
+ *
+ * The removed element is copied to `data_cont`.
+ *
+ * @param data_cont pointer to space in memory
+ *                  able to hold at least `Queue::el_size` bytes or `NULL`
+ * @return `RV_EXCEPTION` if queue is empty, else `RV_SUCCESS`
+ */
+int queue_dequeue( Queue *, void *data_cont );
 
-int queue_get( const struct fifo_queue *queue, size_t index, void *data_cont );
-int queue_get_head( const struct fifo_queue *queue, void *data_cont );
-int queue_get_tail( const struct fifo_queue *queue, void *data_cont );
+/**
+ * Fetches an item at `index`.
+ *
+ * @param index
+ * @param data_cont pointer to space in memory
+ *                  able to hold at least `Queue::el_size` bytes
+ * @return `RV_EXCEPTION` if either
+ * - `index` is OOB
+ * - `data_cont` is `NULL`
+ */
+int queue_get( const Queue *, size_t index, void *data_cont );
+/**
+ * Fetches the next item to be dequeued.
+ *
+ * @param data_cont pointer to space in memory
+ *                  able to hold at least `Queue::el_size` bytes
+ * @return `RV_EXCEPTION` if no head
+ */
+int queue_get_head( const Queue *, void *data_cont );
+/**
+ * Fetches the last item that was enqueued.
+ *
+ * @param data_cont pointer to space in memory
+ *                  able to hold at least `Queue::el_size` bytes
+ * @return `RV_EXCEPTION` if there are no items
+ */
+int queue_get_tail( const Queue *, void *data_cont );
 
-size_t queue_get_size( const struct fifo_queue *queue );
-bool queue_is_empty( const struct fifo_queue *queue );
+/// Length of queue (number of items)
+size_t queue_get_size( const Queue * );
+/** seems self-explanatory */
+bool queue_is_empty( const Queue * );
 
 typedef struct {
     const struct queue_node *const item;
@@ -49,11 +104,11 @@ typedef struct {
 } QueueEnumeratedEntry;
 
 /**
- * Iterator over queue
+ * Iterator over queue.
  *
- * @return QueueEnumeratedEntry
+ * @return `QueueEnumeratedEntry`
  */
-QueueEnumeratedEntry queue_get_next( const struct fifo_queue *,
+QueueEnumeratedEntry queue_get_next( const Queue *,
                                      const struct queue_node *prev,
                                      bool get_first );
 
