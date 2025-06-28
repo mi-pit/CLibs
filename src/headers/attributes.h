@@ -1,16 +1,17 @@
-/*
+/**
+ * @file attributes.h
+ * @brief
  * Function and variable attributes.
  *
- * Whether the compiler supports attributes (GCC/Clang), `declspec`s (MSVC) or neither,
- * this header creates platform-independent macros for certain attributes a function
- * or variable may have.
+ * Whether the compiler supports attributes (GCC/Clang) or not,
+ * this header creates platform-independent macros for certain attributes
+ * a function or variable may have.
  *
  * Some combinations may (definitely will) be missing; this isn't an exhaustive list.
- * (Though all macros are safe to use)
- *
- *
- * Created by MacBook on 10.01.2025.
+ * (Though all macros are safe to use, no matter the compiler)
  */
+
+// Created by MacBook on 10.01.2025.
 
 #ifndef CLIBS_ATTRIBUTES_H
 #define CLIBS_ATTRIBUTES_H
