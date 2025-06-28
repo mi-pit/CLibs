@@ -15,8 +15,6 @@
 #ifndef CLIBS_ATTRIBUTES_H
 #define CLIBS_ATTRIBUTES_H
 
-#include <sys/cdefs.h>
-
 
 #ifdef __has_attribute
 /** Evaluates as true if the compiler (clang/GCC) supports the attribute */
@@ -112,5 +110,14 @@
  * Function's return value only depends on its parameters.
  */
 #define Mathematical Const
+
+
+#if HAS_ATTRIBUTE( nonnull )
+/** Must not be NULL */
+#define NonNullParams( ... ) __attribute( ( nonnull( __VA_ARGS__ ) ) )
+#else
+#define NonNullParams
+#endif
+
 
 #endif //CLIBS_ATTRIBUTES_H
