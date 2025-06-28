@@ -167,7 +167,7 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
                 printf( " " );
         }
         const size_t ndots =
-                ln > 0 ? ln : TESTS_LINE_WIDTH - MSG_END_PART_LEN - msg_indent;
+                ln > 0 ? ( size_t ) ln : TESTS_LINE_WIDTH - MSG_END_PART_LEN - msg_indent;
 
         for ( size_t i = 0; i < ndots; ++i )
             printf( "." );
