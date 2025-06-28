@@ -16,6 +16,8 @@
 !*.js
 !*.css
 !*.svg
+!Doxyfile
+
 
 # Sources
 !*.c
