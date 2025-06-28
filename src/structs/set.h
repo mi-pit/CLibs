@@ -24,13 +24,13 @@ struct set_item {
 
 
 enum SetInsertRV {
-    SETINSERT_INSERTED = 1,
-    SETINSERT_WAS_IN   = 2,
+    SETINSERT_INSERTED = 0,
+    SETINSERT_WAS_IN   = 1,
 };
 
 enum SetRemoveRV {
-    SETREMOVE_REMOVED   = 1,
-    SETREMOVE_NOT_FOUND = 2,
+    SETREMOVE_REMOVED   = 0,
+    SETREMOVE_NOT_FOUND = 1,
 };
 
 

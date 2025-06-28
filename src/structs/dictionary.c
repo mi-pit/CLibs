@@ -1,5 +1,6 @@
 #include "dictionary.h"
 
+#include "../headers/assert_that.h"
 #include "../headers/errors.h"        /* includes misc.h */
 #include "../headers/misc.h"          /* hash_func(), cmp_size_t(), cmpeq() */
 #include "../headers/pointer_utils.h" /* free_n() */
@@ -16,12 +17,12 @@ struct dictionary {
 };
 
 
-struct const_kvp {
-    const void *key;
+struct key_value_pair {
+    void *key;
     size_t key_size;
     PrintFunction key_print;
 
-    const void *val;
+    void *val;
     size_t val_size;
     PrintFunction val_print;
 
@@ -29,7 +30,7 @@ struct const_kvp {
 };
 
 
-int item_key_cmp( const void *i1, const void *i2 )
+int dict_item_key_cmp( const void *i1, const void *i2 )
 {
     const struct key_value_pair *item1 = i1;
     const struct key_value_pair *item2 = i2;
@@ -39,7 +40,7 @@ int item_key_cmp( const void *i1, const void *i2 )
     return memcmp( item1->key, item2->key, item1->key_size );
 }
 
-int item_val_cmp( const void *i1, const void *i2 )
+int dict_item_val_cmp( const void *i1, const void *i2 )
 {
     const struct key_value_pair *item1 = i1;
     const struct key_value_pair *item2 = i2;
@@ -49,13 +50,16 @@ int item_val_cmp( const void *i1, const void *i2 )
     return memcmp( item1->val, item2->val, item1->val_size );
 }
 
-int item_cmp( const void *i1, const void *i2 )
+int dict_item_cmp( const void *i1, const void *i2 )
 {
-    const int rv = item_key_cmp( i1, i2 );
+    const int rv = dict_item_key_cmp( i1, i2 );
     if ( rv != 0 )
         return rv;
-    return item_val_cmp( i1, i2 );
+    return dict_item_val_cmp( i1, i2 );
 }
+
+
+#define DICT_DEF_CAP 64
 
 
 struct dictionary *dict_init( void )
@@ -64,14 +68,14 @@ struct dictionary *dict_init( void )
     if ( dict == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
-    dict->items = calloc( DICT_DEF_SIZE, sizeof( struct key_value_pair ) );
+    dict->items = calloc( DICT_DEF_CAP, sizeof( struct key_value_pair ) );
     if ( dict->items == NULL )
     {
         free( dict );
         return ( void * ) fwarn_ret( NULL, "calloc" );
     }
 
-    dict->capacity = DICT_DEF_SIZE;
+    dict->capacity = DICT_DEF_CAP;
 
     return dict;
 }
@@ -87,11 +91,11 @@ int dict_insert_f( struct dictionary *dict,
     // todo: resize
     const uint64_t hash = hash_func( key, key_size );
 
-    const struct const_kvp new_item = {
+    const struct key_value_pair new_item = {
         .key_size = key_size,
         .val_size = val_size,
-        .key      = key,
-        .val      = val,
+        .key      = ( void * ) key,
+        .val      = ( void * ) val,
     };
 
     for ( size_t i = 0; i < dict->capacity; ++i )
@@ -99,8 +103,12 @@ int dict_insert_f( struct dictionary *dict,
         const size_t index          = ( hash + i ) % dict->capacity;
         struct key_value_pair *item = dict->items + index;
 
-        if ( item->key != NULL && item_key_cmp( &new_item, item ) != 0 )
+        if ( item->key != NULL )
+        {
+            if ( dict_item_key_cmp( &new_item, item ) == 0 )
+                return DICTINSERT_WAS_IN;
             continue;
+        }
 
         if ( item->key == NULL )
             dict->size++;
@@ -127,7 +135,7 @@ int dict_insert_f( struct dictionary *dict,
         item->val_print = val_print;
         item->removed   = false;
 
-        return RV_SUCCESS;
+        return DICTINSERT_INSERTED;
     }
 
     return RV_ERROR;
@@ -142,9 +150,9 @@ int dict_insert( struct dictionary *dict,
     return dict_insert_f( dict, key, key_size, val, val_size, print_byte, print_byte );
 }
 
-static struct key_value_pair *dict_get_non_const( const struct dictionary *const dict,
-                                                  const void *data,
-                                                  const size_t nbytes )
+Private struct key_value_pair *dict_get_non_const( const struct dictionary *const dict,
+                                                   const void *data,
+                                                   const size_t nbytes )
 {
     const uint64_t hash = hash_func( data, nbytes );
 
@@ -160,18 +168,16 @@ static struct key_value_pair *dict_get_non_const( const struct dictionary *const
 
         if ( item->key == NULL )
             continue;
-        if ( item_key_cmp( item, &search_for ) == 0 )
+        if ( dict_item_key_cmp( item, &search_for ) == 0 )
             return item;
     }
 
     return NULL;
 }
 
-const struct key_value_pair *dict_get( const struct dictionary *dict,
-                                       const void *key,
-                                       const size_t key_size )
+bool dict_has_key( const struct dictionary *dict, const void *key, size_t key_size )
 {
-    return dict_get_non_const( dict, key, key_size );
+    return dict_get_non_const( dict, key, key_size ) != NULL;
 }
 
 const void *dict_get_val( const struct dictionary *dict,
@@ -190,7 +196,7 @@ int dict_set_val( struct dictionary *dict,
 {
     struct key_value_pair *item = dict_get_non_const( dict, key, key_size );
     if ( item == NULL )
-        return RV_EXCEPTION;
+        return fwarnx_ret( RV_EXCEPTION, "couldn't find key" );
 
     free( item->val );
     item->val = malloc( val_size );
@@ -222,7 +228,7 @@ enum DictRemoveRV dict_remove( struct dictionary *dict,
         if ( item->key == NULL && !item->removed )
             return DICTREMOVE_NOT_FOUND;
 
-        if ( !cmpeq( item_key_cmp( &search, item ) ) )
+        if ( !cmpeq( dict_item_key_cmp( &search, item ) ) )
             continue;
 
         free_n( item->key );
@@ -244,53 +250,31 @@ size_t dict_size( const struct dictionary *dict )
     return dict->size;
 }
 
-size_t dict_cap( const struct dictionary *dict )
+Private inline void kvp_print_as( const struct key_value_pair *item,
+                                  const PrintFunction key_print,
+                                  const PrintFunction val_print,
+                                  const char *kv_sep )
 {
-    return dict->capacity;
-}
+    assert_that( ( item->key_print != NULL || key_print != NULL )
+                         && ( item->val_print != NULL || val_print != NULL ),
+                 "no way to print values, this shouldn't happen" );
 
-struct key_value_pair *dict_items_as_array( const struct dictionary *dict )
-{
-    struct key_value_pair *new_data = malloc( dict->size );
-
-    size_t count = 0;
-
-    for ( size_t i = 0; i < dict->capacity; ++i )
-    {
-        if ( dict->items[ i ].key == NULL )
-            continue;
-
-        memcpy( new_data + count++, dict->items + i, sizeof( struct key_value_pair ) );
-        new_data[ count++ ] = dict->items[ i ];
-    }
-
-    return new_data;
-}
-
-
-void kvp_print( const struct key_value_pair *item, const char *kv_sep )
-{
-    kvp_print_as( item, NULL, NULL, kv_sep );
-}
-
-void kvp_print_as( const struct key_value_pair *item,
-                   const PrintFunction key_print,
-                   const PrintFunction val_print,
-                   const char *kv_sep )
-{
-    printf( "|" );
+    printf( "\"" );
     ( key_print != NULL ? key_print : item->key_print )( item->key, item->key_size );
     printf( "%s", kv_sep );
     ( val_print != NULL ? val_print : item->val_print )( item->val, item->val_size );
-    printf( "|" );
+    printf( "\"" );
 }
 
 
-static void dict_print_d( const struct dictionary *dict,
-                          const PrintFunction key_print,
-                          const PrintFunction val_print )
+void dict_print_as( const struct dictionary *dict,
+                    const PrintFunction key_print,
+                    const PrintFunction val_print )
 {
-    printf( "dictionary (size=%zu): {", dict->size );
+    /** Maximum items printed on one line */
+    static const size_t line_max_items = 4;
+
+    printf( "{" );
 
     const char *delim = "";
     size_t n          = 0;
@@ -300,10 +284,9 @@ static void dict_print_d( const struct dictionary *dict,
         if ( item->key == NULL )
             continue;
 
-        delim = item->key_size > 16 || n % DICT_PRINT_LINE_MAX_ITEMS == 0 ? ",\n\t"
-                                                                          : ", ";
+        delim = item->key_size > 16 || n % line_max_items == 0 ? ",\n\t" : ", ";
         if ( n == 0 )
-            delim = dict->size > DICT_PRINT_LINE_MAX_ITEMS ? "\n\t" : " ";
+            delim = dict->size > line_max_items ? "\n\t" : " ";
         printf( "%s", delim );
 
         kvp_print_as( item, key_print, val_print, ": " );
@@ -311,7 +294,7 @@ static void dict_print_d( const struct dictionary *dict,
         ++n;
     }
 
-    if ( dict->size > DICT_PRINT_LINE_MAX_ITEMS )
+    if ( dict->size > line_max_items )
         printf( "\n" );
     else if ( !strchr( delim, '\n' ) )
         printf( " " );
@@ -320,14 +303,7 @@ static void dict_print_d( const struct dictionary *dict,
 
 void dict_print( const struct dictionary *dict )
 {
-    dict_print_d( dict, NULL, NULL );
-}
-
-void dict_print_as( const struct dictionary *dict,
-                    const PrintFunction key_print,
-                    const PrintFunction val_print )
-{
-    dict_print_d( dict, key_print, val_print );
+    dict_print_as( dict, NULL, NULL );
 }
 
 
