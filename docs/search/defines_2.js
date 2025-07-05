@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['clibs_5fassert_5fthat_5fexit_5fval_0',['CLIBS_ASSERT_THAT_EXIT_VAL',['../assert__that_8h.html#aab07a7f71f46aabfbf67021ad4da6609',1,'assert_that.h']]],
+  ['cmpeq_1',['cmpeq',['../misc_8h.html#a639203d8640747c3ee18078f70caa1bf',1,'misc.h']]],
+  ['cold_2',['Cold',['../attributes_8h.html#a4e71aa12a3a472cddbdd122e90a41cd6',1,'attributes.h']]],
+  ['color_5fcreator_3',['COLOR_CREATOR',['../terminal__colors_8h.html#afc71bf6191dd16cd1d99f80da4694015',1,'terminal_colors.h']]],
+  ['color_5fdefault_4',['COLOR_DEFAULT',['../terminal__colors_8h.html#a56e1aea61ee305e3648158362333b3a8',1,'terminal_colors.h']]],
+  ['color_5ffail_5',['COLOR_FAIL',['../unit__tests_8h.html#ac3c186ac6329d3533b0781fdeb95f70c',1,'unit_tests.h']]],
+  ['color_5fnote_6',['COLOR_NOTE',['../unit__tests_8h.html#a33623c9b1344f8e80dacc4f484761adb',1,'unit_tests.h']]],
+  ['color_5fsucc_7',['COLOR_SUCC',['../unit__tests_8h.html#a881308696ee68523c76c4c8f535a5f22',1,'unit_tests.h']]],
+  ['color_5ftest_5ftag_8',['COLOR_TEST_TAG',['../unit__tests_8h.html#a1c2b5e588173931fe88ade63c5198720',1,'unit_tests.h']]],
+  ['color_5fwarning_9',['COLOR_WARNING',['../errors_8h.html#a4d79f3f59a4d19b93eaf106105bddc90',1,'errors.h']]],
+  ['colorcode_5fblack_10',['COLORCODE_BLACK',['../terminal__colors_8h.html#a965fe8d9a39bce1bba46ff28ad5e45c2',1,'terminal_colors.h']]],
+  ['colorcode_5fblue_11',['COLORCODE_BLUE',['../terminal__colors_8h.html#ab2d9e062ad898e4fb7b92c9ac65723b1',1,'terminal_colors.h']]],
+  ['colorcode_5fcyan_12',['COLORCODE_CYAN',['../terminal__colors_8h.html#a69fc9151356793896d65770a9b0b8c00',1,'terminal_colors.h']]],
+  ['colorcode_5fgreen_13',['COLORCODE_GREEN',['../terminal__colors_8h.html#a6b45080f8c0ccc7ee3f5420f278a2752',1,'terminal_colors.h']]],
+  ['colorcode_5fmagenta_14',['COLORCODE_MAGENTA',['../terminal__colors_8h.html#a91cd3e2f6f40f0b35278e6c2c334d8fe',1,'terminal_colors.h']]],
+  ['colorcode_5fred_15',['COLORCODE_RED',['../terminal__colors_8h.html#aa195564ca8a653e1e81c84c759a71723',1,'terminal_colors.h']]],
+  ['colorcode_5fwhite_16',['COLORCODE_WHITE',['../terminal__colors_8h.html#aeaf2f3e0a90119855c6e195dd3df6083',1,'terminal_colors.h']]],
+  ['colorcode_5fyellow_17',['COLORCODE_YELLOW',['../terminal__colors_8h.html#adfa70580122c877185a264613f91a641',1,'terminal_colors.h']]],
+  ['const_18',['Const',['../attributes_8h.html#a124ec14aaad863b43cd8e660ee034fbe',1,'attributes.h']]],
+  ['constructor_19',['Constructor',['../attributes_8h.html#aef897e02962ee0e2e9338bd39ec7c9a5',1,'attributes.h']]],
+  ['countof_20',['countof',['../misc_8h.html#ab317c73e51fb8a68f86165ac831f7b8c',1,'misc.h']]],
+  ['critical_5ftest_21',['CRITICAL_TEST',['../unit__tests_8h.html#a1eab8b78627d670d6ee40104963cb956',1,'unit_tests.h']]]
+];
