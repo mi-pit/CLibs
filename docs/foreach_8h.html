@@ -102,8 +102,8 @@ Macros</h2></td></tr>
 <tr class="memitem:ad866eeb2a1f5dce3897b5e87463d6760" id="r_ad866eeb2a1f5dce3897b5e87463d6760"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad866eeb2a1f5dce3897b5e87463d6760">foreach_arr</a>(ITEM_TYPE,  ITEM_NAME,  ARRAY,  COUNT)</td></tr>
 <tr class="memitem:a7f18de9eaf10e6a9d51dd5ed998f3764" id="r_a7f18de9eaf10e6a9d51dd5ed998f3764"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7f18de9eaf10e6a9d51dd5ed998f3764">foreach_str</a>(ITEM_NAME,  STRING)</td></tr>
 <tr class="memitem:add5e69654a1688164617d9536b0dc6ea" id="r_add5e69654a1688164617d9536b0dc6ea"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add5e69654a1688164617d9536b0dc6ea">foreach_ls</a>(TYPE,  ITEM_NAME,  LIST)</td></tr>
-<tr class="memitem:a55ed553deef8880ef0338cf642261950" id="r_a55ed553deef8880ef0338cf642261950"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55ed553deef8880ef0338cf642261950">foreach_set</a>(SET)</td></tr>
-<tr class="memitem:a89c8871fbb67a70e906641671733ec07" id="r_a89c8871fbb67a70e906641671733ec07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89c8871fbb67a70e906641671733ec07">foreach_que</a>(QUEUE)</td></tr>
+<tr class="memitem:aac0d2f4bce293b6cf3f8977db44c1d6a" id="r_aac0d2f4bce293b6cf3f8977db44c1d6a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac0d2f4bce293b6cf3f8977db44c1d6a">foreach_set</a>(ENTRY_NAME,  SET)</td></tr>
+<tr class="memitem:a8cc42e46348d0496f8eb8bf28a83c454" id="r_a8cc42e46348d0496f8eb8bf28a83c454"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8cc42e46348d0496f8eb8bf28a83c454">foreach_que</a>(ENTRY_NAME,  QUEUE)</td></tr>
 </table>
 <a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="ad866eeb2a1f5dce3897b5e87463d6760" name="ad866eeb2a1f5dce3897b5e87463d6760"></a>
@@ -193,8 +193,8 @@ Macros</h2></td></tr>
 
 </div>
 </div>
-<a id="a89c8871fbb67a70e906641671733ec07" name="a89c8871fbb67a70e906641671733ec07"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89c8871fbb67a70e906641671733ec07">&#9670;&#160;</a></span>foreach_que</h2>
+<a id="a8cc42e46348d0496f8eb8bf28a83c454" name="a8cc42e46348d0496f8eb8bf28a83c454"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8cc42e46348d0496f8eb8bf28a83c454">&#9670;&#160;</a></span>foreach_que</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -202,24 +202,29 @@ Macros</h2></td></tr>
         <tr>
           <td class="memname">#define foreach_que</td>
           <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>QUEUE</em></span></td><td>)</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>ENTRY_NAME</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>QUEUE</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_define" href="#adabdca200027c54aeb86022903fc89a2">foreach_uni</a> ( <span class="keyword">const</span> <a class="code hl_struct" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a>, entry,              \</div>
-<div class="line">                  <a class="code hl_function" href="queue_8h.html#a87b12b52a4f0c3f80a780487580b6d0c">queue_get_next</a>( ( QUEUE ), NULL, <span class="keyword">true</span> ),        \</div>
-<div class="line">                  <a class="code hl_function" href="queue_8h.html#a87b12b52a4f0c3f80a780487580b6d0c">queue_get_next</a>( ( QUEUE ), entry.item, <span class="keyword">false</span> ), \</div>
-<div class="line">                  <a class="code hl_function" href="queue_8h.html#aba1682cfc16307b4eeb1945e07455648">queue_get_size</a>( ( QUEUE ) ) )</div>
-<div class="ttc" id="aforeach_8h_html_adabdca200027c54aeb86022903fc89a2"><div class="ttname"><a href="#adabdca200027c54aeb86022903fc89a2">foreach_uni</a></div><div class="ttdeci">#define foreach_uni(TYPE, ITEM_NAME, INITIALIZER, ACCESSOR, SIZE)</div><div class="ttdef"><b>Definition</b> foreach.h:44</div></div>
-<div class="ttc" id="aqueue_8h_html_a87b12b52a4f0c3f80a780487580b6d0c"><div class="ttname"><a href="queue_8h.html#a87b12b52a4f0c3f80a780487580b6d0c">queue_get_next</a></div><div class="ttdeci">QueueEnumeratedEntry queue_get_next(const Queue *, const struct queue_node *prev, bool get_first)</div></div>
-<div class="ttc" id="aqueue_8h_html_aba1682cfc16307b4eeb1945e07455648"><div class="ttname"><a href="queue_8h.html#aba1682cfc16307b4eeb1945e07455648">queue_get_size</a></div><div class="ttdeci">size_t queue_get_size(const Queue *)</div><div class="ttdoc">Length of queue (number of items)</div></div>
-<div class="ttc" id="astruct_queue_enumerated_entry_html"><div class="ttname"><a href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></div><div class="ttdef"><b>Definition</b> queue.h:101</div></div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">for</span> ( <a class="code hl_struct" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a> ENTRY_NAME = <a class="code hl_function" href="queue_8h.html#a7b1b25ef6b98a309c130cb499a73ac9e">queue_get_next</a>( ( QUEUE ), NULL ); \</div>
+<div class="line">          ENTRY_NAME.<a class="code hl_variable" href="struct_queue_enumerated_entry.html#a13deada30c807c57c67570d3591b6cf9">return_status</a> == 0;                                       \</div>
+<div class="line">          ENTRY_NAME = <a class="code hl_function" href="queue_8h.html#a7b1b25ef6b98a309c130cb499a73ac9e">queue_get_next</a>( ( QUEUE ), ENTRY_NAME.item ) )</div>
+<div class="ttc" id="aqueue_8h_html_a7b1b25ef6b98a309c130cb499a73ac9e"><div class="ttname"><a href="queue_8h.html#a7b1b25ef6b98a309c130cb499a73ac9e">queue_get_next</a></div><div class="ttdeci">QueueEnumeratedEntry queue_get_next(const Queue *, const struct queue_node *prev)</div></div>
+<div class="ttc" id="astruct_queue_enumerated_entry_html"><div class="ttname"><a href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></div><div class="ttdef"><b>Definition</b> queue.h:100</div></div>
+<div class="ttc" id="astruct_queue_enumerated_entry_html_a13deada30c807c57c67570d3591b6cf9"><div class="ttname"><a href="struct_queue_enumerated_entry.html#a13deada30c807c57c67570d3591b6cf9">QueueEnumeratedEntry::return_status</a></div><div class="ttdeci">int return_status</div><div class="ttdef"><b>Definition</b> queue.h:104</div></div>
 </div><!-- fragment --><p>Iterates over a queue.</p>
 <p>"Retrieves" a <span class="tt">const <a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></span> struct (see <span class="tt"><a class="el" href="queue_8h.html" title="First in, first out.">src/structs/queue.h</a></span>); in short, <span class="tt"><a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></span> contains a field <span class="tt">void *const data</span> &ndash; data from the item</p>
-<p>Example </p><div class="fragment"><div class="line"><a class="code hl_define" href="#a89c8871fbb67a70e906641671733ec07">foreach_que</a>( queue )</div>
+<p>Example </p><div class="fragment"><div class="line"><a class="code hl_define" href="#a8cc42e46348d0496f8eb8bf28a83c454">foreach_que</a>( queue )</div>
+<div class="line">{</div>
 <div class="line">    <span class="keyword">const</span> <span class="keywordtype">int</span> data = <a class="code hl_define" href="pointer__utils_8h.html#a4fc639e4e801ba162f43e55e61ede3c1">deref_as</a>( <span class="keywordtype">int</span>, entry.data );</div>
-<div class="ttc" id="aforeach_8h_html_a89c8871fbb67a70e906641671733ec07"><div class="ttname"><a href="#a89c8871fbb67a70e906641671733ec07">foreach_que</a></div><div class="ttdeci">#define foreach_que(QUEUE)</div><div class="ttdef"><b>Definition</b> foreach.h:140</div></div>
+<div class="line">    <span class="comment">// ...</span></div>
+<div class="line">}</div>
+<div class="ttc" id="aforeach_8h_html_a8cc42e46348d0496f8eb8bf28a83c454"><div class="ttname"><a href="#a8cc42e46348d0496f8eb8bf28a83c454">foreach_que</a></div><div class="ttdeci">#define foreach_que(ENTRY_NAME, QUEUE)</div><div class="ttdef"><b>Definition</b> foreach.h:129</div></div>
 <div class="ttc" id="apointer__utils_8h_html_a4fc639e4e801ba162f43e55e61ede3c1"><div class="ttname"><a href="pointer__utils_8h.html#a4fc639e4e801ba162f43e55e61ede3c1">deref_as</a></div><div class="ttdeci">#define deref_as(type, var)</div><div class="ttdoc">Dereferences a pointer as if it was a pointer to type</div><div class="ttdef"><b>Definition</b> pointer_utils.h:53</div></div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -227,12 +232,16 @@ Macros</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section attention"><dt>Attention</dt><dd>Requires previous definition of <span class="tt">CLIBS_FOREACH_QUEUE</span> or <span class="tt">CLIBS_QUEUE_H</span>. The latter is defined when including <span class="tt"><a class="el" href="queue_8h.html" title="First in, first out.">src/structs/queue.h</a></span>. </dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd><ol type="1">
+<li>DO NOT MODIFY THE CONTENTS OF THE <span class="tt"><a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></span></li>
+<li>Requires previous definition of <span class="tt">CLIBS_FOREACH_QUEUE</span> or <span class="tt">CLIBS_QUEUE_H</span>. The latter is defined when including <span class="tt"><a class="el" href="queue_8h.html" title="First in, first out.">src/structs/queue.h</a></span>. </li>
+</ol>
+</dd></dl>
 
 </div>
 </div>
-<a id="a55ed553deef8880ef0338cf642261950" name="a55ed553deef8880ef0338cf642261950"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a55ed553deef8880ef0338cf642261950">&#9670;&#160;</a></span>foreach_set</h2>
+<a id="aac0d2f4bce293b6cf3f8977db44c1d6a" name="aac0d2f4bce293b6cf3f8977db44c1d6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac0d2f4bce293b6cf3f8977db44c1d6a">&#9670;&#160;</a></span>foreach_set</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -240,16 +249,21 @@ Macros</h2></td></tr>
         <tr>
           <td class="memname">#define foreach_set</td>
           <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>SET</em></span></td><td>)</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>ENTRY_NAME</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>SET</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_define" href="#adabdca200027c54aeb86022903fc89a2">foreach_uni</a> ( <span class="keyword">const</span> <a class="code hl_struct" href="struct_set_enumerated_entry.html">SetEnumeratedEntry</a>, entry, <a class="code hl_function" href="set_8h.html#a30026f713ac4fb1572a023e272391453">set_get_next</a>( ( SET ), -1 ), \</div>
-<div class="line">                  <a class="code hl_function" href="set_8h.html#a30026f713ac4fb1572a023e272391453">set_get_next</a>( ( SET ), entry.index ), <a class="code hl_function" href="set_8h.html#a4dec9228590ed5ff1113b9542371ac2b">set_size</a>( ( SET ) ) )</div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">for</span> ( <a class="code hl_struct" href="struct_set_enumerated_entry.html">SetEnumeratedEntry</a> ENTRY_NAME = <a class="code hl_function" href="set_8h.html#a30026f713ac4fb1572a023e272391453">set_get_next</a>( ( SET ), -1 ); \</div>
+<div class="line">          ENTRY_NAME.<a class="code hl_variable" href="struct_set_enumerated_entry.html#a44ce747eee1393fee3ab579375efe7c6">index</a> &gt;= 0;                                       \</div>
+<div class="line">          ENTRY_NAME = <a class="code hl_function" href="set_8h.html#a30026f713ac4fb1572a023e272391453">set_get_next</a>( ( SET ), ENTRY_NAME.index ) )</div>
 <div class="ttc" id="aset_8h_html_a30026f713ac4fb1572a023e272391453"><div class="ttname"><a href="set_8h.html#a30026f713ac4fb1572a023e272391453">set_get_next</a></div><div class="ttdeci">SetEnumeratedEntry set_get_next(const Set *, int64_t index_last)</div></div>
-<div class="ttc" id="aset_8h_html_a4dec9228590ed5ff1113b9542371ac2b"><div class="ttname"><a href="set_8h.html#a4dec9228590ed5ff1113b9542371ac2b">set_size</a></div><div class="ttdeci">Const size_t set_size(const Set *set)</div></div>
 <div class="ttc" id="astruct_set_enumerated_entry_html"><div class="ttname"><a href="struct_set_enumerated_entry.html">SetEnumeratedEntry</a></div><div class="ttdef"><b>Definition</b> set.h:169</div></div>
+<div class="ttc" id="astruct_set_enumerated_entry_html_a44ce747eee1393fee3ab579375efe7c6"><div class="ttname"><a href="struct_set_enumerated_entry.html#a44ce747eee1393fee3ab579375efe7c6">SetEnumeratedEntry::index</a></div><div class="ttdeci">int64_t index</div><div class="ttdef"><b>Definition</b> set.h:171</div></div>
 </div><!-- fragment --><p>Iterates over a set.</p>
 <p>Retrieves a <span class="tt">const <a class="el" href="struct_set_enumerated_entry.html">SetEnumeratedEntry</a></span> struct (see <span class="tt"><a class="el" href="set_8h.html" title="Sets implemented via a hash table.">src/structs/set.h</a></span>); in short, <span class="tt"><a class="el" href="struct_set_enumerated_entry.html">SetEnumeratedEntry</a></span> contains a field <span class="tt">struct <a class="el" href="structset__item.html">set_item</a> *item</span> with the desired data</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -258,7 +272,11 @@ Macros</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section attention"><dt>Attention</dt><dd>Requires previous definition of <span class="tt">CLIBS_FOREACH_SET</span> or <span class="tt">CLIBS_SETS_H</span>. The latter is defined when including <span class="tt"><a class="el" href="set_8h.html" title="Sets implemented via a hash table.">src/structs/set.h</a></span>. </dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd><ol type="1">
+<li>DO NOT MODIFY THE CONTENTS OF THE <span class="tt"><a class="el" href="struct_set_enumerated_entry.html">SetEnumeratedEntry</a></span></li>
+<li>Requires previous definition of <span class="tt">CLIBS_FOREACH_SET</span> or <span class="tt">CLIBS_SETS_H</span>. The latter is defined when including <span class="tt"><a class="el" href="set_8h.html" title="Sets implemented via a hash table.">src/structs/set.h</a></span>. </li>
+</ol>
+</dd></dl>
 
 </div>
 </div>
