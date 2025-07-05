@@ -168,10 +168,11 @@ TEST( foreach_queue )
         assert_that( queue_enqueue( queue, &i ) == RV_SUCCESS, "enqueue" );
     assert_that( queue_get_size( queue ) == 16, );
 
-    foreach_que( queue )
+    int foreach_index = 16;
+    foreach_que( queue, entry )
     {
         const int data = deref_as( int, entry.data );
-        UNIT_TEST( data == ( int ) ( 16 - foreach_index_entry ) );
+        UNIT_TEST( data == foreach_index-- );
     }
 
     queue_destroy( queue );

@@ -111,7 +111,10 @@
  * Example
  * @code
  * foreach_que( queue )
+ * {
  *     const int data = deref_as( int, entry.data );
+ *     // ...
+ * }
  * @endcode
  *
  * @param QUEUE valid `struct fifo_queue *`
@@ -120,12 +123,11 @@
  * Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
  * The latter is defined when including `src/structs/queue.h`.
  */
-#define foreach_que( QUEUE )                                      \
-    foreach_uni ( const QueueEnumeratedEntry, entry,              \
-                  queue_get_next( ( QUEUE ), NULL, true ),        \
-                  queue_get_next( ( QUEUE ), entry.item, false ), \
-                  queue_get_size( ( QUEUE ) ) )
-// TODO?: remove `queue_get_size` call (for efficiency)
+#define foreach_que( QUEUE, ENTRY_NAME )                                       \
+    for ( QueueEnumeratedEntry ENTRY_NAME = queue_get_next( ( QUEUE ), NULL ); \
+          ENTRY_NAME.return_status == 0;                                       \
+          ENTRY_NAME = queue_get_next( ( QUEUE ), ENTRY_NAME.item ) )
+
 #endif // Queue
 
 

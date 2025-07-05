@@ -27,7 +27,6 @@
 #include "../headers/extra_types.h"
 
 
-struct fifo_queue;
 typedef struct fifo_queue Queue;
 
 
@@ -99,8 +98,10 @@ size_t queue_get_size( const Queue * );
 bool queue_is_empty( const Queue * );
 
 typedef struct {
-    const struct queue_node *const item;
-    void *const data;
+    const struct queue_node *item;
+    void *data;
+
+    int return_status;
 } QueueEnumeratedEntry;
 
 /**
@@ -108,9 +109,7 @@ typedef struct {
  *
  * @return `QueueEnumeratedEntry`
  */
-QueueEnumeratedEntry queue_get_next( const Queue *,
-                                     const struct queue_node *prev,
-                                     bool get_first );
+QueueEnumeratedEntry queue_get_next( const Queue *, const struct queue_node *prev );
 
 
 #endif //CLIBS_QUEUE_H
