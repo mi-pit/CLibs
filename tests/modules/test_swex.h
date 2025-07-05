@@ -57,7 +57,7 @@ static int get_swex_val( int branch_1, int branch_2, string_t branch_3 )
 
     return rv;
 }
-Tester test_one_swex( int branch_1, int branch_2, string_t branch_3, int rv )
+Private bool test_one_swex( int branch_1, int branch_2, string_t branch_3, int rv )
 {
     return get_swex_val( branch_1, branch_2, branch_3 ) == rv;
 }

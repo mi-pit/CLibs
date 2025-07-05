@@ -11,6 +11,11 @@
 #include <string.h> /* mem* */
 
 
+#define LIST_DEF_CAP 64
+
+#define LIST_CAP_SIZE_RATIO 2
+
+
 #define ListIndexOOBExceptionString( LIST, INDEX ) \
     "index %zu out of bounds for list of size %zu", INDEX, ( LIST )->size
 
@@ -19,35 +24,6 @@
 #define ListNullPointerExceptionString( ARG ) #ARG " may not be null"
 
 
-/**
- * A dynamic array. (List)<br>
- * The List can store any elements of arbitrary size.
- * <p>
- * A new List can (and should) be created with list_init_* functions
- * <p>
- * list_init_type* functions take as its `type' argument the C keyword
- * e.g. 'char'
- * <br>
- * list_init_size* functions take as its `el_size' argument
- * the number of bytes (acquired by sizeof)
- * for the desired type to be stored
- * <p>
- * The list_init_*_p functions take a second parameter
- * – a constant for the print functions. This field can be changed
- * later with list_set_print_mode().
- * <p>
- * list_init_* functions allocate and initialize a List
- * with these default values:
- * @code
- * List::capacity = LIST_DEF_SIZE
- * List::size     = 0
- * List::items    = pointer to heap allocated memory of width ‹capacity›, set to 0
- * List::el_size  = width of a single element
- * @endcode
- *
- * @attention
- * All elements must be the same number of bytes long
-*/
 struct dynamic_array {
     size_t capacity; // Amount of allocated memory slots for items
     size_t size;     // Number of items stored in List
@@ -76,14 +52,14 @@ List *list_init_cap_size( const size_t el_size, const size_t init_cap )
         free( ls );
         return ( void * ) fwarn_ret( NULL, "calloc" );
     }
-    ls->capacity = LIST_DEF_SIZE;
+    ls->capacity = LIST_DEF_CAP;
     ls->el_size  = el_size;
     return ls;
 }
 
 List *list_init_size( const size_t el_size )
 {
-    List *new = list_init_cap_size( el_size, LIST_DEF_SIZE );
+    List *new = list_init_cap_size( el_size, LIST_DEF_CAP );
     if ( new == NULL )
         f_stack_trace( NULL );
 
@@ -118,7 +94,8 @@ void *list_at( struct dynamic_array *ls, const size_t idx )
     return list_at_non_safe( ls, idx );
 }
 
-void *list_at_last( struct dynamic_array *ls )
+typedef List *LSP;
+void *list_at_last( const LSP ls )
 {
     if ( ls->size == 0 )
         return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
@@ -429,7 +406,7 @@ int list_copy( const struct dynamic_array *old, struct dynamic_array **new_ls_co
     return RV_SUCCESS;
 }
 
-struct dynamic_array *list_copy_p( const struct dynamic_array *ls )
+struct dynamic_array *list_copy_of( const struct dynamic_array *ls )
 {
     struct dynamic_array *new;
     if ( list_copy( ls, &new ) )
@@ -465,7 +442,7 @@ int list_clear( struct dynamic_array *ls )
 {
     free_n( ls->items );
     ls->size     = 0;
-    ls->capacity = LIST_DEF_SIZE;
+    ls->capacity = LIST_DEF_CAP;
     if ( ( ls->items = calloc( ls->capacity, ls->el_size ) ) == NULL )
         return fwarn_ret( RV_ERROR, "calloc" );
 

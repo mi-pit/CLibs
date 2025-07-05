@@ -14,11 +14,14 @@
 #include <stdio.h>
 
 
+/** Format string for printing colors */
 #define PRINT_COLOR "%s"
 
 /**
  * When supplied with the correct ANSI color code,
  * this macro creates the escape code for the corresponding color.
+ *
+ * For example:
  * @code
  * #define COLOR_DEFAULT    COLOR_CREATOR( "0" )
  * #define FOREGROUND_BLACK COLOR_CREATOR( GROUND_FORE COLORCODE_BLACK )
@@ -66,11 +69,19 @@
 #define BACKGROUND_GRAY COLOR_CREATOR( GROUND_BACK "8;5;238" )
 
 
+/**
+ * Sets the terminal color to `Color`.
+ *
+ * The string must be a valid color string (something like `FOREGROUND_WHITE`),
+ * otherwise this function is just a worse `fprintf`.
+ * (it only exists as an abstraction for `fprintf`)
+ */
 LibraryDefined inline bool SetTerminalColor( FILE *stream, const char *Color )
 {
     return fprintf( stream, "%s", Color ) > 0;
 }
 
+/// @see `PrintInColor`
 LibraryDefined inline int VPrintInColor( FILE *file,
                                          const char *Color,
                                          const char *format,
@@ -88,8 +99,10 @@ LibraryDefined inline int VPrintInColor( FILE *file,
 }
 
 /**
+ * Prints a formatted message (like `fprintf`) in the supplied color.
+ *
  * Since there exists no reliable way to retrieve the current terminal color,
- * this function resets it to the default
+ * this function resets it to the default.
  */
 LibraryDefined PrintfLike( 3, 4 ) inline int PrintInColor( FILE *file,
                                                            const char *Color,

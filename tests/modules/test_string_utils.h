@@ -36,7 +36,7 @@ TEST( replace )
 END_TEST
 
 
-Tester test_one_replace( string_t orig, string_t old, string_t new, string_t expected )
+Private bool test_one_replace( string_t orig, string_t old, string_t new, string_t expected )
 {
     str_t got = string_replaced( orig, old, new );
     bool rv   = strcmp( got, expected ) == 0;
@@ -77,7 +77,7 @@ TEST( replaced )
 END_TEST
 
 
-Tester test_one_escape( string_t old, string_t new )
+Private bool test_one_escape( string_t old, string_t new )
 {
     str_t esc = string_escaped( old );
     bool rv   = strcmp( esc, new ) == 0;
@@ -99,7 +99,7 @@ TEST( escape )
 END_TEST
 
 
-Tester test_one_unescape( string_t old, string_t new )
+Private bool test_one_unescape( string_t old, string_t new )
 {
     str_t esc = string_unescaped( old );
     bool rv   = strcmp( esc, new ) == 0;
@@ -119,7 +119,7 @@ TEST( unescape )
 END_TEST
 
 
-Tester test_one_strspl_str( string_t haystack,
+Private bool test_one_strspl_str( string_t haystack,
                             string_t split_tok,
                             strsplit_mode_t mode,
                             size_t n_split,
@@ -151,7 +151,7 @@ Tester test_one_strspl_str( string_t haystack,
     string_split_destroy( n_got, &spl );
     return rv;
 }
-Tester test_one_strspl_regex( string_t haystack,
+Private bool test_one_strspl_regex( string_t haystack,
                               string_t regex_str,
                               int regex_flags,
                               strsplit_mode_t mode,
@@ -460,7 +460,7 @@ END_TEST
 
 
 typedef void( StringToUL )( str_t );
-Tester test_one_string_to_UL( StringToUL func, string_t old, string_t new )
+Private bool test_one_string_to_UL( StringToUL func, string_t old, string_t new )
 {
     str_t s = strdup( old );
     func( s );
@@ -490,7 +490,7 @@ TEST( string_to_UL )
 END_TEST
 
 typedef str_t( StringAsUL )( string_t );
-Tester test_one_string_as_UL( StringAsUL func, string_t old, string_t res )
+Private bool test_one_string_as_UL( StringAsUL func, string_t old, string_t res )
 {
     str_t got = func( old );
     bool rv   = strcmp( got, res ) == 0;
@@ -519,7 +519,7 @@ TEST( string_as_UL )
 END_TEST
 
 
-Tester test_one_reverse_str( string_t orig, string_t result )
+Private bool test_one_reverse_str( string_t orig, string_t result )
 {
     str_t rev = strdup( orig );
     string_reverse( rev );
@@ -550,7 +550,7 @@ TEST( reverse_str )
 END_TEST
 
 
-Tester test_one_strip( string_t orig, string_t desired )
+Private bool test_one_strip( string_t orig, string_t desired )
 {
     str_t s = strdup( orig );
     assert_that( s != NULL, "strdup" );

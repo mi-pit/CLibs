@@ -14,6 +14,9 @@
 #include <string.h> /* this one should be obvious */
 
 
+#define DEFAULT_DYNSTRING_CAP 256
+
+
 struct dynamic_string {
     char *data;
     size_t len;

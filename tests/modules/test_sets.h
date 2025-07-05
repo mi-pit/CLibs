@@ -5,6 +5,10 @@
 #include "../../src/headers/unit_tests.h"
 #include "../../src/structs/set.h"
 
+
+#define SET_DEFAULT_CAP 64
+
+
 TEST( set_init )
 {
     struct hash_set *set = set_init();

@@ -59,13 +59,39 @@ TEST( loop )
 }
 END_TEST
 
+TEST( critical )
+{
+    UNIT_TEST( true );
+    CRITICAL_TEST( true );
+    CRITICAL_TEST( false );
+
+    UNIT_TEST( !"This one shouldn't run" );
+}
+END_TEST
+
+TEST( really_long_messages_test_hopshops_test_test_kunker_lager )
+{
+    UNIT_TEST( !"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in augue "
+                "sed diam cursus pulvinar eu id massa. Vestibulum dignissim aliquet "
+                "feugiat. Cras feugiat velit a elit sollicitudin, ac molestie." );
+}
+END_TEST
+
 
 int main( void )
 {
+    SetTerminalColor( stdout, BACKGROUND_YELLOW );
+    for ( int i = 0; i < LINE_PREF_WIDTH; ++i )
+        printf( "%d", i % 10 );
+    SetTerminalColor( stdout, COLOR_DEFAULT );
+    printf( "\n" );
+
     RUN_TEST( all_fail );
     RUN_TEST( test_example );
     RUN_TEST( this_one_actually_passes );
     RUN_TEST( loop );
+    RUN_TEST( critical );
+    RUN_TEST( really_long_messages_test_hopshops_test_test_kunker_lager );
 
     f_stack_trace( 0 );
 

@@ -2,6 +2,7 @@
 
 !.gitignore
 
+# CI
 !/.github/
 !/.github/workflows/
 !*.yml
@@ -9,11 +10,20 @@
 !CMakeLists.txt
 !.clang-format
 
+# Docs
 !*.md
+!*.html
+!*.js
+!*.css
+!*.svg
+!Doxyfile
 
+
+# Sources
 !*.c
 !*.h
 
+# Testing scripts?
 !*.sh
 
 !/tests/
@@ -22,3 +32,4 @@
 !/src/*
 
 !/docs/
+!/docs/search

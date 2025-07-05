@@ -3,6 +3,7 @@
 //
 #include "../src/headers/assert_that.h"
 #include "../src/headers/pointer_utils.h"
+#include "../src/headers/unit_tests.h"
 #include "../src/structs/dictionary.h"
 #include "../src/structs/dynarr.h"
 
@@ -10,83 +11,70 @@
 #include "../src/headers/foreach.h"
 
 
-typedef int64_t Number;
 typedef size_t count_t;
 
-#define TypeNumber 1
-
-#if TypeNumber == 1
-#define Type Number
 #include <inttypes.h>
-DEFINE_PRINT_FUNC( Number, "%" PRIi64 );
 
-#elif TypeNumber == 2
-typedef void *pointer_t;
-DEFINE_PRINT_FUNC( pointer_t, "%p" );
-#define Type pointer_t
-
-#endif //TypeNumber
+DEFINE_PRINT_FUNC( int64_t, "%" PRIi64 )
 
 
-Type majority_element( struct dynamic_array *nums )
+int64_t majority_element( const size_t arrlen, const int64_t array[ const arrlen ] )
 {
     Dictionary *freq = dict_init();
 
-    foreach_ls ( Type, num, nums )
+    foreach_arr ( int64_t, num, array, arrlen )
     {
-        const struct key_value_pair *kvp = dict_get( freq, &num, sizeof num );
-        count_t count = ( kvp == NULL ? 0 : deref_as( count_t, kvp->val ) ) + 1;
-        dict_insert( freq, &num, sizeof num, &count, sizeof count );
+        const void *val     = dict_get_val( freq, &num, sizeof num );
+        const count_t count = ( val == NULL ? 0 : deref_as( count_t, val ) ) + 1;
+        if ( !dict_has_key( freq, &num, sizeof num ) )
+            assert_that( dict_insert( freq, &num, sizeof num, &count, sizeof count )
+                                 == DICTINSERT_INSERTED,
+                         "insert" );
+        else
+            assert_that( dict_set_val( freq, &num, sizeof num, &count, sizeof count )
+                                 == RV_SUCCESS,
+                         "set_val" );
     }
 
-    dict_printn_as( freq, print_function( Type ), print_size_t );
+    // dict_print_as( freq, print_int64_t, print_int64_t );
 
-    foreach_ls ( Type, num, nums )
+    foreach_arr ( int64_t, num, array, arrlen )
     {
-        const struct key_value_pair *kvp = dict_get( freq, &num, sizeof num );
-        Type key                         = deref_as( Type, kvp->key );
-        count_t value                    = deref_as( count_t, kvp->val );
+        const void *val     = dict_get_val( freq, &num, sizeof num );
+        const int64_t key   = num;
+        const count_t value = deref_as( count_t, val );
 
-        if ( value >= list_size( nums ) / 2 )
+        if ( value >= arrlen / 2 )
         {
-            list_destroy( nums );
             dict_destroy( freq );
             return key;
         }
     }
 
-    list_destroy( nums );
     dict_destroy( freq );
 
-    exit( fflwarnx_ret( 1, "couldn't find majority element" ) );
+    return fwarnx_ret( -1, "couldn't find majority element" );
 }
 
 
-#define test_one_majelem( TYPE, DESIRED, LS_LEN, ... )         \
-    do                                                         \
-    {                                                          \
-        struct dynamic_array *values = list_init_type( TYPE ); \
-        TYPE values_array[ LS_LEN ]  = { __VA_ARGS__ };        \
-        list_extend( values, values_array, LS_LEN );           \
-        TYPE found = majority_element( values );               \
-        assert_that( found == DESIRED,                         \
-                     "found %lli expected %lli",               \
-                     ( long long ) found,                      \
-                     ( long long ) DESIRED );                  \
-    }                                                          \
+#define test_one_majelem( TYPE, DESIRED, ... )                                           \
+    do                                                                                   \
+    {                                                                                    \
+        TYPE values_array[] = { __VA_ARGS__ };                                           \
+        TYPE found          = majority_element( countof( values_array ), values_array ); \
+        UNIT_TEST( found == DESIRED );                                                   \
+    }                                                                                    \
     while ( 0 )
 
 
-int main( void )
+TEST( majelem )
 {
-#if TypeNumber == 1
-    test_one_majelem( Type, 1, 3, 1, 2, 1 );
+    test_one_majelem( int64_t, 1, 1, 2, 1 );
 
-    test_one_majelem( Type, 1, 6, 3, 2, 2, 1, 1, 1 );
+    test_one_majelem( int64_t, 1, 3, 2, 2, 1, 1, 1 );
 
-    test_one_majelem( Type,
-                      /* should get */ 2,
-                      /* len */ 10,
+    test_one_majelem( int64_t,
+                      /* desired */ 2,
                       2,
                       4,
                       2,
@@ -98,9 +86,8 @@ int main( void )
                       5,
                       7 );
 
-    test_one_majelem( Type,
-                      /* should get */ 2,
-                      /* len */ 16,
+    test_one_majelem( int64_t,
+                      /* desired */ 2,
                       100,
                       2,
                       2,
@@ -117,15 +104,12 @@ int main( void )
                       2,
                       2,
                       1001000 );
-#elif TypeNumber == 2
-    test_one_majelem( void *,
-                      NULL,
-                      4,
-                      NULL,
-                      list_init_type( int ),
-                      list_init_type( size_t ),
-                      list_init_size( -1 ) );
-#endif
+}
+END_TEST
 
-    return 0;
+
+int main( void )
+{
+    RUN_TEST( majelem );
+    FINISH_TESTING();
 }

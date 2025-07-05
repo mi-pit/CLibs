@@ -19,7 +19,7 @@
 #include "../../src/headers/pointer_utils.h"
 
 
-Tester test_one_foreach_arr( const int64_t arr[], const size_t count )
+Private bool test_one_foreach_arr( const int64_t arr[], const size_t count )
 {
     foreach_arr ( int64_t, num, arr, count )
     {
@@ -28,9 +28,9 @@ Tester test_one_foreach_arr( const int64_t arr[], const size_t count )
     }
     return true;
 }
-Tester test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
-                            const int64_t numbers_arr[],
-                            const size_t count )
+Private bool test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
+                                  const int64_t numbers_arr[],
+                                  const size_t count )
 {
     assert_that( list_size( numbers_ls ) == count, "list size != array size" );
 
@@ -41,7 +41,7 @@ Tester test_one_foreach_ls( const struct dynamic_array *const numbers_ls,
     }
     return true;
 }
-Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
+Private bool test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
 {
     foreach_uni ( const int64_t,
                   num,
@@ -54,7 +54,7 @@ Tester test_one_foreach_uni( const int64_t numbers_arr[], const size_t count )
     }
     return true;
 }
-Tester test_one_foreach_str( const string_t str )
+Private bool test_one_foreach_str( const string_t str )
 {
     foreach_str ( c, str )
     {
@@ -71,7 +71,7 @@ Tester test_one_foreach_str( const string_t str )
     }
     return true;
 }
-Tester test_one_foreach_dynstr( string_t str )
+Private bool test_one_foreach_dynstr( string_t str )
 {
     struct dynamic_string *dynstr = dynstr_init_as( str );
     assert_that( dynstr != NULL, "dynstr init" );
