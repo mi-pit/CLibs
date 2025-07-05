@@ -88,15 +88,17 @@
  * in short, `SetEnumeratedEntry` contains a field `struct set_item *item`
  * with the desired data
  *
- * @param SET a valid `Set *`
+ * @param SET   a valid `Set *`
  *
  * @attention
- * Requires previous definition of `CLIBS_FOREACH_SET` or `CLIBS_SETS_H`.
+ * 1. DO NOT MODIFY THE CONTENTS OF THE `SetEnumeratedEntry`
+ * 2. Requires previous definition of `CLIBS_FOREACH_SET` or `CLIBS_SETS_H`.
  * The latter is defined when including `src/structs/set.h`.
  */
-#define foreach_set( SET )                                                      \
-    foreach_uni ( const SetEnumeratedEntry, entry, set_get_next( ( SET ), -1 ), \
-                  set_get_next( ( SET ), entry.index ), set_size( ( SET ) ) )
+#define foreach_set( ENTRY_NAME, SET )                                 \
+    for ( SetEnumeratedEntry ENTRY_NAME = set_get_next( ( SET ), -1 ); \
+          ENTRY_NAME.index >= 0;                                       \
+          ENTRY_NAME = set_get_next( ( SET ), ENTRY_NAME.index ) )
 #endif // Set
 
 
@@ -120,7 +122,8 @@
  * @param QUEUE valid `struct fifo_queue *`
  *
  * @attention
- * Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
+ * 1. DO NOT MODIFY THE CONTENTS OF THE `QueueEnumeratedEntry`
+ * 2. Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
  * The latter is defined when including `src/structs/queue.h`.
  */
 #define foreach_que( ENTRY_NAME, QUEUE )                                       \

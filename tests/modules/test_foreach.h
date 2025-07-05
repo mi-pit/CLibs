@@ -128,11 +128,10 @@ TEST( foreach_set )
     Set *const set = set_init();
     assert_that( set != NULL, "set init" );
 
-    assert_that( set_insert( set, &set, sizeof set ) == SETINSERT_INSERTED,
-                 "couldn't insert set" );
+    CRITICAL_TEST( set_insert( set, &set, sizeof set ) == SETINSERT_INSERTED );
+
     const int num = 1423;
-    assert_that( set_insert( set, &num, sizeof num ) == SETINSERT_INSERTED,
-                 "couldn't insert num" );
+    CRITICAL_TEST( set_insert( set, &num, sizeof num ) == SETINSERT_INSERTED );
 
     // check sanity
     assert_that( set_insert( set, &set, sizeof set ) == SETINSERT_WAS_IN,
@@ -140,11 +139,11 @@ TEST( foreach_set )
     assert_that( set_size( set ) == 2, "two items must be present" );
     assert_that( sizeof( Set * ) != sizeof( int ), "test assumes this" );
 
-    foreach_set ( set )
+    foreach_set ( entry, set )
     {
         UNIT_TEST( entry.index >= 0 );
         const struct set_item *item = entry.item;
-        assert_that( item != NULL && item->data != NULL, "entry item" );
+        CRITICAL_TEST( item != NULL && item->data != NULL );
 
         UNIT_TEST( item->size == sizeof( Set * ) || item->size == sizeof( int ) );
 

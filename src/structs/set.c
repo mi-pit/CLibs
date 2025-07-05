@@ -24,30 +24,28 @@ size_t set_size( const Set *set )
     return set->n_items;
 }
 
+
 SetEnumeratedEntry set_get_next( const Set *set, const int64_t index_last )
 {
     if ( index_last < -1 )
     {
         fwarnx( "index must not be negative except -1 for initialization" );
-        return ( SetEnumeratedEntry ) { .item = NULL, .index = RV_EXCEPTION };
+        return ( SetEnumeratedEntry ) { .item = NULL, .index = -2 };
     }
     if ( index_last >= 0 && ( size_t ) index_last >= set->capacity )
     {
         fwarnx( "index %" PRIi64 " out of bounds for set of length %zu", index_last,
                 set->capacity );
 
-        return ( SetEnumeratedEntry ) { .item = NULL, .index = RV_EXCEPTION };
+        return ( SetEnumeratedEntry ) { .item = NULL, .index = -2 };
     }
 
-    size_t i = index_last + 1;
-    while ( i < set->capacity )
-    {
+    for ( size_t i = index_last + 1; i < set->capacity; ++i )
         if ( set->items[ i ].data != NULL )
-            return ( SetEnumeratedEntry ) { .item  = ( set->items + i ),
-                                            .index = ( int64_t ) i };
-
-        i++;
-    }
+            return ( SetEnumeratedEntry ) {
+                .item  = ( set->items + i ),
+                .index = ( int64_t ) i,
+            };
 
     return ( SetEnumeratedEntry ) { .item = NULL, .index = -1 };
 }
