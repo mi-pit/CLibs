@@ -169,7 +169,7 @@ TEST( foreach_queue )
     assert_that( queue_get_size( queue ) == 16, );
 
     int foreach_index = 16;
-    foreach_que( queue, entry )
+    foreach_que( entry, queue )
     {
         const int data = deref_as( int, entry.data );
         UNIT_TEST( data == foreach_index-- );

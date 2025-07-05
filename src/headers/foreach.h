@@ -123,7 +123,7 @@
  * Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
  * The latter is defined when including `src/structs/queue.h`.
  */
-#define foreach_que( QUEUE, ENTRY_NAME )                                       \
+#define foreach_que( ENTRY_NAME, QUEUE )                                       \
     for ( QueueEnumeratedEntry ENTRY_NAME = queue_get_next( ( QUEUE ), NULL ); \
           ENTRY_NAME.return_status == 0;                                       \
           ENTRY_NAME = queue_get_next( ( QUEUE ), ENTRY_NAME.item ) )
