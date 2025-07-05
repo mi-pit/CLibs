@@ -29,16 +29,17 @@
  * @param ...           Additional arguments for the formatted error message (format string + varargs).
  *                      These are passed to `fflwarnx_ret` for constructing the error message.
  *
- * @example
+ * Example:
  * @code
  * int x = 5;
  * assert_that(x > 10, "x must be greater than 10, but got %d", x);
  * @endcode
  *
- * In this example, if `x > 10` evaluates to false, the program will exit and print an
- * error message:
+ * In this example, if `x > 10` evaluates to false,
+ * the program will exit and print an error message
+ * (the expression is printed in `COLOR_DEFAULT`, the rest in `COLOR_WARNING`):
  * @code
- * "Assertion error: [x > 10]: x must be greater than 10, but got 5".
+ * "Assertion error: x > 10: x must be greater than 10, but got 5".
  * @endcode
  *
  * @note

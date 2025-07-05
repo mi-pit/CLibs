@@ -15,7 +15,7 @@ typedef size_t count_t;
 
 #include <inttypes.h>
 
-DEFINE_PRINT_FUNC( int64_t, "%" PRIi64 );
+DEFINE_PRINT_FUNC( int64_t, "%" PRIi64 )
 
 
 int64_t majority_element( const size_t arrlen, const int64_t array[ const arrlen ] )

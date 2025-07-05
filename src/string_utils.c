@@ -33,9 +33,11 @@ bool string_is_blank_l( const string_t s, const size_t len )
 
     return true;
 }
+bool string_is_empty( const string_t s )
+{
+    return *s == '\0';
+}
 
-
-// `string_stripped` is implemented separately from `strip` for memory efficiency
 
 str_t string_stripped_l( const string_t s, size_t length )
 {
