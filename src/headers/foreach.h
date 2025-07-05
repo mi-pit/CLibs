@@ -15,23 +15,6 @@
 #include <string.h>
 
 
-/** @cond INTERNAL */
-#define foreach_helper_init( SIZE, ITEM_NAME )                                \
-    for ( size_t foreach_keep_##ITEM_NAME = 1, foreach_index_##ITEM_NAME = 0, \
-                 foreach_cap_##ITEM_NAME = ( SIZE );                          \
-          foreach_keep_##ITEM_NAME                                            \
-          && foreach_index_##ITEM_NAME < foreach_cap_##ITEM_NAME;             \
-          foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME,               \
-                 ++foreach_index_##ITEM_NAME )
-
-#define foreach_helper_assign( TYPE, ITEM_NAME, INITIALIZER, ACCESSOR )         \
-    for ( TYPE ITEM_NAME = ( foreach_index_##ITEM_NAME == 0 ) ? ( INITIALIZER ) \
-                                                              : ( ACCESSOR );   \
-          foreach_keep_##ITEM_NAME;                                             \
-          foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME )
-/** @endcond */
-
-
 /**
  * Universal foreach macro
  *
@@ -144,6 +127,23 @@
                   queue_get_size( ( QUEUE ) ) )
 // TODO?: remove `queue_get_size` call (for efficiency)
 #endif // Queue
+
+
+/** @cond INTERNAL */
+#define foreach_helper_init( SIZE, ITEM_NAME )                                \
+    for ( size_t foreach_keep_##ITEM_NAME = 1, foreach_index_##ITEM_NAME = 0, \
+                 foreach_cap_##ITEM_NAME = ( SIZE );                          \
+          foreach_keep_##ITEM_NAME                                            \
+          && foreach_index_##ITEM_NAME < foreach_cap_##ITEM_NAME;             \
+          foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME,               \
+                 ++foreach_index_##ITEM_NAME )
+
+#define foreach_helper_assign( TYPE, ITEM_NAME, INITIALIZER, ACCESSOR )         \
+    for ( TYPE ITEM_NAME = ( foreach_index_##ITEM_NAME == 0 ) ? ( INITIALIZER ) \
+                                                              : ( ACCESSOR );   \
+          foreach_keep_##ITEM_NAME;                                             \
+          foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME )
+/** @endcond */
 
 
 #endif //CLIBS_FOREACH_H
