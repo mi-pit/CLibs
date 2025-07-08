@@ -61,6 +61,7 @@ enable_testing()
 add_executable(tests_sanitizers
         tests/tests.c
 )
+target_compile_definitions(tests_sanitizers PRIVATE CLIBS_TESTS_MAIN)
 target_link_options(tests_sanitizers PRIVATE -fsanitize=address -fsanitize=undefined)
 target_link_libraries(tests_sanitizers PRIVATE clib_core)
 add_test(
