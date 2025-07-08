@@ -186,11 +186,20 @@ bool queue_is_empty( const struct fifo_queue *queue )
 
 const struct queue_node *queue__iterator_get_head( const Queue *q )
 {
+    if ( q->head == NULL )
+        fwarnx( "queue is empty" );
     return q->head;
 }
 
+
 const struct queue_node *queue__iterator_get_next( const struct queue_node *n )
 {
+    if ( n->next == NULL )
+    {
+        fwarnx( "node is NULL" );
+        return NULL;
+    }
+
     return n->next;
 }
 
