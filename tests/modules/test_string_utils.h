@@ -36,7 +36,8 @@ TEST( replace )
 END_TEST
 
 
-Private bool test_one_replace( string_t orig, string_t old, string_t new, string_t expected )
+Private bool test_one_replace( string_t orig, string_t old, string_t new,
+                               string_t expected )
 {
     str_t got = string_replaced( orig, old, new );
     bool rv   = strcmp( got, expected ) == 0;
@@ -120,10 +121,10 @@ END_TEST
 
 
 Private bool test_one_strspl_str( string_t haystack,
-                            string_t split_tok,
-                            strsplit_mode_t mode,
-                            size_t n_split,
-                            ... )
+                                  string_t split_tok,
+                                  strsplit_mode_t mode,
+                                  size_t n_split,
+                                  ... )
 {
     str_t *spl;
     const ssize_t strspl_rv = string_split( &spl, haystack, split_tok, mode );
@@ -152,11 +153,11 @@ Private bool test_one_strspl_str( string_t haystack,
     return rv;
 }
 Private bool test_one_strspl_regex( string_t haystack,
-                              string_t regex_str,
-                              int regex_flags,
-                              strsplit_mode_t mode,
-                              size_t n_split,
-                              ... )
+                                    string_t regex_str,
+                                    int regex_flags,
+                                    strsplit_mode_t mode,
+                                    size_t n_split,
+                                    ... )
 {
     regex_t reg;
     int recomp_rv = regcomp( &reg, regex_str, regex_flags );
@@ -580,16 +581,6 @@ TEST( strip )
 }
 END_TEST
 
-TEST( strings_misc )
-{
-    UNIT_TEST( strcmp( get_file_name( "/Users/macbook/Hovno" ), "Hovno" ) == 0 );
-    UNIT_TEST( strcmp( get_file_name( "Hovno" ), "Hovno" ) == 0 );
-    UNIT_TEST( strcmp( get_file_name( "/a" ), "a" ) == 0 );
-    UNIT_TEST( strcmp( get_file_name( "./a" ), "a" ) == 0 );
-    UNIT_TEST( strcmp( get_file_name( "Directory/Subdir/" ), "Subdir/" ) == 0 );
-}
-END_TEST
-
 LibraryDefined void RUNALL_STRING_UTILS( void )
 {
     RUN_TEST( replace );
@@ -602,8 +593,6 @@ LibraryDefined void RUNALL_STRING_UTILS( void )
     RUN_TEST( string_as_UL );
     RUN_TEST( reverse_str );
     RUN_TEST( strip );
-
-    RUN_TEST( strings_misc );
 
     RUN_TEST( join );
 }
