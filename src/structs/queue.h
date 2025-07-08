@@ -109,7 +109,7 @@ const struct queue_node *queue__iterator_get_next( const struct queue_node * );
 
 // struct queue_node
 
-/** @return  */
+/** @return queue node data pointer */
 const void *queue_node_get_data( const struct queue_node * );
 
 #endif //CLIBS_QUEUE_H

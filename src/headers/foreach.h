@@ -59,7 +59,7 @@
                                    ( STRING )[ foreach_index_##ITEM_NAME ] )
 
 
-#if defined( CLIBS_FOREACH_LIST ) || defined( CLIBS_DYNAMIC_ARRAY_H )
+#if defined( CLIBS_DYNAMIC_ARRAY_H ) || defined( CLIBS__GENERATE_DOCS )
 /**
  * Iterates over a list.
  *
@@ -80,7 +80,7 @@
 #endif // List
 
 
-#if defined( CLIBS_FOREACH_SET ) || defined( CLIBS_SETS_H )
+#if defined( CLIBS_SETS_H ) || defined( CLIBS__GENERATE_DOCS )
 /**
  * Iterates over a set.
  *
@@ -91,7 +91,7 @@
  * @param SET   a valid `Set *`
  *
  * @attention
- * 1. DO NOT MODIFY THE CONTENTS OF THE `SetEnumeratedEntry`
+ * 1. Do not modify the contents of the `SetEnumeratedEntry`.
  * 2. Requires previous definition of `CLIBS_FOREACH_SET` or `CLIBS_SETS_H`.
  * The latter is defined when including `src/structs/set.h`.
  */
@@ -102,7 +102,7 @@
 #endif // Set
 
 
-#if defined( CLIBS_FOREACH_QUEUE ) || defined( CLIBS_QUEUE_H )
+#if defined( CLIBS_QUEUE_H ) || defined( CLIBS__GENERATE_DOCS )
 /**
  * Iterates over a queue.
  *
@@ -113,7 +113,7 @@
  * @code
  * foreach_que( queue )
  * {
- *     const int data = deref_as( int, entry.data );
+ *     const int data = deref_as( int, queue_node_get_data( entry ) );
  *     // ...
  * }
  * @endcode
@@ -121,7 +121,8 @@
  * @param QUEUE valid `struct fifo_queue *`
  *
  * @attention
- * Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
+ * 1. Do not reassign `ENTRY_NAME` variable.
+ * 2. Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
  * The latter is defined when including `src/structs/queue.h`.
  */
 #define foreach_que( ENTRY_NAME, QUEUE )                                           \

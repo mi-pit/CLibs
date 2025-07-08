@@ -211,21 +211,18 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">for</span> ( <a class="code hl_struct" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a> ENTRY_NAME = <a class="code hl_function" href="queue_8h.html#a7b1b25ef6b98a309c130cb499a73ac9e">queue_get_next</a>( ( QUEUE ), NULL ); \</div>
-<div class="line">          ENTRY_NAME.<a class="code hl_variable" href="struct_queue_enumerated_entry.html#a13deada30c807c57c67570d3591b6cf9">return_status</a> == 0;                                       \</div>
-<div class="line">          ENTRY_NAME = <a class="code hl_function" href="queue_8h.html#a7b1b25ef6b98a309c130cb499a73ac9e">queue_get_next</a>( ( QUEUE ), ENTRY_NAME.item ) )</div>
-<div class="ttc" id="aqueue_8h_html_a7b1b25ef6b98a309c130cb499a73ac9e"><div class="ttname"><a href="queue_8h.html#a7b1b25ef6b98a309c130cb499a73ac9e">queue_get_next</a></div><div class="ttdeci">QueueEnumeratedEntry queue_get_next(const Queue *, const struct queue_node *prev)</div></div>
-<div class="ttc" id="astruct_queue_enumerated_entry_html"><div class="ttname"><a href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></div><div class="ttdef"><b>Definition</b> queue.h:100</div></div>
-<div class="ttc" id="astruct_queue_enumerated_entry_html_a13deada30c807c57c67570d3591b6cf9"><div class="ttname"><a href="struct_queue_enumerated_entry.html#a13deada30c807c57c67570d3591b6cf9">QueueEnumeratedEntry::return_status</a></div><div class="ttdeci">int return_status</div><div class="ttdef"><b>Definition</b> queue.h:104</div></div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">for</span> ( <span class="keyword">const</span> <span class="keyword">struct</span> queue_node *ENTRY_NAME = queue__iterator_get_head( QUEUE ); \</div>
+<div class="line">          ENTRY_NAME != NULL; ENTRY_NAME      = queue__iterator_get_next( ENTRY_NAME ) )</div>
 </div><!-- fragment --><p>Iterates over a queue.</p>
-<p>"Retrieves" a <span class="tt">const <a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></span> struct (see <span class="tt"><a class="el" href="queue_8h.html" title="First in, first out.">src/structs/queue.h</a></span>); in short, <span class="tt"><a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></span> contains a field <span class="tt">void *const data</span> &ndash; data from the item</p>
+<p>"Retrieves" a <span class="tt">const struct queue_node</span> struct (see <span class="tt"><a class="el" href="queue_8h.html" title="First in, first out.">src/structs/queue.h</a></span>); use <span class="tt"><a class="el" href="queue_8h.html#a6d719effb975fafb72d8429a851c5d83">queue_node_get_data()</a></span> to retrieve data from the item</p>
 <p>Example </p><div class="fragment"><div class="line"><a class="code hl_define" href="#a8cc42e46348d0496f8eb8bf28a83c454">foreach_que</a>( queue )</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">const</span> <span class="keywordtype">int</span> data = <a class="code hl_define" href="pointer__utils_8h.html#a4fc639e4e801ba162f43e55e61ede3c1">deref_as</a>( <span class="keywordtype">int</span>, entry.data );</div>
+<div class="line">    <span class="keyword">const</span> <span class="keywordtype">int</span> data = <a class="code hl_define" href="pointer__utils_8h.html#a4fc639e4e801ba162f43e55e61ede3c1">deref_as</a>( <span class="keywordtype">int</span>, <a class="code hl_function" href="queue_8h.html#a6d719effb975fafb72d8429a851c5d83">queue_node_get_data</a>( entry ) );</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
-<div class="ttc" id="aforeach_8h_html_a8cc42e46348d0496f8eb8bf28a83c454"><div class="ttname"><a href="#a8cc42e46348d0496f8eb8bf28a83c454">foreach_que</a></div><div class="ttdeci">#define foreach_que(ENTRY_NAME, QUEUE)</div><div class="ttdef"><b>Definition</b> foreach.h:129</div></div>
+<div class="ttc" id="aforeach_8h_html_a8cc42e46348d0496f8eb8bf28a83c454"><div class="ttname"><a href="#a8cc42e46348d0496f8eb8bf28a83c454">foreach_que</a></div><div class="ttdeci">#define foreach_que(ENTRY_NAME, QUEUE)</div><div class="ttdef"><b>Definition</b> foreach.h:128</div></div>
 <div class="ttc" id="apointer__utils_8h_html_a4fc639e4e801ba162f43e55e61ede3c1"><div class="ttname"><a href="pointer__utils_8h.html#a4fc639e4e801ba162f43e55e61ede3c1">deref_as</a></div><div class="ttdeci">#define deref_as(type, var)</div><div class="ttdoc">Dereferences a pointer as if it was a pointer to type</div><div class="ttdef"><b>Definition</b> pointer_utils.h:53</div></div>
+<div class="ttc" id="aqueue_8h_html_a6d719effb975fafb72d8429a851c5d83"><div class="ttname"><a href="queue_8h.html#a6d719effb975fafb72d8429a851c5d83">queue_node_get_data</a></div><div class="ttdeci">const void * queue_node_get_data(const struct queue_node *)</div></div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">QUEUE</td><td>valid <span class="tt">struct fifo_queue *</span></td></tr>
@@ -233,7 +230,7 @@ Macros</h2></td></tr>
   </dd>
 </dl>
 <dl class="section attention"><dt>Attention</dt><dd><ol type="1">
-<li>DO NOT MODIFY THE CONTENTS OF THE <span class="tt"><a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></span></li>
+<li>Do not reassign <span class="tt">ENTRY_NAME</span> variable.</li>
 <li>Requires previous definition of <span class="tt">CLIBS_FOREACH_QUEUE</span> or <span class="tt">CLIBS_QUEUE_H</span>. The latter is defined when including <span class="tt"><a class="el" href="queue_8h.html" title="First in, first out.">src/structs/queue.h</a></span>. </li>
 </ol>
 </dd></dl>
@@ -273,7 +270,7 @@ Macros</h2></td></tr>
   </dd>
 </dl>
 <dl class="section attention"><dt>Attention</dt><dd><ol type="1">
-<li>DO NOT MODIFY THE CONTENTS OF THE <span class="tt"><a class="el" href="struct_set_enumerated_entry.html">SetEnumeratedEntry</a></span></li>
+<li>Do not modify the contents of the <span class="tt"><a class="el" href="struct_set_enumerated_entry.html">SetEnumeratedEntry</a></span>.</li>
 <li>Requires previous definition of <span class="tt">CLIBS_FOREACH_SET</span> or <span class="tt">CLIBS_SETS_H</span>. The latter is defined when including <span class="tt"><a class="el" href="set_8h.html" title="Sets implemented via a hash table.">src/structs/set.h</a></span>. </li>
 </ol>
 </dd></dl>
