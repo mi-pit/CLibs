@@ -7,14 +7,6 @@ set(CMAKE_C_STANDARD 99)
 #  1) Set sanitizer flags and “build type” as options
 # ————————————————————————————————————
 
-# Option to enable Address+Undefined sanitizer (ON by default for Debug builds).
-option(USE_SANITIZERS "Compile & link with -fsanitize=address,undefined" OFF)
-if (USE_SANITIZERS)
-    message(STATUS "→ Building with Address+Undefined sanitizers enabled")
-    add_compile_options(-fsanitize=address -fsanitize=undefined)
-    add_link_options(-fsanitize=address -fsanitize=undefined)
-endif ()
-
 # Allow the user to pass -DCMAKE_BUILD_TYPE=Debug/Release from the command line.
 # By default, set it to “Release” if nothing was specified:
 if (NOT CMAKE_BUILD_TYPE)
@@ -60,22 +52,31 @@ install(TARGETS clib_core ARCHIVE DESTINATION lib)
 
 
 # ————————————————————————————————————
-#  3) Enable CTest and define each test executable
+#  Enable CTest and define each test executable
 # ————————————————————————————————————
 
+# ================ With ASAN ================
 enable_testing()
+
+add_executable(tests_sanitizers
+        tests/tests.c
+)
+target_link_options(tests_sanitizers PRIVATE -fsanitize=address -fsanitize=undefined)
+target_link_libraries(tests_sanitizers PRIVATE clib_core)
+add_test(
+        NAME all_unit_tests
+        COMMAND tests_sanitizers
+)
+
+
+# ================ Without ASAN ================
 
 add_executable(tests
         tests/tests.c
 )
 target_link_libraries(tests PRIVATE clib_core)
-add_test(
-        NAME all_unit_tests
-        COMMAND tests
-)
 
-
-# Don't add_test, because this one should fail in some way
+# Don't add_test(), because this one should fail in some way
 add_executable(test_unit_tests
         tests/test_unit_tests.c
 )
