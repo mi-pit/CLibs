@@ -17,6 +17,7 @@
 // must be after dynarr.h and set.h
 #include "../../src/headers/foreach.h"
 #include "../../src/headers/pointer_utils.h"
+#include "test_queue.h"
 
 
 Private bool test_one_foreach_arr( const int64_t arr[], const size_t count )
@@ -128,11 +129,10 @@ TEST( foreach_set )
     Set *const set = set_init();
     assert_that( set != NULL, "set init" );
 
-    assert_that( set_insert( set, &set, sizeof set ) == SETINSERT_INSERTED,
-                 "couldn't insert set" );
+    CRITICAL_TEST( set_insert( set, &set, sizeof set ) == SETINSERT_INSERTED );
+
     const int num = 1423;
-    assert_that( set_insert( set, &num, sizeof num ) == SETINSERT_INSERTED,
-                 "couldn't insert num" );
+    CRITICAL_TEST( set_insert( set, &num, sizeof num ) == SETINSERT_INSERTED );
 
     // check sanity
     assert_that( set_insert( set, &set, sizeof set ) == SETINSERT_WAS_IN,
@@ -140,11 +140,11 @@ TEST( foreach_set )
     assert_that( set_size( set ) == 2, "two items must be present" );
     assert_that( sizeof( Set * ) != sizeof( int ), "test assumes this" );
 
-    foreach_set ( set )
+    foreach_set ( entry, set )
     {
         UNIT_TEST( entry.index >= 0 );
         const struct set_item *item = entry.item;
-        assert_that( item != NULL && item->data != NULL, "entry item" );
+        CRITICAL_TEST( item != NULL && item->data != NULL );
 
         UNIT_TEST( item->size == sizeof( Set * ) || item->size == sizeof( int ) );
 
@@ -168,10 +168,11 @@ TEST( foreach_queue )
         assert_that( queue_enqueue( queue, &i ) == RV_SUCCESS, "enqueue" );
     assert_that( queue_get_size( queue ) == 16, );
 
-    foreach_que( queue )
+    int foreach_index = 16;
+    foreach_que( entry, queue )
     {
-        const int data = deref_as( int, entry.data );
-        UNIT_TEST( data == ( int ) ( 16 - foreach_index_entry ) );
+        const int data = deref_as( int, queue_node_get_data( entry ) );
+        UNIT_TEST( data == foreach_index-- );
     }
 
     queue_destroy( queue );

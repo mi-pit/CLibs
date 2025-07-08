@@ -168,9 +168,8 @@ Const size_t set_size( const Set *set );
 
 typedef struct {
     const struct set_item *item;
-    const int64_t index;
+    int64_t index;
 } SetEnumeratedEntry;
-
 /**
  * Iterator over set.
  *

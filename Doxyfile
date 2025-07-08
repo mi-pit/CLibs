@@ -2445,13 +2445,10 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = __has_attribute(x)=1       \
                          HAS_ATTRIBUTE(x)=1         \
-                         CLIBS_FOREACH_QUEUE=1      \
-                         CLIBS_FOREACH_SET=1        \
-                         CLIBS_FOREACH_LIST=1       \
-                         CLIBS_ARRAY_PRINTF_DOCS=1  \
+                         CLIBS__GENERATE_DOCS=1     \
                          _POSIX_C_SOURCE=200809L    \
                          __FILE_NAME__=file         \
-                         LINE_PREF_WIDTH=100        \
+                         LINE_PREF_WIDTH=80         \
                          "PrintfLike(x,y)=PrintfLike"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

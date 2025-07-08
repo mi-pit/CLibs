@@ -15,23 +15,6 @@
 #include <string.h>
 
 
-/** @cond INTERNAL */
-#define foreach_helper_init( SIZE, ITEM_NAME )                                \
-    for ( size_t foreach_keep_##ITEM_NAME = 1, foreach_index_##ITEM_NAME = 0, \
-                 foreach_cap_##ITEM_NAME = ( SIZE );                          \
-          foreach_keep_##ITEM_NAME                                            \
-          && foreach_index_##ITEM_NAME < foreach_cap_##ITEM_NAME;             \
-          foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME,               \
-                 ++foreach_index_##ITEM_NAME )
-
-#define foreach_helper_assign( TYPE, ITEM_NAME, INITIALIZER, ACCESSOR )         \
-    for ( TYPE ITEM_NAME = ( foreach_index_##ITEM_NAME == 0 ) ? ( INITIALIZER ) \
-                                                              : ( ACCESSOR );   \
-          foreach_keep_##ITEM_NAME;                                             \
-          foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME )
-/** @endcond */
-
-
 /**
  * Universal foreach macro
  *
@@ -76,7 +59,7 @@
                                    ( STRING )[ foreach_index_##ITEM_NAME ] )
 
 
-#if defined( CLIBS_FOREACH_LIST ) || defined( CLIBS_DYNAMIC_ARRAY_H )
+#if defined( CLIBS_DYNAMIC_ARRAY_H ) || defined( CLIBS__GENERATE_DOCS )
 /**
  * Iterates over a list.
  *
@@ -97,7 +80,7 @@
 #endif // List
 
 
-#if defined( CLIBS_FOREACH_SET ) || defined( CLIBS_SETS_H )
+#if defined( CLIBS_SETS_H ) || defined( CLIBS__GENERATE_DOCS )
 /**
  * Iterates over a set.
  *
@@ -105,45 +88,65 @@
  * in short, `SetEnumeratedEntry` contains a field `struct set_item *item`
  * with the desired data
  *
- * @param SET a valid `Set *`
+ * @param SET   a valid `Set *`
  *
  * @attention
- * Requires previous definition of `CLIBS_FOREACH_SET` or `CLIBS_SETS_H`.
+ * 1. Do not modify the contents of the `SetEnumeratedEntry`.
+ * 2. Requires previous definition of `CLIBS_FOREACH_SET` or `CLIBS_SETS_H`.
  * The latter is defined when including `src/structs/set.h`.
  */
-#define foreach_set( SET )                                                      \
-    foreach_uni ( const SetEnumeratedEntry, entry, set_get_next( ( SET ), -1 ), \
-                  set_get_next( ( SET ), entry.index ), set_size( ( SET ) ) )
+#define foreach_set( ENTRY_NAME, SET )                                 \
+    for ( SetEnumeratedEntry ENTRY_NAME = set_get_next( ( SET ), -1 ); \
+          ENTRY_NAME.index >= 0;                                       \
+          ENTRY_NAME = set_get_next( ( SET ), ENTRY_NAME.index ) )
 #endif // Set
 
 
-#if defined( CLIBS_FOREACH_QUEUE ) || defined( CLIBS_QUEUE_H )
+#if defined( CLIBS_QUEUE_H ) || defined( CLIBS__GENERATE_DOCS )
 /**
  * Iterates over a queue.
  *
- * "Retrieves" a `const QueueEnumeratedEntry` struct (see `src/structs/queue.h`);
- * in short, `QueueEnumeratedEntry` contains a field
- * `void *const data` -- data from the item
+ * "Retrieves" a `const struct queue_node` struct (see `src/structs/queue.h`);
+ * use `queue_node_get_data()` to retrieve data from the item
  *
  * Example
  * @code
  * foreach_que( queue )
- *     const int data = deref_as( int, entry.data );
+ * {
+ *     const int data = deref_as( int, queue_node_get_data( entry ) );
+ *     // ...
+ * }
  * @endcode
  *
  * @param QUEUE valid `struct fifo_queue *`
  *
  * @attention
- * Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
+ * 1. Do not reassign `ENTRY_NAME` variable.
+ * 2. Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
  * The latter is defined when including `src/structs/queue.h`.
  */
-#define foreach_que( QUEUE )                                      \
-    foreach_uni ( const QueueEnumeratedEntry, entry,              \
-                  queue_get_next( ( QUEUE ), NULL, true ),        \
-                  queue_get_next( ( QUEUE ), entry.item, false ), \
-                  queue_get_size( ( QUEUE ) ) )
-// TODO?: remove `queue_get_size` call (for efficiency)
+#define foreach_que( ENTRY_NAME, QUEUE )                                           \
+    for ( const struct queue_node *ENTRY_NAME = queue__iterator_get_head( QUEUE ); \
+          ENTRY_NAME != NULL; ENTRY_NAME      = queue__iterator_get_next( ENTRY_NAME ) )
+
 #endif // Queue
+
+
+/** @cond INTERNAL */
+#define foreach_helper_init( SIZE, ITEM_NAME )                                \
+    for ( size_t foreach_keep_##ITEM_NAME = 1, foreach_index_##ITEM_NAME = 0, \
+                 foreach_cap_##ITEM_NAME = ( SIZE );                          \
+          foreach_keep_##ITEM_NAME                                            \
+          && foreach_index_##ITEM_NAME < foreach_cap_##ITEM_NAME;             \
+          foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME,               \
+                 ++foreach_index_##ITEM_NAME )
+
+#define foreach_helper_assign( TYPE, ITEM_NAME, INITIALIZER, ACCESSOR )         \
+    for ( TYPE ITEM_NAME = ( foreach_index_##ITEM_NAME == 0 ) ? ( INITIALIZER ) \
+                                                              : ( ACCESSOR );   \
+          foreach_keep_##ITEM_NAME;                                             \
+          foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME )
+/** @endcond */
 
 
 #endif //CLIBS_FOREACH_H

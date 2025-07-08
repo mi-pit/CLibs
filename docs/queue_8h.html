@@ -99,10 +99,6 @@ $(function(){initNavTree('queue_8h.html','',''); });
 </div>
 <p><a href="queue_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Data Structures</h2></td></tr>
-<tr class="memitem:QueueEnumeratedEntry" id="r_QueueEnumeratedEntry"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:adc68927cf041d91382bf6ac22b3c2228" id="r_adc68927cf041d91382bf6ac22b3c2228"><td class="memItemLeft" align="right" valign="top">typedef struct fifo_queue&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc68927cf041d91382bf6ac22b3c2228">Queue</a></td></tr>
@@ -120,7 +116,7 @@ Functions</h2></td></tr>
 <tr class="memitem:aba1682cfc16307b4eeb1945e07455648" id="r_aba1682cfc16307b4eeb1945e07455648"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba1682cfc16307b4eeb1945e07455648">queue_get_size</a> (const <a class="el" href="#adc68927cf041d91382bf6ac22b3c2228">Queue</a> *)</td></tr>
 <tr class="memdesc:aba1682cfc16307b4eeb1945e07455648"><td class="mdescLeft">&#160;</td><td class="mdescRight">Length of queue (number of items)  <br /></td></tr>
 <tr class="memitem:aff6dfe23ea1107378d1dedc82ecbe146" id="r_aff6dfe23ea1107378d1dedc82ecbe146"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff6dfe23ea1107378d1dedc82ecbe146">queue_is_empty</a> (const <a class="el" href="#adc68927cf041d91382bf6ac22b3c2228">Queue</a> *)</td></tr>
-<tr class="memitem:a87b12b52a4f0c3f80a780487580b6d0c" id="r_a87b12b52a4f0c3f80a780487580b6d0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a87b12b52a4f0c3f80a780487580b6d0c">queue_get_next</a> (const <a class="el" href="#adc68927cf041d91382bf6ac22b3c2228">Queue</a> *, const struct queue_node *prev, bool get_first)</td></tr>
+<tr class="memitem:a6d719effb975fafb72d8429a851c5d83" id="r_a6d719effb975fafb72d8429a851c5d83"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d719effb975fafb72d8429a851c5d83">queue_node_get_data</a> (const struct queue_node *)</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>First in, first out. </p>
@@ -327,34 +323,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a87b12b52a4f0c3f80a780487580b6d0c" name="a87b12b52a4f0c3f80a780487580b6d0c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a87b12b52a4f0c3f80a780487580b6d0c">&#9670;&#160;</a></span>queue_get_next()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a> queue_get_next </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="#adc68927cf041d91382bf6ac22b3c2228">Queue</a> *</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const struct queue_node *</td>          <td class="paramname"><span class="paramname"><em>prev</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>get_first</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Iterator over queue.</p>
-<dl class="section return"><dt>Returns</dt><dd><span class="tt"><a class="el" href="struct_queue_enumerated_entry.html">QueueEnumeratedEntry</a></span> </dd></dl>
-
-</div>
-</div>
 <a id="aba1682cfc16307b4eeb1945e07455648" name="aba1682cfc16307b4eeb1945e07455648"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aba1682cfc16307b4eeb1945e07455648">&#9670;&#160;</a></span>queue_get_size()</h2>
 
@@ -443,6 +411,24 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>seems self-explanatory </p>
+
+</div>
+</div>
+<a id="a6d719effb975fafb72d8429a851c5d83" name="a6d719effb975fafb72d8429a851c5d83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d719effb975fafb72d8429a851c5d83">&#9670;&#160;</a></span>queue_node_get_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const void * queue_node_get_data </td>
+          <td>(</td>
+          <td class="paramtype">const struct queue_node *</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>queue node data pointer </dd></dl>
 
 </div>
 </div>
