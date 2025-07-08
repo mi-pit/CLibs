@@ -49,7 +49,7 @@ static const size_t TESTS_LINE_WIDTH = LINE_PREF_WIDTH;
 
 
 /// To avoid namespace collisions
-#define TEST_NAME_CREATOR( TOK ) CLIBS_UNIT_TESTS_##TOK
+#define TEST_NAME_CREATOR( TOK ) CLIBS_UNIT_TESTS_## TOK
 
 
 static int TEST_NAME_CREATOR( TOTAL_FAILED ) = 0;
@@ -212,6 +212,7 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
     ( void ) cond_str;
     ( void ) filename;
     ( void ) lineno;
+    ( void ) isCritical;
 #endif //UNIT_TESTS_SILENT
 
     return passed;
