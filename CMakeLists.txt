@@ -55,6 +55,20 @@ install(TARGETS clib_core ARCHIVE DESTINATION lib)
 #  Enable CTest and define each test executable
 # ————————————————————————————————————
 
+# ================ With ASAN ================
+enable_testing()
+
+add_executable(tests_sanitizers
+        tests/tests.c
+)
+target_link_options(tests_sanitizers PRIVATE -fsanitize=address -fsanitize=undefined)
+target_link_libraries(tests_sanitizers PRIVATE clib_core)
+add_test(
+        NAME all_unit_tests
+        COMMAND tests_sanitizers
+)
+
+
 # ================ Without ASAN ================
 
 add_executable(tests
@@ -62,22 +76,7 @@ add_executable(tests
 )
 target_link_libraries(tests PRIVATE clib_core)
 
-
-# ================ With ASAN ================
-enable_testing()
-
-add_executable(tests_asan
-        tests/tests.c
-)
-target_link_options(tests_asan PRIVATE -fsanitize=address -fsanitize=undefined)
-target_link_libraries(tests_asan PRIVATE clib_core)
-add_test(
-        NAME all_unit_tests
-        COMMAND tests
-)
-
-
-# Don't add_test, because this one should fail in some way
+# Don't add_test(), because this one should fail in some way
 add_executable(test_unit_tests
         tests/test_unit_tests.c
 )
