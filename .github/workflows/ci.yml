@@ -1,11 +1,10 @@
 # File: .github/workflows/ci.yml
 #
-# GitHub Actions CI for the CLibs project.
-# • Builds on Ubuntu & macOS
-# • Tests with both GCC and Clang.
-# • Enables sanitizers on Debug builds.
-# • Runs CTest to execute all registered tests.
-# • (Optional) Captures coverage on Ubuntu/GCC.
+# GitHub Actions CI for CLibs.
+# * Builds on Ubuntu & macOS
+# * Tests with both GCC and Clang.
+# * Enables sanitizers on Debug builds.
+# * Runs CTest to execute all registered tests.
 
 name: C/C++ CI
 
