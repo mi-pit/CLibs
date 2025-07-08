@@ -106,9 +106,8 @@
 /**
  * Iterates over a queue.
  *
- * "Retrieves" a `const QueueEnumeratedEntry` struct (see `src/structs/queue.h`);
- * in short, `QueueEnumeratedEntry` contains a field
- * `void *const data` -- data from the item
+ * "Retrieves" a `const struct queue_node` struct (see `src/structs/queue.h`);
+ * use `queue_node_get_data()` to retrieve data from the item
  *
  * Example
  * @code
@@ -122,14 +121,12 @@
  * @param QUEUE valid `struct fifo_queue *`
  *
  * @attention
- * 1. DO NOT MODIFY THE CONTENTS OF THE `QueueEnumeratedEntry`
- * 2. Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
+ * Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
  * The latter is defined when including `src/structs/queue.h`.
  */
-#define foreach_que( ENTRY_NAME, QUEUE )                                       \
-    for ( QueueEnumeratedEntry ENTRY_NAME = queue_get_next( ( QUEUE ), NULL ); \
-          ENTRY_NAME.return_status == 0;                                       \
-          ENTRY_NAME = queue_get_next( ( QUEUE ), ENTRY_NAME.item ) )
+#define foreach_que( ENTRY_NAME, QUEUE )                                           \
+    for ( const struct queue_node *ENTRY_NAME = queue__iterator_get_head( QUEUE ); \
+          ENTRY_NAME != NULL; ENTRY_NAME      = queue__iterator_get_next( ENTRY_NAME ) )
 
 #endif // Queue
 

@@ -97,19 +97,19 @@ size_t queue_get_size( const Queue * );
 /** seems self-explanatory */
 bool queue_is_empty( const Queue * );
 
-typedef struct {
-    const struct queue_node *item;
-    void *data;
-
-    int return_status;
-} QueueEnumeratedEntry;
 
 /**
+ * @cond INTERNAL
  * Iterator over queue.
- *
- * @return `QueueEnumeratedEntry`
  */
-QueueEnumeratedEntry queue_get_next( const Queue *, const struct queue_node *prev );
+const struct queue_node *queue__iterator_get_head( const Queue * );
+const struct queue_node *queue__iterator_get_next( const struct queue_node * );
+/** @endcond */
 
+
+// struct queue_node
+
+/** @return  */
+const void *queue_node_get_data( const struct queue_node * );
 
 #endif //CLIBS_QUEUE_H

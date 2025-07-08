@@ -184,27 +184,18 @@ bool queue_is_empty( const struct fifo_queue *queue )
 }
 
 
-QueueEnumeratedEntry queue_get_next( const struct fifo_queue *const queue,
-                                     const struct queue_node *const prev )
+const struct queue_node *queue__iterator_get_head( const Queue *q )
 {
-    if ( prev == NULL ) // get first
-        return ( QueueEnumeratedEntry ) { .item          = queue->head,
-                                          .data          = queue->head->data,
-                                          .return_status = 0 };
+    return q->head;
+}
 
-    if ( queue->head == NULL )
-        return ( QueueEnumeratedEntry ) { .item          = NULL,
-                                          .data          = NULL,
-                                          .return_status = -1 };
+const struct queue_node *queue__iterator_get_next( const struct queue_node *n )
+{
+    return n->next;
+}
 
-    const struct queue_node *node = prev->next;
 
-    if ( node == NULL )
-        return ( QueueEnumeratedEntry ) { .item          = NULL,
-                                          .data          = NULL,
-                                          .return_status = +1 };
-
-    return ( QueueEnumeratedEntry ) { .item          = node,
-                                      .data          = node->data,
-                                      .return_status = 0 };
+const void *queue_node_get_data( const struct queue_node *n )
+{
+    return n->data;
 }

@@ -17,6 +17,7 @@
 // must be after dynarr.h and set.h
 #include "../../src/headers/foreach.h"
 #include "../../src/headers/pointer_utils.h"
+#include "test_queue.h"
 
 
 Private bool test_one_foreach_arr( const int64_t arr[], const size_t count )
@@ -170,7 +171,7 @@ TEST( foreach_queue )
     int foreach_index = 16;
     foreach_que( entry, queue )
     {
-        const int data = deref_as( int, entry.data );
+        const int data = deref_as( int, queue_node_get_data( entry ) );
         UNIT_TEST( data == foreach_index-- );
     }
 
