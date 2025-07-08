@@ -29,7 +29,7 @@ set(CLIB_SOURCES
 
         src/structs/dynarr.c
         src/structs/dynstring.c
-        src/structs/sets.c
+        src/structs/set.c
         src/structs/dictionary.c
         src/structs/queue.c
 )
@@ -41,7 +41,7 @@ set(CLIB_PUBLIC_HDRS
 
         src/structs/dynarr.h
         src/structs/dynstring.h
-        src/structs/sets.h
+        src/structs/set.h
         src/Structs/dictionary.h
         src/Structs/queue.h
 )
@@ -52,14 +52,8 @@ install(TARGETS clib_core ARCHIVE DESTINATION lib)
 
 
 # ————————————————————————————————————
-#  3) Enable CTest and define each test executable
+#  Enable CTest and define each test executable
 # ————————————————————————————————————
-
-# Don't add_test, because this one should fail in some way
-add_executable(test_unit_tests
-        tests/test_unit_tests.c
-)
-target_link_libraries(test_unit_tests PRIVATE clib_core)
 
 # ================ Without ASAN ================
 
@@ -67,17 +61,6 @@ add_executable(tests
         tests/tests.c
 )
 target_link_libraries(tests PRIVATE clib_core)
-
-add_executable(test_sets
-        tests/test_sets.c
-)
-target_link_libraries(test_sets PRIVATE clib_core)
-
-add_executable(test_queue
-        tests/test_queue.c
-)
-target_link_libraries(test_queue PRIVATE clib_core)
-target_compile_definitions(test_queue PUBLIC UNIT_TESTS_SILENT)
 
 
 # ================ With ASAN ================
@@ -93,25 +76,28 @@ add_test(
         COMMAND tests
 )
 
-add_executable(test_sets_asan
-        tests/test_sets.c
-)
-target_link_options(test_sets_asan PRIVATE -fsanitize=address -fsanitize=undefined)
-target_link_libraries(test_sets_asan PRIVATE clib_core)
-add_test(
-        NAME sets_tests
-        COMMAND test_sets_asan
-)
 
-add_executable(test_queue_asan
-        tests/test_queue.c
+# Don't add_test, because this one should fail in some way
+add_executable(test_unit_tests
+        tests/test_unit_tests.c
 )
-target_link_libraries(test_queue_asan PRIVATE clib_core)
-target_compile_definitions(test_queue_asan PUBLIC UNIT_TESTS_SILENT)
-add_test(
-        NAME queue_test
-        COMMAND test_queue_asan
+target_link_libraries(test_unit_tests PRIVATE clib_core)
+
+# Not even really a test
+add_executable(test_hash
+        tests/test_hash_func.c
 )
+target_link_libraries(test_hash PRIVATE clib_core)
+
+add_executable(test_leet
+        tests/test_leet.c
+)
+target_link_libraries(test_leet PRIVATE clib_core)
+
+add_executable(test_prints
+        tests/test_printing.c
+)
+target_link_libraries(test_prints PRIVATE clib_core)
 
 
 # ————————————————————————————————————

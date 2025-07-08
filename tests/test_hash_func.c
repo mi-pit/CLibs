@@ -2,20 +2,21 @@
 // Created by MacBook on 30.12.2024.
 //
 
-#include "../Dev/assert_that.h" /* assert_that(), include errors.h */
-#include "../misc.h"            /* hash_func() */
-#include "../Structs/sets.h"    /* Set */
+#include "../src/headers/assert_that.h" /* assert_that(), include errors.h */
+#include "../src/headers/misc.h"        /* hash_func() */
+#include "../src/structs/set.h"         /* Set */
 
+#include <inttypes.h>
 #include <stdlib.h>
 
 
-#define try_one( TYPE, VALUE )                                  \
-    do                                                          \
-    {                                                           \
-        TYPE Variable = VALUE;                                  \
-        uint64_t Hash = hash_func( &Variable, sizeof( TYPE ) ); \
-        printf( "`%s`\t:= %s -> %llu\n", #TYPE, #VALUE, Hash ); \
-    }                                                           \
+#define try_one( TYPE, VALUE )                                         \
+    do                                                                 \
+    {                                                                  \
+        TYPE Variable = VALUE;                                         \
+        uint64_t Hash = hash_func( &Variable, sizeof( TYPE ) );        \
+        printf( "`%s`\t:= %s -> %" PRIu64 "\n", #TYPE, #VALUE, Hash ); \
+    }                                                                  \
     while ( 0 )
 
 int main( void )
@@ -35,14 +36,14 @@ int main( void )
 
     char buffer[ 128 ] = { 0 };
     uint64_t Hash      = hash_func( buffer, sizeof buffer );
-    printf( "`%s`\t:= %s -> %llu\n", "char[128]", "{0}", Hash );
+    printf( "`%s`\t:= %s -> %" PRIu64 "\n", "char[128]", "{0}", Hash );
 
     for ( int i = 0; i < 128; ++i )
         buffer[ i ] = ( char ) ( rand() % 0xFF ); // NOLINT(cert-msc50-cpp)
     Hash = hash_func( buffer, 128 );
-    printf( "`%s`\t:= %s -> %llu\n", "char[128]", "rand() % 0xFF", Hash );
+    printf( "`%s`\t:= %s -> %" PRIu64 "\n", "char[128]", "rand() % 0xFF", Hash );
 
-    Set set = set_init();
+    Set *set = set_init();
     if ( set == NULL )
         err( -1, "set_init" );
 

@@ -1,6 +1,12 @@
-//
-// Created by MacBook on 23.10.2024.
-//
+/*
+ * Macros for iterating over different structures (arrays, strings, sets, ...).
+ *
+ * To define `foreach` for a data structure in `src/structs`,
+ * first include the struct, then this header.
+ *
+ *
+ * Created by MacBook on 23.10.2024.
+ */
 
 #ifndef CLIBS_FOREACH_H
 #define CLIBS_FOREACH_H
@@ -8,11 +14,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+/** @cond INTERNAL */
 #define foreach_helper_init( SIZE, ITEM_NAME )                                \
     for ( size_t foreach_keep_##ITEM_NAME = 1, foreach_index_##ITEM_NAME = 0, \
                  foreach_cap_##ITEM_NAME = ( SIZE );                          \
-          foreach_keep_##ITEM_NAME &&                                         \
-          foreach_index_##ITEM_NAME < foreach_cap_##ITEM_NAME;                \
+          foreach_keep_##ITEM_NAME                                            \
+          && foreach_index_##ITEM_NAME < foreach_cap_##ITEM_NAME;             \
           foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME,               \
                  ++foreach_index_##ITEM_NAME )
 
@@ -21,21 +29,33 @@
                                                               : ( ACCESSOR );   \
           foreach_keep_##ITEM_NAME;                                             \
           foreach_keep_##ITEM_NAME = !foreach_keep_##ITEM_NAME )
+/** @endcond */
 
 
+/**
+ * Universal foreach macro
+ *
+ * @param TYPE          type of the item
+ * @param ITEM_NAME     name of the variable created and assigned in the loop
+ * @param INITIALIZER   runs on the first pass through the loop
+ * @param ACCESSOR      runs every other time (index variable is foreach_index_ITEM_NAME)
+ * @param SIZE          number of elements in the structure
+ */
 #define foreach_uni( TYPE, ITEM_NAME, INITIALIZER, ACCESSOR, SIZE ) \
     foreach_helper_init( SIZE, ITEM_NAME )                          \
             foreach_helper_assign( TYPE, ITEM_NAME, INITIALIZER, ACCESSOR )
 
 /**
- * Iterates over the ‹array›<br>
- * Stores each array member in a new variable ‹item› (only
- * visible in the scope of the foreach loop)
- * @param type  C-keyword (or typedef/…) of the type of the array items and the new
- *              variable
+ * Iterates over an array.
  *
- * @param item  name of the new variable
- * @param array array of type 'type[]'
+ * Stores each array member in a new variable (only
+ * visible in the scope of the foreach loop).
+ *
+ * @param ITEM_TYPE     C-keyword (or typedef/…) of the type of the array
+ *                      items and the new variable
+ * @param ITEM_NAME     name of the new variable
+ * @param ARRAY         array of type `TYPE[ COUNT ]`
+ * @param COUNT         number of elements in array
  */
 #define foreach_arr( ITEM_TYPE, ITEM_NAME, ARRAY, COUNT )                \
     foreach_helper_init( COUNT, ITEM_NAME )                              \
@@ -43,64 +63,79 @@
                                    ( ARRAY )[ foreach_index_##ITEM_NAME ] )
 
 /**
- * Iterates over a string<br>
- * Stores each character of the string in a new variable of type char
+ * Iterates over a string.
  *
- * @param item  name of the new variable
- * @param strn string
+ * Stores each character of the string in a new variable of type `const char`.
+ *
+ * @param ITEM_NAME name of the new variable
+ * @param STRING    string
  */
-#define foreach_str( ITEM_NAME, STRING )                                      \
-    foreach_helper_init( strlen( STRING ), ITEM_NAME ) foreach_helper_assign( \
-            const char, ITEM_NAME, ( STRING )[ 0 ], ( STRING )[ foreach_index_##ITEM_NAME ] )
+#define foreach_str( ITEM_NAME, STRING )                                   \
+    foreach_helper_init( strlen( STRING ), ITEM_NAME )                     \
+            foreach_helper_assign( const char, ITEM_NAME, ( STRING )[ 0 ], \
+                                   ( STRING )[ foreach_index_##ITEM_NAME ] )
 
 
-#ifdef CLIBS_DYNAMIC_ARRAY_H
+#if defined( CLIBS_FOREACH_LIST ) || defined( CLIBS_DYNAMIC_ARRAY_H )
 /**
- * Iterates over the List<br>
- * Stores each list member in a new variable named ‹item› of type char
+ * Iterates over a list.
  *
- * @param type  type of the new variable and items in the list
- * @param item  name of the new variable
- * @param ls string
- */
+ * Stores each list member in a new variable.
+ *
+ * @param TYPE      type of the new variable and items in the list
+ * @param ITEM_NAME name of the new variable
+ * @param LIST      a valid `List *`
+ *
+ * @attention
+ * Requires previous definition of `CLIBS_FOREACH_LIST` or `CLIBS_DYNAMIC_ARRAY_H`.
+ * The latter is defined when including `src/structs/dynarr.h`.
+*/
 #define foreach_ls( TYPE, ITEM_NAME, LIST )                                      \
     foreach_helper_init( list_size( LIST ), ITEM_NAME )                          \
             foreach_helper_assign( TYPE, ITEM_NAME, list_fetch( LIST, 0, TYPE ), \
                                    list_fetch( LIST, foreach_index_##ITEM_NAME, TYPE ) )
-#endif //CLIBS_DYNAMIC_ARRAY_H
+#endif // List
 
 
-#ifdef CLIBS_SETS_H
+#if defined( CLIBS_FOREACH_SET ) || defined( CLIBS_SETS_H )
 /**
- * Iterates over a set, results are set in an SetEnumeratedEntry
- * "Retrieves" a `const SetEnumeratedEntry` struct (see sets.h);
- * in short, `SetEnumeratedEntry` contains
- * - `struct set_item *` -- the desired data
- * - `index` -- for the iterator, doesn't really hold any value for the user
+ * Iterates over a set.
  *
- * @param SET set
+ * Retrieves a `const SetEnumeratedEntry` struct (see `src/structs/set.h`);
+ * in short, `SetEnumeratedEntry` contains a field `struct set_item *item`
+ * with the desired data
+ *
+ * @param SET a valid `Set *`
+ *
+ * @attention
+ * Requires previous definition of `CLIBS_FOREACH_SET` or `CLIBS_SETS_H`.
+ * The latter is defined when including `src/structs/set.h`.
  */
 #define foreach_set( SET )                                                      \
     foreach_uni ( const SetEnumeratedEntry, entry, set_get_next( ( SET ), -1 ), \
                   set_get_next( ( SET ), entry.index ), set_size( ( SET ) ) )
-#endif //CLIBS_SETS_H
+#endif // Set
 
 
-#ifdef CLIBS_QUEUE_H
+#if defined( CLIBS_FOREACH_QUEUE ) || defined( CLIBS_QUEUE_H )
 /**
- * Iterates over a set, results are set in an SetEnumeratedEntry
- * "Retrieves" a `const QueueEnumeratedEntry` struct (see queue.h);
- * in short, `QueueEnumeratedEntry` contains
- * - `struct set_item *` -- the desired data
- * - `index` -- for the iterator, doesn't really hold any value for the user
+ * Iterates over a queue.
  *
- * @param QUEUE valid fifo_queue *
+ * "Retrieves" a `const QueueEnumeratedEntry` struct (see `src/structs/queue.h`);
+ * in short, `QueueEnumeratedEntry` contains a field
+ * `void *const data` -- data from the item
  *
- * @example
+ * Example
  * @code
  * foreach_que( queue )
  *     const int data = deref_as( int, entry.data );
  * @endcode
+ *
+ * @param QUEUE valid `struct fifo_queue *`
+ *
+ * @attention
+ * Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
+ * The latter is defined when including `src/structs/queue.h`.
  */
 #define foreach_que( QUEUE )                                      \
     foreach_uni ( const QueueEnumeratedEntry, entry,              \
@@ -108,7 +143,7 @@
                   queue_get_next( ( QUEUE ), entry.item, false ), \
                   queue_get_size( ( QUEUE ) ) )
 // TODO?: remove `queue_get_size` call (for efficiency)
-#endif //CLIBS_QUEUE_H
+#endif // Queue
 
 
 #endif //CLIBS_FOREACH_H

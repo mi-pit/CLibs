@@ -1,3 +1,7 @@
+/*
+ * Includes most standard types and defines `byte` type.
+ */
+
 #ifndef CLIBS_EXTRA_TYPES_H
 #define CLIBS_EXTRA_TYPES_H
 

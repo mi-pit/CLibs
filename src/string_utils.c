@@ -33,9 +33,11 @@ bool string_is_blank_l( const string_t s, const size_t len )
 
     return true;
 }
+bool string_is_empty( const string_t s )
+{
+    return *s == '\0';
+}
 
-
-// `string_stripped` is implemented separately from `strip` for memory efficiency
 
 str_t string_stripped_l( const string_t s, size_t length )
 {
@@ -352,10 +354,35 @@ ERROR:
     return ( void * ) f_stack_trace( NULL );
 }
 
+int string_replace( const str_t string, const string_t old, const string_t new )
+{
+    if ( string == NULL || old == NULL || new == NULL )
+        return fwarnx_ret( RV_EXCEPTION, "an argument is NULL" );
 
-Private const strsplit_mode_t ALL_MODES =
-        STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY | STRSPLIT_KEEP_DELIM_AFTER |
-        STRSPLIT_KEEP_DELIM_BEFORE;
+    const size_t repl_len = strlen( old );
+    if ( repl_len != strlen( new ) )
+        return fwarnx_ret(
+                RV_EXCEPTION,
+                "replacement must be the same length as the string it's replacing" );
+
+    if ( repl_len == 0 )
+        return RV_SUCCESS;
+
+    char *occ = strstr( string, old );
+    if ( occ == NULL )
+        return RV_SUCCESS;
+
+    do
+        strncpy( occ, new, repl_len );
+    while ( ( occ = strstr( occ, old ) ) != NULL );
+
+    return RV_SUCCESS;
+}
+
+
+Private const strsplit_mode_t ALL_MODES = STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY
+                                          | STRSPLIT_KEEP_DELIM_AFTER
+                                          | STRSPLIT_KEEP_DELIM_BEFORE;
 
 Private ssize_t string_split_empty( str_t **str_arr_cont, const string_t string )
 {
@@ -428,15 +455,15 @@ ssize_t string_split( str_t **str_arr_cont,
         const char *start       = curr + start_offset;
         const size_t end_offset = mode & STRSPLIT_KEEP_DELIM_BEFORE ? split_tok_len : 0;
 
-        if ( mode & STRSPLIT_EXCLUDE_EMPTY &&
-             ( ( next == NULL && *start == '\0' ) ||
-               ( next != NULL && next - start + end_offset == 0 ) ) )
+        if ( mode & STRSPLIT_EXCLUDE_EMPTY
+             && ( ( next == NULL && *start == '\0' )
+                  || ( next != NULL && next - start + end_offset == 0 ) ) )
             continue;
 
         const size_t len = next == NULL ? strlen( start ) : next - start + end_offset;
 
-        if ( mode & STRSPLIT_EXCLUDE_EMPTY && mode & STRSPLIT_STRIP_RESULTS &&
-             string_is_blank_l( start, len ) )
+        if ( mode & STRSPLIT_EXCLUDE_EMPTY && mode & STRSPLIT_STRIP_RESULTS
+             && string_is_blank_l( start, len ) )
             continue;
 
         char *const dup = mode & STRSPLIT_STRIP_RESULTS ? string_stripped_l( start, len )
@@ -553,6 +580,38 @@ void string_split_destroy( const size_t size, str_t **str_arr_cont )
 }
 
 
+str_t string_join( const size_t len, const string_t strarr[ len ], const string_t joiner )
+{
+    if ( strarr == NULL )
+        return ( void * ) fwarnx_ret( NULL, "strarr must not be NULL" );
+    if ( joiner == NULL )
+        return ( void * ) fwarnx_ret( NULL, "joiner must not be NULL" );
+
+    if ( len == 0 )
+        return calloc( 1, 1 ); // empty string
+
+    DynString *builder = dynstr_init();
+    if ( builder == NULL )
+        return ( void * ) f_stack_trace( NULL );
+
+    const size_t joiner_len = strlen( joiner );
+    foreach_arr ( const string_t, string, strarr, len )
+    {
+        if ( dynstr_append( builder, string ) < 0 )
+            return ( void * ) f_stack_trace( NULL );
+
+        if ( foreach_index_string < len - 1 )
+            if ( dynstr_appendn( builder, joiner, joiner_len ) != ( ssize_t ) joiner_len )
+                return ( void * ) f_stack_trace( NULL );
+    }
+
+    const str_t data_copy = dynstr_data_copy( builder );
+    dynstr_destroy( builder );
+
+    return data_copy;
+}
+
+
 str_t mul_uint_strings( const string_t str_1, const string_t str_2 )
 {
     typedef uint8_t digit_t;
@@ -573,8 +632,8 @@ str_t mul_uint_strings( const string_t str_1, const string_t str_2 )
         digit_t carry = 0;
         for ( ssize_t j = ( ssize_t ) len_2 - 1; j >= 0; --j )
         {
-            const digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry +
-                                 ( result[ i + j + 1 ] - '0' );
+            const digit_t prod = ( str_1[ i ] - '0' ) * ( str_2[ j ] - '0' ) + carry
+                                 + ( result[ i + j + 1 ] - '0' );
             result[ i + j + 1 ] = ( char ) ( prod % 10 + '0' );
             carry               = prod / 10;
         }

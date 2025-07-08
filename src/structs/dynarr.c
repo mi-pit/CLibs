@@ -1,14 +1,19 @@
-
 #include "dynarr.h"
 
-#include "../headers/errors.h" /* RVs, fwarn* */
-#include "../headers/extra_types.h"
-#include "../headers/misc.h"
-#include "../headers/pointer_utils.h"
+#include "../headers/assert_that.h"
+#include "../headers/errors.h"        /* RVs, fwarn* */
+#include "../headers/extra_types.h"   /* byte, size_t */
+#include "../headers/misc.h"          /* cmp */
+#include "../headers/pointer_utils.h" /* deref_as */
 
 #include <stdio.h>  /* *print* */
-#include <stdlib.h> /* malloc, free, bsearch, qsort */
+#include <stdlib.h> /* alloc, bsearch, qsort */
 #include <string.h> /* mem* */
+
+
+#define LIST_DEF_CAP 64
+
+#define LIST_CAP_SIZE_RATIO 2
 
 
 #define ListIndexOOBExceptionString( LIST, INDEX ) \
@@ -19,42 +24,11 @@
 #define ListNullPointerExceptionString( ARG ) #ARG " may not be null"
 
 
-/**
- * A dynamic array. (List)<br>
- * The List can store any elements of arbitrary size.
- * <p>
- * A new List can (and should) be created with list_init_* functions
- * <p>
- * list_init_type* functions take as its `type' argument the C keyword
- * e.g. 'char'
- * <br>
- * list_init_size* functions take as its `el_size' argument
- * the number of bytes (acquired by sizeof)
- * for the desired type to be stored
- * <p>
- * The list_init_*_p functions take a second parameter
- * – a constant for the print functions. This field can be changed
- * later with list_set_print_mode().
- * <p>
- * list_init_* functions allocate and initialize a List
- * with these default values:
- * @code
- * List::capacity = LIST_DEF_SIZE
- * List::size     = 0
- * List::items    = pointer to heap allocated memory of width ‹capacity›, set to 0
- * List::el_size  = width of a single element
- * @endcode
- *
- * @attention
- * All elements must be the same number of bytes long
-*/
 struct dynamic_array {
     size_t capacity; // Amount of allocated memory slots for items
     size_t size;     // Number of items stored in List
     void *items;     // Array of any type
     size_t el_size;  // sizeof a single item
-
-    enum ListPrinters def_print_mode; // for print functions
 };
 
 
@@ -66,31 +40,30 @@ Private inline void *list_at_non_safe( const struct dynamic_array *ls, const siz
 
 /* –––––––––––––––––––––––––––––– FUNCTIONAL –––––––––––––––––––––––––––––– */
 
-struct dynamic_array *list_init_size( const size_t el_size )
+List *list_init_cap_size( const size_t el_size, const size_t init_cap )
 {
     struct dynamic_array *ls = calloc( 1, sizeof( struct dynamic_array ) );
     if ( ls == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
-    ls->items = calloc( LIST_DEF_SIZE, el_size );
+    ls->items = calloc( init_cap, el_size );
     if ( ls->items == NULL )
     {
         free( ls );
         return ( void * ) fwarn_ret( NULL, "calloc" );
     }
-    ls->capacity = LIST_DEF_SIZE;
+    ls->capacity = LIST_DEF_CAP;
     ls->el_size  = el_size;
     return ls;
 }
 
-struct dynamic_array *list_init_size_p( const size_t el_size, const int mode )
+List *list_init_size( const size_t el_size )
 {
-    struct dynamic_array *new_ls = list_init_size( el_size );
-    if ( new_ls == NULL )
-        return ( void * ) f_stack_trace( NULL );
+    List *new = list_init_cap_size( el_size, LIST_DEF_CAP );
+    if ( new == NULL )
+        f_stack_trace( NULL );
 
-    new_ls->def_print_mode = mode;
-    return new_ls;
+    return new;
 }
 
 
@@ -121,7 +94,8 @@ void *list_at( struct dynamic_array *ls, const size_t idx )
     return list_at_non_safe( ls, idx );
 }
 
-void *list_at_last( struct dynamic_array *ls )
+typedef List *LSP;
+void *list_at_last( const LSP ls )
 {
     if ( ls->size == 0 )
         return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
@@ -391,16 +365,26 @@ int list_reverse( struct dynamic_array *ls )
 
 struct dynamic_array *list_reversed( const struct dynamic_array *ls )
 {
-    // todo: re-implement this for efficiency
-    struct dynamic_array *rev;
-    if ( list_copy( ls, &rev ) != RV_SUCCESS )
+    struct dynamic_array *rev = list_init_size( ls->el_size );
+    if ( rev == NULL )
         return ( void * ) f_stack_trace( NULL );
 
-    if ( list_reverse( rev ) != RV_SUCCESS )
+    for ( size_t i = 0; i < ls->size; ++i )
     {
-        list_destroy( rev );
-        return ( void * ) f_stack_trace( NULL );
+        const size_t index = ls->size - 1 - i;
+        const void *datap  = list_see( ls, index );
+        assert_that( datap != NULL,
+                     "index %zu must be in bounds (size=%zu)",
+                     index,
+                     ls->size );
+
+        if ( list_append( rev, datap ) != RV_SUCCESS )
+        {
+            list_destroy( rev );
+            return ( void * ) f_stack_trace( NULL );
+        }
     }
+
     return rev;
 }
 
@@ -422,7 +406,7 @@ int list_copy( const struct dynamic_array *old, struct dynamic_array **new_ls_co
     return RV_SUCCESS;
 }
 
-struct dynamic_array *list_copy_p( const struct dynamic_array *ls )
+struct dynamic_array *list_copy_of( const struct dynamic_array *ls )
 {
     struct dynamic_array *new;
     if ( list_copy( ls, &new ) )
@@ -454,97 +438,15 @@ void list_destroy( struct dynamic_array *ls )
     free( ls );
 }
 
-void list_destroy_p( struct dynamic_array ls )
+int list_clear( struct dynamic_array *ls )
 {
-    free_n( ls.items );
-}
+    free_n( ls->items );
+    ls->size     = 0;
+    ls->capacity = LIST_DEF_CAP;
+    if ( ( ls->items = calloc( ls->capacity, ls->el_size ) ) == NULL )
+        return fwarn_ret( RV_ERROR, "calloc" );
 
-
-/* ––––––––––––––––––––––––––––––– PRINTERS ––––––––––––––––––––––––––––––– */
-
-Private void list_print_static( const struct dynamic_array *ls,
-                                int print_mode,
-                                bool print_size );
-
-Private void list_print_mode( const struct dynamic_array *ls, // NOLINT(misc-no-recursion)
-                              const int print_mode,
-                              const bool print_size )
-{
-    switch ( print_mode )
-    {
-        default:
-            fwarnx( "invalid print format" );
-            __attribute__( ( fallthrough ) );
-        case LS_PRINT_BYTE:
-            list_printf_d( ls, byte, "%02x", " " );
-            break;
-        case LS_PRINT_SIGNED:
-            list_printf( ls, long long int, "%lli" );
-            break;
-        case LS_PRINT_UNSIGNED:
-            list_printf( ls, unsigned long long int, "%llu" );
-            break;
-        case LS_PRINT_DEC:
-            list_printf( ls, double, "%.2f" );
-            break;
-        case LS_PRINT_PTR:
-            list_printf( ls, void *, "@%p" );
-            break;
-        case LS_PRINT_STR:
-            printf( "\"%s\"\n", ( char * ) ls->items );
-            break;
-        case LS_PRINT_NOFORMAT:
-            list_print_mode( ls, ls->def_print_mode, print_size );
-            break;
-        case LS_PRINT_LIST:
-            printf( "[\n" );
-            for ( size_t i = 0; i < ls->size; ++i )
-            {
-                printf( "\t" );
-                list_print_static( list_fetch( ls, i, struct dynamic_array * ),
-                                   LS_PRINT_NOFORMAT,
-                                   print_size );
-            }
-            printf( "]\n" );
-            break;
-    }
-}
-
-Private void list_print_static( // NOLINT(misc-no-recursion)
-        const struct dynamic_array *ls,
-        const int print_mode,
-        const bool print_size )
-{
-    if ( ls == NULL )
-    {
-        printf( "NULL\n" );
-        return;
-    }
-    if ( ls->items == NULL )
-    {
-        printf( "List (%p) has no items\n", ( void * ) ls );
-        return;
-    }
-
-    if ( print_size )
-        printf( "%zu:", ls->size );
-
-    list_print_mode( ls, print_mode, print_size );
-}
-
-void list_prints( const struct dynamic_array *ls, const int print_mode )
-{
-    list_print_static( ls, print_mode, true );
-}
-
-void list_printm( const struct dynamic_array *ls, const int print_mode )
-{
-    list_print_static( ls, print_mode, false );
-}
-
-void list_print( const struct dynamic_array *ls )
-{
-    list_print_static( ls, LS_PRINT_NOFORMAT, false );
+    return RV_SUCCESS;
 }
 
 
@@ -578,10 +480,4 @@ void *list_items_copy( const struct dynamic_array *ls )
 
     memcpy( copy, ls->items, ls->size * ls->el_size );
     return copy;
-}
-
-
-void list_set_print_mode( struct dynamic_array *ls, const int fmt )
-{
-    ls->def_print_mode = fmt;
 }

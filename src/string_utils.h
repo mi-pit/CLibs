@@ -1,6 +1,9 @@
-//
-// Created by MacBook on 28.10.2024.
-//
+/*
+ * Utility functions and macros for working with C ASCII strings.
+ *
+ *
+ * Created by MacBook on 28.10.2024.
+ */
 
 #ifndef CLIBS_STRING_UTILS_H
 #define CLIBS_STRING_UTILS_H
@@ -8,15 +11,18 @@
 #include "headers/attributes.h" /* UseResult */
 
 #include <regex.h>     /* regex_t */
+#include <stdbool.h>   /* bool */
 #include <sys/types.h> /* ssize_t */
 
 /* include for user */
-#include <stdbool.h>
 #include <string.h>
 
 
+/// Immutable string
 typedef const char *string_t;
+/// Mutable string
 typedef char *str_t;
+
 
 #if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
 #include <stdlib.h> /* malloc */
@@ -24,6 +30,7 @@ typedef char *str_t;
 #define strndup string_nduplicate
 #define strdup  string_duplicate
 
+/// `strndup` implementation (standard in POSIX and C23+)
 LibraryDefined UseResult str_t string_nduplicate( string_t s, size_t l )
 {
     str_t n = malloc( l + 1 );
@@ -35,6 +42,7 @@ LibraryDefined UseResult str_t string_nduplicate( string_t s, size_t l )
     return n;
 }
 
+/// `strdup` implementation (standard in POSIX and C23+)
 LibraryDefined UseResult str_t string_duplicate( string_t s )
 {
     size_t l = strlen( s );
@@ -48,19 +56,20 @@ LibraryDefined UseResult str_t string_duplicate( string_t s )
 }
 #endif // ndef strdup
 
-#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) || \
-        defined( _POSIX_C_SOURCE ) // non-standard
+#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) \
+        || defined( _POSIX_C_SOURCE ) // non-standard
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifndef vsnprintf
+/// `va_list` version of `snprintf()`
 int vsnprintf( char *str, size_t size, const char *restrict format, va_list ap );
 #endif
 
 /**
- * Like `vsprintf`, except it heap-allocates memory for the resulting string.
- * (*strp) may be passed to free(3)
+ * Like `vsprintf()`, except it heap-allocates memory for the resulting string.
+ * `*strp` may be passed to `free(3)`
  */
 LibraryDefined int vasprintf( str_t *strp, const string_t fmt, va_list args )
 {
@@ -82,6 +91,10 @@ LibraryDefined int vasprintf( str_t *strp, const string_t fmt, va_list args )
     return result;
 }
 
+/**
+ * Like `sprintf()`, except it heap-allocates memory for the resulting string.
+ * `*strp` may be passed to `free(3)` *
+ */
 LibraryDefined int asprintf( str_t *strp, const string_t fmt, ... )
 {
     va_list va;
@@ -96,14 +109,14 @@ LibraryDefined int asprintf( str_t *strp, const string_t fmt, ... )
 /**
  * Returns true if ascii string is blank
  *
- * @return true if each char in s tests positive for isspace(3)
+ * @return true if each char in s tests positive for `isspace(3)`
  */
 bool string_is_blank( string_t );
 /**
  * Returns true if ascii string is blank
  *
  * @param len max string length
- * @return true if each char in s tests positive for isspace(3)
+ * @return true if each char in s tests positive for `isspace(3)`
  */
 bool string_is_blank_l( string_t, size_t len );
 
@@ -111,21 +124,21 @@ bool string_is_blank_l( string_t, size_t len );
  * Evaluates to true if string contains no characters
  *
  * @param s string
- * @return true if string is empty -- ""
+ * @return true if string is empty -- `""`
  */
-#define string_is_empty( s ) ( ( s )[ 0 ] == '\0' )
+bool string_is_empty( string_t s );
 
 /**
- * Heap-allocates a new string with all whitespace (as defined in isspace(3)) from either end stripped.
+ * Heap-allocates a new string with all whitespace (as defined in `isspace(3)`) from either end stripped.
  *
  * @return  New string – copy of the original with no whitespace at either end.
- *          Pointer should be freed with free(3).
+ *          Pointer should be freed with `free(3)`.
  */
 UseResult str_t string_stripped( string_t );
 /**
- * Heap-allocates a new string with all whitespace (as defined in isspace(3)) from either end stripped.
+ * Heap-allocates a new string with all whitespace (as defined in `isspace(3)`) from either end stripped.
  *
- * String is treated as if it was `length' characters long (at most, may be less)
+ * String is treated as if it was `length` characters long (at most, may be less)
  *
  * @param length maximum number of characters read from string
  * @return  New string – copy of the original with no whitespace at either end.
@@ -135,15 +148,19 @@ UseResult str_t string_stripped_l( string_t, size_t length );
 /**
  * Removes all whitespace from either end of the string.
  * This is done in place.
+ *
+ * `string_stripped()` is implemented separately from `string_strip` for memory efficiency
  */
 void string_strip( str_t );
 
 
+/// Charset of special characters that can be escaped
 #define ESCAPED_CHARS "\n\t\r\f\v\"\\"
 
 /**
- * Escapes characters defined in ESCAPED_CHARS
- * @example
+ * Escapes characters defined in `ESCAPED_CHARS`
+ * <p>
+ * Example:
  * @code
  * #include "string_utils.h"
  *
@@ -158,11 +175,12 @@ void string_strip( str_t );
  * "
  * "Hello,\"World\"!\n"
  * @endcode
- * @return New escaped string. Pointer should be freed with free(3).
+ * </p>
+ * @return New escaped string. Pointer should be freed with `free(3)`.
  */
 UseResult str_t string_escaped( string_t );
 
-/// Opposite of `string_escaped`
+/// Opposite of `string_escaped()`
 UseResult str_t string_unescaped( string_t );
 
 /**
@@ -200,7 +218,7 @@ UseResult str_t string_as_lower( string_t );
 
 
 /**
- * Creates a new string with all occurrences of the sub-string ‹old› replaced with ‹new›
+ * Creates a new string with all occurrences of the sub-string `old` replaced with `new`
  *
  * @param old old substring
  * @param new new substring
@@ -208,14 +226,31 @@ UseResult str_t string_as_lower( string_t );
  */
 UseResult str_t string_replaced( string_t, string_t old, string_t new );
 
+/**
+ * Replaces all occurrences of a substring with another one.
+ * This is done in-place.
+ *
+ * The substitution string must be the same length as the old substituted string.
+ * (for arbitrary lengths use `string_replaced`)
+ *
+ * @param string    this string is modified
+ * @param old   must be the same length as new
+ * @param new   must be the same length as old
+ * @return `RV_SUCCESS`/`RV_EXCEPTION`
+ */
+int string_replace( str_t string, string_t old, string_t new );
 
-#define STRSPLIT_EXCLUDE_EMPTY     0x01
-#define STRSPLIT_KEEP_DELIM_BEFORE 0x02
-#define STRSPLIT_KEEP_DELIM_AFTER  0x04
-#define STRSPLIT_STRIP_RESULTS     0x08 // Only for string_split() (not regex)
+
+#define STRSPLIT_EXCLUDE_EMPTY     ( 1 << 0 )
+#define STRSPLIT_KEEP_DELIM_BEFORE ( 1 << 1 )
+#define STRSPLIT_KEEP_DELIM_AFTER  ( 1 << 2 )
+
+/// Only for `string_split()` (not regex)
+#define STRSPLIT_STRIP_RESULTS ( 1 << 3 )
+
 
 /**
- * Flags for the string_split[_regex] functions
+ * Flags for the `string_split[_regex]` functions
  * @code
  * STRSPLIT_EXCLUDE_EMPTY       // = 0x01
  *      - resulting string array doesn't include empty strings ("")
@@ -236,8 +271,10 @@ UseResult str_t string_replaced( string_t, string_t old, string_t new );
 typedef unsigned int strsplit_mode_t;
 
 /**
- * Splits ‹str› at places matching ‹split_tok›<br>
- * Substring must match perfectly<br>
+ * Splits `str` at places matching `split_tok`
+ * <p>
+ * Substring must match perfectly
+ * </p>
  *
  * @param str_arr_cont  container for the string_array for the result; the resulting
  *                      string array is allocated in this function
@@ -245,16 +282,16 @@ typedef unsigned int strsplit_mode_t;
  * @param split_tok     boundary
  * @param mode          see strsplit_mode_t
  * @return number of strings in the result,
- *         (-1) on allocation fail,
- *         (-2) if split_tok is invalid
+ *         `RV_ERROR` on allocation fail,
+ *         `RV_EXCEPTION` if split_tok is invalid
  */
 ssize_t string_split( str_t **str_arr_cont,
                       string_t string,
                       string_t split_tok,
                       strsplit_mode_t mode );
 /**
- * Splits ‹str› at places matching ‹regex›<br>
- * Substring must match ‹regex›<br>
+ * Splits `str` at places matching `regex`<br>
+ * Substring must match `regex`<br>
  *
  * @param str_arr_cont  container for the string_array for the result; the resulting
  *                      string array is allocated in this function
@@ -262,16 +299,37 @@ ssize_t string_split( str_t **str_arr_cont,
  * @param regexp        boundary; compiled regex
  * @param mode          see strsplit_mode_t
  * @return number of strings in the result,
- *         RV_ERROR (-1) on allocation fail or regex error,
- *         RV_EXCEPTION (-2) if split_tok is invalid
+ *         `RV_ERROR` on allocation fail or regex error,
+ *         `RV_EXCEPTION` if a parameter is invalid
  */
 ssize_t string_split_regex( str_t **str_arr_cont,
                             string_t string,
                             const regex_t *__restrict regexp,
                             strsplit_mode_t mode );
 
-
+/**
+ * `free()`s all memory allocated by `string_split()` or `string_split_regex()`.
+ *
+ * Also sets str_arr to `NULL`
+ *
+ * @param size number of strings in `*str_arr_cont`
+ * @param str_arr_cont same variable as the one passed to `string_split()`
+ */
 void string_split_destroy( size_t size, str_t **str_arr_cont );
+
+
+/**
+ * Joins a string array into one long string.
+ *
+ * @param len length of `strarr`
+ * @param strarr array of string (not modified in this function)
+ * @param joiner string to be put between each member of `strarr`
+ * @return new heap-allocated string to be freed with `free(3)`
+ */
+UseResult str_t string_join( size_t len, const string_t strarr[ len ], string_t joiner );
+
+/// String array being passed to `string_join` may be typecast to this
+typedef const string_t *strjoin_strarr_t;
 
 
 /* ==== Mathematical stuff ==== */

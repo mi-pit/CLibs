@@ -9,7 +9,7 @@
 #include <string.h>
 
 
-void print_byte( const void *data, const size_t nbytes )
+void ITEM_PRINT_FUNCTION_NAME( byte )( const void *data, const size_t nbytes )
 {
     printf( "'" );
     for ( size_t i = 0; i < nbytes; ++i )
@@ -22,7 +22,7 @@ void print_byte( const void *data, const size_t nbytes )
     printf( "'" );
 }
 
-void print_bool( const void *data, const size_t nbytes )
+void ITEM_PRINT_FUNCTION_NAME( bool )( const void *data, const size_t nbytes )
 {
     if ( nbytes != sizeof( bool ) )
     {
@@ -33,22 +33,22 @@ void print_bool( const void *data, const size_t nbytes )
     printf( "%s", deref_as( bool, data ) ? "true" : "false" );
 }
 
-define_print_func( int, "%-d" );
+DEFINE_PRINT_FUNC( int, "%-d" )
 
-define_print_func( size_t, "%-zu" );
+DEFINE_PRINT_FUNC( size_t, "%-zu" )
 
-define_print_func( ssize_t, "%-zd" );
+DEFINE_PRINT_FUNC( ssize_t, "%-zd" )
 
-define_print_func( char, "'%c'" );
+DEFINE_PRINT_FUNC( char, "'%c'" )
 
-define_print_func( float, "%.2f" );
+DEFINE_PRINT_FUNC( float, "%.2f" )
 
-define_print_func( double, "%.4f" );
+DEFINE_PRINT_FUNC( double, "%.4f" )
 
-define_print_func( int8_t, "%3d" );
+DEFINE_PRINT_FUNC( int8_t, "%3d" )
 
 
-void print_pointer( const void *data, const size_t nbytes )
+void ITEM_PRINT_FUNCTION_NAME( pointer )( const void *data, const size_t nbytes )
 {
     if ( nbytes != sizeof( void * ) )
     {
@@ -56,10 +56,10 @@ void print_pointer( const void *data, const size_t nbytes )
         return;
     }
 
-    printf( "'pointer: \"%p\"'", *( void ** ) data );
+    printf( "\"%p\"", *( void ** ) data );
 }
 
-void print_string( const void *data, const size_t nbytes )
+void ITEM_PRINT_FUNCTION_NAME( string )( const void *data, const size_t nbytes )
 {
     if ( nbytes != strlen( data ) )
     {
@@ -69,24 +69,11 @@ void print_string( const void *data, const size_t nbytes )
     printf( "\"%s\"", deref_as( const char *, data ) );
 }
 
-void print_string_direct( const void *data, const size_t nbytes )
+void ITEM_PRINT_FUNCTION_NAME( string_direct )( const void *data, const size_t nbytes )
 {
     printf( "\"%.*s\"", ( int ) nbytes, ( const char * ) data );
 }
 
-
-#ifdef CLIBS_DYNAMIC_ARRAY_H
-void print_List( const void *data, size_t nbytes )
-{
-    if ( nbytes != sizeof( List ) )
-    {
-        printf( "%s: invalid data", __func__ );
-        return;
-    }
-    ConstList ls = *( List * ) data;
-    list_print( ls );
-}
-#endif //CLIBS_DYNAMIC_ARRAY_H
 
 #ifdef CLIBS_SETS_H
 void print_Set( const void *data, size_t nbytes )
