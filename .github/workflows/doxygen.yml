@@ -1,9 +1,9 @@
-name: Generate Doxygen Docs
+name: Generate and Deploy Doxygen Docs
 
 on:
   push:
-    branches:
-      - '**'
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   generate-docs:
@@ -13,16 +13,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Doxygen
-        run: sudo apt-get install doxygen -y
+      - name: Install Doxygen and Graphviz
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
       - name: Generate Doxygen docs
         run: doxygen Doxyfile
 
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./docs/html
           publish_branch: gh-pages
+          force_orphan: true
