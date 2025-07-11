@@ -1,4 +1,4 @@
-# File: .github/workflows/ci.yml
+# File: .github/workflows/c-tests.yml
 #
 # GitHub Actions CI for CLibs.
 # * Builds on Ubuntu & macOS
