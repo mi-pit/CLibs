@@ -6,7 +6,7 @@
 # * Enables sanitizers on Debug builds.
 # * Runs CTest to execute all registered tests.
 
-name: C/C++ CI
+name: Tests
 
 on:
   push:
@@ -27,10 +27,6 @@ jobs:
         compiler: [ gcc, clang ]
       fail-fast: false
 
-    env:
-      USE_SANITIZERS: true
-      COLLECT_COVERAGE: ${{ matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc' && github.event_name == 'push' }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,12 +34,12 @@ jobs:
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
         run: |
+          sudo apt-get update
+          sudo apt-get install cmake
           if [ "${{ matrix.compiler }}" == "gcc" ]; then
-            sudo apt-get update
-            sudo apt-get install -y build-essential cmake
+            sudo apt-get install -y build-essential
           else
-            sudo apt-get update
-            sudo apt-get install -y clang cmake
+            sudo apt-get install -y clang
           fi
           sudo apt-get install -y valgrind
 
