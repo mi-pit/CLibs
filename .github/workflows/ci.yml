@@ -1,10 +1,10 @@
 # File: .github/workflows/ci.yml
 #
-# GitHub Actions CI for the CLibs project.
-# • Builds on Ubuntu & macOS
-# • Tests with both GCC and Clang.
-# • Enables sanitizers on Debug builds.
-# • Runs CTest to execute all registered tests.
+# GitHub Actions CI for CLibs.
+# * Builds on Ubuntu & macOS
+# * Tests with both GCC and Clang.
+# * Enables sanitizers on Debug builds.
+# * Runs CTest to execute all registered tests.
 
 name: C/C++ CI
 
@@ -45,6 +45,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y clang cmake
           fi
+          sudo apt-get install -y valgrind
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
@@ -57,7 +58,7 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_SANITIZERS=$USE_SANITIZERS
+          cmake .. -DCMAKE_BUILD_TYPE=Debug
 
       - name: Build
         shell: bash
@@ -68,3 +69,17 @@ jobs:
         run: |
           cd build
           ctest --output-on-failure
+
+      - name: Check memory leaks (macOS)
+        shell: bash
+        if: runner.os == 'macOS'
+        run: |
+          cd build
+          leaks -quiet --atExit -- ./tests
+
+      - name: Check memory leaks (Linux)
+        shell: bash
+        if: runner.os == 'Linux'
+        run: |
+          cd build
+          valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./tests

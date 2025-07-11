@@ -27,7 +27,6 @@
 #include "../headers/extra_types.h"
 
 
-struct fifo_queue;
 typedef struct fifo_queue Queue;
 
 
@@ -98,19 +97,19 @@ size_t queue_get_size( const Queue * );
 /** seems self-explanatory */
 bool queue_is_empty( const Queue * );
 
-typedef struct {
-    const struct queue_node *const item;
-    void *const data;
-} QueueEnumeratedEntry;
 
 /**
+ * @cond INTERNAL
  * Iterator over queue.
- *
- * @return `QueueEnumeratedEntry`
  */
-QueueEnumeratedEntry queue_get_next( const Queue *,
-                                     const struct queue_node *prev,
-                                     bool get_first );
+const struct queue_node *queue__iterator_get_head( const Queue * );
+const struct queue_node *queue__iterator_get_next( const struct queue_node * );
+/** @endcond */
 
+
+// struct queue_node
+
+/** @return queue node data pointer */
+const void *queue_node_get_data( const struct queue_node * );
 
 #endif //CLIBS_QUEUE_H

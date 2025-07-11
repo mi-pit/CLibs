@@ -5,6 +5,7 @@
 #include "modules/test_array_sprintf.h"
 #include "modules/test_dict.h"
 #include "modules/test_dynstr.h"
+#include "modules/test_filenames.h"
 #include "modules/test_foreach.h"
 #include "modules/test_list.h"
 #include "modules/test_math.h"
@@ -32,6 +33,8 @@ int main( void )
     RUNALL_ARRAYPRINTF();
     RUNALL_FOREACH();
     RUNALL_SWEX();
+
+    RUNALL_FILENAMES();
 
     FINISH_TESTING();
 }

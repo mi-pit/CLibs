@@ -2,9 +2,10 @@
 
 ## Standard
 
-`C99`
-
-`_POSIX_C_SOURCE=200809L`
+| Standard | Version |
+|----------|---------|
+| STD C    | C99     |
+| POSIX    | 200809  |
 
 ---
 
@@ -19,7 +20,7 @@
 - Unit testing
 - Assertions with messages
 - Some mathematical functions
-- String utilities
+- String utility functions
 - Switch "expressions"
 - More...
 
@@ -29,17 +30,10 @@
 
 * `src/headers/` – (mostly) lightweight headers without the need for linking/…
 * `src/structs/` – advanced data structures
-* `src/*.[ch]` – useful algorithms
+* `src/*.[ch]` – miscellaneous useful algorithms
+
+* `tests/` – tests for the library
+
+* `docs/` – documentation [(also on GitHub Pages)](https://mi-pit.github.io/CLibs/)
 
 ---
-
----
-
-## Footnotes
-
-### Windows support
-
-I tried supporting non-posix, but there are just too many
-caveats and weird things for me to do it.
-
-*(like the `"%zu"` format string not working for `size_t` on a Windows compiler)*
