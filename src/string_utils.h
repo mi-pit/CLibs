@@ -25,7 +25,7 @@ typedef const char *string_t;
 typedef char *str_t;
 
 
-#if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
+#if __STDC_VERSION__ < 202311L
 #include <stdlib.h> /* malloc */
 
 #define strndup string_nduplicate
@@ -34,7 +34,7 @@ typedef char *str_t;
 /// `strndup` implementation (standard in POSIX and C23+)
 LibraryDefined UseResult str_t string_nduplicate( string_t s, size_t l )
 {
-    str_t n = malloc( l + 1 );
+    const str_t n = malloc( l + 1 );
     if ( n == NULL )
         return NULL;
 
@@ -46,8 +46,8 @@ LibraryDefined UseResult str_t string_nduplicate( string_t s, size_t l )
 /// `strdup` implementation (standard in POSIX and C23+)
 LibraryDefined UseResult str_t string_duplicate( string_t s )
 {
-    size_t l = strlen( s );
-    str_t n  = malloc( l + 1 );
+    const size_t l = strlen( s );
+    const str_t n  = malloc( l + 1 );
     if ( n == NULL )
         return NULL;
 
