@@ -380,7 +380,30 @@ int string_replace( const str_t string, const string_t old, const string_t new )
 }
 
 
-Private const strsplit_mode_t ALL_MODES = STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY
+bool string_equal(const string_t s1, const string_t s2, const streq_mode_t mode)
+{
+    const size_t s1_len = strlen( s1 );
+    const size_t s2_len = strlen( s2 );
+    if ( s1_len != s2_len )
+        return false;
+
+    if ( mode & STREQ_IGNORE_CASE )
+    {
+        for ( size_t i = 0; i < s1_len; ++i )
+            if ( tolower( s1[ i ] ) != tolower( s2[ i ] ) )
+                return false;
+
+        return true;
+    }
+
+    if ( mode & STREQ_IGNORE_WHITESPACE )
+        err( EXIT_FAILURE, "not implemented yet" );
+
+    return false;
+}
+
+
+Private const strsplit_mode_t ALL_SPLIT_MODES = STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY
                                           | STRSPLIT_KEEP_DELIM_AFTER
                                           | STRSPLIT_KEEP_DELIM_BEFORE;
 
@@ -416,13 +439,13 @@ ssize_t string_split( str_t **str_arr_cont,
     if ( string == NULL )
         return fwarnx_ret( RV_EXCEPTION, "string cannot be null" );
 
-    if ( mode & ~ALL_MODES ) // contains mode not in ALL_MODES
+    if ( mode & ~ALL_SPLIT_MODES ) // contains mode not in ALL_SPLIT_MODES
         return fwarnx_ret( RV_EXCEPTION,
                            "invalid mode: 0x%X, only valid options are 0x%X",
                            mode,
-                           ALL_MODES );
+                           ALL_SPLIT_MODES );
 
-    if ( strcmp( split_tok, "" ) == 0 )
+    if ( split_tok[0] == '\0' )
     {
         const ssize_t rv = string_split_empty( str_arr_cont, string );
         if ( rv == RV_ERROR )
@@ -466,7 +489,7 @@ ssize_t string_split( str_t **str_arr_cont,
              && string_is_blank_l( start, len ) )
             continue;
 
-        char *const dup = mode & STRSPLIT_STRIP_RESULTS ? string_stripped_l( start, len )
+        const str_t dup = mode & STRSPLIT_STRIP_RESULTS ? string_stripped_l( start, len )
                                                         : strndup( start, len );
         if ( dup == NULL )
         {
@@ -498,11 +521,11 @@ ssize_t string_split_regex( str_t **str_arr_cont,
     if ( regexp == NULL )
         return fwarnx_ret( RV_EXCEPTION, "regexp may not be NULL" );
 
-    if ( mode & ~ALL_MODES ) // contains mode not in ALL_MODES
+    if ( mode & ~ALL_SPLIT_MODES ) // contains mode not in ALL_SPLIT_MODES
         return fwarnx_ret( RV_EXCEPTION,
                            "invalid mode: 0x%X, only valid options are 0x%X",
                            mode,
-                           ALL_MODES );
+                           ALL_SPLIT_MODES );
 
     struct dynamic_array *ls = list_init_type( str_t );
     if ( ls == NULL )
