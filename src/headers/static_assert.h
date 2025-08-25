@@ -7,7 +7,7 @@
 #if __STDC_VERSION__ >= 201112L
 
 /// C11's static assert
-#define STATIC_ASSERT( cond, msg ) _Static_assert( cond, msg )
+#define STATIC_ASSERT( cond, msg ) _Static_assert( cond, msg );
 
 #elif HAS_ATTRIBUTE( constructor ) // BeforeMain
 
