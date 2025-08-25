@@ -10,6 +10,7 @@
 
 #include "headers/attributes.h" /* UseResult */
 
+#include <ctype.h>     /* is* (space, digit, ...) */
 #include <regex.h>     /* regex_t */
 #include <stdbool.h>   /* bool */
 #include <sys/types.h> /* ssize_t */
@@ -247,7 +248,11 @@ typedef unsigned int streq_mode_t;
 #define STREQ_IGNORE_WHITESPACE ( 1 << 1 )
 
 bool string_equal( string_t s1, string_t s2, streq_mode_t mode );
-bool string_equal_l( size_t len1, string_t s1, size_t len2, string_t s2, streq_mode_t mode );
+bool string_equal_l( size_t len1,
+                     string_t s1,
+                     size_t len2,
+                     string_t s2,
+                     streq_mode_t mode );
 
 
 /**
