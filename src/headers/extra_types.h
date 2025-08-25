@@ -6,9 +6,10 @@
 #define CLIBS_EXTRA_TYPES_H
 
 /* imports */
-#include <stdbool.h> /* bool, true/false */
-#include <stddef.h>  /* size_t, ptrdiff_t */
-#include <stdint.h>  /* int*_t */
+#include <stdbool.h>   /* bool, true/false */
+#include <stddef.h>    /* size_t, ptrdiff_t */
+#include <stdint.h>    /* int*_t */
+#include <sys/types.h> /* off_t, mode_t */
 
 typedef int8_t byte;
 
