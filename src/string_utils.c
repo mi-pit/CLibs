@@ -159,7 +159,13 @@ void string_collapse_backspaces( const str_t s )
     assert_that( new_idx <= str_len,
                  "new end index must not be further along than the original" );
 
+#ifdef STRING_COLLAPSE_BACKSPACE__SAFE
+    // delete all chars
+    for ( ; new_idx < str_len; ++new_idx )
+        s[ new_idx ] = '\0';
+#else
     s[ new_idx ] = '\0';
+#endif
 }
 
 str_t string_escaped( const string_t old )
