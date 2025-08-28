@@ -89,6 +89,7 @@ str_t string_stripped( const string_t s )
     return string_stripped_l( s, strlen( s ) );
 }
 
+// `string_stripped()` is implemented separately from `string_strip` for memory efficiency
 void string_strip( char *const s )
 {
     /*
@@ -132,6 +133,34 @@ void string_strip( char *const s )
     s[ new_str_len ] = '\0';
 }
 
+
+void string_collapse_backspaces( const str_t s )
+{
+    const size_t str_len = strlen( s );
+    size_t new_idx       = 0;
+    for ( size_t i = 0; i < str_len; ++i )
+    {
+        assert_that( new_idx <= i,
+                     "new-index (%zu) may only write behind where you're looking (%zu)",
+                     new_idx,
+                     i );
+
+        const char ch = s[ i ];
+
+        if ( ch == '\b' )
+        {
+            if ( new_idx > 0 )
+                --new_idx;
+        }
+        else
+            s[ new_idx++ ] = ch;
+    }
+
+    assert_that( new_idx <= str_len,
+                 "new end index must not be further along than the original" );
+
+    s[ new_idx ] = '\0';
+}
 
 str_t string_escaped( const string_t old )
 {
