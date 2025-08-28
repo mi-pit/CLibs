@@ -183,10 +183,10 @@ int list_insert( struct dynamic_array *, size_t index, const void *data );
  *
  * @param container pointer to valid space in memory
  * of at least `ls::el_size` bytes
- * @return
+ * @return :
  * - `RV_EXCEPTION` if List is empty
  * - `RV_ERROR` if malloc fails
- * - else RV_SUCCESS
+ * - else `RV_SUCCESS`
  */
 int list_pop( struct dynamic_array *, void *container );
 /**
