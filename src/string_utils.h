@@ -149,10 +149,24 @@ UseResult str_t string_stripped_l( string_t, size_t length );
 /**
  * Removes all whitespace from either end of the string.
  * This is done in place.
- *
- * `string_stripped()` is implemented separately from `string_strip` for memory efficiency
  */
 void string_strip( str_t );
+
+
+/**
+ * Collapses all occurrences of `substring` so that
+ * they don't repeat more than once at a time.
+ *
+ * @param string    string
+ * @param substring sub
+ */
+void string_collapse( str_t string, string_t substring );
+
+
+/**
+ * Modifies the string so that for each backspace, one previous char is removed.
+ */
+void string_collapse_backspaces( str_t );
 
 
 /// Charset of special characters that can be escaped
