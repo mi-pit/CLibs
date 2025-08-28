@@ -593,21 +593,41 @@ Private bool test_one_collapse_backspace( const string_t orig, const string_t re
 
 TEST( collapse_backspaces )
 {
+    // delete
     UNIT_TEST( test_one_collapse_backspace( "Hello,\b World!", "Hello World!" ) );
     UNIT_TEST( test_one_collapse_backspace( "Hello, World!\b\b\b\b\b\b", "Hello, " ) );
 
+    // start
     UNIT_TEST( test_one_collapse_backspace( "\bHello!", "Hello!" ) );
     UNIT_TEST( test_one_collapse_backspace( "\b\b", "" ) );
 
+    // delete all
     UNIT_TEST( test_one_collapse_backspace( "\n\t\b\b", "" ) );
     UNIT_TEST( test_one_collapse_backspace( "A\bH\bO\bJ\b\b", "" ) );
 
+    // nothing
     UNIT_TEST( test_one_collapse_backspace( "Hello!", "Hello!" ) );
     UNIT_TEST( test_one_collapse_backspace( "", "" ) );
 
+    // delete all, then write
     UNIT_TEST( test_one_collapse_backspace( "\bA", "A" ) );
+    UNIT_TEST( test_one_collapse_backspace( "A\bB\b\bC", "C" ) );
+
+    if ( CLIBS_UNIT_TESTS_failed_total == 0 )
+    {
+        const str_t esc = string_escaped( "Ahoj.\b" );
+        string_collapse_backspaces( esc );
+        UNIT_TEST( strcmp( esc, "Ahoj.\\b" ) == 0 );
+
+        const str_t unesc = string_unescaped( esc );
+        string_collapse_backspaces( unesc );
+        UNIT_TEST( strcmp( unesc, "Ahoj" ) == 0 );
+
+        free_all( 2, esc, unesc );
+    }
 }
 END_TEST
+
 
 LibraryDefined void RUNALL_STRING_UTILS( void )
 {
