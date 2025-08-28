@@ -581,6 +581,34 @@ TEST( strip )
 }
 END_TEST
 
+
+Private bool test_one_collapse_backspace( const string_t orig, const string_t result )
+{
+    const str_t s = strdup( orig );
+    string_collapse_backspaces( s );
+    const bool rv = strcmp( s, result ) == 0;
+    free( s );
+    return rv;
+}
+
+TEST( collapse_backspaces )
+{
+    UNIT_TEST( test_one_collapse_backspace( "Hello,\b World!", "Hello World!" ) );
+    UNIT_TEST( test_one_collapse_backspace( "Hello, World!\b\b\b\b\b\b", "Hello, " ) );
+
+    UNIT_TEST( test_one_collapse_backspace( "\bHello!", "Hello!" ) );
+    UNIT_TEST( test_one_collapse_backspace( "\b\b", "" ) );
+
+    UNIT_TEST( test_one_collapse_backspace( "\n\t\b\b", "" ) );
+    UNIT_TEST( test_one_collapse_backspace( "A\bH\bO\bJ\b\b", "" ) );
+
+    UNIT_TEST( test_one_collapse_backspace( "Hello!", "Hello!" ) );
+    UNIT_TEST( test_one_collapse_backspace( "", "" ) );
+
+    UNIT_TEST( test_one_collapse_backspace( "\bA", "A" ) );
+}
+END_TEST
+
 LibraryDefined void RUNALL_STRING_UTILS( void )
 {
     RUN_TEST( replace );
@@ -593,8 +621,8 @@ LibraryDefined void RUNALL_STRING_UTILS( void )
     RUN_TEST( string_as_UL );
     RUN_TEST( reverse_str );
     RUN_TEST( strip );
-
     RUN_TEST( join );
+    RUN_TEST( collapse_backspaces );
 }
 
 #endif
