@@ -25,7 +25,7 @@ typedef const char *string_t;
 typedef char *str_t;
 
 
-#if __STDC_VERSION__ < 202311L
+#if __STDC_VERSION__ < 202311L && !defined( _POSIX_C_SOURCE )
 #include <stdlib.h> /* malloc */
 
 #define strndup string_nduplicate
@@ -156,7 +156,7 @@ void string_strip( str_t );
 
 
 /// Charset of special characters that can be escaped
-#define ESCAPED_CHARS "\n\t\r\f\v\"\\"
+#define ESCAPED_CHARS "\n\t\r\f\v\"\'\\\b\a"
 
 /**
  * Escapes characters defined in `ESCAPED_CHARS`

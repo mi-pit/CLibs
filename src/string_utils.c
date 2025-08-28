@@ -33,6 +33,7 @@ bool string_is_blank_l( const string_t s, const size_t len )
 
     return true;
 }
+
 bool string_is_empty( const string_t s )
 {
     return *s == '\0';
@@ -63,23 +64,21 @@ str_t string_stripped_l( const string_t s, size_t length )
             break;
     }
 
-    if ( !( started && ended ) )
+    if ( !started || !ended )
     {
-        char *const new = malloc( 1 );
+        const str_t new = malloc( 1 );
         if ( new != NULL )
             new[ 0 ] = '\0';
         return new;
     }
 
     length          = end_idx - start_idx + 1;
-    char *const new = malloc( length + 1 );
+    const str_t new = malloc( length + 1 );
     if ( new == NULL )
         return ( void * ) fflwarn_ret( NULL, "malloc" );
 
     for ( size_t i = 0; i < length; ++i )
-    {
         new[ i ] = s[ i + start_idx ];
-    }
     new[ length ] = '\0';
 
     return new;
@@ -99,7 +98,7 @@ void string_strip( char *const s )
     "Hovno prdel.\nSračka."
     */
 
-    size_t str_len = strlen( s );
+    const size_t str_len = strlen( s );
 
     size_t start_idx = 0;
     size_t end_idx   = str_len - 1;
@@ -122,15 +121,15 @@ void string_strip( char *const s )
         if ( started && ended )
             break;
     }
-    if ( !( started && ended ) )
+    if ( !started || !ended )
     {
         s[ 0 ] = '\0';
         return;
     }
 
-    str_len = end_idx - start_idx + 1;
-    memmove( s, s + start_idx, str_len );
-    s[ str_len ] = '\0';
+    const size_t new_str_len = end_idx - start_idx + 1;
+    memmove( s, s + start_idx, new_str_len );
+    s[ new_str_len ] = '\0';
 }
 
 
@@ -141,17 +140,16 @@ str_t string_escaped( const string_t old )
 
     const size_t len = strlen( old );
 
-    char *const new = calloc( len * 2 + 1, 1 );
+    const str_t new = calloc( len * 2 + 1, 1 );
     if ( new == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
-    size_t new_idx = 0;
-    for ( size_t i = 0; i < len; ++i, ++new_idx )
+    for ( size_t old_idx = 0, new_idx = 0; old_idx < len; ++old_idx, ++new_idx )
     {
-        if ( strchr( ESCAPED_CHARS, old[ i ] ) )
+        if ( strchr( ESCAPED_CHARS, old[ old_idx ] ) )
             new[ new_idx++ ] = '\\';
 
-        switch ( old[ i ] )
+        switch ( old[ old_idx ] )
         {
             case '\n':
                 new[ new_idx ] = 'n';
@@ -168,9 +166,15 @@ str_t string_escaped( const string_t old )
             case '\v':
                 new[ new_idx ] = 'v';
                 break;
+            case '\b':
+                new[ new_idx ] = 'b';
+                break;
+            case '\a':
+                new[ new_idx ] = 'a';
+                break;
 
             default: // backslash, double-quote, ...?
-                new[ new_idx ] = old[ i ];
+                new[ new_idx ] = old[ old_idx ];
                 break;
         }
     }
@@ -186,21 +190,20 @@ str_t string_unescaped( const string_t old )
 
     const size_t len = strlen( old );
 
-    char *const new = calloc( len + 1, 1 );
+    const str_t new = calloc( len + 1, 1 );
     if ( new == NULL )
         return ( void * ) fwarn_ret( NULL, "calloc" );
 
-    size_t new_idx = 0;
-    for ( size_t i = 0; i < len; ++i, ++new_idx )
+    for ( size_t old_idx = 0, new_idx = 0; old_idx < len; ++old_idx, ++new_idx )
     {
-        const char old_c = old[ i ];
+        const char old_c = old[ old_idx ];
         if ( old_c != '\\' )
         {
-            new[ new_idx ] = old[ i ];
+            new[ new_idx ] = old[ old_idx ];
             continue;
         }
 
-        switch ( old[ ++i ] )
+        switch ( old[ ++old_idx ] )
         {
             case 'n':
                 new[ new_idx ] = '\n';
@@ -217,9 +220,15 @@ str_t string_unescaped( const string_t old )
             case 'v':
                 new[ new_idx ] = '\v';
                 break;
+            case 'b':
+                new[ new_idx ] = '\b';
+                break;
+            case 'a':
+                new[ new_idx ] = '\a';
+                break;
 
             default: // backslash, double-quote, ...?
-                new[ new_idx ] = old[ i ];
+                new[ new_idx ] = old[ old_idx ];
                 break;
         }
     }
@@ -380,7 +389,7 @@ int string_replace( const str_t string, const string_t old, const string_t new )
 }
 
 
-bool string_equal(const string_t s1, const string_t s2, const streq_mode_t mode)
+bool string_equal( const string_t s1, const string_t s2, const streq_mode_t mode )
 {
     const size_t s1_len = strlen( s1 );
     const size_t s2_len = strlen( s2 );
@@ -403,9 +412,9 @@ bool string_equal(const string_t s1, const string_t s2, const streq_mode_t mode)
 }
 
 
-Private const strsplit_mode_t ALL_SPLIT_MODES = STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY
-                                          | STRSPLIT_KEEP_DELIM_AFTER
-                                          | STRSPLIT_KEEP_DELIM_BEFORE;
+Private const strsplit_mode_t ALL_SPLIT_MODES =
+        STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY | STRSPLIT_KEEP_DELIM_AFTER
+        | STRSPLIT_KEEP_DELIM_BEFORE;
 
 Private ssize_t string_split_empty( str_t **str_arr_cont, const string_t string )
 {
@@ -445,7 +454,7 @@ ssize_t string_split( str_t **str_arr_cont,
                            mode,
                            ALL_SPLIT_MODES );
 
-    if ( split_tok[0] == '\0' )
+    if ( split_tok[ 0 ] == '\0' )
     {
         const ssize_t rv = string_split_empty( str_arr_cont, string );
         if ( rv == RV_ERROR )
@@ -497,7 +506,7 @@ ssize_t string_split( str_t **str_arr_cont,
             return fwarn_ret( RV_ERROR, "strdup" );
         }
 
-        on_fail( list_append( ls, &dup ) )
+        on_fail ( list_append( ls, &dup ) )
         {
             list_destroy( ls );
             return f_stack_trace( RV_ERROR );

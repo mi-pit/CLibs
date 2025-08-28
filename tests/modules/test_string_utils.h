@@ -176,7 +176,7 @@ Private bool test_one_strspl_regex( string_t haystack,
         exit( -1 );
     }
 
-    size_t n_got = ( size_t ) strspl_rv;
+    const size_t n_got = ( size_t ) strspl_rv;
 
     bool rv = n_got == n_split;
     if ( !rv )
@@ -189,8 +189,8 @@ Private bool test_one_strspl_regex( string_t haystack,
     va_start( vaList, n_split );
     for ( size_t i = 0; i < n_got && rv; ++i )
     {
-        string_t cmp = va_arg( vaList, string_t );
-        rv           = strcmp( spl[ i ], cmp ) == 0;
+        const string_t cmp = va_arg( vaList, string_t );
+        rv                 = strcmp( spl[ i ], cmp ) == 0;
     }
     va_end( vaList );
 
@@ -463,9 +463,9 @@ END_TEST
 typedef void( StringToUL )( str_t );
 Private bool test_one_string_to_UL( StringToUL func, string_t old, string_t new )
 {
-    str_t s = strdup( old );
+    const str_t s = strdup( old );
     func( s );
-    bool rv = strcmp( s, new ) == 0;
+    const bool rv = strcmp( s, new ) == 0;
     free( s );
     return rv;
 }
