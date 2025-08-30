@@ -7,6 +7,7 @@
 #include "headers/assert_that.h" /* assert_that */
 #include "headers/errors.h"      /* *warn* */
 #include "headers/foreach.h"     /* foreach_arr */
+#include "headers/misc.h"
 #include "headers/simple_math.h" /* min */
 #include "structs/dynarr.h"      /* List */
 #include "structs/dynstring.h"   /* dynstr */
@@ -131,6 +132,31 @@ void string_strip( char *const s )
     const size_t new_str_len = end_idx - start_idx + 1;
     memmove( s, s + start_idx, new_str_len );
     s[ new_str_len ] = '\0';
+}
+
+
+/* Horrible time complexity */
+void string_collapse( const str_t string, const string_t substring )
+{
+    const size_t string_len = strlen( string );
+    const size_t substr_len = strlen( substring );
+
+    if ( substr_len > string_len || substr_len == 0 )
+        return;
+
+    char *sub_occ = strstr( string, substring );
+    if ( sub_occ == NULL )
+        return;
+
+    for ( char *next; sub_occ != NULL; sub_occ = next )
+    {
+        next = strstr( sub_occ + substr_len, substring );
+        if ( next == sub_occ + substr_len )
+        {
+            memmove( sub_occ, sub_occ + substr_len, string_len - ( sub_occ - string ) );
+            next -= substr_len;
+        }
+    }
 }
 
 

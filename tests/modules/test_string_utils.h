@@ -629,6 +629,32 @@ TEST( collapse_backspaces )
 END_TEST
 
 
+static bool test_collapse( const string_t string, const string_t substr,
+                           const string_t result )
+{
+    static char array[ 1024 ] = { 0 };
+
+    strncpy( array, string, strlen( string ) + 1 );
+    string_collapse( array, substr );
+    return strcmp( array, result ) == 0;
+}
+
+TEST( collapse )
+{
+    UNIT_TEST( test_collapse( "Collapse", "", "Collapse" ) );
+    UNIT_TEST( test_collapse( "Collapse", "ll", "Collapse" ) );
+    UNIT_TEST( test_collapse( "Collllapse", "ll", "Collapse" ) );
+    UNIT_TEST( test_collapse( "Collapse", "lll", "Collapse" ) );
+    UNIT_TEST( test_collapse( "Colllapse", "l", "Colapse" ) );
+    UNIT_TEST( test_collapse( "", ".", "" ) );
+    UNIT_TEST( test_collapse( "AAAAAAAAAAAAAAAAAbc", "A", "Abc" ) );
+    UNIT_TEST( test_collapse(
+            "Hello, World!\n\n\nThis is a strangely formatted string!\n\n\n\n", "\n",
+            "Hello, World!\nThis is a strangely formatted string!\n" ) );
+}
+END_TEST
+
+
 LibraryDefined void RUNALL_STRING_UTILS( void )
 {
     RUN_TEST( replace );
@@ -643,6 +669,7 @@ LibraryDefined void RUNALL_STRING_UTILS( void )
     RUN_TEST( strip );
     RUN_TEST( join );
     RUN_TEST( collapse_backspaces );
+    RUN_TEST( collapse );
 }
 
 #endif
