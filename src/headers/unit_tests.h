@@ -49,7 +49,7 @@ static const size_t TESTS_LINE_WIDTH = LINE_PREF_WIDTH;
 
 
 /// To avoid namespace collisions
-#define TEST_NAME_CREATOR( TOK ) CLIBS_UNIT_TESTS_## TOK
+#define TEST_NAME_CREATOR( TOK ) CLIBS_UNIT_TESTS_##TOK
 
 
 static int TEST_NAME_CREATOR( TOTAL_FAILED ) = 0;
@@ -73,13 +73,16 @@ static bool TEST_NAME_CREATOR( YAP ) = true;
  *
  * @param HANDLE handle of the test case -- must be unique
  */
-#define TEST( HANDLE )                                          \
-    int TEST_NAME_CREATOR( HANDLE )( void )                     \
-    {                                                           \
-        int TEST_NAME_CREATOR( failed_total )        = 0;       \
-        int TEST_NAME_CREATOR( ran_total )           = 0;       \
-        const char *TEST_NAME_CREATOR( test_handle ) = #HANDLE; \
-        printf( COLOR_TEST_TAG "[TEST]" COLOR_DEFAULT " " #HANDLE "\n" );
+#define TEST( HANDLE )                                                     \
+    int TEST_NAME_CREATOR( HANDLE )( void )                                \
+    {                                                                      \
+        int TEST_NAME_CREATOR( failed_total )        = 0;                  \
+        int TEST_NAME_CREATOR( ran_total )           = 0;                  \
+        const char *TEST_NAME_CREATOR( test_handle ) = #HANDLE;            \
+        printf( COLOR_TEST_TAG "[TEST ... " COLOR_NOTE "%s" COLOR_TEST_TAG \
+                               "]" COLOR_DEFAULT " %s\n",                  \
+                __FILE_NAME__,                                             \
+                #HANDLE );
 #else
 #define TEST( HANDLE )                                    \
     int TEST_NAME_CREATOR( HANDLE )( void )               \
@@ -95,13 +98,15 @@ static bool TEST_NAME_CREATOR( YAP ) = true;
  * Prints a summary of the test case and returns if it failed.
  */
 #define END_TEST                                                                    \
-    printf( COLOR_TEST_TAG "[TEST]" COLOR_DEFAULT " %s: ran %i tests, " PRINT_COLOR \
-                           "%i successful" COLOR_DEFAULT ", " PRINT_COLOR           \
-                           "%i failed" COLOR_DEFAULT "\n",                          \
+    printf( COLOR_TEST_TAG COLOR_TEST_TAG                                           \
+            "[TEST ... " COLOR_NOTE "%s" COLOR_TEST_TAG "]" COLOR_DEFAULT           \
+            " %s: ran %i tests, " PRINT_COLOR "%i successful" COLOR_DEFAULT         \
+            ", " PRINT_COLOR "%i failed" COLOR_DEFAULT "\n",                        \
+            __FILE_NAME__,                                                          \
             TEST_NAME_CREATOR( test_handle ),                                       \
             TEST_NAME_CREATOR( ran_total ),                                         \
             TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ) == 0 \
-                    ? COLOR_FAIL                                                    \
+                    ? COLOR_FAIL /* if any fail -> COLOR_FAIL */                    \
                     : COLOR_SUCC,                                                   \
             TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ),     \
             TEST_NAME_CREATOR( failed_total ) == 0 ? COLOR_SUCC : COLOR_FAIL,       \
