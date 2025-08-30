@@ -137,13 +137,27 @@ void string_strip( char *const s )
 
 /* Should be linear time complexity.
  * I actually tried to optimize this one. */
-void string_collapse( const str_t string, const string_t substring )
+void string_collapse( char *const __restrict string, const char *__restrict substring )
 {
-    size_t match_len        = 0;     /* length of match between string and substr */
-    size_t new_idx          = 0;     /* index for writing to string */
-    bool should_remove_next = false; /* at least one occurrence immediately precedes */
+    const char *fst = strstr( string, substring );
+    if ( fst == NULL )
+        return;
 
-    for ( size_t old_idx = 0; string[ old_idx ] != '\0';
+    const size_t fst_idx = fst - string;
+
+    /* length of match between string and substr */
+    size_t match_len = 0;
+
+    /* index for writing to string */
+    size_t new_idx = fst_idx + strlen( substring );
+    size_t old_idx = new_idx;
+    // start search after first substr occurrence
+
+    /* at least one occurrence immediately precedes */
+    bool should_remove_next = true;
+    // true because fst != NULL
+
+    for ( ; string[ old_idx ] != '\0';
           string[ ++new_idx ] =
                   string[ ++old_idx ] /* always copy chars to where they should be */ )
     {
