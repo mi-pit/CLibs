@@ -135,35 +135,47 @@ void string_strip( char *const s )
 }
 
 
-/* Horrible time complexity */
+/* Should be linear time complexity.
+ * I actually tried to optimize this one. */
 void string_collapse( const str_t string, const string_t substring )
 {
-    const size_t string_len = strlen( string );
-    const size_t substr_len = strlen( substring );
+    size_t match_len        = 0;     /* length of match between string and substr */
+    size_t new_idx          = 0;     /* index for writing to string */
+    bool should_remove_next = false; /* at least one occurrence immediately precedes */
 
-    if ( substr_len > string_len || substr_len == 0 )
-        return;
-
-    char *sub_occ = strstr( string, substring );
-    if ( sub_occ == NULL )
-        return;
-
-    for ( char *next; sub_occ != NULL; sub_occ = next )
+    for ( size_t old_idx = 0; string[ old_idx ] != '\0';
+          string[ ++new_idx ] =
+                  string[ ++old_idx ] /* always copy chars to where they should be */ )
     {
-        next = strstr( sub_occ + substr_len, substring );
-        if ( next == sub_occ + substr_len )
+        if ( string[ old_idx ] != substring[ match_len ] )
         {
-            memmove( sub_occ, sub_occ + substr_len, string_len - ( sub_occ - string ) );
-            next -= substr_len;
+            match_len          = 0;
+            should_remove_next = false;
+            continue;
         }
+
+        ++match_len;
+        if ( substring[ match_len ] != '\0' )
+            // if not the end of substr, do nothing
+            continue;
+
+        if ( should_remove_next )
+            new_idx -= match_len;
+        else
+            should_remove_next = true;
+
+        match_len = 0; // current substr occurrence ends
     }
+
+    string[ new_idx ] = '\0';
 }
 
 
 void string_collapse_backspaces( const str_t s )
 {
     const size_t str_len = strlen( s );
-    size_t new_idx       = 0;
+
+    size_t new_idx = 0;
     for ( size_t i = 0; i < str_len; ++i )
     {
         assert_that( new_idx <= i,
@@ -173,13 +185,10 @@ void string_collapse_backspaces( const str_t s )
 
         const char ch = s[ i ];
 
-        if ( ch == '\b' )
-        {
-            if ( new_idx > 0 )
-                --new_idx;
-        }
-        else
+        if ( ch != '\b' )
             s[ new_idx++ ] = ch;
+        else if ( new_idx > 0 )
+            --new_idx;
     }
 
     assert_that( new_idx <= str_len,
