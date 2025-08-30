@@ -5,6 +5,7 @@
 #define TEST_STRING_UTILS_H
 
 #include "../../src/headers/assert_that.h"
+#include "../../src/headers/pointer_utils.h"
 #include "../../src/headers/unit_tests.h"
 #include "../../src/string_utils.h"
 
@@ -36,11 +37,11 @@ TEST( replace )
 END_TEST
 
 
-Private bool test_one_replace( string_t orig, string_t old, string_t new,
-                               string_t expected )
+Private bool test_one_replace( const string_t orig, const string_t old,
+                               const string_t new, const string_t expected )
 {
-    str_t got = string_replaced( orig, old, new );
-    bool rv   = strcmp( got, expected ) == 0;
+    const str_t got = string_replaced( orig, old, new );
+    const bool rv   = strcmp( got, expected ) == 0;
     free( got );
 
     return rv;
@@ -78,10 +79,10 @@ TEST( replaced )
 END_TEST
 
 
-Private bool test_one_escape( string_t old, string_t new )
+Private bool test_one_escape( const string_t old, const string_t new )
 {
-    str_t esc = string_escaped( old );
-    bool rv   = strcmp( esc, new ) == 0;
+    const str_t esc = string_escaped( old );
+    const bool rv   = strcmp( esc, new ) == 0;
     free( esc );
     return rv;
 }
@@ -100,10 +101,10 @@ TEST( escape )
 END_TEST
 
 
-Private bool test_one_unescape( string_t old, string_t new )
+Private bool test_one_unescape( const string_t old, const string_t new )
 {
-    str_t esc = string_unescaped( old );
-    bool rv   = strcmp( esc, new ) == 0;
+    const str_t esc = string_unescaped( old );
+    const bool rv   = strcmp( esc, new ) == 0;
     free( esc );
     return rv;
 }
@@ -120,10 +121,10 @@ TEST( unescape )
 END_TEST
 
 
-Private bool test_one_strspl_str( string_t haystack,
-                                  string_t split_tok,
-                                  strsplit_mode_t mode,
-                                  size_t n_split,
+Private bool test_one_strspl_str( const string_t haystack,
+                                  const string_t split_tok,
+                                  const strsplit_mode_t mode,
+                                  const size_t n_split,
                                   ... )
 {
     str_t *spl;
@@ -152,15 +153,15 @@ Private bool test_one_strspl_str( string_t haystack,
     string_split_destroy( n_got, &spl );
     return rv;
 }
-Private bool test_one_strspl_regex( string_t haystack,
-                                    string_t regex_str,
-                                    int regex_flags,
-                                    strsplit_mode_t mode,
-                                    size_t n_split,
+Private bool test_one_strspl_regex( const string_t haystack,
+                                    const string_t regex_str,
+                                    const int regex_flags,
+                                    const strsplit_mode_t mode,
+                                    const size_t n_split,
                                     ... )
 {
     regex_t reg;
-    int recomp_rv = regcomp( &reg, regex_str, regex_flags );
+    const int recomp_rv = regcomp( &reg, regex_str, regex_flags );
     if ( recomp_rv == -1 )
     {
         char buff[ 128 ];
@@ -169,7 +170,7 @@ Private bool test_one_strspl_regex( string_t haystack,
     }
 
     str_t *spl;
-    ssize_t strspl_rv = string_split_regex( &spl, haystack, &reg, mode );
+    const ssize_t strspl_rv = string_split_regex( &spl, haystack, &reg, mode );
     if ( strspl_rv < 0 )
     {
         ffl_stack_trace( 0 );
@@ -460,8 +461,9 @@ TEST( join )
 END_TEST
 
 
-typedef void( StringToUL )( str_t );
-Private bool test_one_string_to_UL( StringToUL func, string_t old, string_t new )
+typedef void ( *StringToUL )( str_t );
+Private bool test_one_string_to_UL( const StringToUL func, const string_t old,
+                                    const string_t new )
 {
     const str_t s = strdup( old );
     func( s );
@@ -490,11 +492,12 @@ TEST( string_to_UL )
 }
 END_TEST
 
-typedef str_t( StringAsUL )( string_t );
-Private bool test_one_string_as_UL( StringAsUL func, string_t old, string_t res )
+typedef str_t ( *StringAsUL )( string_t );
+Private bool test_one_string_as_UL( const StringAsUL func, const string_t old,
+                                    const string_t res )
 {
-    str_t got = func( old );
-    bool rv   = strcmp( got, res ) == 0;
+    const str_t got = func( old );
+    const bool rv   = strcmp( got, res ) == 0;
     free( got );
     return rv;
 }
@@ -520,7 +523,7 @@ TEST( string_as_UL )
 END_TEST
 
 
-Private bool test_one_reverse_str( string_t orig, string_t result )
+Private bool test_one_reverse_str( const string_t orig, const string_t result )
 {
     str_t rev = strdup( orig );
     string_reverse( rev );
@@ -551,7 +554,7 @@ TEST( reverse_str )
 END_TEST
 
 
-Private bool test_one_strip( string_t orig, string_t desired )
+Private bool test_one_strip( const string_t orig, const string_t desired )
 {
     str_t s = strdup( orig );
     assert_that( s != NULL, "strdup" );
