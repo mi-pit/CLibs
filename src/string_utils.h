@@ -16,7 +16,8 @@
 #include <sys/types.h> /* ssize_t */
 
 /* include for user */
-#include <string.h>
+#include <ctype.h>  /* is* */
+#include <string.h> /* str* */
 
 
 /// Immutable string
@@ -26,13 +27,18 @@ typedef char *str_t;
 
 
 #if __STDC_VERSION__ < 202311L && !defined( _POSIX_C_SOURCE )
+/*
+ * Define
+ * strdup && strndup
+ */
+
 #include <stdlib.h> /* malloc */
 
-#define strndup string_nduplicate
+#define strndup string_duplicate_l
 #define strdup  string_duplicate
 
 /// `strndup` implementation (standard in POSIX and C23+)
-LibraryDefined UseResult str_t string_nduplicate( string_t s, size_t l )
+LibraryDefined UseResult str_t string_duplicate_l( string_t s, size_t l )
 {
     const str_t n = malloc( l + 1 );
     if ( n == NULL )
@@ -57,8 +63,14 @@ LibraryDefined UseResult str_t string_duplicate( string_t s )
 }
 #endif // ndef strdup
 
-#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) \
-        || defined( _POSIX_C_SOURCE ) // non-standard
+#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) || defined( _POSIX_C_SOURCE )
+// non-standard
+
+/*
+ * Define
+ * asprintf && vasprintf
+ */
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -125,7 +137,7 @@ bool string_is_blank_l( string_t, size_t len );
  * Evaluates to true if string contains no characters
  *
  * @param s string
- * @return true if string is empty -- `""`
+ * @return true if string is empty (`""`)
  */
 bool string_is_empty( string_t s );
 
@@ -188,7 +200,7 @@ void string_collapse_backspaces( str_t );
  * @code
  * "Hello, "World"!
  * "
- * "Hello,\"World\"!\n"
+ * "Hello, \"World\"!\n"
  * @endcode
  * </p>
  * @return New escaped string. Pointer should be freed with `free(3)`.
