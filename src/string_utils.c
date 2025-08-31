@@ -839,11 +839,6 @@ Private int hex_char_to_int( const char hex )
     return -1; // Invalid hex character
 }
 
-Private bool issign( const char c )
-{
-    return c == '-' || c == '+';
-}
-
 
 char *hex_to_decimal( const char *hex )
 {
@@ -860,9 +855,8 @@ char *hex_to_decimal( const char *hex )
 
         const int digit = hex_char_to_int( hex[ i ] );
         assert_that( digit >= 0,
-                     "invalid input string: '%s' (offending digit: '%c')",
-                     hex,
-                     hex[ i ] );
+                     "invalid input string: '%s' (offending digit: '%c' at index %zu)",
+                     hex, hex[ i ], i );
 
         unsigned long carry = digit;
         for ( ssize_t j = ( ssize_t ) dynstr_len( dynstr ) - 1; j >= 0; --j )

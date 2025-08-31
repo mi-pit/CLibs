@@ -20,6 +20,12 @@
 #include <string.h> /* str* */
 
 
+LibraryDefined inline int issign( const int c )
+{
+    return c == '-' || c == '+';
+}
+
+
 /// Immutable string
 typedef const char *string_t;
 /// Mutable string
