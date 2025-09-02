@@ -76,7 +76,7 @@ str_t string_stripped_l( const string_t s, size_t length )
     length          = end_idx - start_idx + 1;
     const str_t new = malloc( length + 1 );
     if ( new == NULL )
-        return ( void * ) fflwarn_ret( NULL, "malloc" );
+        return fflwarn_ret( NULL, "malloc" );
 
     for ( size_t i = 0; i < length; ++i )
         new[ i ] = s[ i + start_idx ];
@@ -223,13 +223,13 @@ void string_collapse_backspaces( const str_t s )
 str_t string_escaped( const string_t old )
 {
     if ( old == NULL )
-        return ( void * ) fwarnx_ret( NULL, "string must not be null" );
+        return fwarnx_ret( NULL, "string must not be null" );
 
     const size_t len = strlen( old );
 
     const str_t new = calloc( len * 2 + 1, 1 );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
 
     for ( size_t old_idx = 0, new_idx = 0; old_idx < len; ++old_idx, ++new_idx )
     {
@@ -273,13 +273,13 @@ str_t string_escaped( const string_t old )
 str_t string_unescaped( const string_t old )
 {
     if ( old == NULL )
-        return ( void * ) fwarnx_ret( NULL, "string must not be null" );
+        return fwarnx_ret( NULL, "string must not be null" );
 
     const size_t len = strlen( old );
 
     const str_t new = calloc( len + 1, 1 );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
 
     for ( size_t old_idx = 0, new_idx = 0; old_idx < len; ++old_idx, ++new_idx )
     {
@@ -328,7 +328,7 @@ str_t string_reversed( const string_t s )
 {
     char *const new = strdup( s );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "strdup" );
+        return fwarn_ret( NULL, "strdup" );
 
     string_reverse( new );
     return new;
@@ -365,7 +365,7 @@ str_t string_as_upper( const string_t old )
 
     char *const new = malloc( len + 1 );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "malloc" );
+        return fwarn_ret( NULL, "malloc" );
 
     new[ len ] = '\0';
 
@@ -381,14 +381,9 @@ str_t string_as_upper( const string_t old )
 
 void string_to_lower( char *const str )
 {
-    size_t idx = 0;
-    while ( str[ idx ] != '\0' )
-    {
+    for ( size_t idx = 0; str[ idx ] != '\0'; ++idx )
         if ( isupper( str[ idx ] ) )
             str[ idx ] += 0x20;
-
-        ++idx;
-    }
 }
 
 str_t string_as_lower( const string_t old )
@@ -397,7 +392,7 @@ str_t string_as_lower( const string_t old )
 
     char *const new = malloc( len + 1 );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "malloc" );
+        return fwarn_ret( NULL, "malloc" );
 
     new[ len ] = '\0';
 
@@ -415,7 +410,7 @@ str_t string_as_lower( const string_t old )
 str_t string_replaced( string_t const str, const string_t old, const string_t new )
 {
     if ( *old == '\0' )
-        return ( void * ) fwarnx_ret( NULL, "cannot replace \"%s\"", old );
+        return fwarnx_ret( NULL, "cannot replace \"%s\"", old );
 
     const char *curr              = str;
     struct dynamic_string *result = dynstr_init();
@@ -441,13 +436,13 @@ str_t string_replaced( string_t const str, const string_t old, const string_t ne
     dynstr_destroy( result );
 
     if ( ret == NULL )
-        return ( void * ) f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     return ret;
 
 ERROR:
     dynstr_destroy( result );
-    return ( void * ) f_stack_trace( NULL );
+    return f_stack_trace( NULL );
 }
 
 int string_replace( const str_t string, const string_t old, const string_t new )
@@ -702,26 +697,26 @@ void string_split_destroy( const size_t size, str_t **str_arr_cont )
 str_t string_join( const size_t len, const string_t strarr[ len ], const string_t joiner )
 {
     if ( strarr == NULL )
-        return ( void * ) fwarnx_ret( NULL, "strarr must not be NULL" );
+        return fwarnx_ret( NULL, "strarr must not be NULL" );
     if ( joiner == NULL )
-        return ( void * ) fwarnx_ret( NULL, "joiner must not be NULL" );
+        return fwarnx_ret( NULL, "joiner must not be NULL" );
 
     if ( len == 0 )
         return calloc( 1, 1 ); // empty string
 
     DynString *builder = dynstr_init();
     if ( builder == NULL )
-        return ( void * ) f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     const size_t joiner_len = strlen( joiner );
     foreach_arr ( const string_t, string, strarr, len )
     {
         if ( dynstr_append( builder, string ) < 0 )
-            return ( void * ) f_stack_trace( NULL );
+            return f_stack_trace( NULL );
 
         if ( foreach_index_string < len - 1 )
             if ( dynstr_appendn( builder, joiner, joiner_len ) != ( ssize_t ) joiner_len )
-                return ( void * ) f_stack_trace( NULL );
+                return f_stack_trace( NULL );
     }
 
     const str_t data_copy = dynstr_data_copy( builder );
@@ -730,6 +725,8 @@ str_t string_join( const size_t len, const string_t strarr[ len ], const string_
     return data_copy;
 }
 
+
+// ==== //// ==== //// ==== //// ==== //
 
 str_t mul_uint_strings( const string_t str_1, const string_t str_2 )
 {
@@ -741,7 +738,7 @@ str_t mul_uint_strings( const string_t str_1, const string_t str_2 )
 
     char *result = malloc( result_len + 1 );
     if ( result == NULL )
-        return ( void * ) fwarn_ret( NULL, "malloc" );
+        return fwarn_ret( NULL, "malloc" );
     memset( result, '0', result_len );
     result[ result_len ] = '\0';
 
@@ -776,7 +773,7 @@ str_t add_uint_strings( const string_t str_1, const string_t str_2 )
 
     struct dynamic_string *result = dynstr_init();
     if ( result == NULL )
-        return ( void * ) f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     const size_t str_1_len = strlen( str_1 );
     const size_t str_2_len = strlen( str_2 );
@@ -806,7 +803,7 @@ str_t add_uint_strings( const string_t str_1, const string_t str_2 )
 
 ERROR:
     dynstr_destroy( result );
-    return ( void * ) f_stack_trace( NULL );
+    return f_stack_trace( NULL );
 }
 
 
@@ -887,5 +884,5 @@ char *hex_to_decimal( const char *hex )
 ERROR:
     if ( dynstr != NULL )
         dynstr_destroy( dynstr );
-    return ( void * ) f_stack_trace( NULL );
+    return f_stack_trace( NULL );
 }

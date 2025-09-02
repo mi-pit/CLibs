@@ -44,13 +44,13 @@ List *list_init_cap_size( const size_t el_size, const size_t init_cap )
 {
     struct dynamic_array *ls = calloc( 1, sizeof( struct dynamic_array ) );
     if ( ls == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
 
     ls->items = calloc( init_cap, el_size );
     if ( ls->items == NULL )
     {
         free( ls );
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
     }
     ls->capacity = LIST_DEF_CAP;
     ls->el_size  = el_size;
@@ -71,7 +71,7 @@ List *list_init_size( const size_t el_size )
 const void *list_see( const struct dynamic_array *ls, const size_t idx )
 {
     if ( idx >= ls->size )
-        return ( void * ) fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
+        return fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
 
     return list_at_non_safe( ls, idx );
 }
@@ -79,26 +79,25 @@ const void *list_see( const struct dynamic_array *ls, const size_t idx )
 const void *list_peek( const struct dynamic_array *ls )
 {
     if ( ls->size == 0 )
-        return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
+        return fwarnx_ret( NULL, ListEmptyExceptionString );
 
     return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
 
 
 /* Mutable */
-void *list_at( struct dynamic_array *ls, const size_t idx )
+void *list_at( List *ls, const size_t idx )
 {
     if ( idx >= ls->size )
-        return ( void * ) fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
+        return fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
 
     return list_at_non_safe( ls, idx );
 }
 
-typedef List *LSP;
-void *list_at_last( const LSP ls )
+void *list_at_last( List *const ls )
 {
     if ( ls->size == 0 )
-        return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
+        return fwarnx_ret( NULL, ListEmptyExceptionString );
 
     return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
@@ -367,7 +366,7 @@ struct dynamic_array *list_reversed( const struct dynamic_array *ls )
 {
     struct dynamic_array *rev = list_init_size( ls->el_size );
     if ( rev == NULL )
-        return ( void * ) f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     for ( size_t i = 0; i < ls->size; ++i )
     {
@@ -381,7 +380,7 @@ struct dynamic_array *list_reversed( const struct dynamic_array *ls )
         if ( list_append( rev, datap ) != RV_SUCCESS )
         {
             list_destroy( rev );
-            return ( void * ) f_stack_trace( NULL );
+            return f_stack_trace( NULL );
         }
     }
 
@@ -476,7 +475,7 @@ void *list_items_copy( const struct dynamic_array *ls )
 {
     void *copy = calloc( ls->size, ls->el_size );
     if ( copy == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
 
     memcpy( copy, ls->items, ls->size * ls->el_size );
     return copy;

@@ -66,13 +66,13 @@ struct dictionary *dict_init( void )
 {
     struct dictionary *dict = calloc( 1, sizeof( struct dictionary ) );
     if ( dict == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
 
     dict->items = calloc( DICT_DEF_CAP, sizeof( struct key_value_pair ) );
     if ( dict->items == NULL )
     {
         free( dict );
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
     }
 
     dict->capacity = DICT_DEF_CAP;

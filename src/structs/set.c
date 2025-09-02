@@ -109,12 +109,12 @@ Set *set_init_cap( const size_t capacity )
 {
     Set *new_set = calloc( 1, sizeof( Set ) );
     if ( new_set == NULL )
-        return ( void * ) fflwarn_ret( NULL, "calloc" );
+        return fflwarn_ret( NULL, "calloc" );
 
     if ( ( new_set->items = calloc( capacity, sizeof( struct set_item ) ) ) == NULL )
     {
         free( new_set );
-        return ( void * ) fflwarn_ret( NULL, "calloc" );
+        return fflwarn_ret( NULL, "calloc" );
     }
 
     new_set->capacity = capacity;
