@@ -187,10 +187,12 @@ void string_collapse( char *const __restrict string, const char *__restrict subs
 
 void string_collapse_backspaces( const str_t s )
 {
-    const size_t str_len = strlen( s );
+    const char *backspace = strchr( s, '\b' );
+    if ( backspace == NULL )
+        return;
 
-    size_t new_idx = 0;
-    for ( size_t i = 0; i < str_len; ++i )
+    size_t new_idx = backspace - s;
+    for ( size_t i = new_idx; s[ i ] != '\0'; ++i )
     {
         assert_that( new_idx <= i,
                      "new-index (%zu) may only write behind where you're looking (%zu)",
@@ -205,13 +207,14 @@ void string_collapse_backspaces( const str_t s )
             --new_idx;
     }
 
-    assert_that( new_idx <= str_len,
-                 "new end index must not be further along than the original" );
+    assert_that( new_idx <= strlen( s ),
+                 "new end index (%zu) must not be further along than the original (%zu)",
+                 new_idx, strlen( s ) );
 
-#ifdef STRING_COLLAPSE_BACKSPACE__SAFE
+#if defined( STRING_COLLAPSE_BACKSPACE__SAFE )
     // delete all chars
-    for ( ; new_idx < str_len; ++new_idx )
-        s[ new_idx ] = '\0';
+    while ( s[ new_idx ] != '\0' )
+        s[ new_idx++ ] = '\0';
 #else
     s[ new_idx ] = '\0';
 #endif
