@@ -65,7 +65,7 @@
 
 #else
 
-#define assert_that( EXPRESSION, ... )
+#define assert_that( EXPRESSION, ... ) ( ( void ) 0 )
 
 #endif //NDEBUG
 
