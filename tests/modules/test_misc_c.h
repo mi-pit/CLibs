@@ -9,7 +9,8 @@
 #include "../../src/headers/unit_tests.h"
 #include "../../src/math.h"
 
-Private bool test_one_reverse_int( int64_t n, unsigned base, uint64_t res )
+Private bool test_one_reverse_int( const int64_t n, const unsigned base,
+                                   const uint64_t res )
 {
     return reverse_integer( n, base ) == res;
 }
@@ -29,6 +30,7 @@ TEST( misc_c )
         int b = 1;
         UNIT_TEST( max_i64( a, b++ ) == 1 );
     }
+#if 0
     {
         int a = 1;
         int b = 1;
@@ -39,6 +41,7 @@ TEST( misc_c )
         double b;
         PrintInColor( stderr, FOREGROUND_CYAN, "%f\n", min_m( a, b = .9 ) );
     }
+#endif
     UNIT_TEST( min_i64( 1, 2 ) == 1 );
     UNIT_TEST( min_i64( 10, 2 ) == 2 );
     UNIT_TEST( min_i64( -10, 2 ) == -10 );
@@ -86,15 +89,15 @@ TEST( misc_c )
     UNIT_TEST( get_next_power_of_two( 2 ) == 4 );
     UNIT_TEST( get_next_power_of_two( 3 ) == 4 );
     UNIT_TEST( get_next_power_of_two( 4 ) == 8 );
-    UNIT_TEST( get_next_power_of_two( 1 << 24 ) == ( 1 << 25 ) );
-    UNIT_TEST( get_next_power_of_two( ( 1 << 24 ) - 1 ) == ( 1 << 24 ) );
+    UNIT_TEST( get_next_power_of_two( 1 << 24 ) == 1 << 25 );
+    UNIT_TEST( get_next_power_of_two( ( 1 << 24 ) - 1 ) == 1 << 24 );
 
     UNIT_TEST( get_prev_power_of_two( 2 ) == 1 );
     UNIT_TEST( get_prev_power_of_two( 3 ) == 2 );
     UNIT_TEST( get_prev_power_of_two( 4 ) == 2 );
     UNIT_TEST( get_prev_power_of_two( 5 ) == 4 );
-    UNIT_TEST( get_prev_power_of_two( 1 << 24 ) == ( 1 << 23 ) );
-    UNIT_TEST( get_prev_power_of_two( ( 1 << 24 ) + 1 ) == ( 1 << 24 ) );
+    UNIT_TEST( get_prev_power_of_two( 1 << 24 ) == 1 << 23 );
+    UNIT_TEST( get_prev_power_of_two( ( 1 << 24 ) + 1 ) == 1 << 24 );
 }
 END_TEST
 

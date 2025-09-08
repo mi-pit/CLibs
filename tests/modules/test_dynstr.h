@@ -13,15 +13,18 @@
 #include <assert.h>
 
 
-typedef ssize_t( PendFunction )( struct dynamic_string *, string_t );
+typedef ssize_t ( *PendFunction )( struct dynamic_string *, string_t );
 
-Private bool test_one_pend( string_t init, string_t app, string_t expected, PendFunction func )
+Private bool test_one_pend( const string_t init,
+                            const string_t app,
+                            const string_t expected,
+                            const PendFunction func )
 {
     struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr alloc" );
     assert_that( func( dynstr, app ) >= 0, "append rv" );
 
-    bool rv = strcmp( dynstr_data( dynstr ), expected ) == 0;
+    const bool rv = strcmp( dynstr_data( dynstr ), expected ) == 0;
 
     dynstr_destroy( dynstr );
 
@@ -42,13 +45,16 @@ TEST( append )
 END_TEST
 
 
-Private bool test_one_appendn( string_t init, string_t app, size_t len, string_t expected )
+Private bool test_one_appendn( const string_t init,
+                               const string_t app,
+                               const size_t len,
+                               const string_t expected )
 {
     struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "dynstr alloc" );
     assert_that( dynstr_appendn( dynstr, app, len ) == ( ssize_t ) len, "append rv" );
 
-    bool rv = strcmp( dynstr_data( dynstr ), expected ) == 0;
+    const bool rv = strcmp( dynstr_data( dynstr ), expected ) == 0;
 
     dynstr_destroy( dynstr );
 
@@ -64,13 +70,13 @@ TEST( appendn )
 END_TEST
 
 
-Private bool test_one_init_as( string_t init )
+Private bool test_one_init_as( const string_t init )
 {
-    size_t str_len                = strlen( init );
+    const size_t str_len          = strlen( init );
     struct dynamic_string *dynstr = dynstr_init_as( init );
     assert_that( dynstr != NULL, "init" );
-    bool rv = cmpeq( strcmp( dynstr_data( dynstr ), init ) )
-              && dynstr_len( dynstr ) == str_len;
+    const bool rv = cmpeq( strcmp( dynstr_data( dynstr ), init ) )
+                    && dynstr_len( dynstr ) == str_len;
     dynstr_destroy( dynstr );
     return rv;
 }
@@ -86,11 +92,11 @@ TEST( init_as )
 END_TEST
 
 
-Private bool test_one_slice( string_t str,
-                       size_t start,
-                       ssize_t end,
-                       int rv_want,
-                       string_t res )
+Private bool test_one_slice( const string_t str,
+                             const size_t start,
+                             const ssize_t end,
+                             const int rv_want,
+                             const string_t res )
 {
     struct dynamic_string *s = dynstr_init_as( str );
     assert_that( s != NULL, "strdup" );
@@ -100,18 +106,21 @@ Private bool test_one_slice( string_t str,
         return fwarnx_ret( false, "init_as isn't working" );
     }
 
-    int rv_got = dynstr_slice( s, start, end );
+    const int rv_got = dynstr_slice( s, start, end );
     if ( rv_got != RV_SUCCESS )
     {
         dynstr_destroy( s );
         return rv_got == rv_want;
     }
 
-    bool rv = strcmp( dynstr_data( s ), res ) == 0;
+    const bool rv = strcmp( dynstr_data( s ), res ) == 0;
     dynstr_destroy( s );
     return rv;
 }
-Private bool test_one_slice_e( string_t str, ssize_t end, int rv_want, string_t res )
+Private bool test_one_slice_e( const string_t str,
+                               const ssize_t end,
+                               const int rv_want,
+                               const string_t res )
 {
     struct dynamic_string *s = dynstr_init_as( str );
     assert_that( s != NULL, "strdup" );
@@ -121,18 +130,19 @@ Private bool test_one_slice_e( string_t str, ssize_t end, int rv_want, string_t 
         return fwarnx_ret( false, "init_as isn't working" );
     }
 
-    int rv_got = dynstr_slice_e( s, end );
+    const int rv_got = dynstr_slice_e( s, end );
     if ( rv_got != RV_SUCCESS )
     {
         dynstr_destroy( s );
         return rv_got == rv_want;
     }
 
-    bool rv = strcmp( dynstr_data( s ), res ) == 0;
+    const bool rv = strcmp( dynstr_data( s ), res ) == 0;
     dynstr_destroy( s );
     return rv;
 }
-Private bool test_one_slice_s( string_t str, size_t start, int rv_want, string_t res )
+Private bool test_one_slice_s( const string_t str, const size_t start,
+                               const int rv_wanted, const string_t res )
 {
     struct dynamic_string *s = dynstr_init_as( str );
     assert_that( s != NULL, "strdup" );
@@ -142,14 +152,14 @@ Private bool test_one_slice_s( string_t str, size_t start, int rv_want, string_t
         return fwarnx_ret( false, "init_as isn't working" );
     }
 
-    int rv_got = dynstr_slice_s( s, start );
+    const int rv_got = dynstr_slice_s( s, start );
     if ( rv_got != RV_SUCCESS )
     {
         dynstr_destroy( s );
-        return rv_got == rv_want;
+        return rv_got == rv_wanted;
     }
 
-    bool rv = strcmp( dynstr_data( s ), res ) == 0;
+    const bool rv = strcmp( dynstr_data( s ), res ) == 0;
     dynstr_destroy( s );
     return rv;
 }
@@ -189,7 +199,8 @@ TEST( slices )
 }
 END_TEST
 
-PrintfLike( 2, 3 ) Private bool test_one_vappendf( string_t init, string_t fmt, ... )
+PrintfLike( 2, 3 ) Private bool test_one_vappendf( const string_t init,
+                                                   const string_t fmt, ... )
 {
     va_list vaList, vaCopy;
     va_start( vaList, fmt );
@@ -210,7 +221,7 @@ PrintfLike( 2, 3 ) Private bool test_one_vappendf( string_t init, string_t fmt, 
 
     assert_that( dynstr_vappendf( dynstr, fmt, vaList ) >= 0, "dynstr_vappendf" );
 
-    bool rv = strcmp( dynstr_data( dynstr ), formatted ) == 0;
+    const bool rv = strcmp( dynstr_data( dynstr ), formatted ) == 0;
 
     free( formatted );
     dynstr_destroy( dynstr );
@@ -239,8 +250,8 @@ TEST( appendf )
     UNIT_TEST( test_one_vappendf( "Hopspop", " Kokot %s", "hovno" ) );
     UNIT_TEST( test_one_vappendf( "Hopspop", " %zu Kokot %s", 1023uL, "hovno" ) );
     UNIT_TEST( test_one_vappendf( "", "%zu Kokot %s\n", 1023uL, "hovno" ) );
-    UNIT_TEST( test_one_vappendf(
-            "", "%zu\\\n\r\t\v\"\'Kokot %s\n" ESCAPED_CHARS, 1023uL, "hovno" ) );
+    UNIT_TEST( test_one_vappendf( "", "%zu\\\n\r\t\v\"\'Kokot %s\n" ESCAPED_CHARS, 1023uL,
+                                  "hovno" ) );
 }
 END_TEST
 
