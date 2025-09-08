@@ -9,7 +9,6 @@
 #define SIMPLE_MATH_H
 
 #include "attributes.h"
-#include "extra_types.h"
 
 
 /// The signs are equal to their supposed value.
