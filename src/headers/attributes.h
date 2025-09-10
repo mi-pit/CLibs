@@ -104,7 +104,7 @@
 #define Private static
 
 /** Function or variable is defined in a header file */
-#define LibraryDefined static UsageOptional
+#define LibraryDefined UsageOptional static
 
 /**
  * Function has no effect except for the return value.
