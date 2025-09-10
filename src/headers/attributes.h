@@ -16,6 +16,8 @@
 #ifndef CLIBS_ATTRIBUTES_H
 #define CLIBS_ATTRIBUTES_H
 
+#include "stdc_versions.h" /* STANDARD_C23_VERSION */
+
 
 #ifdef __has_attribute
 /** Evaluates as true if the compiler (clang/GCC) supports the attribute */
@@ -26,7 +28,9 @@
 #endif // __has_attribute
 
 
-#if HAS_ATTRIBUTE( unused )
+#if __STDC_VERSION__ >= STANDARD_C23_VERSION
+#define UsageOptional [[maybe_unused]]
+#elif HAS_ATTRIBUTE( unused )
 /// Stops compiler warnings when the function/variable is unused
 #define UsageOptional __attribute__( ( __unused__ ) )
 #else // unused
@@ -47,7 +51,10 @@
 #endif // format
 
 
-#if HAS_ATTRIBUTE( warn_unused_result )
+#if __STDC_VERSION__ >= STANDARD_C23_VERSION
+/// Function's return value must be used.
+#define UseResult [[nodiscard]]
+#elif HAS_ATTRIBUTE( warn_unused_result )
 /// Function's return value must be used.
 #define UseResult __attribute__( ( __warn_unused_result__ ) )
 #else // warn_unused_result
@@ -78,7 +85,9 @@
 #endif // constructor
 
 
-#if HAS_ATTRIBUTE( noreturn )
+#if __STDC_VERSION__ >= STANDARD_C23_VERSION
+#define NoReturn [[noreturn]]
+#elif HAS_ATTRIBUTE( noreturn )
 /// Function always exits
 #define NoReturn __attribute__( ( noreturn ) )
 #else
