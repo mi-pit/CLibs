@@ -84,6 +84,9 @@ ForEachMacros:
 IfMacros:
   - on_fail
   - on_error
+  - swex_case_imm
+  - swex_case_ptr
+  - swex_case_str
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: '"so?u?rce?s?/.*"'
