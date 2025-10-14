@@ -12,7 +12,7 @@
 
 
 /// Stops those pesky `unused variable` compiler warnings/errors
-#define UNUSED( UNUSEDARG ) ( ( void ) UNUSEDARG )
+#define UNUSED( UNUSEDARG ) ( ( void ) ( UNUSEDARG ) )
 
 
 /// For string literals
