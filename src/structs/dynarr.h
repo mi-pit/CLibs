@@ -30,11 +30,10 @@
 #ifndef CLIBS_DYNAMIC_ARRAY_H
 #define CLIBS_DYNAMIC_ARRAY_H
 
-#include "../headers/array_printf.h" /* for list_printf */
-#include "../headers/attributes.h"   /* Private */
+#include "../headers/attributes.h"  /* Private */
+#include "../headers/extra_types.h" /* size_t, int*_t */
 
 #include <stdbool.h>
-#include <stdint.h>
 
 
 struct dynamic_array; // defined in dynarr.c
