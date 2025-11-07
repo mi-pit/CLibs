@@ -28,9 +28,7 @@
 #endif // __has_attribute
 
 
-#if __STDC_VERSION__ >= STANDARD_C23_VERSION
-#define UsageOptional [[maybe_unused]]
-#elif HAS_ATTRIBUTE( unused )
+#if HAS_ATTRIBUTE( unused )
 /// Stops compiler warnings when the function/variable is unused
 #define UsageOptional __attribute__( ( __unused__ ) )
 #else // unused
@@ -85,9 +83,7 @@
 #endif // constructor
 
 
-#if __STDC_VERSION__ >= STANDARD_C23_VERSION
-#define NoReturn [[noreturn]]
-#elif HAS_ATTRIBUTE( noreturn )
+#if HAS_ATTRIBUTE( noreturn )
 /// Function always exits
 #define NoReturn __attribute__( ( noreturn ) )
 #else
