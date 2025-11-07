@@ -17,6 +17,7 @@
 #include "attributes.h"      /* PrintfLike, LibraryDefined */
 #include "filenames.h"       /* get_prog_name(), __FILE_NAME__ */
 #include "terminal_colors.h" /* COLORs, PrintInColor */
+#include "unreachable.h"     /* UNREACHABLE */
 
 #include <errno.h>  /* for WarnUniversal + include */
 #include <stddef.h> /* ptrdiff_t */
@@ -300,6 +301,74 @@ ptrdiff_t VWarnUniversal( bool PrintProgName, const char *FileName,
     ( ( void ) WarnUniversal( true, __FILE_NAME__, __func__, __LINE__, -1, 0, \
                               __VA_ARGS__ ),                                  \
       RETVAL )
+
+
+LibraryDefined NoReturn void VErrUniversal( int exit_code,
+                                            bool print_progname,
+                                            const char *file,
+                                            const char *func,
+                                            int line,
+                                            const int err_no,
+                                            const char *__restrict fmt,
+                                            va_list va );
+
+void VErrUniversal( int exit_code,
+                    bool print_progname,
+                    const char *file,
+                    const char *func,
+                    int line,
+                    const int err_no,
+                    const char *__restrict fmt,
+                    va_list va )
+{
+    ( void ) VWarnUniversal( print_progname, file, func, line, err_no, 0, fmt, va );
+    exit( exit_code );
+}
+
+LibraryDefined PrintfLike( 7, 8 ) NoReturn void ErrUniversal( const int exit_code,
+                                                              const bool print_progname,
+                                                              const char *const file,
+                                                              const char *const func,
+                                                              const int line,
+                                                              const int err_no,
+                                                              const char *__restrict fmt,
+                                                              ... )
+{
+    va_list va;
+    va_start( va, fmt );
+    VErrUniversal( exit_code, print_progname, file, func, line, err_no, fmt, va );
+
+    UNREACHABLE();
+}
+
+#define ferr( EXIT_VALUE, ... ) \
+    ( ErrUniversal( EXIT_VALUE, true, NULL, __func__, -1, errno, __VA_ARGS__ ) )
+#define ferrx( EXIT_VALUE, ... ) \
+    ( ErrUniversal( EXIT_VALUE, true, NULL, __func__, -1, -1, __VA_ARGS__ ) )
+
+#define ferr_e( EXPR_TYPE, EXIT_VALUE, ... )                                    \
+    ( ErrUniversal( EXIT_VALUE, true, NULL, __func__, -1, errno, __VA_ARGS__ ), \
+      ( EXPR_TYPE ) 0 )
+#define ferrx_e( EXPR_TYPE, EXIT_VALUE, ... )                                \
+    ( ErrUniversal( EXIT_VALUE, true, NULL, __func__, -1, -1, __VA_ARGS__ ), \
+      ( EXPR_TYPE ) 0 )
+
+
+#define fflerr( EXIT_VALUE, ... )                                               \
+    ( ErrUniversal( EXIT_VALUE, true, __FILE_NAME__, __func__, __LINE__, errno, \
+                    __VA_ARGS__ ) )
+#define fflerrx( EXIT_VALUE, ... )                                           \
+    ( ErrUniversal( EXIT_VALUE, true, __FILE_NAME__, __func__, __LINE__, -1, \
+                    __VA_ARGS__ ) )
+
+#define fflerr_e( EXPR_TYPE, EXIT_VALUE, ... )                                  \
+    ( ErrUniversal( EXIT_VALUE, true, __FILE_NAME__, __func__, __LINE__, errno, \
+                    __VA_ARGS__ ),                                              \
+      ( EXPR_TYPE ) 0 )
+#define fflerrx_e( EXPR_TYPE, EXIT_VALUE, ... )                              \
+    ( ErrUniversal( EXIT_VALUE, true, __FILE_NAME__, __func__, __LINE__, -1, \
+                    __VA_ARGS__ ),                                           \
+      ( EXPR_TYPE ) 0 )
 
 
 #endif //CLIBS_ERRORS_H
