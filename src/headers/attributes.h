@@ -7,8 +7,11 @@
  * this header creates platform-independent macros for certain attributes
  * a function or variable may have.
  *
+ * All of the macros defined in this header are safe to use on any compiler
+ * -- including ones that don't support attributes
+ * (in that case they are preprocessed as empty macros).
+ *
  * Some combinations may (definitely will) be missing; this isn't an exhaustive list.
- * (Though all macros are safe to use, no matter the compiler)
  */
 
 // Created by MacBook on 10.01.2025.
