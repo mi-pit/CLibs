@@ -142,7 +142,7 @@ WarnUniversal( bool PrintProgName,
  *
  * Example of an actual function-like macro defined in `errors.h`:
  * @code
- * #define fwarn( ... )  ( void ) WarnUniversal( NULL, __func__, -1, errno, -1, __VA_ARGS__ )
+ * #define fwarn( ... )  ( void ) WarnUniversal( true, NULL, __func__, -1, errno, -1, __VA_ARGS__ )
  * @endcode
  *
  * @param PrintProgName true if the function should print the executable name
@@ -169,14 +169,22 @@ ptrdiff_t WarnUniversal( const bool PrintProgName,
 #ifndef SUPPRESS_WARNINGS
     ( void ) SetTerminalColor( stderr, COLOR_WARNING );
 
+#if defined( __APPLE__ ) && defined( CLIBS_USE_EMOJIS )
+#define FILENAME_PRETTIFIER     "📄"
+#define FUNCTIONNAME_PRETTIFIER "⚙️"
+#else
+#define FILENAME_PRETTIFIER     ""
+#define FUNCTIONNAME_PRETTIFIER ""
+#endif // __APPLE__
+
     if ( PrintProgName )
-        ( void ) fprintf( stderr, "%s", get_prog_name() );
+        ( void ) fprintf( stderr, "%s: ", get_prog_name() );
     if ( FileName != NULL )
-        ( void ) fprintf( stderr, ": %s", FileName );
+        ( void ) fprintf( stderr, FILENAME_PRETTIFIER "%s: ", FileName );
     if ( FunctionName != NULL )
-        ( void ) fprintf( stderr, ": %s", FunctionName );
+        ( void ) fprintf( stderr, FUNCTIONNAME_PRETTIFIER "%s: ", FunctionName );
     if ( LineNumber > 0 )
-        ( void ) fprintf( stderr, " @ %i", LineNumber );
+        ( void ) fprintf( stderr, "@ %i: ", LineNumber );
 
     if ( PrintProgName || FileName != NULL || FunctionName != NULL || LineNumber > 0 )
         ( void ) fprintf( stderr, ": " );
