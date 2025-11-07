@@ -265,10 +265,15 @@ ptrdiff_t VWarnUniversal( bool PrintProgName, const char *FileName,
       RETVAL )
 
 
+/* Warns like `warn()`, but in color */
+#define xwarn( ... ) \
+    ( ( void ) WarnUniversal( true, NULL, NULL, -1, errno, -1, __VA_ARGS__ ) )
+#define xwarnx( ... ) \
+    ( ( void ) WarnUniversal( true, NULL, NULL, -1, 0, -1, __VA_ARGS__ ) )
 /** Warns like `warn()` and returns RETVAL */
-#define warn_ret( RETVAL, ... ) \
+#define xwarn_ret( RETVAL, ... ) \
     ( ( void ) WarnUniversal( true, NULL, NULL, -1, errno, 0, __VA_ARGS__ ), RETVAL )
-#define warnx_ret( RETVAL, ... ) \
+#define xwarnx_ret( RETVAL, ... ) \
     ( ( void ) WarnUniversal( true, NULL, NULL, -1, -1, 0, __VA_ARGS__ ), RETVAL )
 
 /** `warn()` with function name at the start */
