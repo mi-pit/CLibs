@@ -60,7 +60,7 @@ List *list_init_size( const size_t el_size )
 {
     List *new = list_init_cap_size( el_size, LIST_DEF_CAP );
     if ( new == NULL )
-        f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     return new;
 }
