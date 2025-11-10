@@ -10,7 +10,6 @@
 
 #include "headers/attributes.h" /* UseResult */
 
-#include <ctype.h>     /* is* (space, digit, ...) */
 #include <regex.h>     /* regex_t */
 #include <stdbool.h>   /* bool */
 #include <sys/types.h> /* ssize_t */
