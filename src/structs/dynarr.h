@@ -96,7 +96,7 @@ const void *list_peek( const struct dynamic_array *ls );
  * OOB index dereferences a NULL pointer (so don't do that).
  */
 #define list_fetch( LIST, IDX, TYPE ) \
-    ( *( ( const TYPE * ) list_see( ( LIST ), ( IDX ) ) ) )
+    ( *( ( TYPE const * ) list_see( ( LIST ), ( IDX ) ) ) )
 
 /**
  * Gets a mutable look of the element at the specified index
