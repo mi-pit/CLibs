@@ -1,7 +1,6 @@
 #ifndef CLIBS_TEST_STRUCT_CONVERSIONS_H
 #define CLIBS_TEST_STRUCT_CONVERSIONS_H
 
-#define CLIBS_STRUCT_CONVERSIONS
 
 #include "../../src/headers/assert_that.h"
 #include "../../src/headers/unit_tests.h"
@@ -34,6 +33,30 @@ TEST( set_from_list )
     UNIT_TEST( !set_search( set, &i, sizeof i ) );
 
     SET_UNIT_TEST_VERBOSITY( v );
+
+    list_destroy( ls );
+    set_destroy( set );
+}
+END_TEST
+
+TEST( list_from_set )
+{
+    Set *set = set_init();
+    assert_that( set, );
+
+    for ( int i = 0; i < 123; ++i )
+        assert_that( set_insert( set, &i, sizeof i ) == SETINSERT_INSERTED, );
+
+    List *ls = list_from_set( set );
+    CRITICAL_TEST( ls != NULL );
+    UNIT_TEST( list_el_size( ls ) == sizeof( int ) );
+
+    list_sort( ls, cmp_int );
+    for ( int i = 0; i < 123; ++i )
+        UNIT_TEST( list_fetch( ls, i, int ) == i );
+
+    list_destroy( ls );
+    set_destroy( set );
 }
 END_TEST
 
@@ -41,6 +64,7 @@ END_TEST
 LibraryDefined void RUNALL_STRUCT_CONVERSIONS( void )
 {
     RUN_TEST( set_from_list );
+    RUN_TEST( list_from_set );
 }
 
 

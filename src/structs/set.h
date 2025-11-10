@@ -163,6 +163,7 @@ void set_destroy( Set * );
 
 
 #if defined( CLIBS_DYNAMIC_ARRAY_H ) || defined( CLIBS_STRUCT_CONVERSIONS )
+#include "dynarr.h"
 UseResult Set *set_from_list( const List *list );
 #endif
 
