@@ -391,6 +391,8 @@ int set_cmp( const Set *set_1, const Set *set_2 )
 Set *set_from_list( const List *list )
 {
     Set *const new_set = set_init_cap( list_size( list ) );
+    if ( new_set == NULL )
+        return f_stack_trace( NULL );
 
     const size_t el_size = list_el_size( list );
     for ( size_t i = 0; i < list_size( list ); ++i )
