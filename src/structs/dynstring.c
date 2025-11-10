@@ -92,7 +92,7 @@ Private int dynstr_resize( struct dynamic_string *dynstr, const size_t new_size 
 Private ssize_t dynstr_VPendF( struct dynamic_string *dynstr,
                                ssize_t( pender )( struct dynamic_string *, const char * ),
                                const char *fmt,
-                               const va_list vaList )
+                               va_list vaList )
 {
     str_t buffer;
     vasprintf( &buffer, fmt, vaList );
@@ -139,8 +139,7 @@ ssize_t dynstr_appendf( struct dynamic_string *dynstr, const char *fmt, ... )
     return rv;
 }
 
-ssize_t dynstr_vappendf( struct dynamic_string *dynstr, const char *fmt,
-                         const va_list vargs )
+ssize_t dynstr_vappendf( struct dynamic_string *dynstr, const char *fmt, va_list vargs )
 {
     return dynstr_VPendF( dynstr, dynstr_append, fmt, vargs );
 }
@@ -180,8 +179,7 @@ ssize_t dynstr_prependf( struct dynamic_string *dynstr, const char *fmt, ... )
     return rv;
 }
 
-ssize_t dynstr_vprependf( struct dynamic_string *dynstr, const char *fmt,
-                          const va_list vargs )
+ssize_t dynstr_vprependf( struct dynamic_string *dynstr, const char *fmt, va_list vargs )
 {
     return dynstr_VPendF( dynstr, dynstr_prepend, fmt, vargs );
 }
