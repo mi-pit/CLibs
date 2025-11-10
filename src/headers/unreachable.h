@@ -1,13 +1,20 @@
-//
+/**
+ * @file unreachable.h
+ * @brief
+ *
+ * UNREACHABLE macro (abort(3) alias)
+ */
+
 // Created by Michal Pitner on 04.11.2025.
-//
 
 #ifndef UNREACHABLE_H
 #define UNREACHABLE_H
 
 #include <stdlib.h> /* abort */
 
-/// This code should not be reachable -- abort
+/**
+ * This part of the code should not be reachable -- print warning (formatted) and abort
+ */
 #define UNREACHABLE_MSG( ... )   \
     do                           \
     {                            \
