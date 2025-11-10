@@ -27,7 +27,7 @@
 #define HAS_ATTRIBUTE( TOK ) __has_attribute( TOK )
 #else // ndef __has_attribute
 /** This compiler doesn't have any attributes */
-#define HAS_ATTRIBUTE( TOK ) 0
+#define HAS_ATTRIBUTE( TOK ) ( 0 )
 #endif // __has_attribute
 
 
