@@ -341,6 +341,19 @@ LibraryDefined PrintfLike( 7, 8 ) NoReturn void ErrUniversal( const int exit_cod
     UNREACHABLE();
 }
 
+
+#define xerr( EXIT_VALUE, ... ) \
+    ( ErrUniversal( EXIT_VALUE, true, NULL, NULL, -1, errno, __VA_ARGS__ ) )
+#define xerrx( EXIT_VALUE, ... ) \
+    ( ErrUniversal( EXIT_VALUE, true, NULL, NULL, -1, errno, __VA_ARGS__ ) )
+
+#define xerr_e( EXPR_TYPE, EXIT_VALUE, ... )                                \
+    ( ErrUniversal( EXIT_VALUE, true, NULL, NULL, -1, errno, __VA_ARGS__ ), \
+      ( EXPR_TYPE ) 0 )
+#define xerrx_e( EXPR_TYPE, EXIT_VALUE, ... ) \
+    ( ErrUniversal( EXIT_VALUE, true, NULL, NULL, -1, -1, __VA_ARGS__ ), ( EXPR_TYPE ) 0 )
+
+
 #define ferr( EXIT_VALUE, ... ) \
     ( ErrUniversal( EXIT_VALUE, true, NULL, __func__, -1, errno, __VA_ARGS__ ) )
 #define ferrx( EXIT_VALUE, ... ) \
