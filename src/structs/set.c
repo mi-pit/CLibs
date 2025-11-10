@@ -1,7 +1,7 @@
 #include "set.h"
 
-#include "../headers/errors.h" /* RVs, warns, ... */
-#include "../headers/misc.h"   /* cmp_size_t */
+#include "../headers/misc.h" /* cmp_size_t */
+#include "dynarr.h"
 
 #include <assert.h>   /* assert */
 #include <inttypes.h> /* PRIi64 */
@@ -385,6 +385,33 @@ int set_cmp( const Set *set_1, const Set *set_2 )
     }
 
     return 0;
+}
+
+
+Set *set_from_list( const List *list )
+{
+    Set *const new_set = set_init_cap( list_size( list ) );
+
+    const size_t el_size = list_el_size( list );
+    for ( size_t i = 0; i < list_size( list ); ++i )
+    {
+        const void *const data = list_see( list, i );
+
+        switch ( set_insert( new_set, data, el_size ) )
+        {
+            case SETINSERT_WAS_IN:
+                // fflwarnx( "Actually found a collision in a set!" );
+            case SETINSERT_INSERTED:
+                // don't care
+                break;
+
+            case RV_ERROR:
+            case RV_EXCEPTION:
+                return f_stack_trace( NULL );
+        }
+    }
+
+    return new_set;
 }
 
 

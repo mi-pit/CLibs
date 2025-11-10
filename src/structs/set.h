@@ -162,6 +162,11 @@ int set_cmp( const Set *, const Set * );
 void set_destroy( Set * );
 
 
+#if defined( CLIBS_DYNAMIC_ARRAY_H ) || defined( CLIBS_STRUCT_CONVERSIONS )
+UseResult Set *set_from_list( const List *list );
+#endif
+
+
 /// @return number of items in the set
 Const size_t set_size( const Set *set );
 
