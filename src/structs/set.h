@@ -75,7 +75,7 @@ int set_insert_f( Set *, const void *data, size_t len, PrintFunction func );
  *
  * @param data pointer to data
  * @param len number of bytes in data
- * @return `RV_ERROR` | `RV_EXCEPTION` | `enum SetInsertRV`
+ * @return `RV_ERROR` | `enum SetInsertRV`
  */
 int set_insert( Set *, const void *data, size_t len );
 

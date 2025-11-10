@@ -179,7 +179,7 @@ Set *set_init( void )
         return SETINSERT_INSERTED;
     }
 
-    return fwarnx_ret( RV_EXCEPTION, "unrecognized exception" );
+    return fflwarnx_ret( RV_ERROR, "unrecognized exception; something went wrong" );
 }
 
 int set_insert( Set *set, const void *data, const size_t len )
