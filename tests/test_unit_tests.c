@@ -93,7 +93,7 @@ int main( void )
     RUN_TEST( critical );
     RUN_TEST( really_long_messages_test_hopshops_test_test_kunker_lager );
 
-    f_stack_trace( 0 );
+    ( void ) f_stack_trace( 0 );
 
     FINISH_TESTING();
 }

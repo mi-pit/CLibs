@@ -172,10 +172,7 @@ Private bool test_one_strspl_regex( const string_t haystack,
     str_t *spl;
     const ssize_t strspl_rv = string_split_regex( &spl, haystack, &reg, mode );
     if ( strspl_rv < 0 )
-    {
-        ffl_stack_trace( 0 );
-        exit( -1 );
-    }
+        exit( ffl_stack_trace( -1 ) );
 
     const size_t n_got = ( size_t ) strspl_rv;
 
