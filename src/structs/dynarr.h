@@ -76,6 +76,13 @@ int list_copy( const struct dynamic_array *old, struct dynamic_array **new_ls_co
 Constructor struct dynamic_array *list_copy_of( const struct dynamic_array * );
 
 
+#if defined( CLIBS_SETS_H ) || defined( CLIBS_STRUCT_CONVERSIONS )
+// fixme?
+#include "set.h"
+Constructor List *list_from_set( const Set *set );
+#endif
+
+
 /**
  * Gets a non-mutable look of the element at the specified index
  *
