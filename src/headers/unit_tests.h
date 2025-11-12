@@ -164,55 +164,55 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
                                 const bool isCritical )
 {
 #ifndef UNIT_TESTS_SILENT
-    if ( TEST_NAME_CREATOR( YAP ) || !passed || isCritical )
+    if ( !TEST_NAME_CREATOR( YAP ) && passed && !isCritical )
+        return passed;
+
+    printf( "    " );
+    static const size_t msg_indent = STRLEN( "    " );
+    ssize_t ln                     = TESTS_LINE_WIDTH - msg_indent;
+
+    SetTerminalColor( stdout,
+                      !isCritical ? COLOR_TEST_TAG
+                      : passed    ? COLOR_SUCC
+                                  : COLOR_FAIL );
+
+    ln -= printf( "[%s", isCritical ? "CRITICAL" : "UNIT TEST" );
+
+    if ( !passed )
     {
-        printf( "    " );
-        static const size_t msg_indent = STRLEN( "    " );
-        ssize_t ln                     = TESTS_LINE_WIDTH - msg_indent;
+        static char buffer[ PATH_MAX ];
+        snprintf( buffer, sizeof buffer, " // %s @ %d", filename, lineno );
+        ln -= printf( "%s", buffer );
+    }
+    ln -= printf( "]" );
+    SetTerminalColor( stdout, COLOR_DEFAULT );
+    ln -= printf( " %s ", cond_str );
 
-        SetTerminalColor( stdout,
-                          !isCritical ? COLOR_TEST_TAG
-                          : passed    ? COLOR_SUCC
-                                      : COLOR_FAIL );
+    static const size_t MSG_END_PART_LEN = STRLEN( " SUCCESS" ) /* or failure */;
 
-        ln -= printf( "[%s", isCritical ? "CRITICAL" : "UNIT TEST" );
+    ln -= MSG_END_PART_LEN;
 
-        if ( !passed )
-        {
-            static char buffer[ sizeof( __FILE_NAME__ ) + 20 + 7 + 1 ];
-            snprintf( buffer, sizeof buffer, " // %s @ %d", filename, lineno );
-            ln -= printf( "%s", buffer );
-        }
-        ln -= printf( "]" );
-        SetTerminalColor( stdout, COLOR_DEFAULT );
-        ln -= printf( " %s ", cond_str );
-
-        static const size_t MSG_END_PART_LEN = STRLEN( " SUCCESS" ) /* or failure */;
-
-        ln -= MSG_END_PART_LEN;
-
-        if ( ln < 0 )
-        {
-            printf( "\n" );
-            for ( size_t i = 0; i < msg_indent; ++i )
-                printf( " " );
-        }
+    if ( ln < 0 )
+    {
+        printf( "\n" );
+        for ( size_t i = 0; i < msg_indent; ++i )
+            printf( " " );
+    }
 
 #if defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 201112L
-        _Static_assert( TESTS_LINE_WIDTH > ( MSG_END_PART_LEN + msg_indent ),
-                        "TESTS_LINE_WIDTH must be greater than the const part" );
+    _Static_assert( TESTS_LINE_WIDTH > ( MSG_END_PART_LEN + msg_indent ),
+                    "TESTS_LINE_WIDTH must be greater than the const part" );
 #endif
 
-        const size_t ndots =
-                ln > 0 ? ( size_t ) ln : TESTS_LINE_WIDTH - MSG_END_PART_LEN - msg_indent;
+    const size_t ndots =
+            ln > 0 ? ( size_t ) ln : TESTS_LINE_WIDTH - MSG_END_PART_LEN - msg_indent;
 
-        for ( size_t i = 0; i < ndots; ++i )
-            printf( "." );
+    for ( size_t i = 0; i < ndots; ++i )
+        printf( "." );
 
-        printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",
-                passed ? COLOR_SUCC : COLOR_FAIL,
-                passed ? "SUCCESS" : "FAILURE" );
-    }
+    printf( " " PRINT_COLOR "%s" COLOR_DEFAULT "\n",
+            passed ? COLOR_SUCC : COLOR_FAIL,
+            passed ? "SUCCESS" : "FAILURE" );
 #else
     ( void ) cond_str;
     ( void ) filename;
