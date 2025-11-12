@@ -53,13 +53,13 @@ static const size_t TESTS_LINE_WIDTH = LINE_PREF_WIDTH;
 
 
 typedef enum {
-    UNIT_TESTS_YAP_NONE UsageOptional     = 0,
-    UNIT_TESTS_YAP_FAILED UsageOptional   = 1 << 0,
-    UNIT_TESTS_YAP_CRITICAL UsageOptional = 1 << 1,
-    UNIT_TESTS_YAP_ALL UsageOptional      = 1 << 2,
+    UNIT_TESTS_YAP_NONE     = 0,      /* Don't print any */
+    UNIT_TESTS_YAP_ALL      = 1 << 1, /* Default; print all cases */
+    UNIT_TESTS_YAP_FAILED   = 1 << 2, /* Only print if case fails */
+    UNIT_TESTS_YAP_CRITICAL = 1 << 3, /* Only print if case is critical */
 
-    UNIT_TESTS_YAP_CRITICAL_FAILED UsageOptional =
-            UNIT_TESTS_YAP_CRITICAL | UNIT_TESTS_YAP_FAILED,
+    /* Only print if case both fails and is critical */
+    UNIT_TESTS_YAP_CRITICAL_FAILED = UNIT_TESTS_YAP_CRITICAL | UNIT_TESTS_YAP_FAILED,
 } TEST_NAME_CREATOR( VERBOSITY_ENUM );
 
 
