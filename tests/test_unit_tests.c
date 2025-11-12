@@ -2,7 +2,7 @@
 // Created by MacBook on 03.01.2025.
 //
 
-#include "../src/headers/errors.h"
+#include "../src/headers/assert_that.h"
 #include "../src/headers/unit_tests.h"
 
 #include <string.h>
@@ -41,7 +41,7 @@ TEST( loop_setting_verbosity )
         UNIT_TEST( no_loop );
     }
 
-    int old_v = GET_UNIT_TEST_VERBOSITY();
+    const int old_v = GET_UNIT_TEST_VERBOSITY();
     SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_NONE );
     const bool this_one_should_show = false;
     UNIT_TEST( this_one_should_show );
@@ -96,7 +96,11 @@ bool run_all( void )
 int main( void )
 {
     if ( !SET_UNIT_TEST_VERBOSITY( -1 ) )
+    {
         ( void ) f_stack_trace( 0 );
+
+        assert_that( SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_ALL ), );
+    }
 
     SetTerminalColor( stdout, BACKGROUND_YELLOW );
     for ( int i = 0; i < LINE_PREF_WIDTH; ++i )
