@@ -219,6 +219,9 @@ ptrdiff_t VWarnUniversal( bool PrintProgName, const char *FileName,
     return return_value;
 }
 
+
+#define STACK_TRACE_MESSAGE "    | called from: "
+
 /**
  * prints
  * @code
@@ -252,8 +255,9 @@ ptrdiff_t VWarnUniversal( bool PrintProgName, const char *FileName,
  *     in main
  * \endcode
  */
-#define f_stack_trace( RETVAL )                                                    \
-    ( ( void ) WarnUniversal( false, NULL, NULL, -1, -1, 0, "\tin %s", __func__ ), \
+#define f_stack_trace( RETVAL )                                                       \
+    ( ( void ) WarnUniversal( false, NULL, NULL, -1, -1, 0, STACK_TRACE_MESSAGE "%s", \
+                              __func__ ),                                             \
       RETVAL )
 
 /**
@@ -261,8 +265,9 @@ ptrdiff_t VWarnUniversal( bool PrintProgName, const char *FileName,
  * @see `f_stack_trace()`
  */
 #define ffl_stack_trace( RETVAL )                                               \
-    ( ( void ) WarnUniversal( false, NULL, NULL, -1, -1, 0, "\tin %s: %s @ %d", \
-                              __FILE_NAME__, __func__, __LINE__ ),              \
+    ( ( void ) WarnUniversal( false, NULL, NULL, -1, -1, 0,                     \
+                              STACK_TRACE_MESSAGE "%s: %s @ %d", __FILE_NAME__, \
+                              __func__, __LINE__ ),                             \
       RETVAL )
 
 
