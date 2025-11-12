@@ -315,16 +315,7 @@ LibraryDefined NoReturn void VErrUniversal( int exit_code,
                                             int line,
                                             const int err_no,
                                             const char *__restrict fmt,
-                                            va_list va );
-
-void VErrUniversal( int exit_code,
-                    bool print_progname,
-                    const char *file,
-                    const char *func,
-                    int line,
-                    const int err_no,
-                    const char *__restrict fmt,
-                    va_list va )
+                                            va_list va )
 {
     ( void ) VWarnUniversal( print_progname, file, func, line, err_no, 0, fmt, va );
     exit( exit_code );
