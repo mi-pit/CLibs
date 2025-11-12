@@ -52,10 +52,7 @@
 #endif // format
 
 
-#if __STDC_VERSION__ >= STANDARD_C23_VERSION
-/// Function's return value must be used.
-#define UseResult [[nodiscard]]
-#elif HAS_ATTRIBUTE( warn_unused_result )
+#if HAS_ATTRIBUTE( warn_unused_result )
 /// Function's return value must be used.
 #define UseResult __attribute__( ( __warn_unused_result__ ) )
 #else // warn_unused_result
