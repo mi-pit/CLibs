@@ -19,7 +19,8 @@
 
 int main( void )
 {
-    SET_UNIT_TEST_VERBOSITY( false );
+    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_FAILED );
+
     RUNALL_STRING_UTILS();
 
     RUNALL_DYNSTR();

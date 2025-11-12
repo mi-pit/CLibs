@@ -21,8 +21,8 @@ TEST( set_from_list )
 
     //set_print_as( set, Print_int );
 
-    bool v = GET_UNIT_TEST_VERBOSITY();
-    SET_UNIT_TEST_VERBOSITY( false );
+    const int v = GET_UNIT_TEST_VERBOSITY();
+    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_NONE );
     for ( int i = 0; i < 123; ++i )
         UNIT_TEST( set_search( set, &i, sizeof i ) );
 
@@ -60,11 +60,30 @@ TEST( list_from_set )
 }
 END_TEST
 
+TEST( list_from_queue )
+{
+    Queue *q = queue_init( sizeof( int ) );
+    CRITICAL_TEST( q );
+
+    for ( int i = 0; i < 123; ++i )
+        CRITICAL_TEST( queue_enqueue( q, &i ) == RV_SUCCESS );
+
+    CRITICAL_TEST( queue_get_size( q ) == 123 );
+
+    List *ls = list_from_queue( q );
+    CRITICAL_TEST( ls != NULL );
+
+    for ( int i = 0; i < 123; ++i )
+        UNIT_TEST( list_fetch( ls, i, int ) == i );
+}
+END_TEST
+
 
 LibraryDefined void RUNALL_STRUCT_CONVERSIONS( void )
 {
     RUN_TEST( set_from_list );
     RUN_TEST( list_from_set );
+    RUN_TEST( list_from_queue );
 }
 
 

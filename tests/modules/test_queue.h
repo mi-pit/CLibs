@@ -43,8 +43,8 @@ TEST( enqueue )
     UNIT_TEST( node != NULL );
     UNIT_TEST( queue->head == queue->tail );
 
-    const bool orig_verbosity = GET_UNIT_TEST_VERBOSITY();
-    SET_UNIT_TEST_VERBOSITY( false );
+    const int orig_verbosity = GET_UNIT_TEST_VERBOSITY();
+    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_NONE );
     for ( data = 0; data <= 123; data++ )
     {
         int rv;
@@ -79,8 +79,8 @@ TEST( dequeue )
     for ( data = 0; data <= 123; data++ )
         assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
 
-    const bool orig_verbosity = GET_UNIT_TEST_VERBOSITY();
-    SET_UNIT_TEST_VERBOSITY( false );
+    const int orig_verbosity = GET_UNIT_TEST_VERBOSITY();
+    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_NONE );
     for ( data = -1; data <= 123; data++ )
     {
         int num;
@@ -155,9 +155,8 @@ TEST( get_size )
     UNIT_TEST( queue_get_size( queue ) == 1 );
     UNIT_TEST( !queue_is_empty( queue ) );
 
-    const bool orig_verbosity = GET_UNIT_TEST_VERBOSITY();
-
-    SET_UNIT_TEST_VERBOSITY( false );
+    const int orig_verbosity = GET_UNIT_TEST_VERBOSITY();
+    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_NONE );
     for ( data = 0; data <= 123; data++ )
     {
         assert_that( queue_enqueue( queue, &data ) == RV_SUCCESS, "enqueue" );
