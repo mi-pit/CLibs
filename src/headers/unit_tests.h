@@ -52,13 +52,25 @@ static const size_t TESTS_LINE_WIDTH = LINE_PREF_WIDTH;
 #define TEST_NAME_CREATOR( TOK ) CLIBS_UNIT_TESTS_##TOK
 
 
+typedef enum {
+    UNIT_TESTS_YAP_NONE UsageOptional     = 0,
+    UNIT_TESTS_YAP_FAILED UsageOptional   = 1 << 0,
+    UNIT_TESTS_YAP_CRITICAL UsageOptional = 1 << 1,
+    UNIT_TESTS_YAP_ALL UsageOptional      = 1 << 2,
+
+    UNIT_TESTS_YAP_CRITICAL_FAILED UsageOptional =
+            UNIT_TESTS_YAP_CRITICAL | UNIT_TESTS_YAP_FAILED,
+} TEST_NAME_CREATOR( VERBOSITY_ENUM );
+
+
+static TEST_NAME_CREATOR( VERBOSITY_ENUM )
+        TEST_NAME_CREATOR( VERBOSITY ) = UNIT_TESTS_YAP_ALL;
+
 static int TEST_NAME_CREATOR( TOTAL_FAILED ) = 0;
 static int TEST_NAME_CREATOR( TOTAL_RAN )    = 0;
 
 static int TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) = 0;
 static int TEST_NAME_CREATOR( TOTAL_RAN_UNIT )    = 0;
-
-static bool TEST_NAME_CREATOR( YAP ) = true;
 
 
 #ifndef UNIT_TESTS_SILENT
@@ -164,8 +176,32 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
                                 const bool isCritical )
 {
 #ifndef UNIT_TESTS_SILENT
-    if ( !TEST_NAME_CREATOR( YAP ) && passed && !isCritical )
-        return passed;
+    switch ( TEST_NAME_CREATOR( VERBOSITY ) )
+    {
+        case UNIT_TESTS_YAP_NONE:
+            return passed;
+
+        case UNIT_TESTS_YAP_ALL:
+            break;
+
+        case UNIT_TESTS_YAP_FAILED:
+            if ( passed )
+                return passed;
+            break;
+
+        case UNIT_TESTS_YAP_CRITICAL:
+            if ( !isCritical )
+                return passed;
+            break;
+
+        case UNIT_TESTS_YAP_CRITICAL_FAILED:
+            if ( !isCritical || passed )
+                return passed;
+            break;
+
+        default:
+            UNREACHABLE();
+    }
 
     printf( "    " );
     static const size_t msg_indent = STRLEN( "    " );
@@ -266,24 +302,32 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
 
 
 /**
- * If set to false, `UNIT_TEST`s do not show successes.
- *
- * This option is independent of the macro `UNIT_TESTS_SILENT`,
- * which silences all messages.
- *
- * @param verbose true by default
+ * TODO
+ * @param v
  */
-LibraryDefined void SET_UNIT_TEST_VERBOSITY( const bool verbose )
+LibraryDefined bool SET_UNIT_TEST_VERBOSITY( const TEST_NAME_CREATOR( VERBOSITY_ENUM ) v )
 {
-    TEST_NAME_CREATOR( YAP ) = verbose;
+    switch ( v )
+    {
+        case UNIT_TESTS_YAP_NONE:
+        case UNIT_TESTS_YAP_ALL:
+        case UNIT_TESTS_YAP_FAILED:
+        case UNIT_TESTS_YAP_CRITICAL:
+        case UNIT_TESTS_YAP_CRITICAL_FAILED:
+            TEST_NAME_CREATOR( VERBOSITY ) = v;
+            return true;
+
+        default:
+            return fwarnx_ret( false, "invalid argument (%d)", v );
+    }
 }
 
 /**
  * @return value of the static verbosity variable
  */
-LibraryDefined bool GET_UNIT_TEST_VERBOSITY( void )
+LibraryDefined TEST_NAME_CREATOR( VERBOSITY_ENUM ) GET_UNIT_TEST_VERBOSITY( void )
 {
-    return TEST_NAME_CREATOR( YAP );
+    return TEST_NAME_CREATOR( VERBOSITY );
 }
 
 #endif //CLIBS_UNIT_TESTS_H
