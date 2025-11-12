@@ -6,7 +6,7 @@
 #define CLIBS_MATH_H
 
 #include "headers/attributes.h"
-#include "headers/extra_types.h"
+#include "headers/types.h"
 
 // import
 #include "headers/simple_math.h"

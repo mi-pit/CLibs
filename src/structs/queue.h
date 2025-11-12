@@ -24,7 +24,7 @@
 #define CLIBS_QUEUE_H
 
 #include "../headers/attributes.h"
-#include "../headers/extra_types.h"
+#include "../headers/types.h"
 
 
 typedef struct fifo_queue Queue;

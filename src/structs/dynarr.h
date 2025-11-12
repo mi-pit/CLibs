@@ -31,7 +31,7 @@
 #define CLIBS_DYNAMIC_ARRAY_H
 
 #include "../headers/attributes.h"  /* Private */
-#include "../headers/extra_types.h" /* size_t, int*_t */
+#include "../headers/types.h"       /* size_t, int*_t */
 
 #include <stdbool.h>
 
@@ -189,7 +189,7 @@ int list_insert( struct dynamic_array *, size_t index, const void *data );
  *
  * @param container pointer to valid space in memory
  * of at least `ls::el_size` bytes
- * @return :
+ * @return
  * - `RV_EXCEPTION` if List is empty
  * - `RV_ERROR` if malloc fails
  * - else `RV_SUCCESS`
