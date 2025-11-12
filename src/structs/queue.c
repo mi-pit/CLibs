@@ -174,6 +174,11 @@ size_t queue_get_size( const struct fifo_queue *queue )
     return i;
 }
 
+size_t queue_get_el_size( const Queue *q )
+{
+    return q->el_size;
+}
+
 bool queue_is_empty( const struct fifo_queue *queue )
 {
     const bool no_head = queue->head == NULL;
