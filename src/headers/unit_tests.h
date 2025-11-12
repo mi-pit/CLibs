@@ -50,7 +50,7 @@ static const size_t TESTS_LINE_WIDTH = LINE_PREF_WIDTH;
 
 
 /// To avoid namespace collisions
-#define TEST_NAME_CREATOR( TOK ) CLIBS_UNIT_TESTS_##TOK
+#define TEST_NAME_CREATOR( TOK ) CLIBS_UNIT_TESTS__##TOK
 
 
 typedef enum {
@@ -170,11 +170,11 @@ LibraryDefined NoReturn void FINISH_TESTING( void )
 
 
 /** @cond INTERNAL */
-LibraryDefined bool UNIT_TEST_( const char *cond_str,
-                                const bool passed,
-                                const char *filename,
-                                const int lineno,
-                                const bool isCritical )
+LibraryDefined bool TEST_NAME_CREATOR( UNIT_TEST )( const char *cond_str,
+                                                    const bool passed,
+                                                    const char *filename,
+                                                    const int lineno,
+                                                    const bool isCritical )
 {
 #ifndef UNIT_TESTS_SILENT
     switch ( TEST_NAME_CREATOR( VERBOSITY ) )
@@ -269,13 +269,14 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
  * If condition evaluates to false, "FAILURE" is printed
  * in the color defined in `COLOR_FAIL` (red by default)
  */
-#define UNIT_TEST( CONDITION )                                                      \
-    do                                                                              \
-    {                                                                               \
-        if ( !UNIT_TEST_( #CONDITION, CONDITION, __FILE_NAME__, __LINE__, false ) ) \
-            ++TEST_NAME_CREATOR( failed_total );                                    \
-        ++TEST_NAME_CREATOR( ran_total );                                           \
-    }                                                                               \
+#define UNIT_TEST( CONDITION )                                                 \
+    do                                                                         \
+    {                                                                          \
+        if ( !TEST_NAME_CREATOR( UNIT_TEST )(                                  \
+                     #CONDITION, CONDITION, __FILE_NAME__, __LINE__, false ) ) \
+            ++TEST_NAME_CREATOR( failed_total );                               \
+        ++TEST_NAME_CREATOR( ran_total );                                      \
+    }                                                                          \
     while ( 0 )
 
 
@@ -292,7 +293,8 @@ LibraryDefined bool UNIT_TEST_( const char *cond_str,
     do                                                                                  \
     {                                                                                   \
         ++TEST_NAME_CREATOR( ran_total );                                               \
-        if ( !UNIT_TEST_( #CONDITION, CONDITION, __FILE_NAME__, __LINE__, true ) )      \
+        if ( !TEST_NAME_CREATOR( UNIT_TEST )(                                           \
+                #CONDITION, CONDITION, __FILE_NAME__, __LINE__, true ) )                \
         {                                                                               \
             ++TEST_NAME_CREATOR( failed_total );                                        \
             { END_TEST /* the END_TEST macro has a terminating bracket `}' */           \

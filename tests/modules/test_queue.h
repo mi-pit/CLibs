@@ -58,7 +58,7 @@ TEST( enqueue )
         else
         {
             const int to_go = 123 - data;
-            CLIBS_UNIT_TESTS_failed_total += to_go;
+            TEST_NAME_CREATOR( failed_total ) += to_go;
             UNIT_TEST( to_go <= 0 );
             break;
         }

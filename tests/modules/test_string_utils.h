@@ -613,7 +613,7 @@ TEST( collapse_backspaces )
     UNIT_TEST( test_one_collapse_backspace( "\bA", "A" ) );
     UNIT_TEST( test_one_collapse_backspace( "A\bB\b\bC", "C" ) );
 
-    if ( CLIBS_UNIT_TESTS_failed_total == 0 )
+    if ( TEST_NAME_CREATOR( failed_total ) == 0 )
     {
         const str_t esc = string_escaped( "Ahoj.\b" );
         string_collapse_backspaces( esc );
