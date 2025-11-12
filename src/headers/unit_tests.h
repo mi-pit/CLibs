@@ -97,23 +97,23 @@ static bool TEST_NAME_CREATOR( YAP ) = true;
  *
  * Prints a summary of the test case and returns if it failed.
  */
-#define END_TEST                                                                    \
-    printf( COLOR_TEST_TAG COLOR_TEST_TAG                                           \
-            "[TEST ... " COLOR_NOTE "%s" COLOR_TEST_TAG "]" COLOR_DEFAULT           \
-            " %s: ran %i tests, " PRINT_COLOR "%i successful" COLOR_DEFAULT         \
-            ", " PRINT_COLOR "%i failed" COLOR_DEFAULT "\n",                        \
-            __FILE_NAME__,                                                          \
-            TEST_NAME_CREATOR( test_handle ),                                       \
-            TEST_NAME_CREATOR( ran_total ),                                         \
-            TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ) == 0 \
-                    ? COLOR_FAIL /* if any fail -> COLOR_FAIL */                    \
-                    : COLOR_SUCC,                                                   \
-            TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ),     \
-            TEST_NAME_CREATOR( failed_total ) == 0 ? COLOR_SUCC : COLOR_FAIL,       \
-            TEST_NAME_CREATOR( failed_total ) );                                    \
-    TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) += TEST_NAME_CREATOR( failed_total );    \
-    TEST_NAME_CREATOR( TOTAL_RAN_UNIT ) += TEST_NAME_CREATOR( ran_total );          \
-    return TEST_NAME_CREATOR( failed_total ) == 0 ? 0 : 1;                          \
+#define END_TEST                                                                         \
+    printf( COLOR_TEST_TAG "[TEST ... " COLOR_NOTE "%s" COLOR_TEST_TAG "]" COLOR_DEFAULT \
+                           " %s: ran %i tests, " PRINT_COLOR                             \
+                           "%i successful" COLOR_DEFAULT ", " PRINT_COLOR                \
+                           "%i failed" COLOR_DEFAULT "\n",                               \
+            __FILE_NAME__,                                                               \
+            TEST_NAME_CREATOR( test_handle ),                                            \
+            TEST_NAME_CREATOR( ran_total ),                                              \
+            TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ) == 0      \
+                    ? COLOR_FAIL /* if any fail -> COLOR_FAIL */                         \
+                    : COLOR_SUCC,                                                        \
+            TEST_NAME_CREATOR( ran_total ) - TEST_NAME_CREATOR( failed_total ),          \
+            TEST_NAME_CREATOR( failed_total ) == 0 ? COLOR_SUCC : COLOR_FAIL,            \
+            TEST_NAME_CREATOR( failed_total ) );                                         \
+    TEST_NAME_CREATOR( TOTAL_FAILED_UNIT ) += TEST_NAME_CREATOR( failed_total );         \
+    TEST_NAME_CREATOR( TOTAL_RAN_UNIT ) += TEST_NAME_CREATOR( ran_total );               \
+    return TEST_NAME_CREATOR( failed_total ) == 0 ? 0 : 1;                               \
     }
 
 
