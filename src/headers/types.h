@@ -1,4 +1,7 @@
-/*
+/**
+ * @file types.h
+ * @brief
+ *
  * Includes most standard types and defines `byte` type.
  */
 
