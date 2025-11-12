@@ -3,6 +3,7 @@
 #include "../headers/assert_that.h"
 #include "../headers/misc.h"          /* cmp */
 #include "../headers/pointer_utils.h" /* deref_as */
+#include "queue.h"
 #include "set.h"
 
 #include <inttypes.h> /* PRIi64 */
@@ -106,6 +107,23 @@ Constructor List *list_from_set( const Set *set )
             list_destroy( ls );
             return f_stack_trace( NULL );
         }
+    }
+
+    return ls;
+}
+
+
+List *list_from_queue( const Queue *q )
+{
+    List *ls = list_init_cap_size( queue_get_el_size( q ), queue_get_size( q ) );
+    if ( ls == NULL )
+        return f_stack_trace( NULL );
+
+    foreach_que( entry, q )
+    {
+        const void *datap = queue_node_get_data( entry );
+        on_fail ( list_append( ls, datap ) )
+            return f_stack_trace( NULL );
     }
 
     return ls;
