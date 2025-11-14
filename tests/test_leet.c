@@ -1,14 +1,10 @@
 //
 // Created by MacBook on 03.01.2025.
 //
-#include "../src/headers/ctrlflow/assert_that.h"
-#include "../src/headers/unit_tests.h"
-#include "../src/headers/util/ptrs/alloc.h"
-#include "../src/structs/dictionary.h"
-#include "../src/structs/dynarr.h"
+#define FOREACH_LS
 
-// after dynarr
-#include "../src/headers/ctrlflow/foreach.h"
+#include "../src/headers.h"
+#include "../src/structs/dictionary.h"
 
 
 typedef size_t count_t;
