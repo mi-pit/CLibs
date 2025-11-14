@@ -1,16 +1,11 @@
 //
 // Created by Michal Pitner on 23.06.2025.
 //
+#define ARRAY_SPRINTF
 
-#include "../src/headers/cmp.h"
-#include "../src/headers/ctrlflow/assert_that.h"
-#include "../src/headers/util/ptrs/alloc.h"
-#include "../src/structs/dynarr.h"
-#include "../src/structs/dynstring.h"
+#include "../src/headers.h"
+#include "../src/structs.h"
 #include "../src/util/string_utils.h"
-
-// dynstr.h
-#include "../src/headers/util/print/array_printf.h"
 
 #include <limits.h> /* INT_MAX, INT_MIN */
 

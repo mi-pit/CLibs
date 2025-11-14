@@ -2,9 +2,9 @@
 // Created by MacBook on 30.12.2024.
 //
 
-#include "../src/headers/cmp.h"                  /* hash_func() */
-#include "../src/headers/ctrlflow/assert_that.h" /* assert_that(), include errors.h */
-#include "../src/structs/set.h"                  /* Set */
+#include "../src/headers/cmp.h"           /* hash_func() */
+#include "../src/headers/util/ctrlflow.h" /* assert_that(), include errors.h */
+#include "../src/structs/set.h"           /* Set */
 
 #include <inttypes.h>
 #include <stdlib.h>

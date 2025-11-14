@@ -74,7 +74,8 @@
 #define array_printf( ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
     array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ARRAY_PRINT_DEFAULT_DELIM )
 
-#if defined( CLIBS_DYNSTRING_H ) || defined( CLIBS__GENERATE_DOCS )
+#if defined( CLIBS_DYNSTRING_H ) || defined( CLIBS__GENERATE_DOCS ) \
+        || defined( ARRAY_SPRINTF )
 /**
  * The contents of `STRINGVAR` are overwritten (the pointer itself is).
  *

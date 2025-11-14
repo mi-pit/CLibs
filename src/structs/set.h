@@ -15,7 +15,8 @@
 #ifndef CLIBS_SETS_H
 #define CLIBS_SETS_H
 
-#include "../headers/core/types.h"   /* stddef, stdint, stdbool */
+#include "../headers/core/types.h"        /* stddef, stdint, stdbool */
+#include "../headers/util/hash.h"         /* hash; include for impl */
 #include "../util/item_print_functions.h" /* PrintFunction */
 
 

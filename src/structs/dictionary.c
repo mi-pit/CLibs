@@ -2,7 +2,6 @@
 
 #include "../headers/cmp.h" /* hash_func(), cmp_size_t(), cmpeq() */
 #include "../headers/util/ctrlflow.h"
-#include "../headers/util/ptrs/alloc.h" /* free_n() */
 
 #include <stdio.h>
 #include <stdlib.h>

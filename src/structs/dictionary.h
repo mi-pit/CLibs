@@ -6,6 +6,7 @@
 #ifndef CLIBS_DICTIONARY_H
 #define CLIBS_DICTIONARY_H
 
+#include "../headers/util/hash.h"
 #include "../util/item_print_functions.h"
 
 
