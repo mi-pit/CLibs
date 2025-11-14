@@ -5,13 +5,13 @@
 #ifndef TEST_ARRAYPRINTF_H
 #define TEST_ARRAYPRINTF_H
 
-#include "../../src/headers/misc.h"
+#include "../../src/headers/cmp.h"
 #include "../../src/headers/unit_tests.h"
-#include "../../src/string_utils.h"
 #include "../../src/structs/dynstring.h"
+#include "../../src/util/string_utils.h"
 
 // after dynstring
-#include "../../src/headers/array_printf.h"
+#include "../../src/headers/util/print/array_printf.h"
 
 
 TEST( array_sprintf )

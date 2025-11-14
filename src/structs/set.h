@@ -15,8 +15,8 @@
 #ifndef CLIBS_SETS_H
 #define CLIBS_SETS_H
 
-#include "../headers/types.h"        /* stddef, stdint, stdbool */
-#include "../item_print_functions.h" /* PrintFunction */
+#include "../headers/core/types.h"   /* stddef, stdint, stdbool */
+#include "../util/item_print_functions.h" /* PrintFunction */
 
 
 struct hash_set;

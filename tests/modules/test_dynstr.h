@@ -4,11 +4,11 @@
 #ifndef TEST_DYNSTR_H
 #define TEST_DYNSTR_H
 
-#include "../../src/headers/assert_that.h"
-#include "../../src/headers/misc.h"
+#include "../../src/headers/cmp.h"
 #include "../../src/headers/unit_tests.h"
-#include "../../src/string_utils.h"
+#include "../../src/headers/util/ctrlflow/assert_that.h"
 #include "../../src/structs/dynstring.h"
+#include "../../src/util/string_utils.h"
 
 #include <assert.h>
 

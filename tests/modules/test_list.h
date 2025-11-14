@@ -5,7 +5,7 @@
 #ifndef CLIBS_TEST_LIST_H
 #define CLIBS_TEST_LIST_H
 
-#include "../../src/headers/misc.h"
+#include "../../src/headers/cmp.h"
 #include "../../src/headers/unit_tests.h"
 #include "../../src/structs/dynarr.h"
 

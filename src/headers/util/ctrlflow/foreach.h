@@ -59,7 +59,8 @@
                                    ( STRING )[ foreach_index_##ITEM_NAME ] )
 
 
-#if defined( CLIBS_DYNAMIC_ARRAY_H ) || defined( CLIBS__GENERATE_DOCS )
+#if defined( CLIBS_DYNAMIC_ARRAY_H ) || defined( CLIBS__GENERATE_DOCS ) \
+        || defined( FOREACH_LS )
 /**
  * Iterates over a list.
  *
@@ -80,7 +81,7 @@
 #endif // List
 
 
-#if defined( CLIBS_SETS_H ) || defined( CLIBS__GENERATE_DOCS )
+#if defined( CLIBS_SETS_H ) || defined( CLIBS__GENERATE_DOCS ) || defined( FOREACH_SET )
 /**
  * Iterates over a set.
  *
@@ -102,7 +103,8 @@
 #endif // Set
 
 
-#if defined( CLIBS_QUEUE_H ) || defined( CLIBS__GENERATE_DOCS )
+#if defined( CLIBS_QUEUE_H ) || defined( CLIBS__GENERATE_DOCS ) \
+        || defined( FOREACH_QUEUE )
 /**
  * Iterates over a queue.
  *

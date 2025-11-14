@@ -1,14 +1,15 @@
-/*
- * Assert with a message
- *
- * Created by MacBook on 25.12.2024.
+/**
+ * @file assert_that.h
+ * @brief Assert with a message.
  */
+
+// Created by MacBook on 25.12.2024.
 
 #ifndef CLIBS_ASSERT_THAT_H
 #define CLIBS_ASSERT_THAT_H
 
 /* for this header */
-#include "errors.h" /* warn */
+#include "../../errors.h" /* warn */
 
 #include <stdlib.h> /* exit */
 

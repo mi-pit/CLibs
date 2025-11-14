@@ -10,10 +10,10 @@
 #ifndef CLIBS_UNIT_TESTS_H
 #define CLIBS_UNIT_TESTS_H
 
-#include "errors.h"          /* fwarn, UNREACHABLE */
-#include "filenames.h"       /* PATH_MAX */
-#include "misc.h"            /* STRLEN */
-#include "terminal_colors.h" /* colors */
+#include "core/filenames.h"             /* PATH_MAX */
+#include "errors.h"                     /* fwarn */
+#include "util/print/terminal_colors.h" /* colors */
+#include "util/ptrs/arrays.h"           /* STRLEN */
 
 #include <stdbool.h> /* * */
 #include <stdio.h>   /* printf */

@@ -1,9 +1,8 @@
 #include "dictionary.h"
 
-#include "../headers/assert_that.h"
-#include "../headers/errors.h"        /* includes misc.h */
-#include "../headers/misc.h"          /* hash_func(), cmp_size_t(), cmpeq() */
-#include "../headers/pointer_utils.h" /* free_n() */
+#include "../headers/cmp.h" /* hash_func(), cmp_size_t(), cmpeq() */
+#include "../headers/util/ctrlflow.h"
+#include "../headers/util/ptrs/alloc.h" /* free_n() */
 
 #include <stdio.h>
 #include <stdlib.h>

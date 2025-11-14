@@ -8,7 +8,7 @@
 #ifndef CLIBS_STRING_UTILS_H
 #define CLIBS_STRING_UTILS_H
 
-#include "headers/attributes.h" /* UseResult */
+#include "../headers/core/attributes.h" /* UseResult */
 
 #include <regex.h>     /* regex_t */
 #include <stdbool.h>   /* bool */

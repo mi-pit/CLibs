@@ -5,10 +5,10 @@
  * Created by MacBook on 01.11.2024.
  */
 
-#ifndef CLIBS_POINTER_UTILS_H
-#define CLIBS_POINTER_UTILS_H
+#ifndef CLIBS_ALLOC_H
+#define CLIBS_ALLOC_H
 
-#include "attributes.h" /* LibraryDefined */
+#include "../../core/attributes.h" /* LibraryDefined */
 
 #include <stdarg.h> /* va_* */
 #include <stdlib.h> /* free(), NULL */
@@ -49,10 +49,4 @@ LibraryDefined inline void free_and_null( void **n )
 }
 
 
-/// Dereferences a pointer as if it was a pointer to `type`
-#define deref_as( type, var ) ( *( type * ) ( var ) )
-/// Dereferences a pointer as if it was a pointer to `type` with an offset
-#define deref_as_offset( type, var, offset ) ( *( ( type * ) ( var ) ) + offset )
-
-
-#endif //CLIBS_POINTER_UTILS_H
+#endif //CLIBS_ALLOC_H

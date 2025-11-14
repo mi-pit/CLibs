@@ -6,7 +6,7 @@
 #ifndef CLIBS_DICTIONARY_H
 #define CLIBS_DICTIONARY_H
 
-#include "../item_print_functions.h"
+#include "../util/item_print_functions.h"
 
 
 typedef struct dictionary Dictionary;

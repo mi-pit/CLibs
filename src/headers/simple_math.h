@@ -8,8 +8,8 @@
 #ifndef SIMPLE_MATH_H
 #define SIMPLE_MATH_H
 
-#include "attributes.h"
-#include "types.h" /* int64_t */
+#include "core/attributes.h"
+#include "core/types.h" /* int64_t */
 
 
 /// The signs are equal to their supposed value.

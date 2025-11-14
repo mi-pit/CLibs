@@ -5,7 +5,7 @@
 #ifndef CLIBS_DYNSTRING_H
 #define CLIBS_DYNSTRING_H
 
-#include "../headers/attributes.h" /* Constructor */
+#include "../headers/core/attributes.h" /* Constructor */
 
 #include <stdarg.h>
 #include <stddef.h>

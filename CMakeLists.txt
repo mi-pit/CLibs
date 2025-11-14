@@ -18,7 +18,6 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 add_compile_definitions(
         _POSIX_C_SOURCE=200809L
         LINE_PREF_WIDTH=120
-        CLIBS_STRUCT_CONVERSIONS
 )
 
 
@@ -27,27 +26,29 @@ add_compile_definitions(
 # ————————————————————————————————————
 
 set(CLIB_SOURCES
-        src/string_utils.c
-        src/item_print_functions.c
-        src/math.c
+        src/util/string_utils.c
+        src/util/item_print_functions.c
+        src/util/math.c
 
         src/structs/dynarr.c
         src/structs/dynstring.c
         src/structs/set.c
         src/structs/dictionary.c
         src/structs/queue.c
+
+        src/structs/conversions.c
 )
 
 set(CLIB_PUBLIC_HDRS
-        src/string_utils.h
-        src/item_print_functions.h
-        src/math.h
+        src/util/string_utils.h
+        src/util/item_print_functions.h
+        src/util/math.h
 
         src/structs/dynarr.h
         src/structs/dynstring.h
         src/structs/set.h
-        src/Structs/dictionary.h
-        src/Structs/queue.h
+        src/structs/dictionary.h
+        src/structs/queue.h
 )
 
 add_library(clib_core STATIC ${CLIB_SOURCES})

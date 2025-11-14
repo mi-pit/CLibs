@@ -1,25 +1,12 @@
 /*
- * Miscellaneous things that don't fit elsewhere.
- *
- * UNUSED, countof, cmp functions, ...
+ * Comparator functions
  */
 
-#ifndef CLIBS_MISC_H
-#define CLIBS_MISC_H
+#ifndef CLIBS_CMP_H
+#define CLIBS_CMP_H
 
-#include "attributes.h"
-#include "types.h"
-
-
-/// Stops those pesky `unused variable` compiler warnings/errors
-#define UNUSED( UNUSEDARG ) ( ( void ) ( UNUSEDARG ) )
-
-
-/// For string literals
-#define STRLEN( STRING ) ( sizeof( STRING ) - 1 )
-
-/// Number of elements in an array (stack-allocated)
-#define countof( array ) ( sizeof( array ) / sizeof *( array ) )
+#include "core/attributes.h"
+#include "core/types.h"
 
 
 /// Evaluates the cmp function as true if the elements are equal
@@ -74,4 +61,4 @@ LibraryDefined uint64_t hash_func( const void *const data, const size_t nbytes )
 }
 
 
-#endif //CLIBS_MISC_H
+#endif //CLIBS_CMP_H

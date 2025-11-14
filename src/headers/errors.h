@@ -14,10 +14,10 @@
 #define CLIBS_ERRORS_H
 
 /* for this header */
-#include "attributes.h"      /* PrintfLike, LibraryDefined */
-#include "filenames.h"       /* get_prog_name(), __FILE_NAME__ */
-#include "terminal_colors.h" /* COLORs, PrintInColor */
-#include "unreachable.h"     /* UNREACHABLE */
+#include "core/attributes.h"            /* PrintfLike, LibraryDefined */
+#include "core/filenames.h"             /* get_prog_name(), __FILE_NAME__ */
+#include "util/ctrlflow/unreachable.h"  /* UNREACHABLE */
+#include "util/print/terminal_colors.h" /* COLORs, PrintInColor */
 
 #include <errno.h>  /* for WarnUniversal + include */
 #include <stddef.h> /* ptrdiff_t */

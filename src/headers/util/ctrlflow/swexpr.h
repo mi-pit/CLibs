@@ -10,9 +10,9 @@
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
 
-#include "../structs/dynarr.h" /* stack-like lists */
-#include "errors.h"            /* err */
-#include "pointer_utils.h"     /* deref_as, free_n */
+#include "../../../structs/dynarr.h" /* stack-like lists */
+#include "../../errors.h"            /* err */
+#include "../ptrs.h"                 /* deref_as, free_n */
 
 #include <stdbool.h> /* bool */
 

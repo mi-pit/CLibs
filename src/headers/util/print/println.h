@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 
-#define println( ... ) ( printf( __VA_ARGS__ ) + printf( LINEBREAK_STR ) )
+#define println( ... ) ( printf( __VA_ARGS__ ) + printf( "%c", LINEBREAK_CHR ) )
 
 
 #endif //PRINT_H

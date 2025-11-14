@@ -26,10 +26,12 @@
 # Testing scripts?
 !*.sh
 
+!src/
+!src/**
+
 !/tests/
-!/tests/modules/
-!/src/
-!/src/*
+!/tests/**
+
 
 !/docs/
 !/docs/search

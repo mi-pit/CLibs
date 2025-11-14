@@ -1,10 +1,8 @@
 #include "item_print_functions.h"
 
-#include "headers/errors.h"
-#include "headers/pointer_utils.h"
-#include "headers/types.h"
+#include "../headers/core/types.h"
+#include "../headers/util/ptrs.h"
 
-#include <err.h>
 #include <stdio.h>
 #include <string.h>
 
