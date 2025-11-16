@@ -62,7 +62,7 @@ DECLARE_PRINT_FUNC( string_direct );
     {                                                                              \
         if ( nbytes != sizeof( type ) )                                            \
         {                                                                          \
-            fwarnx( "invalid data" );                                              \
+            fflwarnx( "invalid data" );                                            \
             return;                                                                \
         }                                                                          \
                                                                                    \
