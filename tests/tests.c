@@ -16,10 +16,36 @@
 #include "modules/test_struct_conversions.h"
 #include "modules/test_swex.h"
 
+#include <sys/file.h> /* open */
+#include <unistd.h>   /* dup2 */
+
+
+#define warn_on_error( EXPR, FUNC, ... ) \
+    do                                   \
+    {                                    \
+        if ( EXPR == RV_ERROR )          \
+        {                                \
+            FUNC( __VA_ARGS__ );         \
+        }                                \
+    }                                    \
+    while ( 0 )
+
+
+void setup_testing( void )
+{
+    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_FAILED );
+
+    int fd = open( "/dev/null", 0 );
+    warn_on_error( fd, fflwarn, "opening `/dev/null`" );
+    warn_on_error( dup2( fd, STDERR_FILENO ), fflwarn, "stderr redirection failed" );
+    warn_on_error( close( fd ), PrintInColor, stdout, COLOR_WARNING,
+                   "closing `/dev/null`\n" );
+}
+
 
 int main( void )
 {
-    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_FAILED );
+    setup_testing();
 
     RUNALL_STRING_UTILS();
 
