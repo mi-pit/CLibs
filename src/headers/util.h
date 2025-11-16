@@ -4,3 +4,4 @@
 #include "util/hash.h"
 #include "util/print.h"
 #include "util/ptrs.h"
+#include "util/str.h"
