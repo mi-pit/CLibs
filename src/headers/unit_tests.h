@@ -1,4 +1,4 @@
-/*
+/**
  * Header for unit-testing.
  *
  * For more info see `docs/unit-tests.md`.
@@ -18,6 +18,12 @@
 #include <stdbool.h> /* * */
 #include <stdio.h>   /* printf */
 #include <stdlib.h>  /* exit */
+
+
+/*
+ * TODO:
+ * atexit( FINISH_TESTING );
+ */
 
 
 #if !defined( LINE_PREF_WIDTH )
@@ -235,11 +241,6 @@ LibraryDefined bool TEST_NAME_CREATOR( UNIT_TEST )( const char *cond_str,
         for ( size_t i = 0; i < msg_indent; ++i )
             printf( " " );
     }
-
-#if defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 201112L
-    _Static_assert( TESTS_LINE_WIDTH > ( MSG_END_PART_LEN + msg_indent ),
-                    "TESTS_LINE_WIDTH must be greater than the const part" );
-#endif
 
     const size_t ndots =
             ln > 0 ? ( size_t ) ln : TESTS_LINE_WIDTH - MSG_END_PART_LEN - msg_indent;
