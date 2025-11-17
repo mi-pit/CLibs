@@ -12,14 +12,15 @@
  */
 
 #include <stdlib.h> /* malloc */
+#include <string.h> /* strn?cpy, strlen */
 
 #define strndup string_duplicate_l
 #define strdup  string_duplicate
 
 /// `strndup` implementation (standard in POSIX and C23+)
-LibraryDefined UseResult str_t string_duplicate_l( string_t s, size_t l )
+LibraryDefined UseResult char *string_duplicate_l( const char *s, size_t l )
 {
-    const str_t n = malloc( l + 1 );
+    char *const n = malloc( l + 1 );
     if ( n == NULL )
         return NULL;
 
@@ -29,10 +30,10 @@ LibraryDefined UseResult str_t string_duplicate_l( string_t s, size_t l )
 }
 
 /// `strdup` implementation (standard in POSIX and C23+)
-LibraryDefined UseResult str_t string_duplicate( string_t s )
+LibraryDefined UseResult char *string_duplicate( const char *const s )
 {
     const size_t l = strlen( s );
-    const str_t n  = malloc( l + 1 );
+    char *const n  = malloc( l + 1 );
     if ( n == NULL )
         return NULL;
 
