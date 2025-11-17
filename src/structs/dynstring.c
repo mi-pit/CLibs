@@ -298,12 +298,15 @@ size_t dynstr_len( const struct dynamic_string *dynstr )
 }
 
 
-int dynstr_map( DynString *dynstr,
-                char *( *string_map )( const char *string, size_t string_length ) )
+int DynString__map( DynString *dynstr,
+                    char *( *string_map )( const char *string, size_t string_length ),
+                    const char *mapper_name )
 {
     const str_t mapped = string_map( dynstr->data, dynstr->len );
     if ( mapped == NULL )
-        return fwarnx_ret( RV_ERROR, "could not map string" );
+        // use different function name
+        return WarnUniversal( true, NULL, "string_map", -1, -1, RV_ERROR,
+                              "failed to map string in function `%s`", mapper_name );
 
     free_n( dynstr->data );
 

@@ -222,8 +222,11 @@ size_t dynstr_len( const DynString * );
  *
  * @return `RV_ERROR` if `string_map` returns null, else `RV_SUCCESS`
  */
-int dynstr_map( DynString *,
-                char *( *string_map )( const char *string, size_t string_length ) );
+#define dynstr_map( DYNSTRING, MAPPER ) DynString__map( DYNSTRING, MAPPER, #MAPPER )
+
+int DynString__map( DynString *dynstr,
+                    char *( *string_map )( const char *string, size_t string_length ),
+                    const char *mapper_name );
 
 
 #endif //CLIBS_DYNSTRING_H
