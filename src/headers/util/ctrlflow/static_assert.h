@@ -9,15 +9,42 @@
 #ifndef STATIC_ASSERT_H
 #define STATIC_ASSERT_H
 
-#if __STDC_VERSION__ >= 201112L
+#include "../../core/stdc_versions.h"
+
+#if __STDC_VERSION__ >= STANDARD_C11_VERSION
 #define STATIC_ASSERT( CONDITION, MESSAGE ) _Static_assert( CONDITION, MESSAGE )
+
+#elif HAS_ATTRIBUTE( constructor )
+#include "../../core/attributes.h" /* BeforeMain */
+#include "../../errors.h"          /* xwarnx */
+
+#define CONCAT2( a, b ) a##b
+#define CONCAT( a, b )  CONCAT2( a, b )
+
+#define UNIQUE_NAME( base ) CONCAT( base, __COUNTER__ )
+
+#define FOREGROUND_BWHITE_BOLD COLOR_CREATOR( "1;97" )
+
+/// Asserts condition before entering `main`
+#define STATIC_ASSERT( CONDITION, MESSAGE )                                             \
+    static /* :D */ BeforeMain void UNIQUE_NAME( STATIC_ASSERT__ )( void )              \
+    {                                                                                   \
+        if ( !( CONDITION ) )                                                           \
+        {                                                                               \
+            xwarnx( "'static' assertion failed\n"                                       \
+                    "\toffending expression: " COLOR_DEFAULT " `%s`" COLOR_WARNING "\n" \
+                    "\twith message " FOREGROUND_BWHITE_BOLD "\"%s\"",                  \
+                    #CONDITION, ( MESSAGE ) );                                          \
+            abort();                                                                    \
+        }                                                                               \
+    }                                                                                   \
+    /* The `struct` is there so that there is no */                                     \
+    /* trailing semicolon after use. */                                                 \
+    struct UNUSED_STATIC_ASSERT_STRUCT
 
 #else // C level < 11
 /// Does nothing
 #define STATIC_ASSERT( CONDITION, MESSAGE ) struct UNUSED_STATIC_ASSERT_STRUCT
-
-// The `struct` is there so that there is no
-// trailing semicolon after use.
 
 #endif //C11
 
