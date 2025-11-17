@@ -296,3 +296,20 @@ size_t dynstr_len( const struct dynamic_string *dynstr )
 {
     return dynstr->len;
 }
+
+
+int dynstr_map( DynString *dynstr,
+                char *( *string_map )( const char *string, size_t string_length ) )
+{
+    const str_t mapped = string_map( dynstr->data, dynstr->len );
+    if ( mapped == NULL )
+        return fwarnx_ret( RV_ERROR, "could not map string" );
+
+    free_n( dynstr->data );
+
+    dynstr->data = mapped;
+    dynstr->len  = strlen( mapped );
+    dynstr->cap  = dynstr->len;
+
+    return RV_SUCCESS;
+}

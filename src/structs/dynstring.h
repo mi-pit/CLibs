@@ -187,4 +187,43 @@ const char *dynstr_data( const DynString * );
  */
 size_t dynstr_len( const DynString * );
 
+
+/**
+ * Supplies `string_map` with the `DynString`'s data and
+ * sets the new string as the `DynString`'s contents while preserving its invariants.
+ * <p>
+ * `string_map` MUST return a pointer that may be passed to `free(3)`.
+ * </p>
+ * <p>
+ * If an string_map returns `NULL` --
+ * no change is done in the `DynString`,
+ * RV_ERROR is returned, and an error message is printed.
+ * </p>
+ *
+ * @code
+ * char *string_append_A( const char *str, size_t len )
+ * {
+ *     const size_t new_len = len + 1;
+ *     char *const new_str = malloc( new_len + 1 );
+ *     if ( new_str == NULL )
+ *         return NULL;
+ *
+ *     strncpy( new_str, str, len );
+ *     new_str[ new_len - 1 ] = 'A';
+ *     new_str[ new_len ] = '\0';
+ *
+ *     return new_str;
+ * }
+ *
+ * // Elsewhere
+ * DynString *dynstr = ...;
+ * const int rv = dynstr_map( dynstr, string_append_A ); // appends 'A'
+ * @endcode
+ *
+ * @return `RV_ERROR` if `string_map` returns null, else `RV_SUCCESS`
+ */
+int dynstr_map( DynString *,
+                char *( *string_map )( const char *string, size_t string_length ) );
+
+
 #endif //CLIBS_DYNSTRING_H
