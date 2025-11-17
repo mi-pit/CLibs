@@ -15,6 +15,7 @@
 #include "modules/test_string_utils.h"
 #include "modules/test_struct_conversions.h"
 #include "modules/test_swex.h"
+#include "modules/test_to_string.h"
 
 #include <sys/file.h> /* open */
 #include <unistd.h>   /* dup2 */
