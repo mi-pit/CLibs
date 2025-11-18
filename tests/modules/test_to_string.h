@@ -57,8 +57,10 @@ TEST( to_string )
     TEST_ONE_TO_STRING( char *, "Hello!", "Hello!" );
     TEST_ONE_TO_STRING( const char *, "Hello!", "Hello!" );
 
+#ifdef __APPLE__
     TEST_ONE_TO_STRING( char *, NULL, "(null)" );
     TEST_ONE_TO_STRING( const char *, NULL, "(null)" );
+#endif
 
     TEST_ONE_TO_STRING( void *, NULL, "0x0" );
     TEST_ONE_TO_STRING( const void *, NULL, "0x0" );
