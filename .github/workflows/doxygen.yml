@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Path to the directory Doxygen created
-          path: docs_html/html
+          path: docs/html
 
   deploy:
     runs-on: ubuntu-latest
