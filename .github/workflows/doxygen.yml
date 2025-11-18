@@ -2,7 +2,7 @@ name: Build and Deploy Doxygen Docs
 
 on:
   push:
-    branches: [ pipeline ]
+    branches: [ master ]
   workflow_dispatch:  # Allow manual triggers
 
 permissions:
