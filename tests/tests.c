@@ -45,10 +45,10 @@ void setup_testing( void )
 
 
 /* test Static assert */
+#include "../src/headers/core/limits.h" /* LONG_BIT */
+
 STATIC_ASSERT( sizeof( char ) == 1, "this one is in the standard" );
 STATIC_ASSERT( LONG_BIT / CHAR_BIT == sizeof( long ) / sizeof( char ), "tautology" );
-
-// STATIC_ASSERT( sizeof( int ) == 4, "`int` is four bytes on Mac" );
 
 // STATIC_ASSERT( 1 == 2, "I personally believe one should equal two. " );
 
