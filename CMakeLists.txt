@@ -1,53 +1,48 @@
 cmake_minimum_required(VERSION 3.24)
-project(CLibs VERSION 1.0 LANGUAGES C)
+project(CLibs VERSION 2.0 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-# ————————————————————————————————————
-#  1) Set sanitizer flags and “build type” as options
-# ————————————————————————————————————
-
-# Allow the user to pass -DCMAKE_BUILD_TYPE=Debug/Release from the command line.
-# By default, set it to “Release” if nothing was specified:
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type: Debug or Release" FORCE)
-endif ()
+# ------------------------------------
+#  1) Set compiler options/definitions
+# ------------------------------------
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 add_compile_definitions(
         _POSIX_C_SOURCE=200809L
         LINE_PREF_WIDTH=120
-        CLIBS_STRUCT_CONVERSIONS
 )
 
 
-# ————————————————————————————————————
+# ------------------------------------
 #  2) Gather all “core” sources into a static library
-# ————————————————————————————————————
+# ------------------------------------
 
 set(CLIB_SOURCES
-        src/string_utils.c
-        src/item_print_functions.c
-        src/math.c
+        src/util/string_utils.c
+        src/util/item_print_functions.c
+        src/util/math.c
 
         src/structs/dynarr.c
         src/structs/dynstring.c
         src/structs/set.c
         src/structs/dictionary.c
         src/structs/queue.c
+
+        src/structs/conversions.c
 )
 
 set(CLIB_PUBLIC_HDRS
-        src/string_utils.h
-        src/item_print_functions.h
-        src/math.h
+        src/util/string_utils.h
+        src/util/item_print_functions.h
+        src/util/math.h
 
         src/structs/dynarr.h
         src/structs/dynstring.h
         src/structs/set.h
-        src/Structs/dictionary.h
-        src/Structs/queue.h
+        src/structs/dictionary.h
+        src/structs/queue.h
 )
 
 add_library(clib_core STATIC ${CLIB_SOURCES})
@@ -55,9 +50,9 @@ add_library(clib_core STATIC ${CLIB_SOURCES})
 install(TARGETS clib_core ARCHIVE DESTINATION lib)
 
 
-# ————————————————————————————————————
+# ------------------------------------
 #  Enable CTest and define each test executable
-# ————————————————————————————————————
+# ------------------------------------
 
 # ================ With ASAN ================
 enable_testing()
@@ -81,13 +76,17 @@ add_executable(tests
 )
 target_link_libraries(tests PRIVATE clib_core)
 
-# Don't add_test(), because this one should fail in some way
+add_executable(c23
+        tests/tests.c
+)
+target_link_libraries(c23 PRIVATE clib_core)
+target_compile_options(c23 PRIVATE --std=c2x)
+
 add_executable(test_unit_tests
         tests/test_unit_tests.c
 )
 target_link_libraries(test_unit_tests PRIVATE clib_core)
 
-# Not even really a test
 add_executable(test_hash
         tests/test_hash_func.c
 )
@@ -102,17 +101,3 @@ add_executable(test_prints
         tests/test_printing.c
 )
 target_link_libraries(test_prints PRIVATE clib_core)
-
-
-# ————————————————————————————————————
-#  4) Installation rules for headers & library
-# ————————————————————————————————————
-
-install(TARGETS clib_core
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-)
-install(FILES ${CLIB_PUBLIC_HDRS}
-        DESTINATION include
-)
-

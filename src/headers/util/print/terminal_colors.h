@@ -1,16 +1,17 @@
-/*
- * Functions and macros for working with colors on UNIX terminals.
- *
- *
- * Created by MacBook on 14.01.2025.
+/**
+ * @file terminal_colors.h
+ * @brief Functions and macros for working with colors on UNIX terminals.
  */
+
+// Created by MacBook on 14.01.2025.
 
 #ifndef CLIBS_TERMINAL_COLORS_H
 #define CLIBS_TERMINAL_COLORS_H
 
-#include "attributes.h" /* PrintfLike(), LibraryDefined */
+#include "../../core/attributes.h" /* PrintfLike(), LibraryDefined */
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 

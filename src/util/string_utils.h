@@ -8,13 +8,16 @@
 #ifndef CLIBS_STRING_UTILS_H
 #define CLIBS_STRING_UTILS_H
 
-#include "headers/attributes.h" /* UseResult */
+#include "../headers/core/attributes.h" /* UseResult */
 
 #include <regex.h>     /* regex_t */
 #include <stdbool.h>   /* bool */
 #include <sys/types.h> /* ssize_t */
 
 /* include for user */
+#include "../headers/util/str/asprintf.h" /* v?asprintf */
+#include "../headers/util/str/strdup.h"   /* strn?dup */
+
 #include <ctype.h>  /* is* */
 #include <string.h> /* str* */
 
@@ -29,99 +32,6 @@ LibraryDefined inline int issign( const int c )
 typedef const char *string_t;
 /// Mutable string
 typedef char *str_t;
-
-
-#if __STDC_VERSION__ < 202311L && !defined( _POSIX_C_SOURCE )
-/*
- * Define
- * strdup && strndup
- */
-
-#include <stdlib.h> /* malloc */
-
-#define strndup string_duplicate_l
-#define strdup  string_duplicate
-
-/// `strndup` implementation (standard in POSIX and C23+)
-LibraryDefined UseResult str_t string_duplicate_l( string_t s, size_t l )
-{
-    const str_t n = malloc( l + 1 );
-    if ( n == NULL )
-        return NULL;
-
-    strncpy( n, s, l );
-    n[ l ] = '\0';
-    return n;
-}
-
-/// `strdup` implementation (standard in POSIX and C23+)
-LibraryDefined UseResult str_t string_duplicate( string_t s )
-{
-    const size_t l = strlen( s );
-    const str_t n  = malloc( l + 1 );
-    if ( n == NULL )
-        return NULL;
-
-    n[ l ] = '\0';
-    strcpy( n, s );
-    return n;
-}
-#endif // ndef strdup
-
-#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) || defined( _POSIX_C_SOURCE )
-// non-standard
-
-/*
- * Define
- * asprintf && vasprintf
- */
-
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifndef vsnprintf
-/// `va_list` version of `snprintf()`
-int vsnprintf( char *str, size_t size, const char *restrict format, va_list ap );
-#endif
-
-/**
- * Like `vsprintf()`, except it heap-allocates memory for the resulting string.
- * `*strp` may be passed to `free(3)`
- */
-LibraryDefined int vasprintf( str_t *strp, const string_t fmt, va_list args )
-{
-    va_list vaList;
-    va_copy( vaList, args );
-
-    int size = vsnprintf( NULL, ( size_t ) 0, fmt, args );
-
-    if ( size < 0 )
-        return size;
-
-    *strp = malloc( size + 1 );
-    if ( !*strp )
-        return -1;
-
-    const int result = vsnprintf( *strp, ( size_t ) size + 1, fmt, vaList );
-    va_end( args );
-
-    return result;
-}
-
-/**
- * Like `sprintf()`, except it heap-allocates memory for the resulting string.
- * `*strp` may be passed to `free(3)` *
- */
-LibraryDefined int asprintf( str_t *strp, const string_t fmt, ... )
-{
-    va_list va;
-    va_start( va, fmt );
-    const int rv = vasprintf( strp, fmt, va );
-    va_end( va );
-    return rv;
-}
-#endif
 
 
 /**

@@ -4,8 +4,8 @@
 #ifndef TEST_DICT_H
 #define TEST_DICT_H
 
-#include "../../src/headers/pointer_utils.h"
 #include "../../src/headers/unit_tests.h"
+#include "../../src/headers/util/ptrs/alloc.h"
 #include "../../src/structs/dictionary.h"
 
 TEST( dict_init )

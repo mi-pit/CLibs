@@ -5,18 +5,18 @@
 #ifndef CLIBS_TEST_FOREACH_H
 #define CLIBS_TEST_FOREACH_H
 
-#include "../../src/headers/assert_that.h"
-#include "../../src/headers/misc.h"
+#define FOREACH_LS
+#define FOREACH_SET
+#define FOREACH_QUE
 #include "../../src/headers/unit_tests.h"
-#include "../../src/string_utils.h"
+#include "../../src/headers/util/cmp.h"
+#include "../../src/headers/util/ctrlflow.h"
+#include "../../src/headers/util/ptrs/alloc.h"
 #include "../../src/structs/dynarr.h"
 #include "../../src/structs/dynstring.h"
 #include "../../src/structs/queue.h"
 #include "../../src/structs/set.h"
-
-// must be after dynarr.h and set.h
-#include "../../src/headers/foreach.h"
-#include "../../src/headers/pointer_utils.h"
+#include "../../src/util/string_utils.h"
 #include "test_queue.h"
 
 

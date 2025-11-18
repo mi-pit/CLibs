@@ -3,6 +3,7 @@
 //
 
 #include "modules/test_array_sprintf.h"
+#include "modules/test_cmp.h"
 #include "modules/test_dict.h"
 #include "modules/test_dynstr.h"
 #include "modules/test_filenames.h"
@@ -15,11 +16,49 @@
 #include "modules/test_string_utils.h"
 #include "modules/test_struct_conversions.h"
 #include "modules/test_swex.h"
+#include "modules/test_to_string.h"
+
+#include <sys/file.h> /* open */
+#include <unistd.h>   /* dup2 */
+
+
+#define warn_on_error( EXPR, FUNC, ... ) \
+    do                                   \
+    {                                    \
+        if ( EXPR == RV_ERROR )          \
+        {                                \
+            FUNC( __VA_ARGS__ );         \
+        }                                \
+    }                                    \
+    while ( 0 )
+
+
+void setup_testing( void )
+{
+    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_FAILED );
+
+    int fd = open( "/dev/null", 0 );
+    warn_on_error( fd, fflwarn, "opening `/dev/null`" );
+    warn_on_error( dup2( fd, STDERR_FILENO ), fflwarn, "stderr redirection failed" );
+    warn_on_error( close( fd ), PrintInColor, stdout, COLOR_WARNING,
+                   "closing `/dev/null`\n" );
+}
+
+
+/* test Static assert */
+#include "../src/headers/core/limits.h" /* LONG_BIT */
+
+STATIC_ASSERT( sizeof( char ) == 1, "this one is in the standard" );
+STATIC_ASSERT( LONG_BIT / CHAR_BIT == sizeof( long ) / sizeof( char ), "tautology" );
+
+// STATIC_ASSERT( 1 == 2, "I personally believe one should equal two. " );
+
+/* end test Static assert */
 
 
 int main( void )
 {
-    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_FAILED );
+    setup_testing();
 
     RUNALL_STRING_UTILS();
 
@@ -39,6 +78,11 @@ int main( void )
     RUNALL_SWEX();
 
     RUNALL_FILENAMES();
+
+    // C11+
+    RUNALL_TO_STRING();
+
+    RUNALL_CMP();
 
     FINISH_TESTING();
 }

@@ -1,9 +1,13 @@
-/*
+/**
+ * @file array_printf.h
+ * @brief
  * Print an array in a formatted way.
  *
- *
- * Created by MacBook on 25.12.2024.
+ * Element type of the array must be known at compile time.
  */
+
+// Created by MacBook on 25.12.2024.
+
 
 #ifndef CLIBS_ARRAY_PRINTF_H
 #define CLIBS_ARRAY_PRINTF_H
@@ -74,7 +78,8 @@
 #define array_printf( ARRAY, ARRLEN, TYPE, FORMAT_STR ) \
     array_printf_d( ARRAY, ARRLEN, TYPE, FORMAT_STR, ARRAY_PRINT_DEFAULT_DELIM )
 
-#if defined( CLIBS_DYNSTRING_H ) || defined( CLIBS__GENERATE_DOCS )
+#if defined( CLIBS_DYNSTRING_H ) || defined( CLIBS__GENERATE_DOCS ) \
+        || defined( ARRAY_SPRINTF )
 /**
  * The contents of `STRINGVAR` are overwritten (the pointer itself is).
  *

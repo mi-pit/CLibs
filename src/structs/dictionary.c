@@ -1,9 +1,7 @@
 #include "dictionary.h"
 
-#include "../headers/assert_that.h"
-#include "../headers/errors.h"        /* includes misc.h */
-#include "../headers/misc.h"          /* hash_func(), cmp_size_t(), cmpeq() */
-#include "../headers/pointer_utils.h" /* free_n() */
+#include "../headers/util.h"
+#include "../headers/util/cmp.h" /* cmp_size_t(), cmpeq() */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +14,14 @@ struct dictionary {
     size_t capacity;
 };
 
+/* TODO?
+struct Datum {
+    void *datap;
+    size_t size;
+
+    PrintFunction printer;
+};
+*/
 
 struct key_value_pair {
     void *key;
@@ -255,6 +261,7 @@ size_t dict_size( const struct dictionary *dict )
 {
     return dict->size;
 }
+
 
 Private inline void kvp_print_as( const struct key_value_pair *item,
                                   const PrintFunction key_print,

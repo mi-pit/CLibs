@@ -3,10 +3,10 @@
 //
 #include "dynstring.h"
 
-#include "../headers/assert_that.h"
-#include "../headers/errors.h"      /* RV, warn */
-#include "../headers/simple_math.h" /* min */
-#include "../string_utils.h"        /* vasprintf (if it's not defined in <stdio.h>) */
+#include "../headers/core/errors.h"   /* RV, warn */
+#include "../headers/simple_math.h"   /* min */
+#include "../headers/util/ctrlflow.h" /* assert_that */
+#include "../util/string_utils.h"     /* vasprintf (if it's not defined in <stdio.h>) */
 
 #include <assert.h> //
 #include <stdio.h>  /* fprintf() */
@@ -295,4 +295,24 @@ string_t dynstr_data( const struct dynamic_string *dynstr )
 size_t dynstr_len( const struct dynamic_string *dynstr )
 {
     return dynstr->len;
+}
+
+
+int DynString__map( DynString *dynstr,
+                    char *( *string_map )( const char *string, size_t string_length ),
+                    const char *mapper_name )
+{
+    const str_t mapped = string_map( dynstr->data, dynstr->len );
+    if ( mapped == NULL )
+        // use different function name
+        return WarnUniversal( true, NULL, "string_map", -1, -1, RV_ERROR,
+                              "failed to map string in function `%s`", mapper_name );
+
+    free_n( dynstr->data );
+
+    dynstr->data = mapped;
+    dynstr->len  = strlen( mapped );
+    dynstr->cap  = dynstr->len;
+
+    return RV_SUCCESS;
 }

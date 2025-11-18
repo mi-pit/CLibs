@@ -1,23 +1,47 @@
-/*
+/**
+ * @file unit_tests.h
+ * @brief
  * Header for unit-testing.
  *
- * For more info see `docs/unit-tests.md`.
+ * Example:
+ * @code
+ * #include "src/headers/unit_tests.h"
  *
+ * TEST( some_test )
+ * {
+ *     UNIT_TEST( 1 == 1 );
+ *     UNIT_TEST( 1  < 2 );
+ * }
+ * END_TEST
  *
- * Created by MacBook on 03.01.2025.
+ * int main( void )
+ * {
+ *     RUN_TEST( some_test );
+ *     FINISH_TESTING();
+ * }
+ * @endcode
  */
+
+// Created by MacBook on 03.01.2025.
+
 
 #ifndef CLIBS_UNIT_TESTS_H
 #define CLIBS_UNIT_TESTS_H
 
-#include "errors.h"          /* fwarn, UNREACHABLE */
-#include "filenames.h"       /* PATH_MAX */
-#include "misc.h"            /* STRLEN */
-#include "terminal_colors.h" /* colors */
+#include "core/filenames.h"             /* PATH_MAX */
+#include "util/ctrlflow/unreachable.h"  /* UNREACHABLE_MSG() */
+#include "util/print/terminal_colors.h" /* colors */
+#include "util/ptrs/arrays.h"           /* STRLEN */
 
-#include <stdbool.h> /* * */
+#include <stdbool.h> /**/
 #include <stdio.h>   /* printf */
 #include <stdlib.h>  /* exit */
+
+
+/*
+ * TODO:
+ * atexit( FINISH_TESTING );
+ */
 
 
 #if !defined( LINE_PREF_WIDTH )
@@ -201,7 +225,8 @@ LibraryDefined bool TEST_NAME_CREATOR( UNIT_TEST )( const char *cond_str,
             break;
 
         default:
-            UNREACHABLE();
+            UNREACHABLE_MSG( "Verbosity variable from %s has been tampered with.",
+                             __FILE_NAME__ );
     }
 
     printf( "    " );
@@ -235,11 +260,6 @@ LibraryDefined bool TEST_NAME_CREATOR( UNIT_TEST )( const char *cond_str,
         for ( size_t i = 0; i < msg_indent; ++i )
             printf( " " );
     }
-
-#if defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 201112L
-    _Static_assert( TESTS_LINE_WIDTH > ( MSG_END_PART_LEN + msg_indent ),
-                    "TESTS_LINE_WIDTH must be greater than the const part" );
-#endif
 
     const size_t ndots =
             ln > 0 ? ( size_t ) ln : TESTS_LINE_WIDTH - MSG_END_PART_LEN - msg_indent;
@@ -321,7 +341,7 @@ LibraryDefined bool SET_UNIT_TEST_VERBOSITY( const TEST_NAME_CREATOR( VERBOSITY_
             return true;
 
         default:
-            return fwarnx_ret( false, "invalid argument (%d)", v );
+            return false;
     }
 }
 

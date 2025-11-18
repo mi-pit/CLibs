@@ -4,10 +4,10 @@
 #ifndef TEST_STRING_UTILS_H
 #define TEST_STRING_UTILS_H
 
-#include "../../src/headers/assert_that.h"
-#include "../../src/headers/pointer_utils.h"
 #include "../../src/headers/unit_tests.h"
-#include "../../src/string_utils.h"
+#include "../../src/headers/util/ctrlflow/assert_that.h"
+#include "../../src/headers/util/ptrs/alloc.h"
+#include "../../src/util/string_utils.h"
 
 
 TEST( replace )

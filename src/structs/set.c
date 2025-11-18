@@ -1,6 +1,6 @@
 #include "set.h"
 
-#include "../headers/misc.h" /* cmp_size_t */
+#include "../headers/util/cmp.h" /* cmp_size_t */
 #include "dynarr.h"
 
 #include <assert.h>   /* assert */

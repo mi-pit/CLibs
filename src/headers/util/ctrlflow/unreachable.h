@@ -1,7 +1,6 @@
 /**
  * @file unreachable.h
  * @brief
- *
  * UNREACHABLE macro (abort(3) alias)
  */
 

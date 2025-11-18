@@ -1,8 +1,7 @@
 /**
  * @file types.h
  * @brief
- *
- * Includes most standard types and defines `byte` type.
+ * Includes most (if not all) standard types and defines `byte` type.
  */
 
 #ifndef CLIBS_TYPES_H
@@ -20,6 +19,6 @@
 #include <limits.h>   /* INT*_MAX */
 
 
-typedef int8_t byte;
+typedef uint8_t byte;
 
 #endif //CLIBS_TYPES_H

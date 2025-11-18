@@ -5,27 +5,28 @@
 #ifndef CLIBS_TEST_SWEX_H
 #define CLIBS_TEST_SWEX_H
 
-#include "../../src/headers/swexpr.h"
 #include "../../src/headers/unit_tests.h"
-#include "../../src/string_utils.h"
+#include "../../src/headers/util/ctrlflow.h"
+#include "../../src/util/string_utils.h"
+
 
 static int get_swex_val( int branch_1, int branch_2, string_t branch_3 )
 {
     swex_init_val( int, branch_1 ) as_new( int, rv )
     {
-        swex_case_imm( int, 1 )
+        swex_case_imm ( int, 1 )
         {
             swex_init_val( int, branch_2 ) as( rv )
             {
-                swex_case_imm( int, 1 )
+                swex_case_imm ( int, 1 )
                 {
                     resolve( int, 10 );
                 }
-                swex_case_imm( int, 2 )
+                swex_case_imm ( int, 2 )
                 {
                     swex_init_str( branch_3 ) as( rv )
                     {
-                        swex_case_str( "1" )
+                        swex_case_str ( "1" )
                         {
                             resolve( int, 100 );
                         }
@@ -43,7 +44,7 @@ static int get_swex_val( int branch_1, int branch_2, string_t branch_3 )
             }
             swex_finish();
         }
-        swex_case_imm( int, 2 )
+        swex_case_imm ( int, 2 )
         {
             resolve( int, 2 );
         }

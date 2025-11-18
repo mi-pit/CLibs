@@ -1,12 +1,13 @@
-/*
- * For more information, see `docs/set.md`.
+/**
+ * For more information, see `structs/set.h`.
  * Lots of relevant information is shared between the two structures.
  */
 
 #ifndef CLIBS_DICTIONARY_H
 #define CLIBS_DICTIONARY_H
 
-#include "../item_print_functions.h"
+#include "../headers/util/hash.h"
+#include "../util/item_print_functions.h"
 
 
 typedef struct dictionary Dictionary;

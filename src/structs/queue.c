@@ -4,7 +4,7 @@
 
 #include "queue.h"
 
-#include "../headers/errors.h"
+#include "../headers/core/errors.h"
 
 #include <assert.h>
 #include <stdlib.h>

@@ -2,7 +2,7 @@
 // Created by Michal Pitner on 23.06.2025.
 //
 
-#include "../src/headers/assert_that.h"
+#include "../src/headers/ctrlflow/assert_that.h"
 
 int main( void )
 {

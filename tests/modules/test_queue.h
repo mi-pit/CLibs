@@ -4,9 +4,9 @@
 #ifndef TEST_QUEUE_H
 #define TEST_QUEUE_H
 
-#include "../../src/headers/assert_that.h"
-#include "../../src/headers/pointer_utils.h"
 #include "../../src/headers/unit_tests.h"
+#include "../../src/headers/util/ctrlflow/assert_that.h"
+#include "../../src/headers/util/ptrs/alloc.h"
 #include "../../src/structs/queue.h"
 
 

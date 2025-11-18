@@ -6,17 +6,14 @@
  * Sets contain at most one copy of an item.
  * Items can be of any type -- they are treated as arrays of bytes.
  * Their keys are a combination of the number of bytes and each byte of the data.
- *
- * @param n_items   : `size_t`; number of currently held items in the Set
- * @param capacity  : `size_t`; size of items array
- * @param items     : `struct set_item *`; array of type set_item
  */
 
 #ifndef CLIBS_SETS_H
 #define CLIBS_SETS_H
 
-#include "../headers/types.h"        /* stddef, stdint, stdbool */
-#include "../item_print_functions.h" /* PrintFunction */
+#include "../headers/core/types.h"        /* stddef, stdint, stdbool */
+#include "../headers/util/hash.h"         /* hash; include for impl */
+#include "../util/item_print_functions.h" /* PrintFunction */
 
 
 struct hash_set;
@@ -24,7 +21,13 @@ typedef struct hash_set Set;
 
 
 /**
- * `func` is set to `print_byte()` by default
+ * @param datap pointer to first byte of data
+ * @param size sizeof data
+ * @param func function pointer which is able to print the object behind `data`
+ *      -- set to `print_byte()` by default
+ *
+ * @param removed -- internal -- DO NOT MODIFY
+ * (TODO: make immutable from the outside)
  */
 struct set_item {
     void *data;

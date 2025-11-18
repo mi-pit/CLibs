@@ -30,8 +30,8 @@
 #ifndef CLIBS_DYNAMIC_ARRAY_H
 #define CLIBS_DYNAMIC_ARRAY_H
 
-#include "../headers/attributes.h" /* Private */
-#include "../headers/types.h"      /* size_t, int*_t */
+#include "../headers/core/attributes.h" /* Private */
+#include "../headers/core/types.h"      /* size_t, int*_t */
 
 #include <stdbool.h>
 
@@ -74,20 +74,6 @@ int list_copy( const struct dynamic_array *old, struct dynamic_array **new_ls_co
  *         This list may be passed to `list_destroy()`
  */
 Constructor struct dynamic_array *list_copy_of( const struct dynamic_array * );
-
-
-#if defined( CLIBS_STRUCT_CONVERSIONS )
-#include "queue.h"
-#include "set.h"
-#endif
-
-#ifdef CLIBS_SETS_H
-Constructor List *list_from_set( const Set * );
-#endif
-
-#ifdef CLIBS_QUEUE_H
-Constructor List *list_from_queue( const Queue * );
-#endif
 
 
 /**

@@ -7,8 +7,8 @@
 #ifndef CLIBS_PRINT_FUNCTIONS_H
 #define CLIBS_PRINT_FUNCTIONS_H
 
-#include "headers/attributes.h"
-#include "headers/errors.h"
+#include "../headers/core/attributes.h"
+#include "../headers/core/errors.h"
 
 #include <stdbool.h>
 
@@ -62,7 +62,7 @@ DECLARE_PRINT_FUNC( string_direct );
     {                                                                              \
         if ( nbytes != sizeof( type ) )                                            \
         {                                                                          \
-            fwarnx( "invalid data" );                                              \
+            fflwarnx( "invalid data" );                                            \
             return;                                                                \
         }                                                                          \
                                                                                    \

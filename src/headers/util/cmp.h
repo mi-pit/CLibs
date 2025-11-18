@@ -1,25 +1,15 @@
-/*
- * Miscellaneous things that don't fit elsewhere.
+/**
+ * @file cmp.h
+ * @brief Comparator functions.
  *
- * UNUSED, countof, cmp functions, ...
+ * May be used for sorting numeric types.
  */
 
-#ifndef CLIBS_MISC_H
-#define CLIBS_MISC_H
+#ifndef CLIBS_CMP_H
+#define CLIBS_CMP_H
 
-#include "attributes.h"
-#include "types.h"
-
-
-/// Stops those pesky `unused variable` compiler warnings/errors
-#define UNUSED( UNUSEDARG ) ( ( void ) ( UNUSEDARG ) )
-
-
-/// For string literals
-#define STRLEN( STRING ) ( sizeof( STRING ) - 1 )
-
-/// Number of elements in an array (stack-allocated)
-#define countof( array ) ( sizeof( array ) / sizeof *( array ) )
+#include "../core/attributes.h"
+#include "../core/types.h"
 
 
 /// Evaluates the cmp function as true if the elements are equal
@@ -53,25 +43,4 @@ DEFINE_CMP_FUNCTION( int64_t )
 DEFINE_CMP_FUNCTION( uint64_t )
 
 
-/**
- * Creates an arbitrary hash of any data of the specified length.
- *
- * Used, for example, in `set.h` and `dictionary.h`.
- *
- * @param data      pointer to data
- * @param nbytes    number of bytes (chars) under the pointer
- * @return unsigned 64-bit int hash
- */
-LibraryDefined uint64_t hash_func( const void *const data, const size_t nbytes )
-{
-    uint64_t hash = 5381 * nbytes;
-
-    const byte *data_byte = ( byte * ) data;
-    for ( size_t i = 0; i < nbytes; ++i )
-        hash = ( hash << 5 ) + hash + data_byte[ i ];
-
-    return hash;
-}
-
-
-#endif //CLIBS_MISC_H
+#endif //CLIBS_CMP_H
