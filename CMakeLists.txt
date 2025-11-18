@@ -80,7 +80,7 @@ add_executable(c23
         tests/tests.c
 )
 target_link_libraries(c23 PRIVATE clib_core)
-target_compile_options(c23 PRIVATE --std=c23)
+target_compile_options(c23 PRIVATE --std=c2x)
 
 add_executable(test_unit_tests
         tests/test_unit_tests.c
