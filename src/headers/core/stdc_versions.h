@@ -1,5 +1,5 @@
 /**
- * @file attributes.h
+ * @file stdc_versions.h
  * @brief
  * Macros for values of the C standards.
  *
