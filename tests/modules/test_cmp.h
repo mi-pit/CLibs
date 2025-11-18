@@ -20,7 +20,7 @@ static TEST( intcmp )
         array[ i ] = hash_func( &i, sizeof i );
 
     qsort( array, countof( array ), sizeof( TEST_CMP_CURRENT_TYPE ), cmp_unsigned );
-    array_printf( array, countof( array ), TEST_CMP_CURRENT_TYPE, "%u" );
+    // array_printf( array, countof( array ), TEST_CMP_CURRENT_TYPE, "%u" );
 
     for ( size_t i = 0; i < countof( array ) - 1; ++i )
         CRITICAL_TEST( array[ i ] <= array[ i + 1 ] );

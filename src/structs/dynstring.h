@@ -1,6 +1,14 @@
-//
+/**
+ * @file dynstring.h
+ * @brief A dynamic string.
+ *
+ * A string structure which handles re-allocation for the user.
+ * Can append to the end, pre-pend to the start (linear complexity),
+ * append formatted, clear, slice, and more.
+ */
+
 // Created by MacBook on 18.10.2024.
-//
+
 
 #ifndef CLIBS_DYNSTRING_H
 #define CLIBS_DYNSTRING_H

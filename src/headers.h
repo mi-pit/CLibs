@@ -1,7 +1,7 @@
 /**
  * @file headers.h
  * @brief
- * Includes all header-only* modules
+ * Includes all header-only* modules (`headers/`)
  *
  * @note *`headers/util/ctrlflow/swexpr.h` is not header-only.
  * Otherwise they -- at most -- only depend on other headers or the standard library.

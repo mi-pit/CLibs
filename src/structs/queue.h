@@ -14,11 +14,12 @@
  * | `get_tail` | O(1)            |
  * | `get_size` | O(n)            |
  * | `is_empty` | O(1)            |
+ *
+ * @attention All elements must be the same size (see `structs/dynarr.h`)
  */
 
-//
 // Created by Michal Pitner on 08.06.2025.
-//
+
 
 #ifndef CLIBS_QUEUE_H
 #define CLIBS_QUEUE_H
