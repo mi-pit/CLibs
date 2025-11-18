@@ -1,9 +1,10 @@
-/*
- * Utility functions and macros for working with pointers.
- *
- *
- * Created by MacBook on 01.11.2024.
+/**
+ * @file alloc.h
+ * @brief Utility functions and macros for allocating/deallocating memory.
  */
+
+// Created by MacBook on 01.11.2024.
+
 
 #ifndef CLIBS_ALLOC_H
 #define CLIBS_ALLOC_H

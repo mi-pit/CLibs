@@ -1,6 +1,6 @@
 #include "dynarr.h"
 
-#include "../headers/cmp.h"                     /* cmp */
+#include "../headers/util/cmp.h"                /* cmp */
 #include "../headers/util/ctrlflow.h"           /* assert_that */
 #include "../headers/util/ptrs/alloc.h"         /* deref_as */
 #include "queue.h"

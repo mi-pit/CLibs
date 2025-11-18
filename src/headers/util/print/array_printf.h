@@ -1,9 +1,13 @@
-/*
+/**
+ * @file array_printf.h
+ * @brief
  * Print an array in a formatted way.
  *
- *
- * Created by MacBook on 25.12.2024.
+ * Element type of the array must be known at compile time.
  */
+
+// Created by MacBook on 25.12.2024.
+
 
 #ifndef CLIBS_ARRAY_PRINTF_H
 #define CLIBS_ARRAY_PRINTF_H

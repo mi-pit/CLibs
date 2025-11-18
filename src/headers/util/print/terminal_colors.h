@@ -1,5 +1,6 @@
-/*
- * Functions and macros for working with colors on UNIX terminals.
+/**
+ * @file terminal_colors.h
+ * @brief Functions and macros for working with colors on UNIX terminals.
  */
 
 // Created by MacBook on 14.01.2025.
@@ -10,6 +11,7 @@
 #include "../../core/attributes.h" /* PrintfLike(), LibraryDefined */
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 

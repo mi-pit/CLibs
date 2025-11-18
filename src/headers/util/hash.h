@@ -1,6 +1,10 @@
-//
+/**
+ * @file hash.h
+ * @brief Simple hash function.
+ */
+
 // Created by Michal Pitner on 14.11.2025.
-//
+
 
 #ifndef CLIBS_HASH_H
 #define CLIBS_HASH_H

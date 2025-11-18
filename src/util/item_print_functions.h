@@ -8,7 +8,7 @@
 #define CLIBS_PRINT_FUNCTIONS_H
 
 #include "../headers/core/attributes.h"
-#include "../headers/errors.h"
+#include "../headers/core/errors.h"
 
 #include <stdbool.h>
 

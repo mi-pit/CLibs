@@ -1,6 +1,10 @@
-//
+/**
+ * @file strdup.h
+ * @brief `strdup` & `strndup` macros for platforms that don't have these.
+ */
+
 // Created by Michal Pitner on 16.11.2025.
-//
+
 
 #ifndef CLIBS_STRDUP_H
 #define CLIBS_STRDUP_H

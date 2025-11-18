@@ -1,4 +1,10 @@
+/**
+ * @file asprintf.h
+ * @brief `sprintf(3)` which also `malloc`s the memory for the string.
+ */
+
 // Created by Michal Pitner on 16.11.2025.
+
 
 #ifndef CLIBS_ASPRINTF_H
 #define CLIBS_ASPRINTF_H
@@ -27,6 +33,9 @@ int vsnprintf( char *str, size_t size, const char *restrict format, va_list ap )
  * Like `vsprintf()`, except it heap-allocates memory for the resulting string.
  * `*strp` may be passed to `free(3)`
  *
+ * @param strp container for the new string
+ * @param fmt  printf-like format string
+ * @param args va_list of printf args
  * @return `vsnprintf(3)` return value or -1 if `malloc(3)` fails
  */
 LibraryDefined int vasprintf( char **strp, const char *const fmt, va_list args )
@@ -53,7 +62,7 @@ LibraryDefined int vasprintf( char **strp, const char *const fmt, va_list args )
  * Like `sprintf()`, except it heap-allocates memory for the resulting string.
  * `*strp` may be passed to `free(3)` *
  */
-LibraryDefined int asprintf( char **strp, const char *const fmt, ... )
+LibraryDefined PrintfLike( 2, 3 ) int asprintf( char **strp, const char *const fmt, ... )
 {
     va_list va;
     va_start( va, fmt );

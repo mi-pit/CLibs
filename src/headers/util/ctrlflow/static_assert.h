@@ -2,9 +2,15 @@
  * @file static_assert.h
  * @brief Static assert macro for C99 compatibility
  *
- * Makes it so that the macro acts as a static assert in C11+ and does nothing in C99 and earlier.
+ * Makes it so that the you can use static asserts in some way in any std C version.
+ *
+ * If the version of C is below C11 and the compiler supports function attributes,
+ * the macro expands to a function which asserts the condition
+ * at the start of the execution of the program (not actually static).
  */
+
 // Created by Michal Pitner on 07.10.2025.
+
 
 #ifndef STATIC_ASSERT_H
 #define STATIC_ASSERT_H
@@ -16,7 +22,7 @@
 
 #elif HAS_ATTRIBUTE( constructor )
 #include "../../core/attributes.h" /* BeforeMain */
-#include "../../errors.h"          /* xwarnx */
+#include "../../core/errors.h"     /* xwarnx */
 
 #define CONCAT2( a, b ) a##b
 #define CONCAT( a, b )  CONCAT2( a, b )

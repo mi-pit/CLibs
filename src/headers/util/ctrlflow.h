@@ -1,5 +1,8 @@
 /**
- * TODO
+ * @file ctrlflow.h
+ * @brief Includes all files from `headers/util/ctrlflow`
+ *
+ * These files help with the control flow by providing pseudo-keywords.
  */
 
 // Created by Michal Pitner on 14.11.2025.

@@ -1,4 +1,10 @@
+/**
+ * @file to_string.h
+ * @brief Generic `to_string` macro (C11+ only)
+ */
+
 // Created by Michal Pitner on 16.11.2025.
+
 
 #ifndef CLIBS_TO_STRING_H
 #define CLIBS_TO_STRING_H
@@ -43,36 +49,37 @@ LibraryDefined PrintfLike( 1, 2 ) UseResult char *GetStringFormatted( const char
 #if defined( TO_STRING_ERROR )
 #include "../headers/errors.h"
 
-/// Exit with a warning message
+// Exit with a warning message
 #define TO_STRING_DEFAULT_BRANCH( EXPRESSION ) \
     default:                                   \
         ferrx_e( char *, EXIT_FAILURE, "Unknown type for expression `" #EXPRESSION "`" )
 #elif defined( TO_STRING_WARN )
-/// No message in string
+// No message in string
 #define TO_STRING_DEFAULT_BRANCH( EXPRESSION )                           \
     default:                                                             \
         ( fflwarnx( "unknown type for expression \"" #EXPRESSION "\"" ), \
           GetStringFormatted( "0x%llx", ( unsigned long long ) ( EXPRESSION ) ) )
 #elif defined( TO_STRING_WARN_IN_STRING )
-/// No fwarn, warning in string
+// No fwarn, warning in string
 #define TO_STRING_DEFAULT_BRANCH( EXPRESSION )       \
     default:                                         \
         GetStringFormatted( "(Unknown type) 0x%llx", \
                             ( unsigned long long ) ( EXPRESSION ) )
 #else
-/// No warning, assume pointer was passed
+// No warning, assume pointer was passed
 #define TO_STRING_DEFAULT_BRANCH( EXPRESSION ) \
     default:                                   \
         GetStringFormatted( "0x%llx", ( unsigned long long ) ( EXPRESSION ) )
 #endif
 
 
-/// We type-cast this so that `GetStringFormatted` may keep its `PrintfLike` attribute.
+// We type-cast this so that `GetStringFormatted` may keep its `PrintfLike` attribute.
 #define TO_STRING_BRANCH( TYPE, FMTSTR, EXPRESSION ) \
     TYPE:                                            \
     GetStringFormatted( FMTSTR, ( TYPE ) ( ptrdiff_t ) EXPRESSION )
 
 
+/// Creates a heap-allocated string representation of the object
 #define to_string( EXPRESSION )                                         \
     _Generic( ( EXPRESSION ),                                           \
             bool: strdup( ( EXPRESSION ) ? "true" : "false" ),          \

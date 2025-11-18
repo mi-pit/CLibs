@@ -1,11 +1,29 @@
 /**
+ * @file unit_tests.h
+ * @brief
  * Header for unit-testing.
  *
- * For more info see `docs/unit-tests.md`.
+ * Example:
+ * @code
+ * #include "src/headers/unit_tests.h"
  *
+ * TEST( some_test )
+ * {
+ *     UNIT_TEST( 1 == 1 );
+ *     UNIT_TEST( 1  < 2 );
+ * }
+ * END_TEST
  *
- * Created by MacBook on 03.01.2025.
+ * int main( void )
+ * {
+ *     RUN_TEST( some_test );
+ *     FINISH_TESTING();
+ * }
+ * @endcode
  */
+
+// Created by MacBook on 03.01.2025.
+
 
 #ifndef CLIBS_UNIT_TESTS_H
 #define CLIBS_UNIT_TESTS_H

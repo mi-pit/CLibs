@@ -7,9 +7,9 @@
 
 #define FOREACH_LS
 #define FOREACH_SET
-#define FOREACH_QUEUE
-#include "../../src/headers/cmp.h"
+#define FOREACH_QUE
 #include "../../src/headers/unit_tests.h"
+#include "../../src/headers/util/cmp.h"
 #include "../../src/headers/util/ctrlflow.h"
 #include "../../src/headers/util/ptrs/alloc.h"
 #include "../../src/structs/dynarr.h"

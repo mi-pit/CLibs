@@ -1,12 +1,16 @@
-/*
+/**
+ * @file foreach.h
+ * @brief
  * Macros for iterating over different structures (arrays, strings, sets, ...).
  *
  * To define `foreach` for a data structure in `src/structs`,
- * first include the struct, then this header.
- *
- *
- * Created by MacBook on 23.10.2024.
+ * do either before including `"foreach.h"`:
+ * - include the struct first
+ * - define the macro you want defined as uppercase (if you want `foreach_ls`, define `FOREACH_LS`)
  */
+
+// Created by MacBook on 23.10.2024.
+
 
 #ifndef CLIBS_FOREACH_H
 #define CLIBS_FOREACH_H
@@ -59,8 +63,8 @@
                                    ( STRING )[ foreach_index_##ITEM_NAME ] )
 
 
-#if defined( CLIBS_DYNAMIC_ARRAY_H ) || defined( CLIBS__GENERATE_DOCS ) \
-        || defined( FOREACH_LS )
+#if defined( CLIBS_DYNAMIC_ARRAY_H ) || defined( FOREACH_LS ) \
+        || defined( CLIBS__GENERATE_DOCS /* So it shows up in docs */ )
 /**
  * Iterates over a list.
  *
@@ -81,7 +85,7 @@
 #endif // List
 
 
-#if defined( CLIBS_SETS_H ) || defined( CLIBS__GENERATE_DOCS ) || defined( FOREACH_SET )
+#if defined( CLIBS_SETS_H ) || defined( FOREACH_SET ) || defined( CLIBS__GENERATE_DOCS )
 /**
  * Iterates over a set.
  *
@@ -103,8 +107,7 @@
 #endif // Set
 
 
-#if defined( CLIBS_QUEUE_H ) || defined( CLIBS__GENERATE_DOCS ) \
-        || defined( FOREACH_QUEUE )
+#if defined( CLIBS_QUEUE_H ) || defined( FOREACH_QUE ) || defined( CLIBS__GENERATE_DOCS )
 /**
  * Iterates over a queue.
  *
@@ -124,7 +127,7 @@
  *
  * @attention
  * 1. Do not reassign `ENTRY_NAME` variable.
- * 2. Requires previous definition of `CLIBS_FOREACH_QUEUE` or `CLIBS_QUEUE_H`.
+ * 2. Requires previous definition of `CLIBS_FOREACH_QUE` or `CLIBS_QUEUE_H`.
  * The latter is defined when including `src/structs/queue.h`.
  */
 #define foreach_que( ENTRY_NAME, QUEUE )                                           \

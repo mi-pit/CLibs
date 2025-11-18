@@ -1,3 +1,8 @@
+/**
+ * @file limits.h
+ * @brief This file includes <limits.h> & <stdint.h> and defines `INT_BIT` & `LONG_BIT`.
+ */
+
 // Created by Michal Pitner on 18.11.2025.
 
 #ifndef CLIBS_LIMITS_H

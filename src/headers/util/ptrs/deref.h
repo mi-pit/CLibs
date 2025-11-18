@@ -1,4 +1,10 @@
+/**
+ * @file deref.h
+ * @brief Macros for abstraction of dereferencing pointers.
+ */
+
 // Created by Michal Pitner on 14.11.2025.
+
 
 #ifndef CLIBS_DEREF_H
 #define CLIBS_DEREF_H

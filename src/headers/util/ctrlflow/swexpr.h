@@ -1,17 +1,18 @@
-/*
+/**
+ * @file swexpr.h
+ * @brief
  * A switch which works with more complex data structures.
  *
- * For more info, see `docs/swex.md`
- *
- *
- * Created by MacBook on 18.02.2024.
+ * @requires `structs/dynarr.h`
  */
+
+// Created by MacBook on 18.02.2024.
 
 #ifndef CLIBS_SWEXPR_H
 #define CLIBS_SWEXPR_H
 
 #include "../../../structs/dynarr.h" /* stack-like lists */
-#include "../../errors.h"            /* err */
+#include "../../core/errors.h"       /* err */
 #include "../ptrs.h"                 /* deref_as, free_n */
 
 #include <stdbool.h> /* bool */

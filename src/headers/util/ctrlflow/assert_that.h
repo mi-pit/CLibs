@@ -9,7 +9,7 @@
 #define CLIBS_ASSERT_THAT_H
 
 /* for this header */
-#include "../../errors.h" /* warn */
+#include "../../core/errors.h" /* warn */
 
 #include <stdlib.h> /* exit */
 

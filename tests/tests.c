@@ -3,6 +3,7 @@
 //
 
 #include "modules/test_array_sprintf.h"
+#include "modules/test_cmp.h"
 #include "modules/test_dict.h"
 #include "modules/test_dynstr.h"
 #include "modules/test_filenames.h"
@@ -80,6 +81,8 @@ int main( void )
 
     // C11+
     RUNALL_TO_STRING();
+
+    RUNALL_CMP();
 
     FINISH_TESTING();
 }

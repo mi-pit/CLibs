@@ -4,7 +4,7 @@
 
 #include "string_utils.h"
 
-#include "../headers/errors.h"        /* *warn* */
+#include "../headers/core/errors.h"   /* *warn* */
 #include "../headers/simple_math.h"   /* min */
 #include "../headers/util/ctrlflow.h" /* assert_that, foreach_arr */
 #include "../structs/dynarr.h"        /* List */

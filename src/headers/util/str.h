@@ -1,4 +1,12 @@
-#include "../core/stdc_versions.h" /* STDC11 */
+/**
+ * @file str.h
+ * @brief Includes all files from `headers/util/str/`
+ *
+ * These headers define some semi-standard "functions" (macros).
+ */
+
+
+#include "../core/stdc_versions.h" /* (for this header) STDC11 */
 
 /* include */
 #include "str/asprintf.h"

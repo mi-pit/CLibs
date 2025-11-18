@@ -1,9 +1,10 @@
-/*
- * Functions and macros for simple math operations like min/max of two numbers.
- *
- *
- * Created by Michal Pitner on 13.06.2025.
+/**
+ * @file simple_math.h
+ * @brief Functions and macros for simple math operations like min/max of two numbers.
  */
+
+// Created by Michal Pitner on 13.06.2025.
+
 
 #ifndef SIMPLE_MATH_H
 #define SIMPLE_MATH_H

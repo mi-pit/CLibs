@@ -1,11 +1,14 @@
-/*
+/**
+ * @file filenames.h
+ * @brief
  * Utility functions and macros for working with file names.
  *
- * Trying to be platform-independent.
- *
- *
- * Created by MacBook on 21.01.2025.
+ * Everything *should* be platform-independent
+ * (as long as you work a posix-compliant system)
  */
+
+// Created by MacBook on 21.01.2025.
+
 
 #ifndef CLIBS_FILENAMES_H
 #define CLIBS_FILENAMES_H

@@ -5,8 +5,8 @@
 #ifndef TEST_ARRAYPRINTF_H
 #define TEST_ARRAYPRINTF_H
 
-#include "../../src/headers/cmp.h"
 #include "../../src/headers/unit_tests.h"
+#include "../../src/headers/util/cmp.h"
 #include "../../src/structs/dynstring.h"
 #include "../../src/util/string_utils.h"
 

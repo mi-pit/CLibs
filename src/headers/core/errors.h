@@ -1,23 +1,26 @@
-/*
+/**
+ * @file errors.h
+ * @brief
  * Utility functions for handling errors.
  *
  * Includes (among others):
- *   return values
- *   better warn
+ *   return values (these values are used all throughout the library)
+ *   "better" warn
+ *   `err` expressions
  *   stack trace printing
- *
- *
- * Created by MacBook on 30.10.2024.
  */
+
+// Created by MacBook on 30.10.2024.
+
 
 #ifndef CLIBS_ERRORS_H
 #define CLIBS_ERRORS_H
 
 /* for this header */
-#include "core/attributes.h"            /* PrintfLike, LibraryDefined */
-#include "core/filenames.h"             /* get_prog_name(), __FILE_NAME__ */
-#include "util/ctrlflow/unreachable.h"  /* UNREACHABLE */
-#include "util/print/terminal_colors.h" /* COLORs, PrintInColor */
+#include "../util/ctrlflow/unreachable.h"  /* UNREACHABLE */
+#include "../util/print/terminal_colors.h" /* COLORs, PrintInColor */
+#include "attributes.h"                    /* PrintfLike, LibraryDefined */
+#include "filenames.h"                     /* get_prog_name(), __FILE_NAME__ */
 
 #include <errno.h>  /* for WarnUniversal + include */
 #include <stddef.h> /* ptrdiff_t */

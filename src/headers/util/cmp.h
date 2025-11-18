@@ -1,12 +1,15 @@
-/*
- * Comparator functions
+/**
+ * @file cmp.h
+ * @brief Comparator functions.
+ *
+ * May be used for sorting numeric types.
  */
 
 #ifndef CLIBS_CMP_H
 #define CLIBS_CMP_H
 
-#include "core/attributes.h"
-#include "core/types.h"
+#include "../core/attributes.h"
+#include "../core/types.h"
 
 
 /// Evaluates the cmp function as true if the elements are equal

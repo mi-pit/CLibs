@@ -1,7 +1,7 @@
 #include "dictionary.h"
 
-#include "../headers/cmp.h" /* cmp_size_t(), cmpeq() */
 #include "../headers/util.h"
+#include "../headers/util/cmp.h" /* cmp_size_t(), cmpeq() */
 
 #include <stdio.h>
 #include <stdlib.h>
