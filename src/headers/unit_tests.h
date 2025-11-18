@@ -11,11 +11,11 @@
 #define CLIBS_UNIT_TESTS_H
 
 #include "core/filenames.h"             /* PATH_MAX */
-#include "errors.h"                     /* fwarn */
+#include "util/ctrlflow/unreachable.h"  /* UNREACHABLE_MSG() */
 #include "util/print/terminal_colors.h" /* colors */
 #include "util/ptrs/arrays.h"           /* STRLEN */
 
-#include <stdbool.h> /* * */
+#include <stdbool.h> /**/
 #include <stdio.h>   /* printf */
 #include <stdlib.h>  /* exit */
 
@@ -207,7 +207,8 @@ LibraryDefined bool TEST_NAME_CREATOR( UNIT_TEST )( const char *cond_str,
             break;
 
         default:
-            UNREACHABLE();
+            UNREACHABLE_MSG( "Verbosity variable from %s has been tampered with.",
+                             __FILE_NAME__ );
     }
 
     printf( "    " );
@@ -322,7 +323,7 @@ LibraryDefined bool SET_UNIT_TEST_VERBOSITY( const TEST_NAME_CREATOR( VERBOSITY_
             return true;
 
         default:
-            return fwarnx_ret( false, "invalid argument (%d)", v );
+            return false;
     }
 }
 
