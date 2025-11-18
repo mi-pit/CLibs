@@ -75,6 +75,9 @@ TEST( list_from_queue )
 
     for ( int i = 0; i < 123; ++i )
         UNIT_TEST( list_fetch( ls, i, int ) == i );
+
+    list_destroy( ls );
+    queue_destroy( q );
 }
 END_TEST
 
