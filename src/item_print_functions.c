@@ -1,8 +1,8 @@
 #include "item_print_functions.h"
 
 #include "headers/errors.h"
-#include "headers/extra_types.h"
 #include "headers/pointer_utils.h"
+#include "headers/types.h"
 
 #include <err.h>
 #include <stdio.h>

@@ -7,8 +7,11 @@
  * this header creates platform-independent macros for certain attributes
  * a function or variable may have.
  *
+ * All of the macros defined in this header are safe to use on any compiler
+ * -- including ones that don't support attributes
+ * (in that case they are preprocessed as empty macros).
+ *
  * Some combinations may (definitely will) be missing; this isn't an exhaustive list.
- * (Though all macros are safe to use, no matter the compiler)
  */
 
 // Created by MacBook on 10.01.2025.
@@ -16,13 +19,15 @@
 #ifndef CLIBS_ATTRIBUTES_H
 #define CLIBS_ATTRIBUTES_H
 
+#include "stdc_versions.h" /* STANDARD_C23_VERSION */
+
 
 #ifdef __has_attribute
 /** Evaluates as true if the compiler (clang/GCC) supports the attribute */
 #define HAS_ATTRIBUTE( TOK ) __has_attribute( TOK )
 #else // ndef __has_attribute
 /** This compiler doesn't have any attributes */
-#define HAS_ATTRIBUTE( TOK ) 0
+#define HAS_ATTRIBUTE( TOK ) ( 0 )
 #endif // __has_attribute
 
 
@@ -104,7 +109,7 @@
 #define Private static
 
 /** Function or variable is defined in a header file */
-#define LibraryDefined static UsageOptional
+#define LibraryDefined UsageOptional static
 
 /**
  * Function has no effect except for the return value.

@@ -15,8 +15,6 @@
 /* includes */
 #include <assert.h>
 
-#ifndef NDEBUG
-
 #ifndef CLIBS_ASSERT_THAT_EXIT_VAL
 #define CLIBS_ASSERT_THAT_EXIT_VAL RV_EXCEPTION
 #endif // CLIBS_ASSERT_THAT_EXIT_VAL
@@ -62,11 +60,5 @@
                     ": " __VA_ARGS__ ) );                                       \
     }                                                                           \
     while ( 0 )
-
-#else
-
-#define assert_that( EXPRESSION, ... )
-
-#endif //NDEBUG
 
 #endif //CLIBS_ASSERT_THAT_H

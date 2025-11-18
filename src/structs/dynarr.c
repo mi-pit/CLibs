@@ -1,14 +1,14 @@
 #include "dynarr.h"
 
 #include "../headers/assert_that.h"
-#include "../headers/errors.h"        /* RVs, fwarn* */
-#include "../headers/extra_types.h"   /* byte, size_t */
 #include "../headers/misc.h"          /* cmp */
 #include "../headers/pointer_utils.h" /* deref_as */
+#include "queue.h"
+#include "set.h"
 
-#include <stdio.h>  /* *print* */
-#include <stdlib.h> /* alloc, bsearch, qsort */
-#include <string.h> /* mem* */
+#include <inttypes.h> /* PRIi64 */
+#include <stdlib.h>   /* alloc, bsearch, qsort */
+#include <string.h>   /* mem* */
 
 
 #define LIST_DEF_CAP 64
@@ -44,13 +44,13 @@ List *list_init_cap_size( const size_t el_size, const size_t init_cap )
 {
     struct dynamic_array *ls = calloc( 1, sizeof( struct dynamic_array ) );
     if ( ls == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
 
     ls->items = calloc( init_cap, el_size );
     if ( ls->items == NULL )
     {
         free( ls );
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
     }
     ls->capacity = LIST_DEF_CAP;
     ls->el_size  = el_size;
@@ -61,9 +61,72 @@ List *list_init_size( const size_t el_size )
 {
     List *new = list_init_cap_size( el_size, LIST_DEF_CAP );
     if ( new == NULL )
-        f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     return new;
+}
+
+
+#include "../headers/foreach.h"
+
+Constructor List *list_from_set( const Set *set )
+{
+    size_t elsize;
+    foreach_set ( e, set )
+    {
+        // assign first value
+        elsize = e.item->size;
+        break;
+    }
+
+    foreach_set ( entry, set )
+    {
+        const size_t curr_elsize = entry.item->size;
+        if ( curr_elsize != elsize )
+            return fwarnx_ret( NULL,
+                               "sets contents aren't all the same size (entry %" PRIi64
+                               "=%zu)",
+                               entry.index,
+                               curr_elsize );
+    }
+
+    List *ls = list_init_cap_size( elsize, set_size( set ) );
+    if ( ls == NULL )
+        return f_stack_trace( NULL );
+
+    foreach_set ( entry, set )
+    {
+        assert_that( !entry.item->removed,
+                     "foreach_set should not be yielding removed entries" );
+
+        const void *datap = entry.item->data;
+        assert_that( datap != NULL, "foreach_set should not be yielding NULL entries" );
+
+        if ( list_append( ls, datap ) != RV_SUCCESS )
+        {
+            list_destroy( ls );
+            return f_stack_trace( NULL );
+        }
+    }
+
+    return ls;
+}
+
+
+List *list_from_queue( const Queue *q )
+{
+    List *ls = list_init_cap_size( queue_get_el_size( q ), queue_get_size( q ) );
+    if ( ls == NULL )
+        return f_stack_trace( NULL );
+
+    foreach_que( entry, q )
+    {
+        const void *datap = queue_node_get_data( entry );
+        on_fail ( list_append( ls, datap ) )
+            return f_stack_trace( NULL );
+    }
+
+    return ls;
 }
 
 
@@ -71,7 +134,7 @@ List *list_init_size( const size_t el_size )
 const void *list_see( const struct dynamic_array *ls, const size_t idx )
 {
     if ( idx >= ls->size )
-        return ( void * ) fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
+        return fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
 
     return list_at_non_safe( ls, idx );
 }
@@ -79,26 +142,25 @@ const void *list_see( const struct dynamic_array *ls, const size_t idx )
 const void *list_peek( const struct dynamic_array *ls )
 {
     if ( ls->size == 0 )
-        return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
+        return fwarnx_ret( NULL, ListEmptyExceptionString );
 
     return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
 
 
 /* Mutable */
-void *list_at( struct dynamic_array *ls, const size_t idx )
+void *list_at( List *ls, const size_t idx )
 {
     if ( idx >= ls->size )
-        return ( void * ) fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
+        return fwarnx_ret( NULL, ListIndexOOBExceptionString( ls, idx ) );
 
     return list_at_non_safe( ls, idx );
 }
 
-typedef List *LSP;
-void *list_at_last( const LSP ls )
+void *list_at_last( List *const ls )
 {
     if ( ls->size == 0 )
-        return ( void * ) fwarnx_ret( NULL, ListEmptyExceptionString );
+        return fwarnx_ret( NULL, ListEmptyExceptionString );
 
     return list_at_non_safe( ls, list_size( ls ) - 1 );
 }
@@ -367,7 +429,7 @@ struct dynamic_array *list_reversed( const struct dynamic_array *ls )
 {
     struct dynamic_array *rev = list_init_size( ls->el_size );
     if ( rev == NULL )
-        return ( void * ) f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     for ( size_t i = 0; i < ls->size; ++i )
     {
@@ -381,7 +443,7 @@ struct dynamic_array *list_reversed( const struct dynamic_array *ls )
         if ( list_append( rev, datap ) != RV_SUCCESS )
         {
             list_destroy( rev );
-            return ( void * ) f_stack_trace( NULL );
+            return f_stack_trace( NULL );
         }
     }
 
@@ -476,7 +538,7 @@ void *list_items_copy( const struct dynamic_array *ls )
 {
     void *copy = calloc( ls->size, ls->el_size );
     if ( copy == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
 
     memcpy( copy, ls->items, ls->size * ls->el_size );
     return copy;

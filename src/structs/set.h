@@ -15,7 +15,7 @@
 #ifndef CLIBS_SETS_H
 #define CLIBS_SETS_H
 
-#include "../headers/extra_types.h"  /* stddef, stdint, stdbool */
+#include "../headers/types.h"        /* stddef, stdint, stdbool */
 #include "../item_print_functions.h" /* PrintFunction */
 
 
@@ -75,7 +75,7 @@ int set_insert_f( Set *, const void *data, size_t len, PrintFunction func );
  *
  * @param data pointer to data
  * @param len number of bytes in data
- * @return `RV_ERROR` | `RV_EXCEPTION` | `enum SetInsertRV`
+ * @return `RV_ERROR` | `enum SetInsertRV`
  */
 int set_insert( Set *, const void *data, size_t len );
 
@@ -160,6 +160,12 @@ int set_cmp( const Set *, const Set * );
 
 /** Frees all memory owned by the `Set`. */
 void set_destroy( Set * );
+
+
+#if defined( CLIBS_DYNAMIC_ARRAY_H ) || defined( CLIBS_STRUCT_CONVERSIONS )
+#include "dynarr.h"
+UseResult Set *set_from_list( const List *list );
+#endif
 
 
 /// @return number of items in the set

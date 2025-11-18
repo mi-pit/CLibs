@@ -8,11 +8,11 @@
 #define CLIBS_MISC_H
 
 #include "attributes.h"
-#include "extra_types.h"
+#include "types.h"
 
 
 /// Stops those pesky `unused variable` compiler warnings/errors
-#define UNUSED( UNUSEDARG ) ( ( void ) UNUSEDARG )
+#define UNUSED( UNUSEDARG ) ( ( void ) ( UNUSEDARG ) )
 
 
 /// For string literals

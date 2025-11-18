@@ -15,9 +15,11 @@ endif ()
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
-add_compile_definitions(_POSIX_C_SOURCE=200809L)
-
-add_compile_definitions(LINE_PREF_WIDTH=80)
+add_compile_definitions(
+        _POSIX_C_SOURCE=200809L
+        LINE_PREF_WIDTH=120
+        CLIBS_STRUCT_CONVERSIONS
+)
 
 
 # ————————————————————————————————————

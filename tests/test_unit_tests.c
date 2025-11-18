@@ -2,8 +2,7 @@
 // Created by MacBook on 03.01.2025.
 //
 
-#include "../src/headers/errors.h"
-#include "../src/headers/misc.h"
+#include "../src/headers/assert_that.h"
 #include "../src/headers/unit_tests.h"
 
 #include <string.h>
@@ -35,14 +34,15 @@ TEST( this_one_actually_passes )
 }
 END_TEST
 
-TEST( loop )
+TEST( loop_setting_verbosity )
 {
     {
         const bool no_loop = true;
         UNIT_TEST( no_loop );
     }
 
-    SET_UNIT_TEST_VERBOSITY( false );
+    const int old_v = GET_UNIT_TEST_VERBOSITY();
+    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_NONE );
     const bool this_one_should_show = false;
     UNIT_TEST( this_one_should_show );
     {
@@ -50,7 +50,7 @@ TEST( loop )
         for ( int i = 0; i < 10; ++i )
             UNIT_TEST( this_one_shouldnt_show );
     }
-    SET_UNIT_TEST_VERBOSITY( true );
+    SET_UNIT_TEST_VERBOSITY( old_v );
 
     {
         const bool loop_finished = true;
@@ -78,22 +78,38 @@ TEST( really_long_messages_test_hopshops_test_test_kunker_lager )
 END_TEST
 
 
+bool run_all( void )
+{
+    RUN_TEST( all_fail );
+    RUN_TEST( test_example );
+    RUN_TEST( this_one_actually_passes );
+    RUN_TEST( loop_setting_verbosity );
+    RUN_TEST( critical );
+    RUN_TEST( really_long_messages_test_hopshops_test_test_kunker_lager );
+
+    ( void ) f_stack_trace( 0 );
+
+    return false;
+}
+
+
 int main( void )
 {
+    if ( !SET_UNIT_TEST_VERBOSITY( -1 ) )
+    {
+        ( void ) f_stack_trace( 0 );
+
+        assert_that( SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_ALL ), );
+    }
+
     SetTerminalColor( stdout, BACKGROUND_YELLOW );
     for ( int i = 0; i < LINE_PREF_WIDTH; ++i )
         printf( "%d", i % 10 );
     SetTerminalColor( stdout, COLOR_DEFAULT );
     printf( "\n" );
 
-    RUN_TEST( all_fail );
-    RUN_TEST( test_example );
-    RUN_TEST( this_one_actually_passes );
-    RUN_TEST( loop );
-    RUN_TEST( critical );
-    RUN_TEST( really_long_messages_test_hopshops_test_test_kunker_lager );
-
-    f_stack_trace( 0 );
+    run_all();
+    ( void ) f_stack_trace( 0 );
 
     FINISH_TESTING();
 }

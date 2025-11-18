@@ -15,7 +15,14 @@
 #include <sys/types.h> /* ssize_t */
 
 /* include for user */
-#include <string.h>
+#include <ctype.h>  /* is* */
+#include <string.h> /* str* */
+
+
+LibraryDefined inline int issign( const int c )
+{
+    return c == '-' || c == '+';
+}
 
 
 /// Immutable string
@@ -24,16 +31,21 @@ typedef const char *string_t;
 typedef char *str_t;
 
 
-#if __STDC_VERSION__ < 202311L && !defined( __APPLE__ )
+#if __STDC_VERSION__ < 202311L && !defined( _POSIX_C_SOURCE )
+/*
+ * Define
+ * strdup && strndup
+ */
+
 #include <stdlib.h> /* malloc */
 
-#define strndup string_nduplicate
+#define strndup string_duplicate_l
 #define strdup  string_duplicate
 
 /// `strndup` implementation (standard in POSIX and C23+)
-LibraryDefined UseResult str_t string_nduplicate( string_t s, size_t l )
+LibraryDefined UseResult str_t string_duplicate_l( string_t s, size_t l )
 {
-    str_t n = malloc( l + 1 );
+    const str_t n = malloc( l + 1 );
     if ( n == NULL )
         return NULL;
 
@@ -45,8 +57,8 @@ LibraryDefined UseResult str_t string_nduplicate( string_t s, size_t l )
 /// `strdup` implementation (standard in POSIX and C23+)
 LibraryDefined UseResult str_t string_duplicate( string_t s )
 {
-    size_t l = strlen( s );
-    str_t n  = malloc( l + 1 );
+    const size_t l = strlen( s );
+    const str_t n  = malloc( l + 1 );
     if ( n == NULL )
         return NULL;
 
@@ -56,8 +68,14 @@ LibraryDefined UseResult str_t string_duplicate( string_t s )
 }
 #endif // ndef strdup
 
-#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) \
-        || defined( _POSIX_C_SOURCE ) // non-standard
+#if ( !defined( _GNU_SOURCE ) && !defined( __APPLE__ ) ) || defined( _POSIX_C_SOURCE )
+// non-standard
+
+/*
+ * Define
+ * asprintf && vasprintf
+ */
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,7 +142,7 @@ bool string_is_blank_l( string_t, size_t len );
  * Evaluates to true if string contains no characters
  *
  * @param s string
- * @return true if string is empty -- `""`
+ * @return true if string is empty (`""`)
  */
 bool string_is_empty( string_t s );
 
@@ -148,14 +166,28 @@ UseResult str_t string_stripped_l( string_t, size_t length );
 /**
  * Removes all whitespace from either end of the string.
  * This is done in place.
- *
- * `string_stripped()` is implemented separately from `string_strip` for memory efficiency
  */
 void string_strip( str_t );
 
 
+/**
+ * Collapses all occurrences of `substring` so that
+ * they don't repeat more than once at a time.
+ *
+ * @param string    string
+ * @param substring sub
+ */
+void string_collapse( str_t string, string_t substring );
+
+
+/**
+ * Modifies the string so that for each backspace, one previous char is removed.
+ */
+void string_collapse_backspaces( str_t );
+
+
 /// Charset of special characters that can be escaped
-#define ESCAPED_CHARS "\n\t\r\f\v\"\\"
+#define ESCAPED_CHARS "\n\t\r\f\v\"\'\\\b\a"
 
 /**
  * Escapes characters defined in `ESCAPED_CHARS`
@@ -173,7 +205,7 @@ void string_strip( str_t );
  * @code
  * "Hello, "World"!
  * "
- * "Hello,\"World\"!\n"
+ * "Hello, \"World\"!\n"
  * @endcode
  * </p>
  * @return New escaped string. Pointer should be freed with `free(3)`.
@@ -241,6 +273,42 @@ UseResult str_t string_replaced( string_t, string_t old, string_t new );
 int string_replace( str_t string, string_t old, string_t new );
 
 
+typedef unsigned int streq_mode_t;
+
+#define STREQ_IGNORE_CASE       ( 1 << 0 )
+#define STREQ_IGNORE_WHITESPACE ( 1 << 1 )
+
+bool string_equal( string_t s1, string_t s2, streq_mode_t mode );
+bool string_equal_l( size_t len1,
+                     string_t s1,
+                     size_t len2,
+                     string_t s2,
+                     streq_mode_t mode );
+
+
+/**
+ * Flags for the `string_split[_regex]` functions
+ * <p>
+ *
+ * - `STRSPLIT_EXCLUDE_EMPTY`       // = 0x01
+ *      - resulting string array doesn't include empty strings ("")
+ *
+ * - `STRSPLIT_KEEP_DELIM_BEFORE`   // = 0x02
+ *      - items include the delimiting strings;
+ *        the delim is included at the end of the previous item
+ *
+ * - `STRSPLIT_KEEP_DELIM_AFTER`    // = 0x04
+ *      - items include the delimiting strings;
+ *        the delim is included at the start of the next item
+ *
+ * - `STRSPLIT_STRIP_RESULTS`       // = 0x08
+ *      - strips whitespace from either end of each entry
+ *        only for string_split() (not regex)
+ * </p>
+ */
+typedef unsigned int strsplit_mode_t;
+
+
 #define STRSPLIT_EXCLUDE_EMPTY     ( 1 << 0 )
 #define STRSPLIT_KEEP_DELIM_BEFORE ( 1 << 1 )
 #define STRSPLIT_KEEP_DELIM_AFTER  ( 1 << 2 )
@@ -248,27 +316,6 @@ int string_replace( str_t string, string_t old, string_t new );
 /// Only for `string_split()` (not regex)
 #define STRSPLIT_STRIP_RESULTS ( 1 << 3 )
 
-
-/**
- * Flags for the `string_split[_regex]` functions
- * @code
- * STRSPLIT_EXCLUDE_EMPTY       // = 0x01
- *      - resulting string array doesn't include empty strings ("")
- *
- * STRSPLIT_KEEP_DELIM_BEFORE   // = 0x02
- *      - items include the delimiting strings;
- *        the delim is included at the end of the previous item
- *
- * STRSPLIT_KEEP_DELIM_AFTER    // = 0x04
- *      - items include the delimiting strings;
- *        the delim is included at the start of the next item
- *
- * STRSPLIT_STRIP_RESULTS       // = 0x08
- *      - strips whitespace from either end of each entry
- *        only for string_split() (not regex)
- * @endcode
- */
-typedef unsigned int strsplit_mode_t;
 
 /**
  * Splits `str` at places matching `split_tok`

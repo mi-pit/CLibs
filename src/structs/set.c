@@ -1,7 +1,7 @@
 #include "set.h"
 
-#include "../headers/errors.h" /* RVs, warns, ... */
-#include "../headers/misc.h"   /* cmp_size_t */
+#include "../headers/misc.h" /* cmp_size_t */
+#include "dynarr.h"
 
 #include <assert.h>   /* assert */
 #include <inttypes.h> /* PRIi64 */
@@ -109,12 +109,12 @@ Set *set_init_cap( const size_t capacity )
 {
     Set *new_set = calloc( 1, sizeof( Set ) );
     if ( new_set == NULL )
-        return ( void * ) fflwarn_ret( NULL, "calloc" );
+        return fflwarn_ret( NULL, "calloc" );
 
     if ( ( new_set->items = calloc( capacity, sizeof( struct set_item ) ) ) == NULL )
     {
         free( new_set );
-        return ( void * ) fflwarn_ret( NULL, "calloc" );
+        return fflwarn_ret( NULL, "calloc" );
     }
 
     new_set->capacity = capacity;
@@ -179,7 +179,7 @@ Set *set_init( void )
         return SETINSERT_INSERTED;
     }
 
-    return fwarnx_ret( RV_EXCEPTION, "unrecognized exception" );
+    return fflwarnx_ret( RV_ERROR, "unrecognized exception; something went wrong" );
 }
 
 int set_insert( Set *set, const void *data, const size_t len )
@@ -385,6 +385,35 @@ int set_cmp( const Set *set_1, const Set *set_2 )
     }
 
     return 0;
+}
+
+
+Set *set_from_list( const List *list )
+{
+    Set *const new_set = set_init_cap( list_size( list ) );
+    if ( new_set == NULL )
+        return f_stack_trace( NULL );
+
+    const size_t el_size = list_el_size( list );
+    for ( size_t i = 0; i < list_size( list ); ++i )
+    {
+        const void *const data = list_see( list, i );
+
+        switch ( set_insert( new_set, data, el_size ) )
+        {
+            case SETINSERT_WAS_IN:
+                // fflwarnx( "Actually found a collision in a set!" );
+            case SETINSERT_INSERTED:
+                // don't care
+                break;
+
+            case RV_ERROR:
+            case RV_EXCEPTION:
+                return f_stack_trace( NULL );
+        }
+    }
+
+    return new_set;
 }
 
 

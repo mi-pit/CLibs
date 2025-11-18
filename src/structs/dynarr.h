@@ -30,11 +30,10 @@
 #ifndef CLIBS_DYNAMIC_ARRAY_H
 #define CLIBS_DYNAMIC_ARRAY_H
 
-#include "../headers/array_printf.h" /* for list_printf */
-#include "../headers/attributes.h"   /* Private */
+#include "../headers/attributes.h" /* Private */
+#include "../headers/types.h"      /* size_t, int*_t */
 
 #include <stdbool.h>
-#include <stdint.h>
 
 
 struct dynamic_array; // defined in dynarr.c
@@ -77,6 +76,20 @@ int list_copy( const struct dynamic_array *old, struct dynamic_array **new_ls_co
 Constructor struct dynamic_array *list_copy_of( const struct dynamic_array * );
 
 
+#if defined( CLIBS_STRUCT_CONVERSIONS )
+#include "queue.h"
+#include "set.h"
+#endif
+
+#ifdef CLIBS_SETS_H
+Constructor List *list_from_set( const Set * );
+#endif
+
+#ifdef CLIBS_QUEUE_H
+Constructor List *list_from_queue( const Queue * );
+#endif
+
+
 /**
  * Gets a non-mutable look of the element at the specified index
  *
@@ -97,7 +110,7 @@ const void *list_peek( const struct dynamic_array *ls );
  * OOB index dereferences a NULL pointer (so don't do that).
  */
 #define list_fetch( LIST, IDX, TYPE ) \
-    ( *( ( const TYPE * ) list_see( ( LIST ), ( IDX ) ) ) )
+    ( *( ( TYPE const * ) list_see( ( LIST ), ( IDX ) ) ) )
 
 /**
  * Gets a mutable look of the element at the specified index
@@ -186,7 +199,7 @@ int list_insert( struct dynamic_array *, size_t index, const void *data );
  * @return
  * - `RV_EXCEPTION` if List is empty
  * - `RV_ERROR` if malloc fails
- * - else RV_SUCCESS
+ * - else `RV_SUCCESS`
  */
 int list_pop( struct dynamic_array *, void *container );
 /**

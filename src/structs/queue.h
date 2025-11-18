@@ -24,7 +24,7 @@
 #define CLIBS_QUEUE_H
 
 #include "../headers/attributes.h"
-#include "../headers/extra_types.h"
+#include "../headers/types.h"
 
 
 typedef struct fifo_queue Queue;
@@ -94,6 +94,8 @@ int queue_get_tail( const Queue *, void *data_cont );
 
 /// Length of queue (number of items)
 size_t queue_get_size( const Queue * );
+/// Size of an element
+size_t queue_get_el_size( const Queue * );
 /** seems self-explanatory */
 bool queue_is_empty( const Queue * );
 

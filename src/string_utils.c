@@ -7,6 +7,7 @@
 #include "headers/assert_that.h" /* assert_that */
 #include "headers/errors.h"      /* *warn* */
 #include "headers/foreach.h"     /* foreach_arr */
+#include "headers/misc.h"
 #include "headers/simple_math.h" /* min */
 #include "structs/dynarr.h"      /* List */
 #include "structs/dynstring.h"   /* dynstr */
@@ -33,6 +34,7 @@ bool string_is_blank_l( const string_t s, const size_t len )
 
     return true;
 }
+
 bool string_is_empty( const string_t s )
 {
     return *s == '\0';
@@ -63,23 +65,21 @@ str_t string_stripped_l( const string_t s, size_t length )
             break;
     }
 
-    if ( !( started && ended ) )
+    if ( !started || !ended )
     {
-        char *const new = malloc( 1 );
+        const str_t new = malloc( 1 );
         if ( new != NULL )
             new[ 0 ] = '\0';
         return new;
     }
 
     length          = end_idx - start_idx + 1;
-    char *const new = malloc( length + 1 );
+    const str_t new = malloc( length + 1 );
     if ( new == NULL )
-        return ( void * ) fflwarn_ret( NULL, "malloc" );
+        return fflwarn_ret( NULL, "malloc" );
 
     for ( size_t i = 0; i < length; ++i )
-    {
         new[ i ] = s[ i + start_idx ];
-    }
     new[ length ] = '\0';
 
     return new;
@@ -90,6 +90,7 @@ str_t string_stripped( const string_t s )
     return string_stripped_l( s, strlen( s ) );
 }
 
+// `string_stripped()` is implemented separately from `string_strip` for memory efficiency
 void string_strip( char *const s )
 {
     /*
@@ -99,7 +100,7 @@ void string_strip( char *const s )
     "Hovno prdel.\nSračka."
     */
 
-    size_t str_len = strlen( s );
+    const size_t str_len = strlen( s );
 
     size_t start_idx = 0;
     size_t end_idx   = str_len - 1;
@@ -122,36 +123,120 @@ void string_strip( char *const s )
         if ( started && ended )
             break;
     }
-    if ( !( started && ended ) )
+    if ( !started || !ended )
     {
         s[ 0 ] = '\0';
         return;
     }
 
-    str_len = end_idx - start_idx + 1;
-    memmove( s, s + start_idx, str_len );
-    s[ str_len ] = '\0';
+    const size_t new_str_len = end_idx - start_idx + 1;
+    memmove( s, s + start_idx, new_str_len );
+    s[ new_str_len ] = '\0';
 }
 
+
+/* Should be linear time complexity.
+ * I actually tried to optimize this one. */
+void string_collapse( char *const __restrict string, const char *__restrict substring )
+{
+    const char *fst = strstr( string, substring );
+    if ( fst == NULL )
+        return;
+
+    const size_t fst_idx = fst - string;
+
+    /* length of match between string and substr */
+    size_t match_len = 0;
+
+    /* index for writing to string */
+    size_t new_idx = fst_idx + strlen( substring );
+    size_t old_idx = new_idx;
+    // start search after first substr occurrence
+
+    /* at least one occurrence immediately precedes */
+    bool should_remove_next = true;
+    // true because fst != NULL
+
+    for ( ; string[ old_idx ] != '\0';
+          string[ ++new_idx ] =
+                  string[ ++old_idx ] /* always copy chars to where they should be */ )
+    {
+        if ( string[ old_idx ] != substring[ match_len ] )
+        {
+            match_len          = 0;
+            should_remove_next = false;
+            continue;
+        }
+
+        ++match_len;
+        if ( substring[ match_len ] != '\0' )
+            // if not the end of substr, do nothing
+            continue;
+
+        if ( should_remove_next )
+            new_idx -= match_len;
+        else
+            should_remove_next = true;
+
+        match_len = 0; // current substr occurrence ends
+    }
+
+    string[ new_idx ] = '\0';
+}
+
+
+void string_collapse_backspaces( const str_t s )
+{
+    const char *backspace = strchr( s, '\b' );
+    if ( backspace == NULL )
+        return;
+
+    size_t new_idx = backspace - s;
+    for ( size_t i = new_idx; s[ i ] != '\0'; ++i )
+    {
+        assert_that( new_idx <= i,
+                     "new-index (%zu) may only write behind where you're looking (%zu)",
+                     new_idx,
+                     i );
+
+        const char ch = s[ i ];
+
+        if ( ch != '\b' )
+            s[ new_idx++ ] = ch;
+        else if ( new_idx > 0 )
+            --new_idx;
+    }
+
+    assert_that( new_idx <= strlen( s ),
+                 "new end index (%zu) must not be further along than the original (%zu)",
+                 new_idx, strlen( s ) );
+
+#if defined( STRING_COLLAPSE_BACKSPACE__SAFE )
+    // delete all chars
+    while ( s[ new_idx ] != '\0' )
+        s[ new_idx++ ] = '\0';
+#else
+    s[ new_idx ] = '\0';
+#endif
+}
 
 str_t string_escaped( const string_t old )
 {
     if ( old == NULL )
-        return ( void * ) fwarnx_ret( NULL, "string must not be null" );
+        return fwarnx_ret( NULL, "string must not be null" );
 
     const size_t len = strlen( old );
 
-    char *const new = calloc( len * 2 + 1, 1 );
+    const str_t new = calloc( len * 2 + 1, 1 );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
 
-    size_t new_idx = 0;
-    for ( size_t i = 0; i < len; ++i, ++new_idx )
+    for ( size_t old_idx = 0, new_idx = 0; old_idx < len; ++old_idx, ++new_idx )
     {
-        if ( strchr( ESCAPED_CHARS, old[ i ] ) )
+        if ( strchr( ESCAPED_CHARS, old[ old_idx ] ) )
             new[ new_idx++ ] = '\\';
 
-        switch ( old[ i ] )
+        switch ( old[ old_idx ] )
         {
             case '\n':
                 new[ new_idx ] = 'n';
@@ -168,9 +253,15 @@ str_t string_escaped( const string_t old )
             case '\v':
                 new[ new_idx ] = 'v';
                 break;
+            case '\b':
+                new[ new_idx ] = 'b';
+                break;
+            case '\a':
+                new[ new_idx ] = 'a';
+                break;
 
             default: // backslash, double-quote, ...?
-                new[ new_idx ] = old[ i ];
+                new[ new_idx ] = old[ old_idx ];
                 break;
         }
     }
@@ -182,25 +273,24 @@ str_t string_escaped( const string_t old )
 str_t string_unescaped( const string_t old )
 {
     if ( old == NULL )
-        return ( void * ) fwarnx_ret( NULL, "string must not be null" );
+        return fwarnx_ret( NULL, "string must not be null" );
 
     const size_t len = strlen( old );
 
-    char *const new = calloc( len + 1, 1 );
+    const str_t new = calloc( len + 1, 1 );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "calloc" );
+        return fwarn_ret( NULL, "calloc" );
 
-    size_t new_idx = 0;
-    for ( size_t i = 0; i < len; ++i, ++new_idx )
+    for ( size_t old_idx = 0, new_idx = 0; old_idx < len; ++old_idx, ++new_idx )
     {
-        const char old_c = old[ i ];
+        const char old_c = old[ old_idx ];
         if ( old_c != '\\' )
         {
-            new[ new_idx ] = old[ i ];
+            new[ new_idx ] = old[ old_idx ];
             continue;
         }
 
-        switch ( old[ ++i ] )
+        switch ( old[ ++old_idx ] )
         {
             case 'n':
                 new[ new_idx ] = '\n';
@@ -217,9 +307,15 @@ str_t string_unescaped( const string_t old )
             case 'v':
                 new[ new_idx ] = '\v';
                 break;
+            case 'b':
+                new[ new_idx ] = '\b';
+                break;
+            case 'a':
+                new[ new_idx ] = '\a';
+                break;
 
             default: // backslash, double-quote, ...?
-                new[ new_idx ] = old[ i ];
+                new[ new_idx ] = old[ old_idx ];
                 break;
         }
     }
@@ -232,7 +328,7 @@ str_t string_reversed( const string_t s )
 {
     char *const new = strdup( s );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "strdup" );
+        return fwarn_ret( NULL, "strdup" );
 
     string_reverse( new );
     return new;
@@ -269,7 +365,7 @@ str_t string_as_upper( const string_t old )
 
     char *const new = malloc( len + 1 );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "malloc" );
+        return fwarn_ret( NULL, "malloc" );
 
     new[ len ] = '\0';
 
@@ -285,14 +381,9 @@ str_t string_as_upper( const string_t old )
 
 void string_to_lower( char *const str )
 {
-    size_t idx = 0;
-    while ( str[ idx ] != '\0' )
-    {
+    for ( size_t idx = 0; str[ idx ] != '\0'; ++idx )
         if ( isupper( str[ idx ] ) )
             str[ idx ] += 0x20;
-
-        ++idx;
-    }
 }
 
 str_t string_as_lower( const string_t old )
@@ -301,7 +392,7 @@ str_t string_as_lower( const string_t old )
 
     char *const new = malloc( len + 1 );
     if ( new == NULL )
-        return ( void * ) fwarn_ret( NULL, "malloc" );
+        return fwarn_ret( NULL, "malloc" );
 
     new[ len ] = '\0';
 
@@ -319,7 +410,7 @@ str_t string_as_lower( const string_t old )
 str_t string_replaced( string_t const str, const string_t old, const string_t new )
 {
     if ( *old == '\0' )
-        return ( void * ) fwarnx_ret( NULL, "cannot replace \"%s\"", old );
+        return fwarnx_ret( NULL, "cannot replace \"%s\"", old );
 
     const char *curr              = str;
     struct dynamic_string *result = dynstr_init();
@@ -345,13 +436,13 @@ str_t string_replaced( string_t const str, const string_t old, const string_t ne
     dynstr_destroy( result );
 
     if ( ret == NULL )
-        return ( void * ) f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     return ret;
 
 ERROR:
     dynstr_destroy( result );
-    return ( void * ) f_stack_trace( NULL );
+    return f_stack_trace( NULL );
 }
 
 int string_replace( const str_t string, const string_t old, const string_t new )
@@ -380,9 +471,32 @@ int string_replace( const str_t string, const string_t old, const string_t new )
 }
 
 
-Private const strsplit_mode_t ALL_MODES = STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY
-                                          | STRSPLIT_KEEP_DELIM_AFTER
-                                          | STRSPLIT_KEEP_DELIM_BEFORE;
+bool string_equal( const string_t s1, const string_t s2, const streq_mode_t mode )
+{
+    const size_t s1_len = strlen( s1 );
+    const size_t s2_len = strlen( s2 );
+    if ( s1_len != s2_len )
+        return false;
+
+    if ( mode & STREQ_IGNORE_CASE )
+    {
+        for ( size_t i = 0; i < s1_len; ++i )
+            if ( tolower( s1[ i ] ) != tolower( s2[ i ] ) )
+                return false;
+
+        return true;
+    }
+
+    if ( mode & STREQ_IGNORE_WHITESPACE )
+        err( EXIT_FAILURE, "not implemented yet" );
+
+    return false;
+}
+
+
+Private const strsplit_mode_t ALL_SPLIT_MODES =
+        STRSPLIT_STRIP_RESULTS | STRSPLIT_EXCLUDE_EMPTY | STRSPLIT_KEEP_DELIM_AFTER
+        | STRSPLIT_KEEP_DELIM_BEFORE;
 
 Private ssize_t string_split_empty( str_t **str_arr_cont, const string_t string )
 {
@@ -416,13 +530,13 @@ ssize_t string_split( str_t **str_arr_cont,
     if ( string == NULL )
         return fwarnx_ret( RV_EXCEPTION, "string cannot be null" );
 
-    if ( mode & ~ALL_MODES ) // contains mode not in ALL_MODES
+    if ( mode & ~ALL_SPLIT_MODES ) // contains mode not in ALL_SPLIT_MODES
         return fwarnx_ret( RV_EXCEPTION,
                            "invalid mode: 0x%X, only valid options are 0x%X",
                            mode,
-                           ALL_MODES );
+                           ALL_SPLIT_MODES );
 
-    if ( strcmp( split_tok, "" ) == 0 )
+    if ( split_tok[ 0 ] == '\0' )
     {
         const ssize_t rv = string_split_empty( str_arr_cont, string );
         if ( rv == RV_ERROR )
@@ -466,7 +580,7 @@ ssize_t string_split( str_t **str_arr_cont,
              && string_is_blank_l( start, len ) )
             continue;
 
-        char *const dup = mode & STRSPLIT_STRIP_RESULTS ? string_stripped_l( start, len )
+        const str_t dup = mode & STRSPLIT_STRIP_RESULTS ? string_stripped_l( start, len )
                                                         : strndup( start, len );
         if ( dup == NULL )
         {
@@ -474,7 +588,7 @@ ssize_t string_split( str_t **str_arr_cont,
             return fwarn_ret( RV_ERROR, "strdup" );
         }
 
-        on_fail( list_append( ls, &dup ) )
+        on_fail ( list_append( ls, &dup ) )
         {
             list_destroy( ls );
             return f_stack_trace( RV_ERROR );
@@ -498,11 +612,11 @@ ssize_t string_split_regex( str_t **str_arr_cont,
     if ( regexp == NULL )
         return fwarnx_ret( RV_EXCEPTION, "regexp may not be NULL" );
 
-    if ( mode & ~ALL_MODES ) // contains mode not in ALL_MODES
+    if ( mode & ~ALL_SPLIT_MODES ) // contains mode not in ALL_SPLIT_MODES
         return fwarnx_ret( RV_EXCEPTION,
                            "invalid mode: 0x%X, only valid options are 0x%X",
                            mode,
-                           ALL_MODES );
+                           ALL_SPLIT_MODES );
 
     struct dynamic_array *ls = list_init_type( str_t );
     if ( ls == NULL )
@@ -583,26 +697,26 @@ void string_split_destroy( const size_t size, str_t **str_arr_cont )
 str_t string_join( const size_t len, const string_t strarr[ len ], const string_t joiner )
 {
     if ( strarr == NULL )
-        return ( void * ) fwarnx_ret( NULL, "strarr must not be NULL" );
+        return fwarnx_ret( NULL, "strarr must not be NULL" );
     if ( joiner == NULL )
-        return ( void * ) fwarnx_ret( NULL, "joiner must not be NULL" );
+        return fwarnx_ret( NULL, "joiner must not be NULL" );
 
     if ( len == 0 )
         return calloc( 1, 1 ); // empty string
 
     DynString *builder = dynstr_init();
     if ( builder == NULL )
-        return ( void * ) f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     const size_t joiner_len = strlen( joiner );
     foreach_arr ( const string_t, string, strarr, len )
     {
         if ( dynstr_append( builder, string ) < 0 )
-            return ( void * ) f_stack_trace( NULL );
+            return f_stack_trace( NULL );
 
         if ( foreach_index_string < len - 1 )
             if ( dynstr_appendn( builder, joiner, joiner_len ) != ( ssize_t ) joiner_len )
-                return ( void * ) f_stack_trace( NULL );
+                return f_stack_trace( NULL );
     }
 
     const str_t data_copy = dynstr_data_copy( builder );
@@ -611,6 +725,8 @@ str_t string_join( const size_t len, const string_t strarr[ len ], const string_
     return data_copy;
 }
 
+
+// ==== //// ==== //// ==== //// ==== //
 
 str_t mul_uint_strings( const string_t str_1, const string_t str_2 )
 {
@@ -622,7 +738,7 @@ str_t mul_uint_strings( const string_t str_1, const string_t str_2 )
 
     char *result = malloc( result_len + 1 );
     if ( result == NULL )
-        return ( void * ) fwarn_ret( NULL, "malloc" );
+        return fwarn_ret( NULL, "malloc" );
     memset( result, '0', result_len );
     result[ result_len ] = '\0';
 
@@ -657,7 +773,7 @@ str_t add_uint_strings( const string_t str_1, const string_t str_2 )
 
     struct dynamic_string *result = dynstr_init();
     if ( result == NULL )
-        return ( void * ) f_stack_trace( NULL );
+        return f_stack_trace( NULL );
 
     const size_t str_1_len = strlen( str_1 );
     const size_t str_2_len = strlen( str_2 );
@@ -687,7 +803,7 @@ str_t add_uint_strings( const string_t str_1, const string_t str_2 )
 
 ERROR:
     dynstr_destroy( result );
-    return ( void * ) f_stack_trace( NULL );
+    return f_stack_trace( NULL );
 }
 
 
@@ -723,11 +839,6 @@ Private int hex_char_to_int( const char hex )
     return -1; // Invalid hex character
 }
 
-Private bool issign( const char c )
-{
-    return c == '-' || c == '+';
-}
-
 
 char *hex_to_decimal( const char *hex )
 {
@@ -744,9 +855,8 @@ char *hex_to_decimal( const char *hex )
 
         const int digit = hex_char_to_int( hex[ i ] );
         assert_that( digit >= 0,
-                     "invalid input string: '%s' (offending digit: '%c')",
-                     hex,
-                     hex[ i ] );
+                     "invalid input string: '%s' (offending digit: '%c' at index %zu)",
+                     hex, hex[ i ], i );
 
         unsigned long carry = digit;
         for ( ssize_t j = ( ssize_t ) dynstr_len( dynstr ) - 1; j >= 0; --j )
@@ -774,5 +884,5 @@ char *hex_to_decimal( const char *hex )
 ERROR:
     if ( dynstr != NULL )
         dynstr_destroy( dynstr );
-    return ( void * ) f_stack_trace( NULL );
+    return f_stack_trace( NULL );
 }

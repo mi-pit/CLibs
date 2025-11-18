@@ -13,12 +13,14 @@
 #include "modules/test_queue.h"
 #include "modules/test_sets.h"
 #include "modules/test_string_utils.h"
+#include "modules/test_struct_conversions.h"
 #include "modules/test_swex.h"
 
 
 int main( void )
 {
-    SET_UNIT_TEST_VERBOSITY( false );
+    SET_UNIT_TEST_VERBOSITY( UNIT_TESTS_YAP_FAILED );
+
     RUNALL_STRING_UTILS();
 
     RUNALL_DYNSTR();
@@ -26,6 +28,8 @@ int main( void )
     RUNALL_DICT();
     RUNALL_SETS();
     RUNALL_QUEUE();
+
+    RUNALL_STRUCT_CONVERSIONS();
 
     RUNALL_MISC();
     RUNALL_MATH();

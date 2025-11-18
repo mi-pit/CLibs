@@ -5,6 +5,7 @@
 #define TEST_STRING_UTILS_H
 
 #include "../../src/headers/assert_that.h"
+#include "../../src/headers/pointer_utils.h"
 #include "../../src/headers/unit_tests.h"
 #include "../../src/string_utils.h"
 
@@ -36,11 +37,11 @@ TEST( replace )
 END_TEST
 
 
-Private bool test_one_replace( string_t orig, string_t old, string_t new,
-                               string_t expected )
+Private bool test_one_replace( const string_t orig, const string_t old,
+                               const string_t new, const string_t expected )
 {
-    str_t got = string_replaced( orig, old, new );
-    bool rv   = strcmp( got, expected ) == 0;
+    const str_t got = string_replaced( orig, old, new );
+    const bool rv   = strcmp( got, expected ) == 0;
     free( got );
 
     return rv;
@@ -78,10 +79,10 @@ TEST( replaced )
 END_TEST
 
 
-Private bool test_one_escape( string_t old, string_t new )
+Private bool test_one_escape( const string_t old, const string_t new )
 {
-    str_t esc = string_escaped( old );
-    bool rv   = strcmp( esc, new ) == 0;
+    const str_t esc = string_escaped( old );
+    const bool rv   = strcmp( esc, new ) == 0;
     free( esc );
     return rv;
 }
@@ -100,10 +101,10 @@ TEST( escape )
 END_TEST
 
 
-Private bool test_one_unescape( string_t old, string_t new )
+Private bool test_one_unescape( const string_t old, const string_t new )
 {
-    str_t esc = string_unescaped( old );
-    bool rv   = strcmp( esc, new ) == 0;
+    const str_t esc = string_unescaped( old );
+    const bool rv   = strcmp( esc, new ) == 0;
     free( esc );
     return rv;
 }
@@ -120,10 +121,10 @@ TEST( unescape )
 END_TEST
 
 
-Private bool test_one_strspl_str( string_t haystack,
-                                  string_t split_tok,
-                                  strsplit_mode_t mode,
-                                  size_t n_split,
+Private bool test_one_strspl_str( const string_t haystack,
+                                  const string_t split_tok,
+                                  const strsplit_mode_t mode,
+                                  const size_t n_split,
                                   ... )
 {
     str_t *spl;
@@ -152,15 +153,15 @@ Private bool test_one_strspl_str( string_t haystack,
     string_split_destroy( n_got, &spl );
     return rv;
 }
-Private bool test_one_strspl_regex( string_t haystack,
-                                    string_t regex_str,
-                                    int regex_flags,
-                                    strsplit_mode_t mode,
-                                    size_t n_split,
+Private bool test_one_strspl_regex( const string_t haystack,
+                                    const string_t regex_str,
+                                    const int regex_flags,
+                                    const strsplit_mode_t mode,
+                                    const size_t n_split,
                                     ... )
 {
     regex_t reg;
-    int recomp_rv = regcomp( &reg, regex_str, regex_flags );
+    const int recomp_rv = regcomp( &reg, regex_str, regex_flags );
     if ( recomp_rv == -1 )
     {
         char buff[ 128 ];
@@ -169,14 +170,11 @@ Private bool test_one_strspl_regex( string_t haystack,
     }
 
     str_t *spl;
-    ssize_t strspl_rv = string_split_regex( &spl, haystack, &reg, mode );
+    const ssize_t strspl_rv = string_split_regex( &spl, haystack, &reg, mode );
     if ( strspl_rv < 0 )
-    {
-        ffl_stack_trace( 0 );
-        exit( -1 );
-    }
+        exit( ffl_stack_trace( -1 ) );
 
-    size_t n_got = ( size_t ) strspl_rv;
+    const size_t n_got = ( size_t ) strspl_rv;
 
     bool rv = n_got == n_split;
     if ( !rv )
@@ -189,8 +187,8 @@ Private bool test_one_strspl_regex( string_t haystack,
     va_start( vaList, n_split );
     for ( size_t i = 0; i < n_got && rv; ++i )
     {
-        string_t cmp = va_arg( vaList, string_t );
-        rv           = strcmp( spl[ i ], cmp ) == 0;
+        const string_t cmp = va_arg( vaList, string_t );
+        rv                 = strcmp( spl[ i ], cmp ) == 0;
     }
     va_end( vaList );
 
@@ -460,12 +458,13 @@ TEST( join )
 END_TEST
 
 
-typedef void( StringToUL )( str_t );
-Private bool test_one_string_to_UL( StringToUL func, string_t old, string_t new )
+typedef void ( *StringToUL )( str_t );
+Private bool test_one_string_to_UL( const StringToUL func, const string_t old,
+                                    const string_t new )
 {
-    str_t s = strdup( old );
+    const str_t s = strdup( old );
     func( s );
-    bool rv = strcmp( s, new ) == 0;
+    const bool rv = strcmp( s, new ) == 0;
     free( s );
     return rv;
 }
@@ -490,11 +489,12 @@ TEST( string_to_UL )
 }
 END_TEST
 
-typedef str_t( StringAsUL )( string_t );
-Private bool test_one_string_as_UL( StringAsUL func, string_t old, string_t res )
+typedef str_t ( *StringAsUL )( string_t );
+Private bool test_one_string_as_UL( const StringAsUL func, const string_t old,
+                                    const string_t res )
 {
-    str_t got = func( old );
-    bool rv   = strcmp( got, res ) == 0;
+    const str_t got = func( old );
+    const bool rv   = strcmp( got, res ) == 0;
     free( got );
     return rv;
 }
@@ -520,7 +520,7 @@ TEST( string_as_UL )
 END_TEST
 
 
-Private bool test_one_reverse_str( string_t orig, string_t result )
+Private bool test_one_reverse_str( const string_t orig, const string_t result )
 {
     str_t rev = strdup( orig );
     string_reverse( rev );
@@ -551,7 +551,7 @@ TEST( reverse_str )
 END_TEST
 
 
-Private bool test_one_strip( string_t orig, string_t desired )
+Private bool test_one_strip( const string_t orig, const string_t desired )
 {
     str_t s = strdup( orig );
     assert_that( s != NULL, "strdup" );
@@ -581,6 +581,80 @@ TEST( strip )
 }
 END_TEST
 
+
+Private bool test_one_collapse_backspace( const string_t orig, const string_t result )
+{
+    const str_t s = strdup( orig );
+    string_collapse_backspaces( s );
+    const bool rv = strcmp( s, result ) == 0;
+    free( s );
+    return rv;
+}
+
+TEST( collapse_backspaces )
+{
+    // delete
+    UNIT_TEST( test_one_collapse_backspace( "Hello,\b World!", "Hello World!" ) );
+    UNIT_TEST( test_one_collapse_backspace( "Hello, World!\b\b\b\b\b\b", "Hello, " ) );
+
+    // start
+    UNIT_TEST( test_one_collapse_backspace( "\bHello!", "Hello!" ) );
+    UNIT_TEST( test_one_collapse_backspace( "\b\b", "" ) );
+
+    // delete all
+    UNIT_TEST( test_one_collapse_backspace( "\n\t\b\b", "" ) );
+    UNIT_TEST( test_one_collapse_backspace( "A\bH\bO\bJ\b\b", "" ) );
+
+    // nothing
+    UNIT_TEST( test_one_collapse_backspace( "Hello!", "Hello!" ) );
+    UNIT_TEST( test_one_collapse_backspace( "", "" ) );
+
+    // delete all, then write
+    UNIT_TEST( test_one_collapse_backspace( "\bA", "A" ) );
+    UNIT_TEST( test_one_collapse_backspace( "A\bB\b\bC", "C" ) );
+
+    if ( TEST_NAME_CREATOR( failed_total ) == 0 )
+    {
+        const str_t esc = string_escaped( "Ahoj.\b" );
+        string_collapse_backspaces( esc );
+        UNIT_TEST( strcmp( esc, "Ahoj.\\b" ) == 0 );
+
+        const str_t unesc = string_unescaped( esc );
+        string_collapse_backspaces( unesc );
+        UNIT_TEST( strcmp( unesc, "Ahoj" ) == 0 );
+
+        free_all( 2, esc, unesc );
+    }
+}
+END_TEST
+
+
+static bool test_collapse( const string_t string, const string_t substr,
+                           const string_t result )
+{
+    static char array[ 1024 ] = { 0 };
+
+    strncpy( array, string, strlen( string ) + 1 );
+    string_collapse( array, substr );
+    return strcmp( array, result ) == 0;
+}
+
+TEST( collapse )
+{
+    UNIT_TEST( test_collapse( "Collapse", "", "Collapse" ) );
+    UNIT_TEST( test_collapse( "Collapse", "ll", "Collapse" ) );
+    UNIT_TEST( test_collapse( "Collllapse", "ll", "Collapse" ) );
+    UNIT_TEST( test_collapse( "Collapse", "lll", "Collapse" ) );
+    UNIT_TEST( test_collapse( "Colllapse", "l", "Colapse" ) );
+    UNIT_TEST( test_collapse( "", ".", "" ) );
+    UNIT_TEST( test_collapse( "AAAAAAAAAAAAAAAAAbc", "A", "Abc" ) );
+    UNIT_TEST( test_collapse(
+            "Hello, World!\n\n\nThis is a strangely formatted string!\n\n\n\n", "\n",
+            "Hello, World!\nThis is a strangely formatted string!\n" ) );
+}
+END_TEST
+
+
 LibraryDefined void RUNALL_STRING_UTILS( void )
 {
     RUN_TEST( replace );
@@ -593,8 +667,9 @@ LibraryDefined void RUNALL_STRING_UTILS( void )
     RUN_TEST( string_as_UL );
     RUN_TEST( reverse_str );
     RUN_TEST( strip );
-
     RUN_TEST( join );
+    RUN_TEST( collapse_backspaces );
+    RUN_TEST( collapse );
 }
 
 #endif
